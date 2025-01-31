@@ -1,0 +1,29 @@
+/* Global SCSS classes using CSS variables */
+
+/* Background Colors */
+.mainbg {
+  background-color: var(--q-mainbg);
+}
+
+.lightbg {
+  background-color: var(--q-lightbg);
+}
+
+.mutedbg {
+  background-color: var(--q-mutedbg);
+}
+
+/* Text Colors */
+.maintext {
+  color: var(--q-maintext);
+}
+
+.lighttext {
+  color: var(--q-lighttext);
+}
+
+.mutedtext {
+  color: var(--q-mutedtext);
+}
+
+
