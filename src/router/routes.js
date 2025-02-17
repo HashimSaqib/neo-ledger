@@ -14,6 +14,7 @@ import TrialBalance from "src/pages/reports/TrialBalance.vue";
 import TrialTransactions from "src/pages/reports/TrialTransactions.vue";
 import Reconciliation from "src/pages/cash/Reconciliation.vue";
 import SysCurrencies from "src/pages/system/SysCurrencies.vue";
+import SysDefaults from "src/pages/system/Defaults.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 
@@ -93,8 +94,12 @@ const routes = [
       },
       // System Settings
       {
-        path: "/currencies",
+        path: "/system/currencies",
         component: SysCurrencies,
+      },
+      {
+        path: "/system/defaults",
+        component: SysDefaults,
       },
       {
         path: "/reconciliation",

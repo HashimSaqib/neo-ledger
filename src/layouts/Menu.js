@@ -167,8 +167,13 @@ export const menuLinks = [
     sublinks: [
       {
         title: "Currencies",
-        link: "/currencies",
+        link: "/system/currencies",
         perm: "System--Currencies",
+      },
+      {
+        title: "Defaults",
+        link: "/system/defaults",
+        perm: "System--Defaults",
       },
     ],
   },

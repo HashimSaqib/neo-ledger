@@ -4,30 +4,32 @@
       <q-page class="flex flex-center lightbg">
         <div
           class="q-pa-xl flex column mainbg relative-position"
-          style="width: 40vw"
+          style="min-width: 40vw"
         >
           <div class="q-mb-md text-right">
             <LanguageSwitcher />
           </div>
           <q-img :src="logo" class="q-mb-lg" />
-          <q-input
-            v-model="loginData.username"
-            :label="t('Username')"
-            class="lightbg"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-          />
-          <q-input
-            v-model="loginData.password"
-            :label="t('Password')"
-            type="password"
-            class="lightbg maintext q-my-lg"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-          />
-          <q-btn @click="login" :label="t('Login')" spread color="primary" />
+          <form @submit.prevent="login" class="flex column" style="width: 100%">
+            <q-input
+              v-model="loginData.username"
+              :label="t('Username')"
+              class="lightbg"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+            />
+            <q-input
+              v-model="loginData.password"
+              :label="t('Password')"
+              type="password"
+              class="lightbg maintext q-my-lg"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+            />
+            <q-btn type="submit" :label="t('Login')" spread color="primary" />
+          </form>
           <q-inner-loading :showing="loading">
             <q-spinner-gears size="50px" color="primary" />
           </q-inner-loading>
