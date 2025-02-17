@@ -13,8 +13,9 @@ import VendorInvoice from "src/pages/ap/VendorInvoice.vue";
 import TrialBalance from "src/pages/reports/TrialBalance.vue";
 import TrialTransactions from "src/pages/reports/TrialTransactions.vue";
 import Reconciliation from "src/pages/cash/Reconciliation.vue";
-import SysCurrencies from "src/pages/system/SysCurrencies.vue";
+import SysCurrencies from "src/pages/system/Currencies.vue";
 import SysDefaults from "src/pages/system/Defaults.vue";
+import ListAccounts from "src/pages/system/chart/ListAccounts.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 
@@ -100,6 +101,10 @@ const routes = [
       {
         path: "/system/defaults",
         component: SysDefaults,
+      },
+      {
+        path: "/system/chart/list",
+        component: ListAccounts,
       },
       {
         path: "/reconciliation",
