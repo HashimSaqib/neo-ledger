@@ -175,6 +175,22 @@ export const menuLinks = [
         link: "/system/defaults",
         perm: "System--Defaults",
       },
+      {
+        title: "Chart Of Accounts",
+        perm: "System--Chart Of accounts",
+        sublinks: [
+          {
+            title: "List Accounts",
+            link: "/system/chart/list",
+            perl: "System--Chart Of Accounts--List Accounts",
+          },
+          {
+            title: "Add Account",
+            link: "/system/chart/addaccount",
+            perl: "System--Chart Of Accounts--Add Account",
+          },
+        ],
+      },
     ],
   },
 ];

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- For items without sublinks -->
     <q-item clickable tag="a" :to="props.link" v-if="!hasDropdown">
       <q-item-section>
         <q-item-label class="maintext q-py-md">{{ displayTitle }}</q-item-label>
@@ -14,6 +13,7 @@
       expand-separator
       header-class="maintext"
       expand-icon-class="maintext"
+      class="q-py-none"
     >
       <!-- Loop through sublinks -->
       <template v-for="(sublink, index) in props.sublinks">

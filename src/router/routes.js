@@ -16,6 +16,7 @@ import Reconciliation from "src/pages/cash/Reconciliation.vue";
 import SysCurrencies from "src/pages/system/Currencies.vue";
 import SysDefaults from "src/pages/system/Defaults.vue";
 import ListAccounts from "src/pages/system/chart/ListAccounts.vue";
+import AddAccount from "src/pages/system/chart/AddAccount.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 
@@ -105,6 +106,10 @@ const routes = [
       {
         path: "/system/chart/list",
         component: ListAccounts,
+      },
+      {
+        path: "/system/chart/addaccount",
+        component: AddAccount,
       },
       {
         path: "/reconciliation",

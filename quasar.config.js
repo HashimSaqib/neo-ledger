@@ -84,7 +84,7 @@ export default configure((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: ["Notify", "Cookies", "Dark"],
+      plugins: ["Notify", "Cookies", "Dark", "Dialog"],
 
       // Responsive spacing
       cssAddon: true,

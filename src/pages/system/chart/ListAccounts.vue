@@ -20,7 +20,7 @@
             <template v-if="col.name === 'accno'">
               <a
                 href="#"
-                @click.prevent="openEditDialog(props.row)"
+                @click.prevent="openEditDialog(props.row.id)"
                 class="text-primary"
               >
                 {{ props.row.accno }}
@@ -54,15 +54,15 @@
     </q-table>
 
     <!-- Edit Account Dialog -->
-    <q-dialog v-model="editDialog" persistent>
+    <q-dialog v-model="editDialog">
       <q-card class="q-pa-sm" style="max-width: 500px">
         <q-card-section class="q-pa-xs">
-          <div class="text-h6">Edit Account</div>
+          <div class="text-h6">{{ t("Edit Account") }}</div>
         </q-card-section>
         <q-separator />
 
         <q-card-section class="q-pa-xs">
-          <q-form @submit.prevent="saveAccount" class="q-gutter-xs">
+          <q-form @submit.prevent="saveAccount(false)" class="q-gutter-xs">
             <!-- Row 1: Account Number and Closed -->
             <div class="row q-col-gutter-sm items-center">
               <div class="col-7">
@@ -70,7 +70,7 @@
                   dense
                   outlined
                   v-model="selectedAccount.accno"
-                  label="Account Number *"
+                  :label="t('Account Number *')"
                   class="q-pa-xs"
                 />
               </div>
@@ -78,7 +78,7 @@
                 <q-checkbox
                   dense
                   v-model="selectedAccount.closed"
-                  label="Closed"
+                  :label="t('Closed')"
                   true-value="1"
                   false-value="0"
                   class="q-pa-xs"
@@ -91,14 +91,14 @@
               dense
               outlined
               v-model="selectedAccount.description"
-              label="Description"
+              :label="t('Description')"
               class="q-mt-xs"
             />
 
             <!-- Row 3: Account Type, Contra and Chart Type -->
             <div class="row q-col-gutter-sm items-center q-mt-xs">
               <div class="col-6">
-                <div class="text-subtitle2">Account Type *</div>
+                <div class="text-subtitle2">{{ t("Account Type *") }}</div>
                 <q-option-group
                   dense
                   v-model="selectedAccount.category"
@@ -111,13 +111,13 @@
                 <q-checkbox
                   dense
                   v-model="selectedAccount.contra"
-                  label="Contra"
+                  :label="t('Contra')"
                   true-value="1"
                   false-value="0"
                 />
               </div>
               <div class="col-3">
-                <div class="text-subtitle2">Chart Type</div>
+                <div class="text-subtitle2">{{ t("Chart Type") }}</div>
                 <q-option-group
                   dense
                   v-model="selectedAccount.charttype"
@@ -131,11 +131,11 @@
             <!-- Row 4: Summary Account Checkboxes -->
             <div class="row items-center q-mt-xs">
               <div class="col">
-                <div class="text-subtitle2">Summary Account:</div>
+                <div class="text-subtitle2">{{ t("Summary Account:") }}</div>
                 <q-checkbox
                   dense
                   v-model="selectedAccount.AR"
-                  label="AR"
+                  :label="t('AR')"
                   true-value="AR"
                   false-value=""
                   class="q-mr-sm"
@@ -143,7 +143,7 @@
                 <q-checkbox
                   dense
                   v-model="selectedAccount.AP"
-                  label="AP"
+                  :label="t('AP')"
                   true-value="AP"
                   false-value=""
                   class="q-mr-sm"
@@ -151,7 +151,7 @@
                 <q-checkbox
                   dense
                   v-model="selectedAccount.IC"
-                  label="Inventory"
+                  :label="t('Inventory')"
                   true-value="IC"
                   false-value=""
                 />
@@ -160,86 +160,88 @@
 
             <!-- Row 5: Drop-down Menu Options -->
             <div v-if="selectedAccount.charttype === 'A'" class="q-mt-xs">
-              <div class="text-subtitle2">Include in drop-down menus:</div>
+              <div class="text-subtitle2">
+                {{ t("Include in drop-down menus:") }}
+              </div>
               <div class="row q-col-gutter-sm">
                 <!-- AR Options -->
                 <div class="col">
-                  <div class="text-caption">AR</div>
+                  <div class="text-caption">{{ t("AR") }}</div>
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AR_amount"
-                    label="Lineitem"
+                    :label="t('Lineitem')"
                     true-value="AR_amount"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AR_paid"
-                    label="Payment"
+                    :label="t('Payment')"
                     true-value="AR_paid"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AR_discount"
-                    label="Discount"
+                    :label="t('Discount')"
                     true-value="AR_discount"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AR_tax"
-                    label="Tax"
+                    :label="t('Tax')"
                     true-value="AR_tax"
                     false-value=""
                   />
                 </div>
                 <!-- AP Options -->
                 <div class="col">
-                  <div class="text-caption">AP</div>
+                  <div class="text-caption">{{ t("AP") }}</div>
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AP_amount"
-                    label="Lineitem"
+                    :label="t('Lineitem')"
                     true-value="AP_amount"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AP_paid"
-                    label="Payment"
+                    :label="t('Payment')"
                     true-value="AP_paid"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AP_discount"
-                    label="Discount"
+                    :label="t('Discount')"
                     true-value="AP_discount"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.AP_tax"
-                    label="Tax"
+                    :label="t('Tax')"
                     true-value="AP_tax"
                     false-value=""
                   />
                 </div>
                 <!-- Tracking Items -->
                 <div class="col">
-                  <div class="text-caption">Tracking</div>
+                  <div class="text-caption">{{ t("Tracking") }}</div>
                   <q-checkbox
                     dense
                     v-model="selectedAccount.IC_sale"
-                    label="Income"
+                    :label="t('Income')"
                     true-value="IC_sale"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.IC_cogs"
-                    label="COGS"
+                    :label="t('COGS')"
                     true-value="IC_cogs"
                     false-value=""
                   />
@@ -247,7 +249,7 @@
                   <q-checkbox
                     dense
                     v-model="selectedAccount.IC_taxpart"
-                    label="Tax"
+                    :label="t('Tax')"
                     true-value="IC_taxpart"
                     false-value=""
                     class="col-auto"
@@ -255,25 +257,25 @@
                 </div>
                 <!-- Non-tracking Items -->
                 <div class="col">
-                  <div class="text-caption">Non-tracking</div>
+                  <div class="text-caption">{{ t("Non-tracking Items") }}</div>
                   <q-checkbox
                     dense
                     v-model="selectedAccount.IC_income"
-                    label="Income"
+                    :label="t('Income')"
                     true-value="IC_income"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.IC_expense"
-                    label="Expense"
+                    :label="t('Expense')"
                     true-value="IC_expense"
                     false-value=""
                   />
                   <q-checkbox
                     dense
                     v-model="selectedAccount.IC_taxservice"
-                    label="Tax"
+                    :label="t('Tax')"
                     true-value="IC_taxservice"
                     false-value=""
                   />
@@ -286,19 +288,35 @@
               dense
               outlined
               v-model="selectedAccount.gifi_accno"
-              label="GIFI"
+              :label="t('GIFI')"
               class="q-mt-xs"
             />
 
             <!-- Form actions -->
-            <div class="row justify-end q-mt-xs">
+            <div class="row justify-end q-mt-sm q-gutter-x-sm">
               <q-btn
                 flat
-                label="Cancel"
+                :label="t('Cancel')"
                 color="primary"
                 @click="editDialog = false"
               />
-              <q-btn flat label="Save" color="primary" type="submit" />
+              <q-btn
+                color="negative"
+                :label="t('Delete')"
+                v-if="
+                  !selectedAccount.has_transactions &&
+                  !selectedAccount.has_parts &&
+                  !selectedAccount.has_defaults
+                "
+                @click.prevent="deleteAccount(selectedAccount.id)"
+              />
+
+              <q-btn label="Save" color="primary" type="submit" />
+              <q-btn
+                label="Save As New"
+                color="secondary"
+                @click.prevent="saveAccount(true)"
+              />
             </div>
           </q-form>
         </q-card-section>
@@ -311,14 +329,14 @@
 import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
-const updateTitle = inject("updateTitle");
-updateTitle("Chart Of Accounts");
-const { t } = useI18n();
+import { Notify, Dialog } from "quasar";
 
-// Store the fetched chart data here
+const { t } = useI18n();
+const updateTitle = inject("updateTitle");
+updateTitle(t("Chart Of Accounts"));
+
 const results = ref([]);
 
-// Define the hardcoded columns
 const columns = [
   { name: "accno", label: t("Account"), field: "accno", align: "left" },
   { name: "gifi", label: t("GIFI"), field: "gifi_accno", align: "left" },
@@ -334,7 +352,6 @@ const columns = [
   { name: "closed", label: t("Closed"), field: "closed", align: "center" },
 ];
 
-// Mapping for account category values
 const categoryMapping = {
   A: t("Asset"),
   L: t("Liability"),
@@ -343,7 +360,6 @@ const categoryMapping = {
   E: t("Expense"),
 };
 
-// Mapping for link (drop-down) values
 const linkMapping = {
   AR: t("AR"),
   AP: t("AP"),
@@ -397,11 +413,10 @@ const categoryOptions = [
 ];
 
 const chartTypeOptions = [
-  { label: "Heading", value: "H" },
-  { label: "Account", value: "A" },
+  { label: t("Heading"), value: "H" },
+  { label: t("Account"), value: "A" },
 ];
 
-// All possible link values for summary and drop-down options
 const possibleLinks = [
   "AR",
   "AR_amount",
@@ -422,71 +437,104 @@ const possibleLinks = [
   "IC_taxservice",
 ];
 
-function openEditDialog(account) {
-  selectedAccount.value = { ...account };
+async function openEditDialog(accountId) {
+  try {
+    // Fetch account data from API
+    const response = await api.get(`/system/chart/accounts/${accountId}`);
 
-  selectedAccount.value.closed =
-    selectedAccount.value.closed === "1" ? "1" : "0";
-  selectedAccount.value.contra =
-    selectedAccount.value.contra === "1" ? "1" : "0";
-  selectedAccount.value.charttype = selectedAccount.value.charttype || "A";
+    if (!response.data) {
+      throw new Error(t("Failed to fetch account details"));
+    }
 
-  possibleLinks.forEach((code) => {
-    selectedAccount.value[code] = "";
-  });
+    const account = response.data;
 
-  if (account.link) {
-    const links = account.link.split(":");
+    // Clone account to avoid direct mutations
+    selectedAccount.value = { ...account };
+
+    // Standardize checkbox values as strings
+    selectedAccount.value.closed = String(account.closed);
+    selectedAccount.value.contra = String(account.contra);
+    selectedAccount.value.charttype = account.charttype || "A";
+
+    // Initialize drop-down options
     possibleLinks.forEach((code) => {
-      selectedAccount.value[code] = links.includes(code) ? code : "";
+      selectedAccount.value[code] = "";
+    });
+
+    if (account.link) {
+      const links = account.link.split(":");
+      possibleLinks.forEach((code) => {
+        selectedAccount.value[code] = links.includes(code) ? code : "";
+      });
+    }
+
+    // Open edit dialog
+    editDialog.value = true;
+  } catch (error) {
+    console.error("Error fetching account:", error);
+    Notify.create({
+      message: t("Failed to fetch account details. Please try again."),
+      color: "negative",
+      position: "center",
     });
   }
-
-  editDialog.value = true;
 }
 
-function saveAccount() {
+async function saveAccount(isNew = false) {
+  // Validate mandatory fields using Quasar Notify with centered alerts
   if (!selectedAccount.value.accno) {
-    alert("Account Number missing!");
+    Notify.create({
+      message: t("Account Number missing!"),
+      color: "negative",
+      position: "center",
+    });
     return;
   }
   if (!selectedAccount.value.category) {
-    alert("Account Type missing!");
+    Notify.create({
+      message: t("Account Type missing!"),
+      color: "negative",
+      position: "center",
+    });
     return;
   }
 
-  let summarySelected = "";
-  ["AR", "AP", "IC"].forEach((key) => {
-    if (selectedAccount.value[key])
-      summarySelected += selectedAccount.value[key];
-  });
-  if (
-    (selectedAccount.value.AR ||
-      selectedAccount.value.AP ||
-      selectedAccount.value.IC) &&
-    summarySelected.length > 2
-  ) {
-    alert("Cannot set account for more than one of AR, AP or IC");
+  const summaryCount = ["AR", "AP", "IC"].reduce(
+    (acc, key) => acc + (selectedAccount.value[key] ? 1 : 0),
+    0
+  );
+  if (summaryCount > 1) {
+    Notify.create({
+      message: t("Cannot set account for more than one of AR, AP or IC"),
+      color: "negative",
+      position: "center",
+    });
     return;
   }
+
+  const countSelected = (options) =>
+    options.reduce(
+      (count, opt) => count + (selectedAccount.value[opt] ? 1 : 0),
+      0
+    );
 
   const arOptions = ["AR_amount", "AR_paid", "AR_discount", "AR_tax"];
-  let arCount = 0;
-  arOptions.forEach((opt) => {
-    if (selectedAccount.value[opt]) arCount++;
-  });
-  if (arCount > 1) {
-    alert("Cannot set multiple options for AR");
+  if (countSelected(arOptions) > 1) {
+    Notify.create({
+      message: t("Cannot set multiple options for AR"),
+      color: "negative",
+      position: "center",
+    });
     return;
   }
 
   const apOptions = ["AP_amount", "AP_paid", "AP_discount", "AP_tax"];
-  let apCount = 0;
-  apOptions.forEach((opt) => {
-    if (selectedAccount.value[opt]) apCount++;
-  });
-  if (apCount > 1) {
-    alert("Cannot set multiple options for AP");
+  if (countSelected(apOptions) > 1) {
+    Notify.create({
+      message: t("Cannot set multiple options for AP"),
+      color: "negative",
+      position: "center",
+    });
     return;
   }
 
@@ -511,24 +559,99 @@ function saveAccount() {
       "IC_expense",
       "IC_taxservice",
     ];
-    for (let opt of dropDownOptions) {
-      if (selectedAccount.value[opt]) {
-        alert(
+    if (dropDownOptions.some((opt) => selectedAccount.value[opt])) {
+      Notify.create({
+        message: t(
           "Account cannot be set to any other type of account if AR, AP or IC is selected"
-        );
-        return;
-      }
+        ),
+        color: "negative",
+        position: "center",
+      });
+      return;
     }
   }
 
-  let links = [];
+  // Compile selected drop-down links
+  const links = [];
   possibleLinks.forEach((code) => {
     if (selectedAccount.value[code]) links.push(code);
   });
   selectedAccount.value.link = links.join(":");
+  try {
+    const apiUrl = isNew
+      ? `/system/chart/accounts/` // Save as new (no id)
+      : `/system/chart/accounts/${selectedAccount.value.id}`;
 
-  console.log("Saving account:", selectedAccount.value);
-  editDialog.value = false;
+    // Remove id when saving as new
+    const accountData = { ...selectedAccount.value };
+    if (isNew) {
+      delete accountData.id;
+    }
+
+    await api.post(apiUrl, accountData);
+    Notify.create({
+      message: t("Account saved successfully"),
+      color: "positive",
+      position: "center",
+    });
+    await fetchData();
+    editDialog.value = false;
+  } catch (error) {
+    Notify.create({
+      message: t("Failed to save account"),
+      color: "negative",
+      position: "center",
+    });
+    console.error(error);
+  }
+}
+async function deleteAccount(accountId) {
+  if (!accountId) {
+    Notify.create({
+      message: t("Invalid account ID"),
+      color: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  try {
+    // Show confirmation dialog and handle response directly
+    Dialog.create({
+      title: t("Confirm Deletion"),
+      message: t(
+        "Are you sure you want to delete this account? This action cannot be undone."
+      ),
+      cancel: true,
+      persistent: true,
+    })
+      .onOk(async () => {
+        // Only proceed if user confirmed
+        await api.delete(`/system/chart/accounts/${accountId}`);
+
+        Notify.create({
+          message: t("Account deleted successfully"),
+          color: "positive",
+          position: "center",
+        });
+
+        await fetchData();
+      })
+      .onCancel(() => {
+        Notify.create({
+          message: t("Account deletion canceled"),
+          color: "warning",
+          position: "center",
+        });
+      });
+  } catch (error) {
+    Notify.create({
+      message: t("Failed to delete account") + error,
+      color: "negative",
+      position: "center",
+    });
+    console.error(error);
+  }
 }
 
 onMounted(() => {
