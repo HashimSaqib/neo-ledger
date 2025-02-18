@@ -20,6 +20,7 @@
                   class="q-mb-sm col-12 col-sm-9"
                   @update:model-value="vcUpdate"
                   search="label"
+                  account
                 />
                 <div class="col-sm-4 q-md-ml-md content-center" v-if="vc">
                   <p class="q-px-sm maintext q-ma-none">
@@ -299,8 +300,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Payments Section -->
         <div class="mainbg q-my-md q-pa-md">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">
@@ -325,7 +324,7 @@
               outlined
               v-model="payment.date"
               :label="t('Date')"
-              class="lightbg col-2"
+              class="lightbg q-mt-sm"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -335,7 +334,7 @@
               outlined
               v-model="payment.source"
               :label="t('Source')"
-              class="lightbg col-2"
+              class="lightbg q-mt-sm"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -344,7 +343,7 @@
               outlined
               v-model="payment.memo"
               :label="t('Memo')"
-              class="lightbg col-2"
+              class="lightbg q-mt-sm"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -353,9 +352,17 @@
               outlined
               v-model="payment.amount"
               :label="t('Amount')"
-              class="lightbg col-2"
+              class="lightbg q-mt-sm"
               input-class="maintext"
               label-color="secondary"
+              dense
+            />
+            <fn-input
+              v-if="selectedCurrency && selectedCurrency.rn != 1"
+              outlined
+              v-model="payment.exchangerate"
+              :label="t('Exhcnage Rate')"
+              class="lightbg q-mt-sm"
               dense
             />
             <s-select
@@ -365,11 +372,15 @@
               :label="t('Account')"
               option-label="label"
               option-value="id"
-              class="lightbg col-3"
+              class="lightbg col-2 q-mt-sm"
+              :class="
+                selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
+              "
               input-class="maintext"
               label-color="secondary"
               dense
               search="label"
+              account
             />
             <q-btn
               color="negative"
@@ -769,6 +780,7 @@ const postInvoice = async () => {
     poNumber: poNumber.value,
     salesAccount: salesAccount.value,
     selectedCurrency: selectedCurrency.value,
+    curr: selectedCurrency.value.curr,
     lines: lines.value.map((line) => ({
       amount: line.amount,
       account: line.account.accno,
@@ -780,6 +792,7 @@ const postInvoice = async () => {
       memo: payment.memo,
       amount: payment.amount,
       account: payment.account.label,
+      exchangerate: payment.exchangerate,
     })),
   };
 
@@ -939,10 +952,12 @@ const loadInvoice = async (invoice) => {
     invDate.value = invoice.invDate || "";
     dueDate.value = invoice.dueDate || "";
     link.value = invoice.file;
-    selectedCurrency.value = currencies.value.find(
-      (currency) => currency.rn === 1
-    );
-
+    if (invoice.currency) {
+      selectedCurrency.value = currencies.value.find(
+        (curr) => curr.curr === invoice.currency
+      );
+    }
+    exchangeRate.value = invoice.exchangerate || 1;
     // Reset form fields
     description.value = "";
     notes.value = "";
@@ -958,6 +973,7 @@ const loadInvoice = async (invoice) => {
         source: payment.source || "",
         memo: payment.memo || "",
         amount: payment.amount || 0,
+        exchangerate: payment.exchangerate,
         account:
           paymentAccounts.value.find((acc) => acc.accno === payment.account) ||
           paymentAccounts.value[0],

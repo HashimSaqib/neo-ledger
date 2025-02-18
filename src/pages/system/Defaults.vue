@@ -202,6 +202,7 @@
           dense
           class="lightbg input-box col-12 col-md-5"
           search="label"
+          account
         />
         <s-select
           v-model="form.IC_income"
@@ -212,6 +213,7 @@
           dense
           search="label"
           class="lightbg input-box col-12 col-md-5"
+          account
         />
         <s-select
           v-model="form.IC_expense"
@@ -222,6 +224,7 @@
           dense
           class="lightbg input-box col-12 col-md-5"
           search="label"
+          account
         />
         <s-select
           v-model="form.fxgainloss"
@@ -232,6 +235,7 @@
           dense
           class="lightbg input-box col-12 col-md-5"
           search="label"
+          account
         />
         <s-select
           v-model="form.cashovershort"
@@ -242,6 +246,7 @@
           dense
           class="lightbg input-box col-12 col-md-5"
           search="label"
+          account
         />
       </div>
 

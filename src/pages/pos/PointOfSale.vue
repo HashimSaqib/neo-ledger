@@ -48,6 +48,7 @@
               label-color="secondary"
               class="q-mb-sm col-sm-7 col-12"
               search="label"
+              account
             />
             <div v-if="currencies && currencies.length" class="col-sm-4 col-12">
               <q-select
@@ -278,6 +279,7 @@
               input-class="maintext"
               label-color="secondary"
               dense
+              account
               search="label"
             />
             <q-btn

@@ -48,6 +48,7 @@
               label-color="secondary"
               class="lightbg q-mb-sm col-sm-7 col-12"
               search="label"
+              account
             />
           </div>
           <div v-if="currencies && currencies.length" class="row">
@@ -427,6 +428,7 @@
           label-color="secondary"
           dense
           label="search"
+          account
         />
         <q-btn
           color="negative"

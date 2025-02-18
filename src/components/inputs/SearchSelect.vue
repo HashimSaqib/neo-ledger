@@ -25,7 +25,7 @@
 <script setup>
 import { ref, watch } from "vue";
 
-// Define props that mirror q-select’s props + our custom search
+// Define props that mirror q-select’s props plus our custom search/account props
 const props = defineProps({
   modelValue: {
     default: null,
@@ -55,14 +55,22 @@ const props = defineProps({
     default: false,
   },
   /**
-   * Our custom prop:
-   * - If your options are objects,
-   *   specify the key that should be used for searching.
-   * - If null, it falls back to a string-based search of the entire item.
+   * Custom prop: specify the key to search on when not using account mode.
+   * If null, the entire item is used for string-based search.
    */
   search: {
     type: String,
     default: null,
+  },
+  /**
+   * New prop: if true, the search will target "accno" and "label" properties.
+   * - If the input starts with a number, it will search on the "accno" property using a startsWith match.
+   * - Otherwise, it will search on the "label" property using a substring match.
+   * Additionally, the filtered results are sorted from the lowest to the highest accno.
+   */
+  account: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -103,7 +111,7 @@ const searchTerm = ref("");
 
 /**
  * The filter event from <q-select> passes (val, update).
- * We do our custom filtering here—no separate file needed.
+ * We apply our custom filtering (and sorting when in account mode) here.
  */
 function onFilter(val, update) {
   // Keep track of what the user typed
@@ -115,20 +123,47 @@ function onFilter(val, update) {
         // If the search box is cleared, show all options
         filteredOptions.value = internalOptions.value;
       } else {
-        // Convert the user's search text to lowercase
-        const needle = val.toLowerCase();
-
-        filteredOptions.value = internalOptions.value.filter((option) => {
-          let text;
-          if (props.search && typeof option === "object" && option !== null) {
-            // If the search doesn't exist on this option, use empty string
-            text = option[props.search] ? String(option[props.search]) : "";
+        if (props.account) {
+          // Custom search behavior for account mode:
+          const firstChar = val.charAt(0);
+          if (/\d/.test(firstChar)) {
+            // If input starts with a number, filter on the "accno" property (using startsWith)
+            filteredOptions.value = internalOptions.value.filter((option) => {
+              if (option && typeof option === "object") {
+                const accno = option.accno ? String(option.accno) : "";
+                return accno.toLowerCase().startsWith(val.toLowerCase());
+              }
+              return false;
+            });
           } else {
-            // Otherwise, treat the entire item as a string
-            text = String(option);
+            // If input is text, filter on the "label" property (using includes)
+            filteredOptions.value = internalOptions.value.filter((option) => {
+              if (option && typeof option === "object") {
+                const labelText = option.label ? String(option.label) : "";
+                return labelText.toLowerCase().includes(val.toLowerCase());
+              }
+              return false;
+            });
           }
-          return text.toLowerCase().includes(needle);
-        });
+          // Sort the filtered results by accno (lowest to highest)
+          filteredOptions.value.sort((a, b) => {
+            const aAcc = a && a.accno ? parseInt(a.accno, 10) : Infinity;
+            const bAcc = b && b.accno ? parseInt(b.accno, 10) : Infinity;
+            return aAcc - bAcc;
+          });
+        } else {
+          // Original search behavior when account mode is off
+          const needle = val.toLowerCase();
+          filteredOptions.value = internalOptions.value.filter((option) => {
+            let text;
+            if (props.search && typeof option === "object" && option !== null) {
+              text = option[props.search] ? String(option[props.search]) : "";
+            } else {
+              text = String(option);
+            }
+            return text.toLowerCase().includes(needle);
+          });
+        }
       }
     },
     // Second argument to update: function to manipulate QSelect's ref
@@ -140,6 +175,7 @@ function onFilter(val, update) {
     }
   );
 }
+
 function onPopupShow() {
   if (internalValue.value != null && internalValue.value !== "") {
     searchTerm.value = "";
