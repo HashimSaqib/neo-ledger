@@ -89,9 +89,9 @@ export const menuLinks = [
         perm: "AP--Vendor Invoice",
       },
       {
-        title: "Vendor Invoice",
+        title: "Debit Invoice",
         link: "/ap/vendor-invoice?debit_invoice=1",
-        perm: "AP--Dredit Invoice",
+        perm: "AP--Debit Invoice",
       },
       {
         title: "Reports",
