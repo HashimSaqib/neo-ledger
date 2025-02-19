@@ -796,8 +796,10 @@ const getPath = (row) => {
 
   if (row.till) {
     path = "/pos/sale";
-  } else {
+  } else if (row.invoice) {
     path = "/ar/sales-invoice";
+  } else {
+    path = "/arap/transaction/customer";
   }
 
   return { path, query: { id: row.id } };
