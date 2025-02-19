@@ -6,6 +6,7 @@ import ArApTransaction from "src/pages/arap/ArApTransaction.vue";
 import SalesInvoice from "src/pages/ar/SalesInvoice.vue";
 import ArTransactions from "src/pages/ar/ArTransactions.vue";
 import AddVC from "src/pages/arap/AddVC.vue";
+import VcHistory from "src/pages/arap/VcHistory.vue";
 import SearchVC from "src/pages/arap/SearchVC.vue";
 import PointOfSale from "src/pages/pos/PointOfSale.vue";
 import ApTransactions from "src/pages/ap/ApTransactions.vue";
@@ -41,6 +42,10 @@ const routes = [
         path: "/arap/transaction/:type",
         component: ArApTransaction,
         props: (route) => ({ id: route.query.id }),
+      },
+      {
+        path: "/history/:type",
+        component: VcHistory,
       },
       {
         path: "/arap/:type",

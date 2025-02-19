@@ -88,6 +88,7 @@
           input-class="maintext"
           label-color="secondary"
           search="label"
+          account
         />
 
         <fn-input

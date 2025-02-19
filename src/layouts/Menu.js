@@ -54,6 +54,11 @@ export const menuLinks = [
             link: "/arap/search/customer",
             perm: "Customers--Reports--Search",
           },
+          {
+            title: "History",
+            link: "/history/customer",
+            perm: "Customers--Reports--History",
+          },
         ],
       },
     ],
@@ -118,6 +123,11 @@ export const menuLinks = [
             title: "Search",
             link: "/arap/search/vendor",
             perm: "Vendors--Reports--Search",
+          },
+          {
+            title: "Search",
+            link: "/history/vendor",
+            perm: "Vendors--Reports--History",
           },
         ],
       },
