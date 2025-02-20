@@ -183,7 +183,7 @@
         :key="index"
         class="row q-mb-md justify-between"
       >
-        <q-select
+        <s-select
           outlined
           v-model="line.partnumber"
           :label="t('Number')"
