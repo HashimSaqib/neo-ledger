@@ -176,79 +176,82 @@
               class="q-ml-md"
             />
           </div>
-          <div
-            v-for="(line, index) in lines"
-            :key="index"
-            class="row q-mb-md justify-between"
-          >
-            <q-input
-              outlined
-              v-model="line.description"
-              :label="t('Description')"
-              :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <s-select
-              outlined
-              v-model="line.account"
-              :options="itemAccounts"
-              :label="t('Account')"
-              option-label="label"
-              option-value="id"
-              :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-              search="label"
-              account
-            />
-
-            <fn-input
-              outlined
-              v-model="line.amount"
-              :label="t('Amount')"
-              class="lightbg col-2"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <!-- Show tax account and amount only if line tax is enabled -->
-            <s-select
-              v-if="lineTax && taxAccountList"
-              outlined
-              v-model="line.taxAccount"
-              :options="taxAccountList"
-              :label="t('Tax Account')"
-              option-label="label"
-              option-value="accno"
-              class="lightbg col-2"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-              search="label"
-              account
-              @update:model-value="() => onLineTaxAccountChange(index)"
-            />
-            <fn-input
-              v-if="lineTax && taxAccountList"
-              outlined
-              v-model="line.taxAmount"
-              :label="t('Tax Amount')"
-              class="lightbg col-2"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <q-btn
-              color="negative"
-              icon="delete"
-              dense
-              flat
-              @click="removeLine(index)"
-            />
-          </div>
+          <!-- Use draggable to enable reordering of line items -->
+          <draggable v-model="lines" item-key="id">
+            <template #item="{ element: line, index }">
+              <div class="row q-mb-md justify-between">
+                <!-- Drag handle icon -->
+                <q-btn icon="drag_indicator" class="q-mr-xs" flat dense />
+                <q-input
+                  outlined
+                  v-model="line.description"
+                  :label="t('Description')"
+                  class="lightbg"
+                  :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
+                  input-class="maintext"
+                  label-color="secondary"
+                  dense
+                />
+                <s-select
+                  outlined
+                  v-model="line.account"
+                  :options="itemAccounts"
+                  :label="t('Account')"
+                  option-label="label"
+                  option-value="id"
+                  :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
+                  input-class="maintext"
+                  label-color="secondary"
+                  dense
+                  search="label"
+                  account
+                />
+                <fn-input
+                  outlined
+                  v-model="line.amount"
+                  :label="t('Amount')"
+                  class="lightbg col-2"
+                  input-class="maintext"
+                  label-color="secondary"
+                  dense
+                />
+                <!-- Show tax account and amount only if line tax is enabled -->
+                <s-select
+                  v-if="lineTax && taxAccountList"
+                  outlined
+                  v-model="line.taxAccount"
+                  :options="taxAccountList"
+                  :label="t('Tax Account')"
+                  option-label="label"
+                  option-value="accno"
+                  class="lightbg col-2"
+                  input-class="maintext"
+                  label-color="secondary"
+                  dense
+                  search="label"
+                  account
+                  @update:model-value="() => onLineTaxAccountChange(index)"
+                />
+                <fn-input
+                  v-if="lineTax && taxAccountList"
+                  outlined
+                  v-model="line.taxAmount"
+                  :label="t('Tax Amount')"
+                  class="lightbg col-2"
+                  input-class="maintext"
+                  label-color="secondary"
+                  dense
+                />
+                <q-btn
+                  color="negative"
+                  icon="delete"
+                  dense
+                  flat
+                  @click="removeLine(index)"
+                />
+              </div>
+            </template>
+          </draggable>
 
           <!-- Totals Section -->
           <div class="row justify-between items-end">
@@ -474,6 +477,7 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
+import draggable from "vuedraggable"; // Import draggable
 
 const { t } = useI18n();
 const route = useRoute();
@@ -552,13 +556,22 @@ const invoiceTaxes = ref([]);
 // -------------------------
 // Line Items Management
 // -------------------------
+// Include a unique "id" for each line item.
 const lines = ref([
-  { amount: 0, account: null, description: "", taxAccount: null, taxAmount: 0 },
+  {
+    id: Date.now(),
+    amount: 0,
+    account: null,
+    description: "",
+    taxAccount: null,
+    taxAmount: 0,
+  },
 ]);
 
 // Add a new blank line item.
 const addLine = () => {
   lines.value.push({
+    id: Date.now(),
     amount: 0,
     account: null,
     description: "",
@@ -1029,8 +1042,9 @@ const loadInvoice = async (invoice) => {
       calculateTaxes();
     }
 
-    // Map invoice line items
-    lines.value = invoice.lineitems.map((item) => ({
+    // Map invoice line items with a unique "id"
+    lines.value = invoice.lineitems.map((item, index) => ({
+      id: Date.now() + index,
       amount: Boolean(invoice.taxincluded)
         ? +item.amount + +item.taxAmount
         : +item.amount,
@@ -1124,6 +1138,7 @@ watch(
     vc.value = null;
     lines.value = [
       {
+        id: Date.now(),
         amount: 0,
         account: null,
         description: "",
