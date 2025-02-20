@@ -56,7 +56,6 @@
               </div>
               <div v-if="currencies && currencies.length" class="row">
                 <q-select
-                  v-if="currencies"
                   outlined
                   v-model="selectedCurrency"
                   :options="currencies"
@@ -69,8 +68,8 @@
                   label-color="secondary"
                 />
                 <q-input
-                  v-if="selectedCurrency.rn != 1"
-                  class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
+                  v-if="selectedCurrency && selectedCurrency.rn != 1"
+                  class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm"
                   :label="t('Exchange Rate')"
                   outlined
                   dense
@@ -99,9 +98,9 @@
                 />
               </div>
               <div class="row" v-if="link">
-                <a :href="link" target="_blank" rel="noopener noreferrer">{{
-                  t("View Document")
-                }}</a>
+                <a :href="link" target="_blank" rel="noopener noreferrer">
+                  {{ t("View Document") }}
+                </a>
               </div>
             </div>
             <div class="col-12 col-lg-6">
@@ -198,17 +197,45 @@
               :label="t('Account')"
               option-label="label"
               option-value="id"
-              class="lightbg col-3"
+              :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
               input-class="maintext"
               label-color="secondary"
               dense
               search="label"
+              account
             />
             <q-input
               outlined
               v-model="line.description"
               :label="t('Description')"
-              class="lightbg col-5"
+              :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+            />
+            <!-- Tax Account & Amount: Only show when line tax is enabled -->
+            <s-select
+              v-if="lineTax && taxAccountList"
+              outlined
+              v-model="line.taxAccount"
+              :options="taxAccountList"
+              :label="t('Tax Account')"
+              option-label="label"
+              option-value="accno"
+              class="lightbg col-2"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+              search="label"
+              account
+              @update:model-value="() => onLineTaxAccountChange(index)"
+            />
+            <fn-input
+              v-if="lineTax && taxAccountList"
+              outlined
+              v-model="line.taxAmount"
+              :label="t('Tax Amount')"
+              class="lightbg col-2"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -256,7 +283,7 @@
                   <q-checkbox
                     :label="t('Tax Included')"
                     v-model="taxIncluded"
-                    @click="taxInclude"
+                    @click="calculateTaxes"
                   />
                 </div>
               </div>
@@ -272,7 +299,6 @@
                   </p>
                 </div>
               </div>
-
               <div
                 class="row justify-end maintext"
                 v-for="tax in invoiceTaxes"
@@ -281,7 +307,7 @@
                 <div class="q-mr-xl">
                   <p class="q-my-xs">{{ tax.name }}</p>
                 </div>
-                <div class="">
+                <div>
                   <p class="q-my-xs">{{ formatAmount(tax.amount) }}</p>
                 </div>
               </div>
@@ -396,8 +422,7 @@
           color="primary"
           @click="postInvoice"
           class="relative-position"
-        >
-        </q-btn>
+        ></q-btn>
       </template>
 
       <!-- Right Panel - Invoice Preview -->
@@ -449,48 +474,44 @@ import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 
-// Initialize i18n and router
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const updateTitle = inject("updateTitle");
-
-/**
- * Date utility functions
- */
 const { formatDate } = date;
 const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 
-// UI state management
+// UI state
 const splitterModel = ref(100);
 const invoicePreview = ref(null);
 const loading = ref(false);
 const selectedFile = ref(null);
 
-// Transaction type management (vendor/customer)
+// Transaction type
 const type = ref(route.params.type || route.query.type || "vendor");
-updateTitle(type.value + "Transaction");
-if (type.value == "customer") {
+if (type.value === "customer") {
   updateTitle("AR Transaction");
 } else {
   updateTitle("AP Transaction");
 }
 
-// Entity management (vendors/customers)
+// Entity management
 const vcList = ref([]);
 const selectedEntity = ref();
-const vc = ref();
+const vc = ref(null);
 const taxAccounts = ref([]);
+const lineTax = ref(false); // when true, line tax is enabled
+const taxAccountList = ref([]);
 
 // Account references
-const salesAccount = ref();
+const salesAccount = ref(null);
 const salesAccounts = ref([]);
 const paymentAccounts = ref([]);
 const itemAccounts = ref([]);
 const accounts = ref([]);
 
 // Currency management
-const selectedCurrency = ref();
+const selectedCurrency = ref(null);
 const currencies = ref([]);
 const exchangeRate = ref(1);
 
@@ -509,9 +530,181 @@ const link = ref("");
 const taxIncluded = ref(false);
 const invoiceTaxes = ref([]);
 
-/**
- * Entity management functions
- */
+// Line items
+const lines = ref([
+  { amount: 0, account: null, description: "", taxAccount: null, taxAmount: 0 },
+]);
+
+const addLine = () => {
+  lines.value.push({
+    amount: 0,
+    account: null,
+    description: "",
+    taxAccount: null,
+    taxAmount: 0,
+  });
+};
+
+const removeLine = (index) => {
+  if (lines.value.length > 1) {
+    lines.value.splice(index, 1);
+  }
+};
+
+const computeLineTaxAmount = (line) => {
+  if (!line.amount || !line.taxAccount) return 0;
+  const taxAcc = taxAccountList.value.find(
+    (a) => a.accno === line.taxAccount.accno
+  );
+  if (!taxAcc) return 0;
+  const taxRate = taxAcc.rate;
+  const computed = taxIncluded.value
+    ? line.amount * (taxRate / (1 + taxRate))
+    : line.amount * taxRate;
+  return parseFloat(computed.toFixed(2));
+};
+
+const onLineTaxAccountChange = (index) => {
+  const line = lines.value[index];
+  if (line.taxAccount) {
+    // If the tax account from the UI is different from the API-provided one,
+    // recalc the tax amount; otherwise, use the API value.
+    if (
+      !line.apiTaxAccount ||
+      line.taxAccount.accno.toString() !== line.apiTaxAccount.toString()
+    ) {
+      // User changed the tax account, so recalc the taxAmount.
+      line.apiTaxAmount = 0; // clear the API value if desired
+      line.taxAmount = computeLineTaxAmount(line);
+    } else {
+      // Use the API-provided taxAmount
+      line.taxAmount = line.apiTaxAmount;
+    }
+  }
+  calculateTaxes();
+};
+
+const calculateTaxes = () => {
+  if (!vc.value || !taxAccounts.value.length) {
+    invoiceTaxes.value = [];
+    return;
+  }
+  if (lineTax.value) {
+    const taxAgg = {};
+    lines.value.forEach((line) => {
+      if (line.taxAccount && line.taxAmount) {
+        // Extract the account number whether taxAccount is an object or a string
+        const taxAccNo =
+          typeof line.taxAccount === "object"
+            ? line.taxAccount.accno
+            : line.taxAccount;
+        if (!taxAgg[taxAccNo]) {
+          taxAgg[taxAccNo] = { amount: 0, rate: 0 };
+        }
+        taxAgg[taxAccNo].amount += parseFloat(line.taxAmount) || 0;
+        const taxAcc = taxAccountList.value.find((a) => a.accno === taxAccNo);
+        if (taxAcc) {
+          taxAgg[taxAccNo].rate = taxAcc.rate;
+        }
+      }
+    });
+    invoiceTaxes.value = Object.keys(taxAgg).map((accNo) => {
+      const taxAcc = taxAccountList.value.find((a) => a.accno === accNo);
+      const name =
+        (taxAcc && vc.value[`${taxAcc.accno}_description`]) ||
+        (taxAcc && taxAcc.label) ||
+        t("Tax Name Not Found");
+      return {
+        name: `${name} ${(taxAgg[accNo].rate * 100).toFixed(0)}%`,
+        amount: parseFloat(taxAgg[accNo].amount.toFixed(2)),
+        acc: taxAcc ? taxAcc.accno : "",
+        rate: taxAgg[accNo].rate,
+      };
+    });
+  } else {
+    // Default tax calculation based on overall subtotal
+    invoiceTaxes.value = taxAccounts.value.map((taxAcc) => {
+      const name = vc.value[`${taxAcc}_description`] || t("Tax Name Not Found");
+      const taxRate = parseFloat(vc.value[`${taxAcc}_rate`] || 0);
+      const netAmount = subtotal.value;
+      const taxAmount = taxIncluded.value
+        ? netAmount * (taxRate / (1 + taxRate))
+        : netAmount * taxRate;
+      return {
+        name: `${name} ${(taxRate * 100).toFixed(0)}%`,
+        amount: parseFloat(taxAmount.toFixed(2)),
+        acc: taxAcc,
+        rate: taxRate,
+      };
+    });
+  }
+};
+
+const subtotal = computed(() => {
+  let totalValue = lines.value.reduce(
+    (acc, line) => acc + (parseFloat(line.amount) || 0),
+    0
+  );
+  if (taxIncluded.value) {
+    const totalTaxes = invoiceTaxes.value.reduce(
+      (acc, tax) => acc + (parseFloat(tax.amount) || 0),
+      0
+    );
+    totalValue -= totalTaxes;
+  }
+  return parseFloat(totalValue.toFixed(2));
+});
+
+const total = computed(() => {
+  const totalTaxes = invoiceTaxes.value.reduce(
+    (acc, tax) => acc + (parseFloat(tax.amount) || 0),
+    0
+  );
+  let totalValue = lines.value.reduce(
+    (acc, line) => acc + (parseFloat(line.amount) || 0),
+    0
+  );
+  if (!taxIncluded.value) {
+    totalValue += totalTaxes;
+  }
+  return parseFloat(totalValue.toFixed(2));
+});
+
+// Payment management
+const payments = ref([
+  { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
+]);
+
+const addPayment = () => {
+  payments.value.push({
+    date: getTodayDate(),
+    source: "",
+    memo: "",
+    amount: 0,
+    account: "",
+  });
+};
+
+const removePayment = (index) => {
+  if (payments.value.length > 1) {
+    payments.value.splice(index, 1);
+  }
+};
+
+const fetchLinks = async () => {
+  try {
+    const response = await api.get(`/create_links/${type.value}/`);
+    lineTax.value = response.data.linetax;
+  } catch (error) {
+    console.error("Failed to fetch links:", error);
+    Notify.create({
+      message: t("Failed to fetch links"),
+      type: "negative",
+      position: "center",
+    });
+  }
+};
+
 const fetchvcList = async () => {
   try {
     const response = await api.get(`/arap/list/${type.value}`);
@@ -537,31 +730,34 @@ const fetchEntity = async (id) => {
 };
 
 const vcUpdate = async (newValue) => {
-  vc.value = await fetchEntity(newValue.id);
-  taxAccounts.value = vc.value.taxaccounts
-    ? vc.value.taxaccounts.split(" ")
-    : [];
-  calculateTaxes();
+  const entityId = newValue.id || newValue;
+  vc.value = await fetchEntity(entityId);
+  if (vc.value) {
+    taxAccounts.value = vc.value.taxaccounts
+      ? vc.value.taxaccounts.split(" ")
+      : [];
+    taxAccountList.value = accounts.value
+      .filter((account) => taxAccounts.value.includes(account.accno))
+      .map((acc) => ({
+        ...acc,
+        rate: parseFloat(vc.value[`${acc.accno}_rate`] || 0),
+      }));
+    calculateTaxes();
+  }
 };
 
-/**
- * Account management functions
- */
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     accounts.value = response.data;
-
-    // Determine account link types based on transaction type
     const linkType = type.value === "vendor" ? "AP" : "AR";
     const linkPaid = type.value === "vendor" ? "AP_paid" : "AR_paid";
     const icLink = type.value === "vendor" ? "AP_amount" : "AR_amount";
 
-    // Filter accounts based on their link types
     salesAccounts.value = accounts.value.filter(
       (account) => account.link === linkType
     );
-    salesAccount.value = salesAccounts.value[0];
+    salesAccount.value = salesAccounts.value[0] || null;
     paymentAccounts.value = accounts.value.filter((account) =>
       account.link.split(":").includes(linkPaid)
     );
@@ -578,17 +774,13 @@ const fetchAccounts = async () => {
   }
 };
 
-/**
- * Currency management functions
- */
 const fetchCurrencies = async () => {
   try {
     const response = await api.get("/system/currencies");
     currencies.value = response.data;
-    if (currencies.value) {
-      selectedCurrency.value = currencies.value.find(
-        (currency) => currency.rn === 1
-      );
+    if (currencies.value && currencies.value.length) {
+      selectedCurrency.value =
+        currencies.value.find((currency) => currency.rn === 1) || null;
     }
   } catch (error) {
     console.error("Failed to fetch currencies:", error);
@@ -600,142 +792,15 @@ const fetchCurrencies = async () => {
   }
 };
 
-/**
- * Line item management
- */
-const lines = ref([{ amount: 0, account: null, description: "" }]);
-
-const addLine = () => {
-  lines.value.push({ amount: 0, account: null, description: "" });
-};
-
-const removeLine = (index) => {
-  if (lines.value.length > 1) {
-    lines.value.splice(index, 1);
-  }
-};
-
-/**
- * Tax calculations
- */
-const calculateTaxes = () => {
-  invoiceTaxes.value = [];
-
-  if (!vc.value || !taxAccounts.value || taxAccounts.value.length === 0) {
-    return;
-  }
-
-  const subtotalValue = subtotal.value;
-
-  taxAccounts.value.forEach((taxAccount) => {
-    const name =
-      vc.value[`${taxAccount}_description`] || t("Tax Name Not Found");
-    const taxRate = parseFloat(vc.value[`${taxAccount}_rate`] || 0);
-
-    let taxAmount = 0;
-    let netAmount = subtotalValue;
-
-    if (taxIncluded.value) {
-      // Reverse calculate tax when included in price
-      taxAmount = netAmount * (taxRate / (1 + taxRate));
-      netAmount = netAmount - taxAmount;
-    } else {
-      // Calculate tax normally when not included
-      taxAmount = netAmount * taxRate;
-    }
-
-    taxAmount = parseFloat(taxAmount.toFixed(2));
-
-    invoiceTaxes.value.push({
-      name: `${name} ${(taxRate * 100).toFixed(0)}%`,
-      amount: taxAmount,
-      acc: taxAccount,
-      rate: taxRate,
-    });
-  });
-};
-
-/**
- * Amount calculations
- */
-const subtotal = computed(() => {
-  let totalValue = lines.value.reduce(
-    (acc, line) => acc + (parseFloat(line.amount) || 0),
-    0
-  );
-
-  if (taxIncluded.value) {
-    const totalTaxes = invoiceTaxes.value.reduce(
-      (acc, tax) => acc + (parseFloat(tax.amount) || 0),
-      0
-    );
-    totalValue -= totalTaxes;
-  }
-
-  return parseFloat(totalValue.toFixed(2));
-});
-
-const total = computed(() => {
-  const totalTaxes = invoiceTaxes.value.reduce(
-    (acc, tax) => acc + (parseFloat(tax.amount) || 0),
-    0
-  );
-
-  let totalValue = lines.value.reduce(
-    (acc, line) => acc + (parseFloat(line.amount) || 0),
-    0
-  );
-
-  if (!taxIncluded.value) {
-    totalValue += totalTaxes;
-  }
-
-  return parseFloat(totalValue.toFixed(2));
-});
-
-/**
- * Payment management
- */
-const payments = ref([
-  {
-    date: getTodayDate(),
-    source: "",
-    memo: "",
-    amount: 0,
-    account: "",
-  },
-]);
-
-const addPayment = () => {
-  payments.value.push({
-    date: getTodayDate(),
-    source: "",
-    memo: "",
-    amount: 0,
-    account: "",
-  });
-};
-
-const removePayment = (index) => {
-  if (payments.value.length > 1) {
-    payments.value.splice(index, 1);
-  }
-};
-
-/**
- * Invoice posting
- */
 const postInvoice = async () => {
-  // Validation checks
   if (!selectedEntity.value) {
     Notify.create({
-      message: t(`Entity is required: ${vcLabel.value}`),
+      message: t("Entity is required: " + vcLabel.value),
       type: "negative",
       position: "center",
     });
     return;
   }
-
   if (!salesAccount.value) {
     Notify.create({
       message: t("Account is required"),
@@ -744,7 +809,6 @@ const postInvoice = async () => {
     });
     return;
   }
-
   if (!selectedCurrency.value) {
     Notify.create({
       message: t("Currency is required"),
@@ -753,7 +817,6 @@ const postInvoice = async () => {
     });
     return;
   }
-
   if (
     lines.value.length === 0 ||
     !lines.value.some((line) => line.amount && line.account)
@@ -766,7 +829,6 @@ const postInvoice = async () => {
     return;
   }
 
-  // Prepare invoice data
   const invoiceData = {
     [type.value === "vendor" ? "selectedVendor" : "selectedCustomer"]:
       selectedEntity.value,
@@ -783,25 +845,27 @@ const postInvoice = async () => {
     curr: selectedCurrency.value.curr,
     lines: lines.value.map((line) => ({
       amount: line.amount,
-      account: line.account.accno,
+      account: line.account ? line.account.accno : null,
       description: line.description,
+      taxAccount: line.taxAccount ? line.taxAccount.accno : null,
+      taxAmount: line.taxAmount,
     })),
     payments: payments.value.map((payment) => ({
       date: payment.date,
       source: payment.source,
       memo: payment.memo,
       amount: payment.amount,
-      account: payment.account.label,
+      account:
+        payment.account && payment.account.label
+          ? payment.account.label
+          : payment.account,
       exchangerate: payment.exchangerate,
     })),
   };
 
-  // Add exchange rate for non-default currency
   if (selectedCurrency.value.rn !== 1) {
     invoiceData.exchangerate = exchangeRate.value;
   }
-
-  // Add tax information
   if (invoiceTaxes.value.length > 0) {
     invoiceData.taxes = invoiceTaxes.value.map((tax) => ({
       accno: tax.acc,
@@ -814,11 +878,7 @@ const postInvoice = async () => {
   try {
     loading.value = true;
     const idParam = route.query.id ? `/${route.query.id}` : "";
-    const response = await api.post(
-      `/arap/transaction/${type.value}${idParam}`,
-      invoiceData
-    );
-
+    await api.post(`/arap/transaction/${type.value}${idParam}`, invoiceData);
     Notify.create({
       message: t("Transaction posted successfully"),
       type: "positive",
@@ -836,26 +896,20 @@ const postInvoice = async () => {
   }
 };
 
-/**
- * Invoice loading and file handling
- */
 const uploadInvoice = async () => {
   loading.value = true;
   const formData = new FormData();
   formData.append("files", selectedFile.value);
-
   try {
     const response = await api.post("/upload_invoice", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-
     Notify.create({
       type: "positive",
       message:
         t("File uploaded successfully: ") + (response.data.message || ""),
       position: "center",
     });
-
     splitterModel.value = 70;
     invoicePreview.value = URL.createObjectURL(selectedFile.value);
     loadInvoice(response.data);
@@ -882,26 +936,22 @@ const fetchInvoice = async (id) => {
   }
 };
 
-/**
- * Loads and processes invoice data into the form
- * @param {Object} invoice - The invoice data to load
- */
 const loadInvoice = async (invoice) => {
-  // Ensure all required data is loaded before processing
   if (
     !vcList.value.length ||
     !salesAccounts.value.length ||
     !currencies.value.length
   ) {
-    await Promise.all([fetchvcList(), fetchAccounts(), fetchCurrencies()]);
+    await Promise.all([
+      fetchLinks(),
+      fetchvcList(),
+      fetchAccounts(),
+      fetchCurrencies(),
+    ]);
   }
-
   try {
-    // Find and process vc information
-    const vcId = invoice[type.value + "_id"];
+    const vcId = invoice[`${type.value}_id`];
     let vcToSelect = vcList.value.find((vc) => vc.id === vcId);
-
-    // Fetch and add vc if not in current list
     if (!vcToSelect) {
       const fetchedEntity = await fetchEntity(vcId);
       if (fetchedEntity) {
@@ -911,44 +961,36 @@ const loadInvoice = async (invoice) => {
         throw new Error(t("Failed to fetch vc details"));
       }
     }
-
-    // Update vc references and selected vc
-    vc.value = vcToSelect;
+    // Instead of setting vc and taxAccounts manually,
+    // call vcUpdate to handle everything consistently.
+    await vcUpdate(vcToSelect);
     selectedEntity.value = {
       id: vcToSelect.id,
       label: vcToSelect.name,
       [vcNumberField.value]: vcToSelect[vcNumberField.value],
     };
 
-    // Process tax information
-    taxAccounts.value = vcToSelect.taxaccounts
-      ? vcToSelect.taxaccounts.split(" ")
-      : [];
     calculateTaxes();
-
-    // Process line items with account matching
     lines.value = invoice.lineitems.map((item) => {
-      const matchingAccount = itemAccounts.value.find(
-        (acc) => acc.accno == item.accno
-      );
-
-      if (!matchingAccount) {
-        Notify.create({
-          message: t("Account not found for line item: ") + item.accno,
-          type: "warning",
-          position: "center",
-        });
-      }
-
       return {
         amount: item.price || item.amount,
-        account: matchingAccount || null,
+        account:
+          itemAccounts.value.find((acc) => acc.accno == item.accno) || null,
         description: item.description,
+        taxAccount: lineTax.value
+          ? taxAccountList.value.find(
+              (acc) => acc.accno.toString() === item.taxAccount.toString()
+            ) || null
+          : null,
+        // Use API-provided taxAmount if available
+        taxAmount: lineTax.value ? item.taxAmount || 0 : 0,
+        // Store original API values for later comparison
+        apiTaxAmount: lineTax.value ? item.taxAmount || 0 : 0,
+        apiTaxAccount: lineTax.value ? item.taxAccount : null,
       };
     });
 
-    // Set basic invoice details
-    salesAccount.value = salesAccounts.value[0];
+    salesAccount.value = salesAccounts.value[0] || null;
     invDate.value = invoice.invDate || "";
     dueDate.value = invoice.dueDate || "";
     link.value = invoice.file;
@@ -958,16 +1000,13 @@ const loadInvoice = async (invoice) => {
       );
     }
     exchangeRate.value = invoice.exchangerate || 1;
-    // Reset form fields
     description.value = "";
     notes.value = "";
     intnotes.value = "";
     invNumber.value = invoice.invNumber || "";
     ordNumber.value = "";
     poNumber.value = "";
-
-    // Process payments
-    if (invoice.payments?.length > 0) {
+    if (invoice.payments && invoice.payments.length > 0) {
       payments.value = invoice.payments.map((payment) => ({
         date: payment.date || getTodayDate(),
         source: payment.source || "",
@@ -979,7 +1018,6 @@ const loadInvoice = async (invoice) => {
           paymentAccounts.value[0],
       }));
     } else {
-      // Initialize with default payment if none exist
       payments.value = [
         {
           date: getTodayDate(),
@@ -990,9 +1028,7 @@ const loadInvoice = async (invoice) => {
         },
       ];
     }
-
-    // Handle tax settings
-    if (invoice.taxes?.length > 0) {
+    if (invoice.taxes && invoice.taxes.length > 0) {
       taxIncluded.value = Boolean(invoice.taxincluded);
       calculateTaxes();
     }
@@ -1008,9 +1044,6 @@ const loadInvoice = async (invoice) => {
   }
 };
 
-/**
- * Watch for changes in line items to recalculate taxes
- */
 watch(
   lines,
   () => {
@@ -1019,37 +1052,23 @@ watch(
   { deep: true }
 );
 
-/**
- * Watch for changes in transaction type to reset form
- */
 watch(
   type,
   async (newType) => {
-    // Reset vc selections
     selectedEntity.value = null;
     vc.value = null;
-
-    // Reset line items to default state
     lines.value = [
       {
         amount: 0,
         account: null,
         description: "",
+        taxAccount: null,
+        taxAmount: 0,
       },
     ];
-
-    // Reset payments to default state
     payments.value = [
-      {
-        date: getTodayDate(),
-        source: "",
-        memo: "",
-        amount: 0,
-        account: "",
-      },
+      { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
     ];
-
-    // Reset invoice details
     description.value = "";
     notes.value = "";
     intnotes.value = "";
@@ -1058,17 +1077,11 @@ watch(
     poNumber.value = "";
     taxIncluded.value = false;
     invoiceTaxes.value = [];
-
-    // Fetch new vcList for changed type
     await fetchvcList();
-
-    // Update accounts based on new type if accounts are loaded
     if (accounts.value.length > 0) {
       const linkType = newType === "vendor" ? "AP" : "AR";
       const linkPaid = newType === "vendor" ? "AP_paid" : "AR_paid";
       const icLink = newType === "vendor" ? "AP_amount" : "AR_amount";
-
-      // Filter accounts based on their link types
       salesAccounts.value = accounts.value.filter(
         (account) => account.link === linkType
       );
@@ -1078,13 +1091,9 @@ watch(
       itemAccounts.value = accounts.value.filter((account) =>
         account.link.split(":").includes(icLink)
       );
-
-      // Reset selected accounts to defaults
       salesAccount.value = salesAccounts.value[0] || null;
       payments.value[0].account = paymentAccounts.value[0] || null;
     }
-
-    // Reset UI state
     invoicePreview.value = null;
     selectedFile.value = null;
     splitterModel.value = 100;
@@ -1092,17 +1101,15 @@ watch(
   { immediate: true }
 );
 
-// Computed properties for vc labels
 const vcLabel = computed(() =>
   type.value === "vendor" ? "Vendor" : "Customer"
 );
-
 const vcNumberField = computed(() =>
   type.value === "vendor" ? "vendornumber" : "customernumber"
 );
 
-// Initialize data on component mount
 onMounted(() => {
+  fetchLinks();
   fetchAccounts();
   fetchCurrencies();
   fetchvcList();

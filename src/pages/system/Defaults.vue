@@ -156,6 +156,11 @@
             :label="t('Hide Closed Accounts')"
           />
           <q-checkbox
+            v-model="form.linetax"
+            name="linetax"
+            :label="t('Line Tax')"
+          />
+          <q-checkbox
             v-model="form.namesbynumber"
             name="namesbynumber"
             :label="t('Sort Names by Number')"
@@ -554,6 +559,7 @@ const form = ref({
   checkinventory: false,
   forcewarehouse: false,
   hideaccounts: false,
+  linetax: false,
   IC: {},
   IC_income: {},
   IC_expense: {},
@@ -653,7 +659,7 @@ async function loadDefaults() {
     form.value.checkinventory = isChecked(data.checkinventory);
     form.value.forcewarehouse = isChecked(data.forcewarehouse);
     form.value.hideaccounts = isChecked(data.hideaccounts);
-
+    form.value.linetax = isChecked(data.linetax);
     // Last Numbers + locks
     form.value.glnumber = data.glnumber || "";
     form.value.lock_glnumber = isChecked(data.lock_glnumber);
