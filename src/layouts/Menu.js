@@ -125,7 +125,7 @@ export const menuLinks = [
             perm: "Vendors--Reports--Search",
           },
           {
-            title: "Search",
+            title: "History",
             link: "/history/vendor",
             perm: "Vendors--Reports--History",
           },
