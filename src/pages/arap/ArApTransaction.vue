@@ -25,13 +25,13 @@
                 <div class="col-sm-4 q-md-ml-md content-center" v-if="vc">
                   <p class="q-px-sm maintext q-ma-none">
                     <strong>{{ t("Credit Limit") }}</strong>
-                    <span class="text-primary q-mx-sm">{{
-                      vc.creditlimit
-                    }}</span>
+                    <span class="text-primary q-mx-sm">
+                      {{ vc.creditlimit }}
+                    </span>
                     <strong>{{ t("Remaining") }}</strong>
-                    <span class="text-negative q-ml-sm">{{
-                      vc.creditremaining
-                    }}</span>
+                    <span class="text-negative q-ml-sm">
+                      {{ vc.creditremaining }}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -181,11 +181,11 @@
             :key="index"
             class="row q-mb-md justify-between"
           >
-            <fn-input
+            <q-input
               outlined
-              v-model="line.amount"
-              :label="t('Amount')"
-              class="lightbg col-2"
+              v-model="line.description"
+              :label="t('Description')"
+              :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -204,16 +204,17 @@
               search="label"
               account
             />
-            <q-input
+
+            <fn-input
               outlined
-              v-model="line.description"
-              :label="t('Description')"
-              :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
+              v-model="line.amount"
+              :label="t('Amount')"
+              class="lightbg col-2"
               input-class="maintext"
               label-color="secondary"
               dense
             />
-            <!-- Tax Account & Amount: Only show when line tax is enabled -->
+            <!-- Show tax account and amount only if line tax is enabled -->
             <s-select
               v-if="lineTax && taxAccountList"
               outlined
@@ -481,13 +482,21 @@ const updateTitle = inject("updateTitle");
 const { formatDate } = date;
 const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 
-// UI state
+// -----------------------------------------------------
+// Flags to control tax calculation & initial load
+// -----------------------------------------------------
+const initialLoad = ref(false);
+const preserveApiTaxes = ref(false); // NEW FLAG to skip overwriting API taxes
+
+// -------------------------
+// UI and Form State
+// -------------------------
 const splitterModel = ref(100);
 const invoicePreview = ref(null);
 const loading = ref(false);
 const selectedFile = ref(null);
 
-// Transaction type
+// Determine transaction type and update page title accordingly.
 const type = ref(route.params.type || route.query.type || "vendor");
 if (type.value === "customer") {
   updateTitle("AR Transaction");
@@ -495,27 +504,35 @@ if (type.value === "customer") {
   updateTitle("AP Transaction");
 }
 
-// Entity management
+// -------------------------
+// Entity and Tax Management
+// -------------------------
 const vcList = ref([]);
 const selectedEntity = ref();
 const vc = ref(null);
 const taxAccounts = ref([]);
-const lineTax = ref(false); // when true, line tax is enabled
+const lineTax = ref(false); // enables per-line tax calculations if true
 const taxAccountList = ref([]);
 
-// Account references
+// -------------------------
+// Account References
+// -------------------------
 const salesAccount = ref(null);
 const salesAccounts = ref([]);
 const paymentAccounts = ref([]);
 const itemAccounts = ref([]);
 const accounts = ref([]);
 
-// Currency management
+// -------------------------
+// Currency Management
+// -------------------------
 const selectedCurrency = ref(null);
 const currencies = ref([]);
 const exchangeRate = ref(1);
 
-// Invoice details
+// -------------------------
+// Invoice Details
+// -------------------------
 const description = ref("");
 const notes = ref("");
 const intnotes = ref("");
@@ -526,15 +543,20 @@ const dueDate = ref(getTodayDate());
 const poNumber = ref("");
 const link = ref("");
 
-// Tax management
+// -------------------------
+// Tax Values (computed & API-provided)
+// -------------------------
 const taxIncluded = ref(false);
 const invoiceTaxes = ref([]);
 
-// Line items
+// -------------------------
+// Line Items Management
+// -------------------------
 const lines = ref([
   { amount: 0, account: null, description: "", taxAccount: null, taxAmount: 0 },
 ]);
 
+// Add a new blank line item.
 const addLine = () => {
   lines.value.push({
     amount: 0,
@@ -545,46 +567,60 @@ const addLine = () => {
   });
 };
 
+// Remove a line item if more than one exists.
 const removeLine = (index) => {
   if (lines.value.length > 1) {
     lines.value.splice(index, 1);
   }
 };
 
+// Compute tax for a given line item based on its amount and tax account.
 const computeLineTaxAmount = (line) => {
   if (!line.amount || !line.taxAccount) return 0;
   const taxAcc = taxAccountList.value.find(
-    (a) => a.accno === line.taxAccount.accno
+    (a) =>
+      a.accno ===
+      (typeof line.taxAccount === "object"
+        ? line.taxAccount.accno
+        : line.taxAccount)
   );
   if (!taxAcc) return 0;
   const taxRate = taxAcc.rate;
+  // If tax is included in the amount, extract the tax component; otherwise, apply the rate directly.
   const computed = taxIncluded.value
     ? line.amount * (taxRate / (1 + taxRate))
     : line.amount * taxRate;
   return parseFloat(computed.toFixed(2));
 };
 
+// Handle changes to a line's tax account, recalculating tax if not in initial load.
 const onLineTaxAccountChange = (index) => {
+  if (initialLoad.value) return;
   const line = lines.value[index];
   if (line.taxAccount) {
-    // If the tax account from the UI is different from the API-provided one,
-    // recalc the tax amount; otherwise, use the API value.
     if (
       !line.apiTaxAccount ||
       line.taxAccount.accno.toString() !== line.apiTaxAccount.toString()
     ) {
-      // User changed the tax account, so recalc the taxAmount.
-      line.apiTaxAmount = 0; // clear the API value if desired
+      line.apiTaxAmount = 0;
       line.taxAmount = computeLineTaxAmount(line);
     } else {
-      // Use the API-provided taxAmount
       line.taxAmount = line.apiTaxAmount;
     }
   }
   calculateTaxes();
 };
 
+// Calculate taxes based on current line items and tax configuration.
 const calculateTaxes = () => {
+  // Skip if the form is still loading from the API
+  if (initialLoad.value) return;
+
+  // If line-based tax is NOT enabled AND we are preserving API taxes, skip
+  if (!lineTax.value && preserveApiTaxes.value) {
+    return;
+  }
+
   if (!vc.value || !taxAccounts.value.length) {
     invoiceTaxes.value = [];
     return;
@@ -593,7 +629,6 @@ const calculateTaxes = () => {
     const taxAgg = {};
     lines.value.forEach((line) => {
       if (line.taxAccount && line.taxAmount) {
-        // Extract the account number whether taxAccount is an object or a string
         const taxAccNo =
           typeof line.taxAccount === "object"
             ? line.taxAccount.accno
@@ -622,7 +657,6 @@ const calculateTaxes = () => {
       };
     });
   } else {
-    // Default tax calculation based on overall subtotal
     invoiceTaxes.value = taxAccounts.value.map((taxAcc) => {
       const name = vc.value[`${taxAcc}_description`] || t("Tax Name Not Found");
       const taxRate = parseFloat(vc.value[`${taxAcc}_rate`] || 0);
@@ -640,6 +674,7 @@ const calculateTaxes = () => {
   }
 };
 
+// Compute subtotal by summing all line amounts and subtracting taxes if included.
 const subtotal = computed(() => {
   let totalValue = lines.value.reduce(
     (acc, line) => acc + (parseFloat(line.amount) || 0),
@@ -655,6 +690,7 @@ const subtotal = computed(() => {
   return parseFloat(totalValue.toFixed(2));
 });
 
+// Compute total by adding taxes if they are not already included.
 const total = computed(() => {
   const totalTaxes = invoiceTaxes.value.reduce(
     (acc, tax) => acc + (parseFloat(tax.amount) || 0),
@@ -670,7 +706,9 @@ const total = computed(() => {
   return parseFloat(totalValue.toFixed(2));
 });
 
-// Payment management
+// -------------------------
+// Payment Management
+// -------------------------
 const payments = ref([
   { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
 ]);
@@ -691,6 +729,9 @@ const removePayment = (index) => {
   }
 };
 
+// -------------------------
+// Data Fetching Functions
+// -------------------------
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/${type.value}/`);
@@ -792,6 +833,9 @@ const fetchCurrencies = async () => {
   }
 };
 
+// -------------------------
+// Invoice Submission & Loading
+// -------------------------
 const postInvoice = async () => {
   if (!selectedEntity.value) {
     Notify.create({
@@ -896,6 +940,7 @@ const postInvoice = async () => {
   }
 };
 
+// Upload invoice file, then load the invoice details from the API response.
 const uploadInvoice = async () => {
   loading.value = true;
   const formData = new FormData();
@@ -936,6 +981,7 @@ const fetchInvoice = async (id) => {
   }
 };
 
+// Load invoice data into the form, preserving any tax values if present.
 const loadInvoice = async (invoice) => {
   if (
     !vcList.value.length ||
@@ -949,6 +995,7 @@ const loadInvoice = async (invoice) => {
       fetchCurrencies(),
     ]);
   }
+  initialLoad.value = true;
   try {
     const vcId = invoice[`${type.value}_id`];
     let vcToSelect = vcList.value.find((vc) => vc.id === vcId);
@@ -961,8 +1008,6 @@ const loadInvoice = async (invoice) => {
         throw new Error(t("Failed to fetch vc details"));
       }
     }
-    // Instead of setting vc and taxAccounts manually,
-    // call vcUpdate to handle everything consistently.
     await vcUpdate(vcToSelect);
     selectedEntity.value = {
       id: vcToSelect.id,
@@ -970,25 +1015,37 @@ const loadInvoice = async (invoice) => {
       [vcNumberField.value]: vcToSelect[vcNumberField.value],
     };
 
-    calculateTaxes();
-    lines.value = invoice.lineitems.map((item) => {
-      return {
-        amount: item.price || item.amount,
-        account:
-          itemAccounts.value.find((acc) => acc.accno == item.accno) || null,
-        description: item.description,
-        taxAccount: lineTax.value
-          ? taxAccountList.value.find(
-              (acc) => acc.accno.toString() === item.taxAccount.toString()
-            ) || null
-          : null,
-        // Use API-provided taxAmount if available
-        taxAmount: lineTax.value ? item.taxAmount || 0 : 0,
-        // Store original API values for later comparison
-        apiTaxAmount: lineTax.value ? item.taxAmount || 0 : 0,
-        apiTaxAccount: lineTax.value ? item.taxAccount : null,
-      };
-    });
+    // Use API taxes if provided; otherwise, fall back to calculateTaxes.
+    if (invoice.taxes && invoice.taxes.length > 0) {
+      taxIncluded.value = Boolean(invoice.taxincluded);
+      invoiceTaxes.value = invoice.taxes.map((tx) => ({
+        name: tx.name || `${tx.accno} ${(tx.rate * 100).toFixed(0)}%`,
+        amount: parseFloat(tx.amount),
+        acc: tx.accno,
+        rate: parseFloat(tx.rate),
+      }));
+      preserveApiTaxes.value = true; // <-- We have legit API taxes; preserve them
+    } else {
+      calculateTaxes();
+    }
+
+    // Map invoice line items
+    lines.value = invoice.lineitems.map((item) => ({
+      amount: Boolean(invoice.taxincluded)
+        ? +item.amount + +item.taxAmount
+        : +item.amount,
+      account:
+        itemAccounts.value.find((acc) => acc.accno == item.accno) || null,
+      description: item.description,
+      taxAccount: lineTax.value
+        ? taxAccountList.value.find(
+            (acc) => acc.accno.toString() === item.taxAccount.toString()
+          ) || null
+        : null,
+      taxAmount: lineTax.value ? item.taxAmount || 0 : 0,
+      apiTaxAmount: lineTax.value ? item.taxAmount || 0 : 0,
+      apiTaxAccount: lineTax.value ? item.taxAccount : null,
+    }));
 
     salesAccount.value = salesAccounts.value[0] || null;
     invDate.value = invoice.invDate || "";
@@ -1006,6 +1063,8 @@ const loadInvoice = async (invoice) => {
     invNumber.value = invoice.invNumber || "";
     ordNumber.value = "";
     poNumber.value = "";
+
+    // Map payments if any
     if (invoice.payments && invoice.payments.length > 0) {
       payments.value = invoice.payments.map((payment) => ({
         date: payment.date || getTodayDate(),
@@ -1028,10 +1087,6 @@ const loadInvoice = async (invoice) => {
         },
       ];
     }
-    if (invoice.taxes && invoice.taxes.length > 0) {
-      taxIncluded.value = Boolean(invoice.taxincluded);
-      calculateTaxes();
-    }
   } catch (error) {
     console.error("Error loading invoice:", error);
     Notify.create({
@@ -1041,13 +1096,23 @@ const loadInvoice = async (invoice) => {
       type: "negative",
       position: "center",
     });
+  } finally {
+    initialLoad.value = false;
   }
 };
 
+// -------------------------
+// Watchers
+// -------------------------
 watch(
   lines,
   () => {
-    calculateTaxes();
+    // If user changes the lines and we had API-based taxes,
+    // we clear preserveApiTaxes to allow normal re-calculation.
+    if (!initialLoad.value) {
+      preserveApiTaxes.value = false;
+      calculateTaxes();
+    }
   },
   { deep: true }
 );
@@ -1077,11 +1142,14 @@ watch(
     poNumber.value = "";
     taxIncluded.value = false;
     invoiceTaxes.value = [];
+    preserveApiTaxes.value = false; // reset since we're changing type
+
     await fetchvcList();
     if (accounts.value.length > 0) {
       const linkType = newType === "vendor" ? "AP" : "AR";
       const linkPaid = newType === "vendor" ? "AP_paid" : "AR_paid";
       const icLink = newType === "vendor" ? "AP_amount" : "AR_amount";
+
       salesAccounts.value = accounts.value.filter(
         (account) => account.link === linkType
       );
