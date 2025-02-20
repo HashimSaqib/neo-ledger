@@ -181,7 +181,7 @@
             <template #item="{ element: line, index }">
               <div class="row q-mb-md justify-between">
                 <!-- Drag handle icon -->
-                <q-btn icon="drag_indicator" class="q-mr-xs" flat dense />
+                <q-btn icon="drag_indicator" class="lighttext" flat dense />
                 <q-input
                   outlined
                   v-model="line.description"
