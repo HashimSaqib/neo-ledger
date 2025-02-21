@@ -288,7 +288,6 @@ const filterAccounts = (val, update) => {
 };
 
 const loading = ref(false);
-
 const submitTransaction = async () => {
   loading.value = true;
   const transactionData = {
@@ -312,24 +311,33 @@ const submitTransaction = async () => {
   };
 
   try {
+    let response;
     if (formData.value.id) {
-      await api.put(`/gl/transactions/${formData.value.id}`, transactionData);
+      response = await api.put(
+        `/gl/transactions/${formData.value.id}`,
+        transactionData
+      );
     } else {
-      await api.post("/gl/transactions/", transactionData);
+      response = await api.post("/gl/transactions/", transactionData);
     }
+
     Notify.create({
       message: "Transaction Posted Successfully.",
       type: "positive",
       position: "center",
     });
+
+    // Call loadTransaction with the returned transaction ID
+    if (response.data?.id) {
+      await loadTransaction(response.data.id);
+    }
   } catch (error) {
     console.log("Failed to submit transaction:", error);
     Notify.create({
-      message: error.response.data.message,
+      message: error.response?.data?.message || "Failed to submit transaction.",
       type: "negative",
       position: "center",
     });
-    loading.value = false;
   } finally {
     loading.value = false;
   }
@@ -373,6 +381,10 @@ const fetchCurrencies = async () => {
   try {
     const response = await api.get("/system/currencies");
     currencies.value = response.data;
+    // Ensure there's at least one currency before setting
+    if (currencies.value.length > 0) {
+      formData.value.currency = currencies.value[0];
+    }
   } catch (error) {
     console.log("Failed to submit Currencies:", error);
     Notify.create({

@@ -15,20 +15,33 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      class="mainbg column"
+      style="height: 100%"
+    >
+      <div class="column no-wrap" style="height: 100%">
+        <!-- Scroll area is flex: 1 so it grows to fill leftover space -->
+        <q-scroll-area class="col">
+          <!-- Add bottom padding so last item can scroll above the pinned panel -->
+          <div>
+            <q-list>
+              <EssentialLink
+                v-for="link in menuLinks"
+                :key="link.title"
+                v-bind="link"
+              />
+            </q-list>
+          </div>
+        </q-scroll-area>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="mainbg">
-      <q-scroll-area class="fit">
-        <q-list>
-          <EssentialLink
-            v-for="link in menuLinks"
-            :key="link.title"
-            v-bind="link"
-          />
-        </q-list>
-        <div class="absolute-bottom q-pb-md">
+        <!-- Pinned at the bottom -->
+        <div class="q-pa-md">
           <SettingsPanel />
         </div>
-      </q-scroll-area>
+      </div>
     </q-drawer>
 
     <q-page-container class="lightbg q-px-md-none q-py-md">

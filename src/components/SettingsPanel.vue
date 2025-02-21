@@ -94,9 +94,3 @@ async function handleLogout() {
   await router.push("/login");
 }
 </script>
-
-<style scoped>
-.settings-panel {
-  margin-top: auto;
-}
-</style>

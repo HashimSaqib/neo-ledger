@@ -43,8 +43,8 @@
               <div class="row">
                 <s-select
                   outlined
-                  v-model="salesAccount"
-                  :options="salesAccounts"
+                  v-model="recordAccount"
+                  :options="recordAccounts"
                   :label="t('Record In')"
                   dense
                   popup-content-class="mainbg maintext"
@@ -477,7 +477,7 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
-import draggable from "vuedraggable"; // Import draggable
+import draggable from "vuedraggable";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -521,8 +521,8 @@ const taxAccountList = ref([]);
 // -------------------------
 // Account References
 // -------------------------
-const salesAccount = ref(null);
-const salesAccounts = ref([]);
+const recordAccount = ref(null);
+const recordAccounts = ref([]);
 const paymentAccounts = ref([]);
 const itemAccounts = ref([]);
 const accounts = ref([]);
@@ -808,10 +808,10 @@ const fetchAccounts = async () => {
     const linkPaid = type.value === "vendor" ? "AP_paid" : "AR_paid";
     const icLink = type.value === "vendor" ? "AP_amount" : "AR_amount";
 
-    salesAccounts.value = accounts.value.filter(
+    recordAccounts.value = accounts.value.filter(
       (account) => account.link === linkType
     );
-    salesAccount.value = salesAccounts.value[0] || null;
+    recordAccount.value = recordAccounts.value[0] || null;
     paymentAccounts.value = accounts.value.filter((account) =>
       account.link.split(":").includes(linkPaid)
     );
@@ -858,7 +858,7 @@ const postInvoice = async () => {
     });
     return;
   }
-  if (!salesAccount.value) {
+  if (!recordAccount.value) {
     Notify.create({
       message: t("Account is required"),
       type: "negative",
@@ -897,7 +897,7 @@ const postInvoice = async () => {
     invDate: invDate.value,
     dueDate: dueDate.value,
     poNumber: poNumber.value,
-    salesAccount: salesAccount.value,
+    recordAccount: recordAccount.value,
     selectedCurrency: selectedCurrency.value,
     curr: selectedCurrency.value.curr,
     lines: lines.value.map((line) => ({
@@ -998,7 +998,7 @@ const fetchInvoice = async (id) => {
 const loadInvoice = async (invoice) => {
   if (
     !vcList.value.length ||
-    !salesAccounts.value.length ||
+    !recordAccounts.value.length ||
     !currencies.value.length
   ) {
     await Promise.all([
@@ -1061,7 +1061,7 @@ const loadInvoice = async (invoice) => {
       apiTaxAccount: lineTax.value ? item.taxAccount : null,
     }));
 
-    salesAccount.value = salesAccounts.value[0] || null;
+    recordAccount.value = recordAccounts.value[0] || null;
     invDate.value = invoice.invDate || "";
     dueDate.value = invoice.dueDate || "";
     link.value = invoice.file;
@@ -1165,7 +1165,7 @@ watch(
       const linkPaid = newType === "vendor" ? "AP_paid" : "AR_paid";
       const icLink = newType === "vendor" ? "AP_amount" : "AR_amount";
 
-      salesAccounts.value = accounts.value.filter(
+      recordAccounts.value = accounts.value.filter(
         (account) => account.link === linkType
       );
       paymentAccounts.value = accounts.value.filter((account) =>
@@ -1174,7 +1174,7 @@ watch(
       itemAccounts.value = accounts.value.filter((account) =>
         account.link.split(":").includes(icLink)
       );
-      salesAccount.value = salesAccounts.value[0] || null;
+      recordAccount.value = recordAccounts.value[0] || null;
       payments.value[0].account = paymentAccounts.value[0] || null;
     }
     invoicePreview.value = null;

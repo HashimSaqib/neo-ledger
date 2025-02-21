@@ -21,13 +21,13 @@
             <div class="col-sm-4 q-md-ml-md content-center" v-if="customer">
               <p class="q-px-sm maintext q-ma-none">
                 <strong>{{ t("Credit Limit") }}</strong>
-                <span class="text-primary q-mx-sm"
-                  >{{ formatAmount(customer.creditlimit) }}
+                <span class="text-primary q-mx-sm">
+                  {{ formatAmount(customer.creditlimit) }}
                 </span>
                 <strong>{{ t("Remaining") }}</strong>
-                <span class="text-negative q-ml-sm">{{
-                  formatAmount(customer.creditremaining)
-                }}</span>
+                <span class="text-negative q-ml-sm">
+                  {{ formatAmount(customer.creditremaining) }}
+                </span>
               </p>
             </div>
           </div>
@@ -39,8 +39,8 @@
           <div class="row">
             <s-select
               outlined
-              v-model="salesAccount"
-              :options="salesAccounts"
+              v-model="recordAccount"
+              :options="recordAccounts"
               :label="t('Record In')"
               dense
               popup-content-class="mainbg maintext"
@@ -178,101 +178,108 @@
           class="q-ml-md"
         />
       </div>
-      <div
-        v-for="(line, index) in lines"
-        :key="index"
-        class="row q-mb-md justify-between"
+      <draggable
+        v-model="lines"
+        item-key="id"
+        @start="dragging = true"
+        @end="dragging = false"
       >
-        <s-select
-          outlined
-          v-model="line.partnumber"
-          :label="t('Number')"
-          class="lightbg col-2"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-          :options="items"
-          option-label="partnumber"
-          option-value="partnumber"
-          @update:model-value="handleLineItemChange(line, index)"
-          search="partnumber"
-        />
-        <q-input
-          outlined
-          v-model="line.description"
-          :label="t('Description')"
-          class="lightbg col-2"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-        />
-        <q-input
-          outlined
-          v-model="line.qty"
-          :label="t('Qty')"
-          type="number"
-          class="lightbg col-1"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-        />
-        <q-input
-          outlined
-          :value="line.oh"
-          :label="t('OH')"
-          class="lightbg col-1"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-          readonly
-        />
-        <q-input
-          outlined
-          v-model="line.unit"
-          :label="t('Unit')"
-          class="lightbg col-1"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-        />
-        <fn-input
-          outlined
-          v-model="line.price"
-          :label="t('Price')"
-          class="lightbg col-2"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-        />
-        <q-input
-          outlined
-          v-model="line.discount"
-          :label="t('%')"
-          type="number"
-          class="lightbg col-1"
-          input-class="maintext"
-          label-color="secondary"
-          dense
-        />
-        <q-input
-          outlined
-          v-model="line.extended"
-          :model-value="formatAmount(line.extended)"
-          :label="t('Extended')"
-          dense
-          class="lightbg col-1"
-          input-class="maintext"
-          label-color="secondary"
-          readonly
-        />
-        <q-btn
-          color="negative"
-          icon="delete"
-          dense
-          flat
-          @click="removeLine(index)"
-        />
-      </div>
+        <template #item="{ element: line, index }">
+          <div class="row q-mb-md justify-between" :key="line.id">
+            <q-btn icon="drag_indicator" class="lighttext" flat dense />
+            <s-select
+              :key="line.id"
+              outlined
+              v-model="line.partnumber"
+              :label="t('Number')"
+              class="lightbg col-2"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+              :options="items"
+              option-label="partnumber"
+              option-value="partnumber"
+              @update:model-value="handleLineItemChange(line, index)"
+              search="label"
+            />
+            <q-input
+              outlined
+              v-model="line.description"
+              :label="t('Description')"
+              class="lightbg col-2"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+            />
+            <q-input
+              outlined
+              v-model="line.qty"
+              :label="t('Qty')"
+              type="number"
+              class="lightbg col-1"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+            />
+            <q-input
+              outlined
+              :value="line.oh"
+              :label="t('OH')"
+              class="lightbg col-1"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+              readonly
+            />
+            <q-input
+              outlined
+              v-model="line.unit"
+              :label="t('Unit')"
+              class="lightbg col-1"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+            />
+            <fn-input
+              outlined
+              v-model="line.price"
+              :label="t('Price')"
+              class="lightbg col-2"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+            />
+            <q-input
+              outlined
+              v-model="line.discount"
+              :label="t('%')"
+              type="number"
+              class="lightbg col-1"
+              input-class="maintext"
+              label-color="secondary"
+              dense
+            />
+            <q-input
+              outlined
+              v-model="line.extended"
+              :model-value="formatAmount(line.extended)"
+              :label="t('Extended')"
+              dense
+              class="lightbg col-1"
+              input-class="maintext"
+              label-color="secondary"
+              readonly
+            />
+            <q-btn
+              color="negative"
+              icon="delete"
+              dense
+              flat
+              @click="removeLine(index)"
+            />
+          </div>
+        </template>
+      </draggable>
 
       <div class="row justify-between items-end">
         <div class="col">
@@ -411,8 +418,8 @@
           v-if="selectedCurrency && selectedCurrency.rn != 1"
           outlined
           v-model="payment.exchangerate"
-          :label="t('Exhcnage Rate')"
-          class="lightbg q-mt-sm"
+          :label="t('Exch')"
+          class="lightbg q-mt-sm col-1"
           dense
         />
         <s-select
@@ -422,8 +429,7 @@
           :label="t('Account')"
           option-label="label"
           option-value="id"
-          class="lightbg col-2 q-mt-sm"
-          :class="selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''"
+          class="lightbg q-mt-sm col-3"
           input-class="maintext"
           label-color="secondary"
           dense
@@ -444,13 +450,13 @@
       color="primary"
       @click="postInvoice"
       class="relative-position"
-    >
-    </q-btn>
+    />
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
   </q-page>
 </template>
+
 <script setup>
 import { ref, onMounted, watch, computed, inject } from "vue";
 import { api } from "src/boot/axios";
@@ -458,20 +464,25 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
+import draggable from "vuedraggable";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const loading = ref(false);
 const updateTitle = inject("updateTitle");
-updateTitle("Sales Invoice");
+
+// Set title based on invoice type
+updateTitle("Customer Invoice");
 if (route.query.credit_invoice) {
   updateTitle("Credit Invoice");
 }
 
-// State management
-const expanded = ref(true);
-const expansionLabel = ref("");
+// Unique line id counter
+let lineId = 1;
+
+// Dragging flag for reordering
+const dragging = ref(false);
 
 // Customers
 const customers = ref([]);
@@ -488,7 +499,6 @@ const customer = ref();
 const fetchCustomer = async (id) => {
   try {
     const response = await api.get(`/arap/list/customer/${id}`);
-    console.log(response);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -505,18 +515,18 @@ const customerUpdate = async (newValue) => {
 };
 
 // Accounts
-const salesAccount = ref();
-const salesAccounts = ref([]);
+const recordAccount = ref();
+const recordAccounts = ref([]);
 const paymentAccounts = ref([]);
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     const accounts = response.data;
-    salesAccounts.value = accounts.filter((account) => account.link === "AR");
+    recordAccounts.value = accounts.filter((account) => account.link === "AR");
     paymentAccounts.value = accounts.filter((account) =>
       account.link.split(":").includes("AR_paid")
     );
-    salesAccount.value = salesAccounts.value[0];
+    recordAccount.value = recordAccounts.value[0];
   } catch (error) {
     console.log(error);
     Notify.create({
@@ -564,7 +574,8 @@ const getTodayDate = () => {
   return formatDate(new Date(), "YYYY-MM-DD");
 };
 
-const invType = ref("invoice");
+const invType = ref(route.query.credit_invoice ? "credit_invoice" : "invoice");
+
 const invNumber = ref("");
 const invId = ref(route.query.id ? `${route.query.id}` : "");
 const ordNumber = ref("");
@@ -576,17 +587,19 @@ const items = ref([]);
 const fetchItems = async () => {
   try {
     const response = await api.get("/items");
-    items.value = response.data.parts;
-    items.value.map((item) => ({
+    items.value = response.data.parts.map((item) => ({
       ...item,
       label: `${item.partnumber} -- ${item.description}`,
     }));
+    console.log(items.value);
   } catch (error) {
     console.log(error);
   }
 };
+
 const lines = ref([
   {
+    id: lineId++,
     number: "",
     description: "",
     qty: 1,
@@ -600,6 +613,7 @@ const lines = ref([
 // Function to add a new line
 const addLine = () => {
   lines.value.push({
+    id: lineId++,
     item: "",
     number: "",
     description: "",
@@ -618,9 +632,7 @@ const removeLine = (index) => {
 };
 
 // Invoice Taxes
-
 const taxIncluded = ref(false);
-
 const invoiceTaxes = ref([]);
 const calculateTaxes = () => {
   invoiceTaxes.value = [];
@@ -644,11 +656,9 @@ const calculateTaxes = () => {
           let netAmount = parseFloat(line.extended);
 
           if (taxIncluded.value) {
-            // If tax is included, reverse-calculate the tax
             taxAmount = netAmount * (taxRate / (1 + taxRate));
-            netAmount -= taxAmount; // Adjust net amount after tax
+            netAmount -= taxAmount;
           } else {
-            // If tax is not included, calculate normally
             taxAmount = netAmount * taxRate;
           }
 
@@ -674,37 +684,38 @@ const calculateTaxes = () => {
 
 const subtotal = computed(() => {
   let totalValue = lines.value.reduce((acc, line) => {
-    return acc + (parseFloat(line.extended) || 0); // Ensure extended is treated as a number
+    return acc + (parseFloat(line.extended) || 0);
   }, 0);
 
   if (taxIncluded.value) {
     const totalTaxes = invoiceTaxes.value.reduce((acc, tax) => {
-      return acc + (parseFloat(tax.amount) || 0); // Ensure tax.amount is treated as a number
+      return acc + (parseFloat(tax.amount) || 0);
     }, 0);
 
-    totalValue -= totalTaxes; // Subtotal is the total value minus taxes if tax is included
+    totalValue -= totalTaxes;
   }
 
-  return parseFloat(totalValue.toFixed(2)); // Ensure it returns a properly formatted float
+  return parseFloat(totalValue.toFixed(2));
 });
 
 const taxInclude = () => {
   calculateTaxes();
 };
+
 const total = computed(() => {
   const totalTaxes = invoiceTaxes.value.reduce((acc, tax) => {
-    return acc + (parseFloat(tax.amount) || 0); // Ensure tax.amount is treated as a number
+    return acc + (parseFloat(tax.amount) || 0);
   }, 0);
 
   let totalValue = lines.value.reduce((acc, line) => {
-    return acc + (parseFloat(line.extended) || 0); // Ensure extended is treated as a number
+    return acc + (parseFloat(line.extended) || 0);
   }, 0);
 
   if (!taxIncluded.value) {
-    totalValue += totalTaxes; // Add taxes if not included in line totals
+    totalValue += totalTaxes;
   }
 
-  return parseFloat(totalValue.toFixed(2)); // Ensure it returns a properly formatted float
+  return parseFloat(totalValue.toFixed(2));
 });
 
 const calculateExtended = (qty, price, discount) => {
@@ -713,27 +724,27 @@ const calculateExtended = (qty, price, discount) => {
   return discountedValue.toFixed(2);
 };
 
-// Explicit method to handle part number changes and update line details
+// Handle part number change; skip updating during a drag
 const handleLineItemChange = (newValue, index) => {
-  console.log("Line item changed:", newValue, index);
+  if (dragging.value) return;
 
   if (newValue && newValue.partnumber) {
-    // Update the corresponding line's properties based on the selected item
-    const line = lines.value[index];
-    line.description = newValue.partnumber.description || "";
-    line.oh = newValue.partnumber.oh || 0;
-    line.unit = newValue.partnumber.unit || "";
-    line.price = newValue.partnumber.sellprice || 0;
-
-    // Recalculate the extended price using the calculation function
-    line.extended = calculateExtended(
-      line.qty || 1,
-      line.price,
-      line.discount || 0
-    );
+    if (!newValue.noupdate) {
+      const line = lines.value[index];
+      line.description = newValue.partnumber.description || "";
+      line.oh = newValue.partnumber.oh || 0;
+      line.unit = newValue.partnumber.unit || "";
+      line.price = newValue.partnumber.sellprice || 0;
+      line.extended = calculateExtended(
+        line.qty || 1,
+        line.price,
+        line.discount || 0
+      );
+    } else {
+      const line = lines.value[index];
+      line.noupdate = false;
+    }
   }
-
-  // Recalculate taxes or perform any other required logic
   calculateTaxes();
 };
 
@@ -748,7 +759,6 @@ const payments = ref([
   },
 ]);
 
-// Function to add a new payment line
 const addPayment = () => {
   payments.value.push({
     date: getTodayDate(),
@@ -764,8 +774,8 @@ const removePayment = (index) => {
     payments.value.splice(index, 1);
   }
 };
+
 const postInvoice = async () => {
-  // Validation
   if (!selectedCustomer.value) {
     Notify.create({
       message: "Customer is required.",
@@ -775,7 +785,7 @@ const postInvoice = async () => {
     return;
   }
 
-  if (!salesAccount.value) {
+  if (!recordAccount.value) {
     Notify.create({
       message: "Account is required.",
       type: "negative",
@@ -805,7 +815,6 @@ const postInvoice = async () => {
     return;
   }
 
-  // Create the invoice data object
   const invoiceData = {
     selectedCustomer: selectedCustomer.value,
     shippingPoint: shippingPoint.value,
@@ -819,7 +828,7 @@ const postInvoice = async () => {
     invDate: invDate.value,
     dueDate: dueDate.value,
     poNumber: poNumber.value,
-    salesAccount: salesAccount.value,
+    recordAccount: recordAccount.value,
     selectedCurrency: selectedCurrency.value,
     type: invType.value,
     lines: lines.value.map((line) => ({
@@ -845,7 +854,6 @@ const postInvoice = async () => {
     invoiceData.exchangerate = exchangeRate.value;
   }
 
-  // Add taxes if invoiceTaxes is not empty
   if (invoiceTaxes.value.length > 0) {
     invoiceData.taxes = invoiceTaxes.value.map((tax) => ({
       accno: tax.acc,
@@ -858,9 +866,10 @@ const postInvoice = async () => {
   console.log("Invoice Data:", invoiceData);
   try {
     loading.value = true;
-
-    const response = await api.post(`/ar/invoice/${invId.value}`, invoiceData);
-
+    const response = await api.post(
+      `/arap/invoice/customer/${invId.value}`,
+      invoiceData
+    );
     Notify.create({
       message: "Transaction posted successfully",
       type: "positive",
@@ -882,7 +891,7 @@ const postInvoice = async () => {
 const fetchInvoice = async (id) => {
   if (id) {
     try {
-      const response = await api.get(`/ar/invoice/${id}`);
+      const response = await api.get(`/arap/invoice/customer/${id}`);
       console.log(response.data);
       loadInvoice(response.data);
     } catch (error) {
@@ -890,11 +899,12 @@ const fetchInvoice = async (id) => {
     }
   }
 };
+
 const loadInvoice = async (invoice) => {
   if (
     customers.value.length === 0 ||
     items.value.length === 0 ||
-    salesAccounts.value.length === 0 ||
+    recordAccounts.value.length === 0 ||
     currencies.value.length === 0
   ) {
     await Promise.all([
@@ -905,7 +915,6 @@ const loadInvoice = async (invoice) => {
     ]);
   }
 
-  // Set selectedCustomer based on invoice.customernumber
   selectedCustomer.value = customers.value.find(
     (cust) => cust.customernumber === invoice.customernumber
   );
@@ -919,24 +928,21 @@ const loadInvoice = async (invoice) => {
     return;
   }
 
-  // Fetch and set detailed customer data
   await customerUpdate(selectedCustomer.value);
 
-  // Set salesAccount
-  salesAccount.value = salesAccounts.value.find(
-    (account) => account.accno === invoice.salesAccount.accno
+  recordAccount.value = recordAccounts.value.find(
+    (account) => account.accno === invoice.recordAccount.accno
   );
 
-  if (!salesAccount.value) {
+  if (!recordAccount.value) {
     Notify.create({
-      message: `Sales account ${invoice.salesAccount.accno} not found.`,
+      message: `Sales account ${invoice.recordAccount.accno} not found.`,
       type: "negative",
       position: "center",
     });
     return;
   }
 
-  // Set other header information
   shippingPoint.value = invoice.shippingPoint;
   shipVia.value = invoice.shipVia;
   wayBill.value = invoice.wayBill;
@@ -946,29 +952,27 @@ const loadInvoice = async (invoice) => {
   invNumber.value = invoice.invNumber;
   invId.value = invoice.id;
   invType.value = invoice.type;
-
   ordNumber.value = invoice.ordNumber;
   invDate.value = invoice.invDate;
   dueDate.value = invoice.dueDate;
   poNumber.value = invoice.poNumber;
 
-  if (invType.value == "credit_invoice") {
+  if (invType.value === "credit_invoice") {
     updateTitle("Credit Invoice");
   }
 
-  // Set currency and exchange rate if provided
   if (invoice.currency) {
     selectedCurrency.value = currencies.value.find(
       (curr) => curr.curr === invoice.currency
     );
   }
   exchangeRate.value = invoice.exchangerate || 1;
-
-  // Set taxIncluded
   taxIncluded.value = !!invoice.taxincluded;
 
+  // When loading, add unique id for each line
   lines.value = invoice.lines.map((line) => {
     return {
+      id: lineId++,
       partnumber: line,
       description: line.description,
       qty: line.qty,
@@ -978,19 +982,16 @@ const loadInvoice = async (invoice) => {
       discount: line.discount,
       extended:
         line.qty * line.price - (line.qty * line.price * line.discount) / 100,
+      noupdate: true,
     };
   });
   console.log(invoice.lines);
-
-  // Recalculate taxes
   calculateTaxes();
 
-  // Set payments
   payments.value = invoice.payments.map((payment) => {
     const account = paymentAccounts.value.find(
       (acc) => acc.id === payment.account || acc.label === payment.account
     );
-
     if (!account) {
       Notify.create({
         message: `Payment account ${payment.account} not found.`,
@@ -999,7 +1000,6 @@ const loadInvoice = async (invoice) => {
       });
       return {};
     }
-
     return {
       date: payment.date,
       source: payment.source,
@@ -1018,20 +1018,17 @@ watch(
   lines,
   (newLines) => {
     newLines.forEach((line, index) => {
-      // Recalculate the extended price for each line
       line.extended = calculateExtended(
         line.qty || 1,
         line.price,
         line.discount || 0
       );
     });
-
-    // After updating the extended prices, recalculate the taxes
     calculateTaxes();
   },
   { deep: true }
 );
-// Fetch data on mounted
+
 onMounted(() => {
   fetchAccounts();
   fetchCurrencies();

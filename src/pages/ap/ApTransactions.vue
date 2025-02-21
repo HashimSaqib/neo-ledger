@@ -17,7 +17,7 @@
             label-color="secondary"
             outlined
             dense
-            :options="salesAccounts"
+            :options="recordAccounts"
           />
           <q-select
             v-model="formData.vendor"
@@ -686,12 +686,12 @@ const filteredResults = computed(() => {
 });
 
 // Data fetching functions
-const salesAccounts = ref([]);
+const recordAccounts = ref([]);
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     const accounts = response.data;
-    salesAccounts.value = accounts.filter((account) => account.link === "AP");
+    recordAccounts.value = accounts.filter((account) => account.link === "AP");
   } catch (error) {
     console.error(error);
     Notify.create({
