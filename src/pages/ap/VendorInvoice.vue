@@ -445,12 +445,22 @@
         />
       </div>
     </div>
+    <q-separator class="q-my-sm" size="2px" v-if="invId" />
+
     <q-btn
       :label="t('Post')"
       color="primary"
       @click="postInvoice"
-      class="relative-position"
+      class="relative-position q-mr-md"
     />
+    <q-btn
+      color="accent"
+      :label="t('Print')"
+      @click="printInvoice"
+      v-if="invId"
+      class="q-mr-md"
+    />
+    <q-btn color="danger" :label="t('Delete')" />
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
@@ -478,6 +488,11 @@ if (route.query.debit_invoice) {
 
 // Unique line id counter
 let lineId = 1;
+const printOptions = ref({
+  type: "Invoice",
+  format: "PDF",
+  location: "Download",
+});
 
 // Dragging flag for reordering
 const dragging = ref(false);
@@ -771,6 +786,49 @@ const addPayment = () => {
 const removePayment = (index) => {
   if (payments.value.length > 1) {
     payments.value.splice(index, 1);
+  }
+};
+
+const printInvoice = async () => {
+  loading.value = true;
+  if (!invId.value) {
+    Notify.create({
+      message: t("Invoice ID is required"),
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  try {
+    const response = await api.get(
+      `/print_invoice?id=${invId.value}&vc=vendor`,
+      {
+        responseType: "blob",
+      }
+    );
+
+    const blob = new Blob([response.data], { type: "application/pdf" });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "invoice.pdf";
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    loading.value = false;
+  } catch (error) {
+    Notify.create({
+      message: t("Failed to download invoice"),
+      type: "negative",
+      position: "center",
+    });
+    console.error("Error downloading invoice:", error);
+    loading.value = false;
   }
 };
 

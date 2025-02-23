@@ -445,11 +445,41 @@
         />
       </div>
     </div>
+    <div class="row q-gutter-x-md" v-if="invId">
+      <q-select
+        :options="['Invoice']"
+        v-model="printOptions.type"
+        class="mainbg"
+        dense
+        outlined
+      />
+      <q-select
+        :options="['PDF']"
+        v-model="printOptions.format"
+        class="mainbg"
+        dense
+        outlined
+      />
+      <q-select
+        :options="['Download']"
+        v-model="printOptions.location"
+        class="mainbg"
+        dense
+        outlined
+      />
+    </div>
+    <q-separator class="q-my-sm" size="2px" v-if="invId" />
     <q-btn
       :label="t('Post')"
       color="primary"
       @click="postInvoice"
-      class="relative-position"
+      class="relative-position q-mr-md"
+    />
+    <q-btn
+      color="accent"
+      :label="t('Print')"
+      @click="printInvoice"
+      v-if="invId"
     />
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
@@ -471,7 +501,11 @@ const router = useRouter();
 const { t } = useI18n();
 const loading = ref(false);
 const updateTitle = inject("updateTitle");
-
+const printOptions = ref({
+  type: "Invoice",
+  format: "PDF",
+  location: "Download",
+});
 // Set title based on invoice type
 updateTitle("Customer Invoice");
 if (route.query.credit_invoice) {
@@ -775,10 +809,53 @@ const removePayment = (index) => {
   }
 };
 
+const printInvoice = async () => {
+  loading.value = true;
+  if (!invId.value) {
+    Notify.create({
+      message: t("Invoice ID is required"),
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  try {
+    const response = await api.get(
+      `/print_invoice?id=${invId.value}&vc=customer`,
+      {
+        responseType: "blob",
+      }
+    );
+
+    const blob = new Blob([response.data], { type: "application/pdf" });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "invoice.pdf";
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    loading.value = false;
+  } catch (error) {
+    Notify.create({
+      message: t("Failed to download invoice"),
+      type: "negative",
+      position: "center",
+    });
+    console.error("Error downloading invoice:", error);
+    loading.value = false;
+  }
+};
+
 const postInvoice = async () => {
   if (!selectedCustomer.value) {
     Notify.create({
-      message: "Customer is required.",
+      message: t("Customer is required."),
       type: "negative",
       position: "center",
     });
@@ -787,7 +864,7 @@ const postInvoice = async () => {
 
   if (!recordAccount.value) {
     Notify.create({
-      message: "Account is required.",
+      message: t("Account is required."),
       type: "negative",
       position: "center",
     });
@@ -796,7 +873,7 @@ const postInvoice = async () => {
 
   if (!selectedCurrency.value) {
     Notify.create({
-      message: "Currency is required.",
+      message: t("Currency is required."),
       type: "negative",
       position: "center",
     });
@@ -808,7 +885,7 @@ const postInvoice = async () => {
     !lines.value.some((line) => line.partnumber)
   ) {
     Notify.create({
-      message: "At least one line item is required.",
+      message: t("At least one line item is required."),
       type: "negative",
       position: "center",
     });
