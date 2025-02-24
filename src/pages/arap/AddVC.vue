@@ -1,11 +1,12 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md">
+  <q-page class="lightbg q-px-md" :class="haveProps ? 'q-py-md' : 'q-py-md'">
     <q-form
       @submit.prevent="submitForm"
       ref="formRef"
-      class="q-px-md q-py-md mainbg"
+      class="q-px-md mainbg"
+      :class="haveProps ? 'q-py-md' : 'q-py-md'"
     >
-      <div class="mainbg q-mt-md">
+      <div class="mainbg">
         <!-- Type Selection -->
         <div class="row q-mb-sm">
           <q-radio v-model="form.typeofcontact" val="company" label="Company" />

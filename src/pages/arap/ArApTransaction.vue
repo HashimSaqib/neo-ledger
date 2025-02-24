@@ -22,6 +22,23 @@
                   search="label"
                   account
                 />
+                <div class="q-ml-sm" style="display: flex; align-items: center">
+                  <a
+                    href="#"
+                    @click.prevent="openEditVc"
+                    class="text-primary q-mr-xs"
+                    style="text-decoration: none"
+                    v-if="selectedEntity"
+                    >?</a
+                  >
+                  <a
+                    href="#"
+                    @click.prevent="openAddVc"
+                    class="text-primary"
+                    style="margin-right: 0.5em; text-decoration: none"
+                    >+</a
+                  >
+                </div>
                 <div class="col-sm-4 q-md-ml-md content-center" v-if="vc">
                   <p class="q-px-sm maintext q-ma-none">
                     <strong>{{ t("Credit Limit") }}</strong>
@@ -162,8 +179,9 @@
             </div>
           </div>
         </div>
+
+        <!-- Items Section -->
         <div class="mainbg q-my-md q-pa-md">
-          <!-- Items Section -->
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
             <q-btn
@@ -180,7 +198,6 @@
           <draggable v-model="lines" item-key="id">
             <template #item="{ element: line, index }">
               <div class="row q-mb-md justify-between">
-                <!-- Drag handle icon -->
                 <q-btn icon="drag_indicator" class="lighttext" flat dense />
                 <q-input
                   outlined
@@ -215,7 +232,6 @@
                   label-color="secondary"
                   dense
                 />
-                <!-- Show tax account and amount only if line tax is enabled -->
                 <s-select
                   v-if="lineTax && taxAccountList"
                   outlined
@@ -330,6 +346,8 @@
             </div>
           </div>
         </div>
+
+        <!-- Payments Section -->
         <div class="mainbg q-my-md q-pa-md">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">
@@ -464,9 +482,24 @@
       </template>
     </q-splitter>
 
+    <!-- Global Loading Indicator -->
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
+
+    <!-- Add/Edit VC Dialog -->
+    <q-dialog v-model="vcDialog">
+      <q-card style="min-width: 80vw" class="q-pa-none">
+        <q-card-section class="q-pa-none">
+          <AddVC
+            :id="dialogMode === 'edit' ? selectedEntity.id : null"
+            :type="type"
+            @close="vcDialog = false"
+            @saved="vcSaved"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -478,7 +511,11 @@ import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
+import AddVC from "src/pages/arap/AddVC.vue";
 
+// -------------------------
+// Internationalization and Routing
+// -------------------------
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -486,21 +523,9 @@ const updateTitle = inject("updateTitle");
 const { formatDate } = date;
 const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 
-// -----------------------------------------------------
-// Flags to control tax calculation & initial load
-// -----------------------------------------------------
-const initialLoad = ref(false);
-const preserveApiTaxes = ref(false); // NEW FLAG to skip overwriting API taxes
-
 // -------------------------
-// UI and Form State
+// Transaction Type & Page Title
 // -------------------------
-const splitterModel = ref(100);
-const invoicePreview = ref(null);
-const loading = ref(false);
-const selectedFile = ref(null);
-
-// Determine transaction type and update page title accordingly.
 const type = ref(route.params.type || route.query.type || "vendor");
 if (type.value === "customer") {
   updateTitle("AR Transaction");
@@ -509,33 +534,37 @@ if (type.value === "customer") {
 }
 
 // -------------------------
-// Entity and Tax Management
+// UI and Form State
 // -------------------------
-const vcList = ref([]);
-const selectedEntity = ref();
-const vc = ref(null);
-const taxAccounts = ref([]);
-const lineTax = ref(false); // enables per-line tax calculations if true
-const taxAccountList = ref([]);
+const splitterModel = ref(100);
+const invoicePreview = ref(null);
+const loading = ref(false);
+const selectedFile = ref(null);
+const vcDialog = ref(false);
+const dialogMode = ref(null); // will be "add" or "edit"
 
 // -------------------------
-// Account References
+// Entity, Account and Currency State
 // -------------------------
+const vcList = ref([]);
+const selectedEntity = ref(null);
+const vc = ref(null);
+const taxAccounts = ref([]);
+const lineTax = ref(false); // flag for per-line tax calculations
+const taxAccountList = ref([]);
+
 const recordAccount = ref(null);
 const recordAccounts = ref([]);
 const paymentAccounts = ref([]);
 const itemAccounts = ref([]);
 const accounts = ref([]);
 
-// -------------------------
-// Currency Management
-// -------------------------
 const selectedCurrency = ref(null);
 const currencies = ref([]);
 const exchangeRate = ref(1);
 
 // -------------------------
-// Invoice Details
+// Invoice Details & Calculations
 // -------------------------
 const description = ref("");
 const notes = ref("");
@@ -547,16 +576,12 @@ const dueDate = ref(getTodayDate());
 const poNumber = ref("");
 const link = ref("");
 
-// -------------------------
-// Tax Values (computed & API-provided)
-// -------------------------
 const taxIncluded = ref(false);
 const invoiceTaxes = ref([]);
 
 // -------------------------
 // Line Items Management
 // -------------------------
-// Include a unique "id" for each line item.
 const lines = ref([
   {
     id: Date.now(),
@@ -568,7 +593,6 @@ const lines = ref([
   },
 ]);
 
-// Add a new blank line item.
 const addLine = () => {
   lines.value.push({
     id: Date.now(),
@@ -580,14 +604,12 @@ const addLine = () => {
   });
 };
 
-// Remove a line item if more than one exists.
 const removeLine = (index) => {
   if (lines.value.length > 1) {
     lines.value.splice(index, 1);
   }
 };
 
-// Compute tax for a given line item based on its amount and tax account.
 const computeLineTaxAmount = (line) => {
   if (!line.amount || !line.taxAccount) return 0;
   const taxAcc = taxAccountList.value.find(
@@ -599,21 +621,19 @@ const computeLineTaxAmount = (line) => {
   );
   if (!taxAcc) return 0;
   const taxRate = taxAcc.rate;
-  // If tax is included in the amount, extract the tax component; otherwise, apply the rate directly.
   const computed = taxIncluded.value
     ? line.amount * (taxRate / (1 + taxRate))
     : line.amount * taxRate;
   return parseFloat(computed.toFixed(2));
 };
 
-// Handle changes to a line's tax account, recalculating tax if not in initial load.
 const onLineTaxAccountChange = (index) => {
   if (initialLoad.value) return;
   const line = lines.value[index];
   if (line.taxAccount) {
     if (
       !line.apiTaxAccount ||
-      line.taxAccount.accno.toString() !== line.apiTaxAccount.toString()
+      line.taxAccount.accno.toString() !== line.apiTaxAccount?.toString()
     ) {
       line.apiTaxAmount = 0;
       line.taxAmount = computeLineTaxAmount(line);
@@ -624,16 +644,9 @@ const onLineTaxAccountChange = (index) => {
   calculateTaxes();
 };
 
-// Calculate taxes based on current line items and tax configuration.
 const calculateTaxes = () => {
-  // Skip if the form is still loading from the API
   if (initialLoad.value) return;
-
-  // If line-based tax is NOT enabled AND we are preserving API taxes, skip
-  if (!lineTax.value && preserveApiTaxes.value) {
-    return;
-  }
-
+  if (!lineTax.value && preserveApiTaxes.value) return;
   if (!vc.value || !taxAccounts.value.length) {
     invoiceTaxes.value = [];
     return;
@@ -687,7 +700,6 @@ const calculateTaxes = () => {
   }
 };
 
-// Compute subtotal by summing all line amounts and subtracting taxes if included.
 const subtotal = computed(() => {
   let totalValue = lines.value.reduce(
     (acc, line) => acc + (parseFloat(line.amount) || 0),
@@ -703,7 +715,6 @@ const subtotal = computed(() => {
   return parseFloat(totalValue.toFixed(2));
 });
 
-// Compute total by adding taxes if they are not already included.
 const total = computed(() => {
   const totalTaxes = invoiceTaxes.value.reduce(
     (acc, tax) => acc + (parseFloat(tax.amount) || 0),
@@ -722,6 +733,7 @@ const total = computed(() => {
 // -------------------------
 // Payment Management
 // -------------------------
+const defaultPaymentAccount = ref();
 const payments = ref([
   { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
 ]);
@@ -783,23 +795,6 @@ const fetchEntity = async (id) => {
   }
 };
 
-const vcUpdate = async (newValue) => {
-  const entityId = newValue.id || newValue;
-  vc.value = await fetchEntity(entityId);
-  if (vc.value) {
-    taxAccounts.value = vc.value.taxaccounts
-      ? vc.value.taxaccounts.split(" ")
-      : [];
-    taxAccountList.value = accounts.value
-      .filter((account) => taxAccounts.value.includes(account.accno))
-      .map((acc) => ({
-        ...acc,
-        rate: parseFloat(vc.value[`${acc.accno}_rate`] || 0),
-      }));
-    calculateTaxes();
-  }
-};
-
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
@@ -845,6 +840,9 @@ const fetchCurrencies = async () => {
     });
   }
 };
+
+let initialLoad = ref(false);
+let preserveApiTaxes = ref(false);
 
 // -------------------------
 // Invoice Submission & Loading
@@ -953,7 +951,6 @@ const postInvoice = async () => {
   }
 };
 
-// Upload invoice file, then load the invoice details from the API response.
 const uploadInvoice = async () => {
   loading.value = true;
   const formData = new FormData();
@@ -994,7 +991,6 @@ const fetchInvoice = async (id) => {
   }
 };
 
-// Load invoice data into the form, preserving any tax values if present.
 const loadInvoice = async (invoice) => {
   if (
     !vcList.value.length ||
@@ -1028,7 +1024,6 @@ const loadInvoice = async (invoice) => {
       [vcNumberField.value]: vcToSelect[vcNumberField.value],
     };
 
-    // Use API taxes if provided; otherwise, fall back to calculateTaxes.
     if (invoice.taxes && invoice.taxes.length > 0) {
       taxIncluded.value = Boolean(invoice.taxincluded);
       invoiceTaxes.value = invoice.taxes.map((tx) => ({
@@ -1037,12 +1032,11 @@ const loadInvoice = async (invoice) => {
         acc: tx.accno,
         rate: parseFloat(tx.rate),
       }));
-      preserveApiTaxes.value = true; // <-- We have legit API taxes; preserve them
+      preserveApiTaxes.value = true;
     } else {
       calculateTaxes();
     }
 
-    // Map invoice line items with a unique "id"
     lines.value = invoice.lineitems.map((item, index) => ({
       id: Date.now() + index,
       amount: Boolean(invoice.taxincluded)
@@ -1078,7 +1072,6 @@ const loadInvoice = async (invoice) => {
     ordNumber.value = "";
     poNumber.value = "";
 
-    // Map payments if any
     if (invoice.payments && invoice.payments.length > 0) {
       payments.value = invoice.payments.map((payment) => ({
         date: payment.date || getTodayDate(),
@@ -1116,13 +1109,111 @@ const loadInvoice = async (invoice) => {
 };
 
 // -------------------------
+// Add/Edit Dialog Functions
+// -------------------------
+const openAddVc = () => {
+  dialogMode.value = "add";
+  vcDialog.value = true;
+};
+
+const openEditVc = () => {
+  if (!selectedEntity.value) return;
+  dialogMode.value = "edit";
+  vcDialog.value = true;
+};
+
+const vcSaved = async (savedEntity) => {
+  await fetchvcList();
+  selectedEntity.value = vcList.value.find((vc) => vc.id == savedEntity.id);
+  vcUpdate(selectedEntity.value);
+  vcDialog.value = false;
+};
+
+// -------------------------
+// Update Entity Details
+// -------------------------
+const vcUpdate = async (newValue) => {
+  const entityId = newValue.id || newValue;
+  vc.value = await fetchEntity(entityId);
+  if (vc.value) {
+    // Update tax accounts and tax account list
+    taxAccounts.value = vc.value.taxaccounts
+      ? vc.value.taxaccounts.split(" ")
+      : [];
+    taxAccountList.value = accounts.value
+      .filter((account) => taxAccounts.value.includes(account.accno))
+      .map((acc) => ({
+        ...acc,
+        rate: parseFloat(vc.value[`${acc.accno}_rate`] || 0),
+      }));
+
+    // Update internal notes
+    intnotes.value = vc.value.intnotes;
+
+    // Update record account based on the AR field
+    const recordAccountAccno = vc.value?.AR?.split("--")[0] ?? "";
+    if (recordAccountAccno) {
+      const matchingRecord = recordAccounts.value.find(
+        (account) => account.accno === recordAccountAccno
+      );
+      if (matchingRecord) {
+        recordAccount.value = matchingRecord;
+      }
+    }
+
+    // Update default payment account and assign to payments with zero amount
+    const paymentAccountAccno = vc.value?.payment_accno?.split("--")[0] || "";
+    defaultPaymentAccount.value =
+      paymentAccounts.value.find(
+        (account) => account.accno === paymentAccountAccno
+      ) || paymentAccounts.value[0];
+    payments.value.forEach(
+      (payment) =>
+        payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
+    );
+
+    // Update currency if available
+    if (vc.value?.currency) {
+      const matchingCurrency = currencies.value.find(
+        (curr) => curr.curr === vc.value.currency
+      );
+      if (matchingCurrency) {
+        selectedCurrency.value = matchingCurrency;
+      } else {
+        console.warn(`No matching currency found for: ${vc.value.currency}`);
+      }
+    }
+
+    // Update due date based on terms from the vc and current invoice date
+    if (invDate.value) {
+      const terms = vc.value?.terms ?? 0;
+      const newDueDate = date.addToDate(invDate.value, { days: terms });
+      dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
+    } else {
+      console.warn("Invalid invoice date");
+    }
+
+    // Finally, recalculate taxes
+    calculateTaxes();
+  }
+};
+
+// -------------------------
+// Computed Properties
+// -------------------------
+const vcLabel = computed(() =>
+  type.value === "vendor" ? "Vendor" : "Customer"
+);
+const vcNumberField = computed(() =>
+  type.value === "vendor" ? "vendornumber" : "customernumber"
+);
+
+// -------------------------
 // Watchers
 // -------------------------
 watch(
   lines,
   () => {
-    // If user changes the lines and we had API-based taxes,
-    // we clear preserveApiTaxes to allow normal re-calculation.
     if (!initialLoad.value) {
       preserveApiTaxes.value = false;
       calculateTaxes();
@@ -1157,7 +1248,7 @@ watch(
     poNumber.value = "";
     taxIncluded.value = false;
     invoiceTaxes.value = [];
-    preserveApiTaxes.value = false; // reset since we're changing type
+    preserveApiTaxes.value = false;
 
     await fetchvcList();
     if (accounts.value.length > 0) {
@@ -1182,13 +1273,6 @@ watch(
     splitterModel.value = 100;
   },
   { immediate: true }
-);
-
-const vcLabel = computed(() =>
-  type.value === "vendor" ? "Vendor" : "Customer"
-);
-const vcNumberField = computed(() =>
-  type.value === "vendor" ? "vendornumber" : "customernumber"
 );
 
 onMounted(() => {
