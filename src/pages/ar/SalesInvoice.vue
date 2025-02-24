@@ -1,6 +1,6 @@
 <template>
   <q-page class="lightbg q-px-md q-py-md relative-position">
-    <div class="mainbg textmain q-pa-md-md q-pa-sm">
+    <div class="mainbg textmain q-pa-md-sm q-pa-sm">
       <div class="row justify-between full-width q-mt-md">
         <div class="col-sm-6 col-12">
           <div class="row full-width">
@@ -74,12 +74,12 @@
               v-model="exchangeRate"
             />
           </div>
-          <div class="row">
+          <div class="row q-gutter-x-sm">
             <q-input
               outlined
               :label="t('Shipping Point')"
               v-model="shippingPoint"
-              class="lightbg q-mb-sm col-sm-3 col-12"
+              class="lightbg q-mb-sm col-sm-5 col-12"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -88,7 +88,7 @@
               outlined
               :label="t('Ship Via')"
               v-model="shipVia"
-              class="lightbg q-mb-sm col-sm-3 col-12 q-ml-md-md"
+              class="lightbg q-mb-sm col-sm-5 col-12"
               input-class="maintext"
               label-color="secondary"
               dense
@@ -97,13 +97,12 @@
               outlined
               :label="t('Way Bill')"
               v-model="wayBill"
-              class="lightbg q-mb-sm q-ml-md-md col-sm-3 col-12"
+              class="lightbg q-mb-sm col-sm-5 col-12"
               input-class="maintext"
               label-color="secondary"
               dense
             />
           </div>
-          <div class="row q-my-md-sm"></div>
         </div>
         <div class="col-sm-4 col-12">
           <div class="row justify-around">
@@ -185,98 +184,206 @@
         @end="dragging = false"
       >
         <template #item="{ element: line, index }">
-          <div class="row q-mb-md justify-between" :key="line.id">
-            <q-btn icon="drag_indicator" class="lighttext" flat dense />
-            <s-select
-              :key="line.id"
-              outlined
-              v-model="line.partnumber"
-              :label="t('Number')"
-              class="lightbg col-2"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-              :options="items"
-              option-label="partnumber"
-              option-value="partnumber"
-              @update:model-value="handleLineItemChange(line, index)"
-              search="label"
-            />
-            <q-input
-              outlined
-              v-model="line.description"
-              :label="t('Description')"
-              class="lightbg col-2"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <q-input
-              outlined
-              v-model="line.qty"
-              :label="t('Qty')"
-              type="number"
-              class="lightbg col-1"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <q-input
-              outlined
-              :value="line.oh"
-              :label="t('OH')"
-              class="lightbg col-1"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-              readonly
-            />
-            <q-input
-              outlined
-              v-model="line.unit"
-              :label="t('Unit')"
-              class="lightbg col-1"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <fn-input
-              outlined
-              v-model="line.price"
-              :label="t('Price')"
-              class="lightbg col-2"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <q-input
-              outlined
-              v-model="line.discount"
-              :label="t('%')"
-              type="number"
-              class="lightbg col-1"
-              input-class="maintext"
-              label-color="secondary"
-              dense
-            />
-            <q-input
-              outlined
-              v-model="line.extended"
-              :model-value="formatAmount(line.extended)"
-              :label="t('Extended')"
-              dense
-              class="lightbg col-1"
-              input-class="maintext"
-              label-color="secondary"
-              readonly
-            />
-            <q-btn
-              color="negative"
-              icon="delete"
-              dense
-              flat
-              @click="removeLine(index)"
-            />
+          <div :key="line.id">
+            <!-- Main line fields -->
+            <div
+              class="row justify-between"
+              :class="line.lineitemdetail ? '' : 'q-mb-sm'"
+            >
+              <q-checkbox v-model="line.lineitemdetail" />
+              <s-select
+                :key="line.id"
+                outlined
+                v-model="line.partnumber"
+                :label="t('Number')"
+                class="lightbg col-2"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                :options="items"
+                option-label="partnumber"
+                option-value="partnumber"
+                @update:model-value="handleLineItemChange(line, index)"
+                search="label"
+                :ref="(el) => (lineSelects[index] = el)"
+              />
+              <q-input
+                outlined
+                v-model="line.description"
+                :label="t('Description')"
+                class="lightbg col-2"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.qty"
+                :label="t('Qty')"
+                type="number"
+                class="lightbg col-1"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                :value="line.oh"
+                :label="t('OH')"
+                class="lightbg col-1"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                readonly
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.unit"
+                :label="t('Unit')"
+                class="lightbg col-1"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <fn-input
+                outlined
+                v-model="line.price"
+                :label="t('Price')"
+                class="lightbg col-2"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.discount"
+                :label="t('%')"
+                type="number"
+                class="lightbg col-1"
+                input-class="maintext"
+                label-color="secondary"
+                dense
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.extended"
+                :model-value="formatAmount(line.extended)"
+                :label="t('Extended')"
+                dense
+                class="lightbg col-1"
+                input-class="maintext"
+                label-color="secondary"
+                readonly
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-btn
+                color="negative"
+                icon="delete"
+                dense
+                flat
+                @click="removeLine(index)"
+              />
+            </div>
+
+            <div v-if="line.lineitemdetail" class="row q-pa-sm q-gutter-xs">
+              <q-input
+                outlined
+                v-model="line.devliverydate"
+                :label="t('Delivery Date')"
+                dense
+                type="date"
+                class="col-2 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.itemnotes"
+                :label="t('Item Notes')"
+                dense
+                type="textarea"
+                rows="1"
+                class="col-4 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.serialnumber"
+                :label="t('Serial No.')"
+                dense
+                class="col-3 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.costvendor"
+                :label="t('Vendor')"
+                dense
+                class="col-3 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <fn-input
+                outlined
+                v-model="line.cost"
+                :label="t('Cost')"
+                dense
+                class="col-2 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.ordernumber"
+                :label="t('Order Number')"
+                dense
+                class="col-3 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.customerponumber"
+                :label="t('PO Number')"
+                dense
+                class="col-3 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-input
+                outlined
+                v-model="line.package"
+                :label="t('Packaging')"
+                dense
+                class="col-3 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <fn-input
+                outlined
+                v-model="line.netweight"
+                :label="t('N.W.')"
+                dense
+                class="col-2 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <fn-input
+                outlined
+                v-model="line.weight"
+                :label="t('G.W.')"
+                dense
+                class="col-2 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <fn-input
+                outlined
+                v-model="line.volume"
+                :label="t('Volume')"
+                dense
+                class="col-2 lightbg"
+                @keyup.enter="handleLineEnter(index, $event)"
+              />
+            </div>
           </div>
         </template>
       </draggable>
@@ -386,6 +493,8 @@
           label-color="secondary"
           dense
           type="date"
+          @keyup.enter="handlePaymentEnter(index, $event)"
+          :ref="(el) => (paymentDateInputs[index] = el)"
         />
         <q-input
           outlined
@@ -395,6 +504,7 @@
           input-class="maintext"
           label-color="secondary"
           dense
+          @keyup.enter="handlePaymentEnter(index, $event)"
         />
         <q-input
           outlined
@@ -404,6 +514,7 @@
           input-class="maintext"
           label-color="secondary"
           dense
+          @keyup.enter="handlePaymentEnter(index, $event)"
         />
         <fn-input
           outlined
@@ -413,6 +524,7 @@
           input-class="maintext"
           label-color="secondary"
           dense
+          @keyup.enter="handlePaymentEnter(index, $event)"
         />
         <fn-input
           v-if="selectedCurrency && selectedCurrency.rn != 1"
@@ -421,6 +533,7 @@
           :label="t('Exch')"
           class="lightbg q-mt-sm col-1"
           dense
+          @keyup.enter="handlePaymentEnter(index, $event)"
         />
         <s-select
           outlined
@@ -433,8 +546,9 @@
           input-class="maintext"
           label-color="secondary"
           dense
-          label="search"
+          search="label"
           account
+          @keyup.enter="handlePaymentEnter(index, $event)"
         />
         <q-btn
           color="negative"
@@ -488,7 +602,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, inject } from "vue";
+import { ref, onMounted, watch, computed, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -518,6 +632,10 @@ let lineId = 1;
 // Dragging flag for reordering
 const dragging = ref(false);
 
+// Refs for auto-focusing newly added items
+const lineSelects = ref([]);
+const paymentDateInputs = ref([]);
+
 // Customers
 const customers = ref([]);
 const selectedCustomer = ref();
@@ -545,6 +663,53 @@ const customerUpdate = async (newValue) => {
   taxAccounts.value = customer.value.taxaccounts
     ? customer.value.taxaccounts.split(" ")
     : [];
+  console.log(customer.value);
+  intnotes.value = customer.value.intnotes;
+  const recordAccountAccno = customer.value?.AR?.split("--")[0] ?? "";
+
+  if (recordAccountAccno) {
+    const matchingRecord = recordAccounts.value.find(
+      (account) => account.accno === recordAccountAccno
+    );
+    if (matchingRecord) {
+      recordAccount.value = matchingRecord;
+    } else {
+    }
+  }
+  const paymentAccountAccno =
+    customer.value?.payment_accno?.split("--")[0] || "";
+  defaultPaymentAccount.value =
+    paymentAccounts.value.find(
+      (account) => account.accno === paymentAccountAccno
+    ) || paymentAccounts.value[0];
+
+  payments.value.forEach(
+    (payment) =>
+      payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
+  );
+
+  if (customer.value?.currency) {
+    const customerCurrency = currencies.value.find(
+      (curr) => curr.curr === customer.value.currency
+    );
+    if (customerCurrency) {
+      selectedCurrency.value = customerCurrency;
+    } else {
+      console.warn(
+        `No matching currency found for: ${customer.value.currency}`
+      );
+    }
+  }
+  if (invDate.value) {
+    console.log(invDate.value);
+    const terms = customer.value?.terms ?? 0;
+    const newDueDate = date.addToDate(invDate.value, { days: terms });
+    dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
+
+    console.log(dueDate.value);
+  } else {
+    console.warn("Invalid invoice date");
+  }
   calculateTaxes();
 };
 
@@ -552,6 +717,7 @@ const customerUpdate = async (newValue) => {
 const recordAccount = ref();
 const recordAccounts = ref([]);
 const paymentAccounts = ref([]);
+const defaultPaymentAccount = ref([]);
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
@@ -560,6 +726,7 @@ const fetchAccounts = async () => {
     paymentAccounts.value = accounts.filter((account) =>
       account.link.split(":").includes("AR_paid")
     );
+    defaultPaymentAccount.value = paymentAccounts.value[0];
     recordAccount.value = recordAccounts.value[0];
   } catch (error) {
     console.log(error);
@@ -603,7 +770,7 @@ const notes = ref("");
 const intnotes = ref("");
 
 // Invoice Information
-const { formatDate } = date;
+const { formatDate, addToDate } = date;
 const getTodayDate = () => {
   return formatDate(new Date(), "YYYY-MM-DD");
 };
@@ -634,6 +801,7 @@ const fetchItems = async () => {
 const lines = ref([
   {
     id: lineId++,
+    lineitemdetail: false,
     number: "",
     description: "",
     qty: 1,
@@ -644,10 +812,15 @@ const lines = ref([
   },
 ]);
 
-// Function to add a new line
-const addLine = () => {
-  lines.value.push({
+// Lock flags to prevent duplicate additions on enter key
+let lineEnterLock = false;
+let paymentEnterLock = false;
+
+// Function to add a new line at a given index
+const addLineAt = (index) => {
+  const newLine = {
     id: lineId++,
+    lineitemdetail: false,
     item: "",
     number: "",
     description: "",
@@ -656,7 +829,31 @@ const addLine = () => {
     unit: "",
     price: 0,
     discount: 0,
+  };
+  lines.value.splice(index + 1, 0, newLine);
+  nextTick(() => {
+    const newIndex = index + 1;
+    if (lineSelects.value[newIndex]?.focus) {
+      lineSelects.value[newIndex].focus();
+    }
   });
+};
+
+// Called when enter is pressed on any field in a line
+const handleLineEnter = (index, event) => {
+  if (lineEnterLock) return;
+  lineEnterLock = true;
+  event.preventDefault();
+  event.stopPropagation();
+  addLineAt(index);
+  setTimeout(() => {
+    lineEnterLock = false;
+  }, 300);
+};
+
+// Function to add a new line when the Add Line button is clicked
+const addLine = () => {
+  addLineAt(lines.value.length - 1);
 };
 
 const removeLine = (index) => {
@@ -758,7 +955,6 @@ const calculateExtended = (qty, price, discount) => {
   return discountedValue.toFixed(2);
 };
 
-// Handle part number change; skip updating during a drag
 const handleLineItemChange = (newValue, index) => {
   if (dragging.value) return;
 
@@ -789,18 +985,45 @@ const payments = ref([
     source: "",
     memo: "",
     amount: 0,
-    account: "",
+    account: defaultPaymentAccount.value,
   },
 ]);
 
-const addPayment = () => {
-  payments.value.push({
+// Function to add a new payment at a given index
+const addPaymentAt = (index) => {
+  const newPayment = {
     date: getTodayDate(),
     source: "",
     memo: "",
     amount: 0,
-    account: "",
+    account: defaultPaymentAccount.value,
+  };
+  payments.value.splice(index + 1, 0, newPayment);
+  nextTick(() => {
+    if (
+      paymentDateInputs.value[index + 1] &&
+      paymentDateInputs.value[index + 1].focus
+    ) {
+      paymentDateInputs.value[index + 1].focus();
+    }
   });
+};
+
+// Called when enter is pressed on any payment field
+const handlePaymentEnter = (index, event) => {
+  if (paymentEnterLock) return;
+  paymentEnterLock = true;
+  event.preventDefault();
+  event.stopPropagation();
+  addPaymentAt(index);
+  setTimeout(() => {
+    paymentEnterLock = false;
+  }, 300);
+};
+
+// Function to add a new payment when the Add Payment button is clicked
+const addPayment = () => {
+  addPaymentAt(payments.value.length - 1);
 };
 
 const removePayment = (index) => {
@@ -891,7 +1114,6 @@ const postInvoice = async () => {
     });
     return;
   }
-
   const invoiceData = {
     selectedCustomer: selectedCustomer.value,
     shippingPoint: shippingPoint.value,
@@ -908,15 +1130,29 @@ const postInvoice = async () => {
     recordAccount: recordAccount.value,
     selectedCurrency: selectedCurrency.value,
     type: invType.value,
-    lines: lines.value.map((line) => ({
-      number: line.partnumber.id,
-      description: line.description,
-      qty: line.qty,
-      oh: line.oh,
-      unit: line.unit,
-      price: line.price,
-      discount: line.discount,
-    })),
+    lines: lines.value
+      .filter((line) => line.partnumber && line.partnumber.id) // Filter out empty partnumbers
+      .map((line) => ({
+        number: line.partnumber.id,
+        description: line.description,
+        qty: line.qty,
+        oh: line.oh,
+        unit: line.unit,
+        price: line.price,
+        discount: line.discount,
+        lineitemdetail: line.lineitemdetail,
+        devliverydate: line.deliverydate,
+        itemnotes: line.itemnotes,
+        ordernumber: line.ordernumber,
+        serialnumber: line.serialnumber,
+        customerponumber: line.customerponumber,
+        costvendor: line.costvendor,
+        package: line.package,
+        volume: line.volume,
+        weight: line.weight,
+        netweight: line.netweight,
+        cost: line.cost,
+      })),
     payments: payments.value.map((payment) => ({
       date: payment.date,
       source: payment.source,
@@ -1046,7 +1282,6 @@ const loadInvoice = async (invoice) => {
   exchangeRate.value = invoice.exchangerate || 1;
   taxIncluded.value = !!invoice.taxincluded;
 
-  // When loading, add unique id for each line
   lines.value = invoice.lines.map((line) => {
     return {
       id: lineId++,
@@ -1059,6 +1294,19 @@ const loadInvoice = async (invoice) => {
       discount: line.discount,
       extended:
         line.qty * line.price - (line.qty * line.price * line.discount) / 100,
+      lineitemdetail: line.lineitemdetail ? true : false,
+      devliverydate: line.deliverydate,
+      itemnotes: line.itemnotes,
+      ordernumber: line.ordernumber,
+      serialnumber: line.serialnumber,
+      customerponumber: line.customerponumber,
+      costvendor: line.costvendor,
+      package: line.package,
+      volume: line.volume,
+      weight: line.weight,
+      netweight: line.netweight,
+      cost: line.cost,
+      volume: line.cost,
       noupdate: true,
     };
   });

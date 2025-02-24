@@ -175,7 +175,12 @@ function onFilter(val, update) {
     }
   );
 }
-
+const qSelectRef = ref(null);
+defineExpose({
+  focus: () => {
+    qSelectRef.value.focus();
+  },
+});
 function onPopupShow() {
   if (internalValue.value != null && internalValue.value !== "") {
     searchTerm.value = "";

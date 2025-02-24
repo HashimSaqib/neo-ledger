@@ -41,7 +41,7 @@
         </div>
 
         <!-- Document Numbers Section -->
-        <div class="row q-mt-sm q-gutter-md">
+        <div class="row q-mt-sm q-gutter-sm">
           <q-input
             v-model="formData.invnumber"
             class="lightbg"
@@ -99,7 +99,7 @@
         </div>
 
         <!-- Entity Information Section -->
-        <div class="row q-mt-sm q-gutter-md">
+        <div class="row q-mt-sm q-gutter-sm">
           <q-input
             v-model="formData.warehouse"
             class="lightbg"
@@ -130,7 +130,7 @@
         </div>
 
         <!-- Description Fields Section -->
-        <div class="row q-mt-sm q-gutter-md">
+        <div class="row q-mt-sm q-gutter-sm">
           <q-input
             v-model="formData.description"
             class="lightbg col-5"
@@ -170,7 +170,7 @@
         </div>
 
         <!-- Date Range Section -->
-        <div class="row q-mt-sm q-gutter-md">
+        <div class="row q-mt-sm q-gutter-sm">
           <q-input
             v-model="formData.transdatefrom"
             type="date"
@@ -193,7 +193,7 @@
           />
         </div>
 
-        <div class="row q-mt-sm q-gutter-md">
+        <div class="row q-mt-sm q-gutter-sm">
           <q-toggle
             :model-value="formData.outstanding === 'Y'"
             @update:model-value="
