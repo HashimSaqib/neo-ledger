@@ -15,11 +15,13 @@
     "@quasar/extras": "^1.16.4",
     "axios": "^1.2.1",
     "chart.js": "^4.4.7",
+    "file-saver": "^2.0.5",
     "quasar": "^2.16.0",
     "vue": "^3.4.18",
     "vue-i18n": "^11.0.0-rc.1",
     "vue-router": "^4.0.0",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@quasar/app-vite": "^2.0.0-beta.12",

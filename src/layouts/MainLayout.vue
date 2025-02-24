@@ -60,7 +60,7 @@ import SettingsPanel from "components/SettingsPanel.vue";
 import { menuLinks } from "src/layouts/Menu.js";
 import { Cookies } from "quasar";
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const route = useRoute();
 const leftDrawerOpen = ref(false);
 const company = Cookies.get("company");
@@ -85,11 +85,12 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 
-// Watch route changes to reset title
+// Watch route changes to reset title and close the side panel
 watch(
   () => route.fullPath,
   () => {
     title.value = getDefaultTitle();
+    leftDrawerOpen.value = false; // close side panel on route change
   },
   { immediate: true }
 );
