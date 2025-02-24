@@ -467,15 +467,37 @@ import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 
+// Define props so the component can work as an embedded component
+const props = defineProps({
+  id: { type: [String, Number], default: null },
+  type: { type: String, default: null },
+});
+
+// Define emits for the event that will be raised after save
+const emit = defineEmits(["saved"]);
+
+// Computed property that returns true if props were passed in
+const haveProps = computed(() => props.id !== null || props.type !== null);
+
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-// Computed properties for page state
-const isEditMode = computed(() => !!route.params.id);
+// Create computed values that prefer props over route params
+const componentId = computed(() => {
+  return props.id ?? route.params.id ?? route.query.id;
+});
+const componentType = computed(() => {
+  return props.type ?? route.params.type;
+});
+
+// Computed property for edit mode based on componentId
+const isEditMode = computed(() => !!componentId.value);
+
+// Compute VC type based on the componentType value
 const vcType = computed(() =>
-  route.params.type === "customer" ? t("Customer") : t("Vendor")
+  componentType.value === "customer" ? t("Customer") : t("Vendor")
 );
 
 // Form state with all fields matching original HTML form
@@ -509,7 +531,7 @@ const form = ref({
   threshold: "",
   terms: "",
   curr: "PKR",
-  startdate: new Date().toISOString().split("T")[0], // Today's date as default
+  startdate: new Date().toISOString().split("T")[0],
   enddate: "",
   discount: "",
   taxnumber: "",
@@ -552,7 +574,7 @@ const paymentAccounts = ref([]);
 const taxAccounts = ref([]);
 const arap = ref("");
 
-// Format account options for q-select
+// Helper: Format account options for q-select
 const formatAccountOption = (account) => ({
   label: `${account.accno}--${account.description}`,
   value: `${account.accno}--${account.description}`,
@@ -560,12 +582,14 @@ const formatAccountOption = (account) => ({
 
 // Unified function to update VC-related values
 const updateVCSettings = async () => {
-  const isCustomer = route.params.type === "customer";
+  const isCustomer = componentType.value === "customer";
 
-  // Update page title
-  updateTitle(
-    isEditMode.value ? `Edit ${vcType.value}` : `Add ${vcType.value}`
-  );
+  // Only update the page title if we are NOT using the component via props
+  if (!haveProps.value && updateTitle) {
+    updateTitle(
+      isEditMode.value ? `Edit ${vcType.value}` : `Add ${vcType.value}`
+    );
+  }
 
   // Set AR/AP label
   arap.value = isCustomer ? t("AR") : t("AP");
@@ -614,12 +638,10 @@ const fetchAccounts = async () => {
   }
 };
 
-// Fetch vc data if in edit mode
+// Fetch VC data if in edit mode
 const fetchVc = async (id) => {
   try {
-    const response = await api.get(`/arap/${route.params.type}/${id}`);
-
-    // Destructure response data for clarity
+    const response = await api.get(`/arap/${componentType.value}/${id}`);
     const data = response.data;
 
     // Handle taxaccounts (space-separated string)
@@ -674,7 +696,6 @@ const fetchVc = async (id) => {
 // Form submission handler
 const submitForm = async () => {
   try {
-    // Validate form
     if (!formRef.value.validate()) {
       Notify.create({
         message: t("Please correct the errors in the form"),
@@ -685,8 +706,6 @@ const submitForm = async () => {
     }
 
     loading.value = true;
-
-    // Prepare payload
     const payload = { ...form.value };
 
     // Add selected taxes to payload
@@ -694,18 +713,18 @@ const submitForm = async () => {
       .filter((tax) => form.value[`tax_${tax.id}`])
       .map((tax) => tax.id);
 
-    // Optionally, convert boolean fields to integers if API expects 1/0
+    // Optionally convert boolean fields to integers if API expects 1/0
     payload.remittancevoucher = form.value.remittancevoucher ? 1 : 0;
     payload.taxincluded = form.value.taxincluded ? 1 : 0;
 
-    // Submit to API
-
-    await api.post(`/arap/${route.params.type}`, payload);
+    const response = await api.post(`/arap/${componentType.value}`, payload);
     Notify.create({
       message: t(`${vcType.value} updated successfully`),
       type: "positive",
       position: "center",
     });
+
+    emit("saved", { id: response.data.id });
   } catch (error) {
     console.error("Form submission error:", error);
     Notify.create({
@@ -718,7 +737,7 @@ const submitForm = async () => {
   }
 };
 
-// Watch for type changes
+// Watch for changes in the route params (if no prop is passed)
 watch(
   () => route.params.type,
   () => updateVCSettings()
@@ -727,6 +746,9 @@ watch(
 // Initialize component
 onMounted(async () => {
   await fetchAccounts();
-  await fetchVc(route.query.id);
+  // Only attempt to fetch VC data if there is a valid id
+  if (componentId.value) {
+    await fetchVc(componentId.value);
+  }
 });
 </script>

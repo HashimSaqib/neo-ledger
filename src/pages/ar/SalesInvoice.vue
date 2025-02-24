@@ -18,6 +18,23 @@
               @update:model-value="customerUpdate"
               search="label"
             />
+            <div class="q-ml-sm" style="display: flex; align-items: center">
+              <a
+                href="#"
+                @click.prevent="openEditCustomer"
+                class="text-primary q-mr-xs"
+                style="text-decoration: none"
+                v-if="selectedCustomer"
+                >?</a
+              >
+              <a
+                href="#"
+                @click.prevent="openAddCustomer"
+                class="text-primary"
+                style="margin-right: 0.5em; text-decoration: none"
+                >+</a
+              >
+            </div>
             <div class="col-sm-4 q-md-ml-md content-center" v-if="customer">
               <p class="q-px-sm maintext q-ma-none">
                 <strong>{{ t("Credit Limit") }}</strong>
@@ -36,6 +53,7 @@
               <strong>{{ t("Address") }}</strong> {{ customer.full_address }}
             </p>
           </div>
+
           <div class="row">
             <s-select
               outlined
@@ -51,6 +69,7 @@
               account
             />
           </div>
+
           <div v-if="currencies && currencies.length" class="row">
             <q-select
               v-if="currencies"
@@ -598,6 +617,18 @@
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
+    <q-dialog v-model="customerDialog">
+      <q-card style="min-width: 80vw" class="q-pa-none">
+        <q-card-section class="q-pa-none">
+          <AddVC
+            :id="dialogMode === 'edit' ? selectedCustomer.id : null"
+            type="customer"
+            @close="customerDialog = false"
+            @saved="customerSaved"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -609,7 +640,7 @@ import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
-
+import AddVC from "src/pages/arap/AddVC.vue";
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -658,6 +689,16 @@ const fetchCustomer = async (id) => {
   }
 };
 const taxAccounts = ref([]);
+const customerSaved = async (id) => {
+  console.log(id.id);
+  await fetchCustomers();
+  selectedCustomer.value = customers.value.find((cus) => cus.id == id.id);
+  console.log("SELECTED CUSTOMER");
+  console.log(selectedCustomer.value);
+  customerUpdate(id);
+  customerDialog.value = false;
+};
+
 const customerUpdate = async (newValue) => {
   customer.value = await fetchCustomer(newValue.id);
   taxAccounts.value = customer.value.taxaccounts
@@ -711,6 +752,19 @@ const customerUpdate = async (newValue) => {
     console.warn("Invalid invoice date");
   }
   calculateTaxes();
+};
+const customerDialog = ref(false);
+const dialogMode = ref("add"); // "add" or "edit"
+
+const openAddCustomer = () => {
+  dialogMode.value = "add";
+  customerDialog.value = true;
+};
+
+const openEditCustomer = () => {
+  if (!selectedCustomer.value) return;
+  dialogMode.value = "edit";
+  customerDialog.value = true;
 };
 
 // Accounts
