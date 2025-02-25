@@ -528,7 +528,7 @@ const form = ref({
   arap_accno: "",
   payment_accno: "",
   prepayment_accno: "",
-  creditlimit: "",
+  creditlimit: 0,
   threshold: "",
   terms: "",
   curr: "PKR",
@@ -638,8 +638,6 @@ const fetchAccounts = async () => {
     });
   }
 };
-
-// Fetch VC data if in edit mode
 const fetchVc = async (id) => {
   try {
     const response = await api.get(`/arap/${componentType.value}/${id}`);
@@ -648,8 +646,9 @@ const fetchVc = async (id) => {
     // Handle taxaccounts (space-separated string)
     const taxAccountsString = data.taxaccounts; // e.g., "2310 2320 2330"
     const taxIds = taxAccountsString ? taxAccountsString.split(" ") : [];
-    taxIds.forEach((id) => {
-      form.value[`tax_${id}`] = true;
+    taxIds.forEach((taxId) => {
+      // Set checkbox to true if data[`tax_${taxId}`] equals "1"
+      form.value[`tax_${taxId}`] = data[`tax_${taxId}`] === "1";
     });
 
     // Handle all_contact array
@@ -664,15 +663,15 @@ const fetchVc = async (id) => {
       form.value.contactid = contact.id || "";
     }
 
+    // Other fields mapping
     form.value.vcnumber =
       vcType.value === "Vendor" ? data.vendornumber : data.customernumber;
     form.value.id = data.id;
-    // Handle remittancevoucher and taxincluded (1 or 0)
     form.value.remittancevoucher = data.remittancevoucher === 1;
     form.value.taxincluded = data.taxincluded === 1;
     form.value.addressid = data.addressid;
 
-    // Map other fields, excluding the ones already handled
+    // Map remaining fields (excluding the ones already handled)
     const excludedFields = [
       "taxaccounts",
       "all_contact",
@@ -707,16 +706,37 @@ const submitForm = async () => {
     }
 
     loading.value = true;
+    // Create a payload based on current form values
     const payload = { ...form.value };
 
-    // Add selected taxes to payload
-    payload.taxes = taxAccounts.value
-      .filter((tax) => form.value[`tax_${tax.id}`])
-      .map((tax) => tax.id);
+    // Convert tax checkbox values to 1 or 0
+    const taxKeys = Object.keys(payload).filter((key) =>
+      key.startsWith("tax_")
+    );
+    taxKeys.forEach((key) => {
+      payload[key] = form.value[key] ? 1 : 0;
+    });
 
-    // Optionally convert boolean fields to integers if API expects 1/0
+    // Rebuild the taxaccounts string using only tax IDs that are true
+    payload.taxaccounts = taxKeys
+      .filter((key) => payload[key] === 1)
+      .map((key) => key.slice(4))
+      .join(" ");
+
+    // Convert remittancevoucher and taxincluded to numeric values
     payload.remittancevoucher = form.value.remittancevoucher ? 1 : 0;
     payload.taxincluded = form.value.taxincluded ? 1 : 0;
+
+    // Convert complex fields (assuming these have a .label property)
+    payload.arap_accno =
+      form.value.arap_accno && form.value.arap_accno.label
+        ? form.value.arap_accno.label
+        : form.value.arap_accno;
+
+    payload.payment_accno =
+      form.value.payment_accno && form.value.payment_accno.label
+        ? form.value.payment_accno.label
+        : form.value.payment_accno;
 
     const response = await api.post(`/arap/${componentType.value}`, payload);
     Notify.create({
@@ -724,7 +744,8 @@ const submitForm = async () => {
       type: "positive",
       position: "center",
     });
-
+    // Refresh data with the returned id
+    fetchVc(response.data.id);
     emit("saved", { id: response.data.id });
   } catch (error) {
     console.error("Form submission error:", error);
