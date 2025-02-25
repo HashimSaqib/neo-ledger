@@ -1,10 +1,10 @@
 <template>
-  <q-page class="lightbg q-px-sm q-py-sm relative-position">
+  <q-page class="lightbg q-pa-sm relative-position">
     <q-splitter v-model="splitterModel" class="full-width">
       <!-- Left Panel - Invoice Form -->
       <template v-slot:before>
-        <div class="mainbg textmain q-pa-md-sm q-pa-sm">
-          <div class="row justify-between full-width q-mt-sm">
+        <div class="mainbg textmain q-pa-md-md q-pa-sm">
+          <div class="row justify-between full-width q-mt-md">
             <div class="col-12 col-lg-5">
               <div class="row full-width">
                 <s-select
@@ -181,7 +181,7 @@
         </div>
 
         <!-- Items Section -->
-        <div class="mainbg q-my-sm q-pa-sm">
+        <div class="mainbg q-my-md q-pa-md">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
             <q-btn
@@ -199,6 +199,7 @@
             <template #item="{ element: line, index }">
               <div class="row q-mb-md justify-between">
                 <q-btn icon="drag_indicator" class="lighttext" flat dense />
+                <!-- Description field with inline ref and enter key -->
                 <q-input
                   outlined
                   v-model="line.description"
@@ -208,6 +209,8 @@
                   input-class="maintext"
                   label-color="secondary"
                   dense
+                  :ref="(el) => (lineDescRefs[index] = el)"
+                  @keyup.enter="() => handleLineEnter(index)"
                 />
                 <s-select
                   outlined
@@ -223,6 +226,7 @@
                   search="label"
                   account
                 />
+                <!-- Amount field with enter key -->
                 <fn-input
                   outlined
                   v-model="line.amount"
@@ -231,6 +235,7 @@
                   input-class="maintext"
                   label-color="secondary"
                   dense
+                  @keyup.enter="() => handleLineEnter(index)"
                 />
                 <s-select
                   v-if="lineTax && taxAccountList"
@@ -248,6 +253,7 @@
                   account
                   @update:model-value="() => onLineTaxAccountChange(index)"
                 />
+                <!-- Tax Amount field with enter key -->
                 <fn-input
                   v-if="lineTax && taxAccountList"
                   outlined
@@ -257,6 +263,7 @@
                   input-class="maintext"
                   label-color="secondary"
                   dense
+                  @keyup.enter="() => handleLineEnter(index)"
                 />
                 <q-btn
                   color="negative"
@@ -348,7 +355,7 @@
         </div>
 
         <!-- Payments Section -->
-        <div class="mainbg q-my-sm q-pa-sm">
+        <div class="mainbg q-my-md q-pa-md">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">
               {{ t("Payments") }}
@@ -368,6 +375,7 @@
             :key="index"
             class="row q-mb-md justify-between"
           >
+            <!-- Date field with inline ref and enter key -->
             <q-input
               outlined
               v-model="payment.date"
@@ -377,6 +385,8 @@
               label-color="secondary"
               dense
               type="date"
+              :ref="(el) => (paymentDateRefs[index] = el)"
+              @keyup.enter="() => handlePaymentEnter(index)"
             />
             <q-input
               outlined
@@ -386,6 +396,7 @@
               input-class="maintext"
               label-color="secondary"
               dense
+              @keyup.enter="() => handlePaymentEnter(index)"
             />
             <q-input
               outlined
@@ -395,6 +406,7 @@
               input-class="maintext"
               label-color="secondary"
               dense
+              @keyup.enter="() => handlePaymentEnter(index)"
             />
             <fn-input
               outlined
@@ -404,6 +416,7 @@
               input-class="maintext"
               label-color="secondary"
               dense
+              @keyup.enter="() => handlePaymentEnter(index)"
             />
             <fn-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
@@ -412,6 +425,7 @@
               :label="t('Exhcnage Rate')"
               class="lightbg q-mt-sm"
               dense
+              @keyup.enter="() => handlePaymentEnter(index)"
             />
             <s-select
               outlined
@@ -439,12 +453,23 @@
             />
           </div>
         </div>
-        <q-btn
-          :label="t('Post')"
-          color="primary"
-          @click="postInvoice"
-          class="relative-position"
-        ></q-btn>
+
+        <!-- Action Buttons -->
+        <div class="row q-my-sm">
+          <q-btn
+            :label="t('Post')"
+            color="primary"
+            @click="postInvoice"
+            class="q-mr-md"
+          />
+          <q-btn
+            class="q-mr-md"
+            :label="t('Print')"
+            color="accent"
+            @click="printInvoice"
+          />
+          <q-btn :label="t('Delete')" color="warning" @click="deleteInvoice" />
+        </div>
       </template>
 
       <!-- Right Panel - Invoice Preview -->
@@ -504,7 +529,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, inject } from "vue";
+import { ref, onMounted, watch, computed, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -541,7 +566,7 @@ const invoicePreview = ref(null);
 const loading = ref(false);
 const selectedFile = ref(null);
 const vcDialog = ref(false);
-const dialogMode = ref(null); // will be "add" or "edit"
+const dialogMode = ref(null); // "add" or "edit"
 
 // -------------------------
 // Entity, Account and Currency State
@@ -550,7 +575,7 @@ const vcList = ref([]);
 const selectedEntity = ref(null);
 const vc = ref(null);
 const taxAccounts = ref([]);
-const lineTax = ref(false); // flag for per-line tax calculations
+const lineTax = ref(false);
 const taxAccountList = ref([]);
 
 const recordAccount = ref(null);
@@ -593,6 +618,7 @@ const lines = ref([
   },
 ]);
 
+// For "Add Line" button (appends at the end)
 const addLine = () => {
   lines.value.push({
     id: Date.now(),
@@ -664,9 +690,7 @@ const calculateTaxes = () => {
         }
         taxAgg[taxAccNo].amount += parseFloat(line.taxAmount) || 0;
         const taxAcc = taxAccountList.value.find((a) => a.accno === taxAccNo);
-        if (taxAcc) {
-          taxAgg[taxAccNo].rate = taxAcc.rate;
-        }
+        if (taxAcc) taxAgg[taxAccNo].rate = taxAcc.rate;
       }
     });
     invoiceTaxes.value = Object.keys(taxAgg).map((accNo) => {
@@ -724,9 +748,7 @@ const total = computed(() => {
     (acc, line) => acc + (parseFloat(line.amount) || 0),
     0
   );
-  if (!taxIncluded.value) {
-    totalValue += totalTaxes;
-  }
+  if (!taxIncluded.value) totalValue += totalTaxes;
   return parseFloat(totalValue.toFixed(2));
 });
 
@@ -738,6 +760,7 @@ const payments = ref([
   { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
 ]);
 
+// For "Add Payment" button (appends at the end)
 const addPayment = () => {
   payments.value.push({
     date: getTodayDate(),
@@ -752,6 +775,50 @@ const removePayment = (index) => {
   if (payments.value.length > 1) {
     payments.value.splice(index, 1);
   }
+};
+
+// -------------------------
+// Refs for Focus Management
+// -------------------------
+const lineDescRefs = ref([]);
+const paymentDateRefs = ref([]);
+
+// -------------------------
+// Enter Key Handlers for Inserting New Row Next to Active Row
+// -------------------------
+const handleLineEnter = (index) => {
+  const newLine = {
+    id: Date.now(),
+    amount: 0,
+    account: null,
+    description: "",
+    taxAccount: null,
+    taxAmount: 0,
+  };
+  lines.value.splice(index + 1, 0, newLine);
+  nextTick(() => {
+    const newInput = lineDescRefs.value[index + 1];
+    if (newInput && newInput.focus) {
+      newInput.focus();
+    }
+  });
+};
+
+const handlePaymentEnter = (index) => {
+  const newPayment = {
+    date: getTodayDate(),
+    source: "",
+    memo: "",
+    amount: 0,
+    account: "",
+  };
+  payments.value.splice(index + 1, 0, newPayment);
+  nextTick(() => {
+    const newInput = paymentDateRefs.value[index + 1];
+    if (newInput && newInput.focus) {
+      newInput.focus();
+    }
+  });
 };
 
 // -------------------------
@@ -802,7 +869,6 @@ const fetchAccounts = async () => {
     const linkType = type.value === "vendor" ? "AP" : "AR";
     const linkPaid = type.value === "vendor" ? "AP_paid" : "AR_paid";
     const icLink = type.value === "vendor" ? "AP_amount" : "AR_amount";
-
     recordAccounts.value = accounts.value.filter(
       (account) => account.link === linkType
     );
@@ -1136,7 +1202,6 @@ const vcUpdate = async (newValue) => {
   const entityId = newValue.id || newValue;
   vc.value = await fetchEntity(entityId);
   if (vc.value) {
-    // Update tax accounts and tax account list
     taxAccounts.value = vc.value.taxaccounts
       ? vc.value.taxaccounts.split(" ")
       : [];
@@ -1147,10 +1212,8 @@ const vcUpdate = async (newValue) => {
         rate: parseFloat(vc.value[`${acc.accno}_rate`] || 0),
       }));
 
-    // Update internal notes
     intnotes.value = vc.value.intnotes;
 
-    // Update record account based on the AR field
     const recordAccountAccno = vc.value?.AR?.split("--")[0] ?? "";
     if (recordAccountAccno) {
       const matchingRecord = recordAccounts.value.find(
@@ -1161,7 +1224,6 @@ const vcUpdate = async (newValue) => {
       }
     }
 
-    // Update default payment account and assign to payments with zero amount
     const paymentAccountAccno = vc.value?.payment_accno?.split("--")[0] || "";
     defaultPaymentAccount.value =
       paymentAccounts.value.find(
@@ -1172,7 +1234,6 @@ const vcUpdate = async (newValue) => {
         payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
     );
 
-    // Update currency if available
     if (vc.value?.currency) {
       const matchingCurrency = currencies.value.find(
         (curr) => curr.curr === vc.value.currency
@@ -1184,7 +1245,6 @@ const vcUpdate = async (newValue) => {
       }
     }
 
-    // Update due date based on terms from the vc and current invoice date
     if (invDate.value) {
       const terms = vc.value?.terms ?? 0;
       const newDueDate = date.addToDate(invDate.value, { days: terms });
@@ -1193,13 +1253,12 @@ const vcUpdate = async (newValue) => {
       console.warn("Invalid invoice date");
     }
 
-    // Finally, recalculate taxes
     calculateTaxes();
   }
 };
 
 // -------------------------
-// Computed Properties
+// Computed Properties & Watchers
 // -------------------------
 const vcLabel = computed(() =>
   type.value === "vendor" ? "Vendor" : "Customer"
@@ -1208,9 +1267,6 @@ const vcNumberField = computed(() =>
   type.value === "vendor" ? "vendornumber" : "customernumber"
 );
 
-// -------------------------
-// Watchers
-// -------------------------
 watch(
   lines,
   () => {
@@ -1282,4 +1338,20 @@ onMounted(() => {
   fetchvcList();
   fetchInvoice(route.query.id);
 });
+
+const deleteInvoice = () => {
+  console.warn("Delete function placeholder invoked");
+  Notify.create({
+    type: "warning",
+    message: t("Delete functionality not implemented yet"),
+  });
+};
+
+const printInvoice = () => {
+  console.info("Print function placeholder invoked");
+  Notify.create({
+    type: "accent",
+    message: t("Print functionality not implemented yet"),
+  });
+};
 </script>

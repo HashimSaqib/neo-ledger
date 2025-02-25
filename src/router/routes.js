@@ -8,6 +8,7 @@ import ArTransactions from "src/pages/ar/ArTransactions.vue";
 import AddVC from "src/pages/arap/AddVC.vue";
 import VcHistory from "src/pages/arap/VcHistory.vue";
 import SearchVC from "src/pages/arap/SearchVC.vue";
+import AddPart from "src/pages/goodservices/AddPart.vue";
 import PointOfSale from "src/pages/pos/PointOfSale.vue";
 import ApTransactions from "src/pages/ap/ApTransactions.vue";
 import VendorInvoice from "src/pages/ap/VendorInvoice.vue";
@@ -98,6 +99,11 @@ const routes = [
           from: route.query.fromdate,
           to: route.query.todate,
         }),
+      },
+      // Goods & Serivices
+      {
+        path: "/goodservices/addpart",
+        component: AddPart,
       },
       // System Settings
       {

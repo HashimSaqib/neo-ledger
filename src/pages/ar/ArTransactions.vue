@@ -13,7 +13,7 @@
         </div>
 
         <!-- Basic Info Section -->
-        <div class="row q-mt-sm q-gutter-sm">
+        <div class="row q-mt-xs q-gutter-sm">
           <q-select
             v-model="formData.account"
             class="lightbg col-6 col-md-3"
@@ -25,19 +25,19 @@
             :options="recordAccounts"
           />
           <q-select
-            v-model="formData.customer"
+            v-model="formData.vendor"
             class="lightbg col-3"
-            :label="t('Customers')"
+            :label="t('Vendors')"
             input-class="maintext"
             label-color="secondary"
             outlined
             dense
-            :options="customers"
+            :options="vendors"
           />
           <q-input
-            v-model="formData.customernumber"
+            v-model="formData.vendornumber"
             class="lightbg"
-            :label="t('Customer Number')"
+            :label="t('Vendor Number')"
             input-class="maintext"
             label-color="secondary"
             outlined
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Document Numbers Section -->
-        <div class="row q-mt-sm q-gutter-sm">
+        <div class="row q-mt-xs q-gutter-sm">
           <q-input
             v-model="formData.invnumber"
             class="lightbg"
@@ -104,7 +104,7 @@
         </div>
 
         <!-- Entity Information Section -->
-        <div class="row q-mt-sm q-gutter-sm">
+        <div class="row q-mt-xs q-gutter-sm">
           <q-input
             v-model="formData.warehouse"
             class="lightbg"
@@ -135,7 +135,7 @@
         </div>
 
         <!-- Description Fields Section -->
-        <div class="row q-mt-sm q-gutter-sm">
+        <div class="row q-mt-xs q-gutter-sm">
           <q-input
             v-model="formData.description"
             class="lightbg col-5"
@@ -175,7 +175,7 @@
         </div>
 
         <!-- Date Range Section -->
-        <div class="row q-mt-sm q-gutter-sm">
+        <div class="row q-mt-xs q-gutter-sm">
           <q-input
             v-model="formData.transdatefrom"
             type="date"
@@ -239,7 +239,7 @@
           />
         </div>
 
-        <div class="q-px-lg q-py-sm">
+        <div class="q-py-sm">
           <draggable v-model="baseColumns" item-key="name" class="drag-area">
             <template #item="{ element }">
               <q-checkbox
@@ -247,7 +247,7 @@
                 v-model="selectedColumns[element.name]"
                 :label="t(element.label)"
                 color="primary"
-                class="q-mr-md maintext"
+                class="q-mr-sm maintext"
               />
             </template>
           </draggable>
@@ -303,7 +303,7 @@
           </q-td>
         </template>
 
-        <!-- Customer Name -->
+        <!-- Vendor Name -->
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <div class="wrapped-description">
@@ -376,9 +376,9 @@ import { formatAmount, downloadReport } from "src/helpers/utils";
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 
-// Form data (with defaults)
+// Form data (with defaults) -- updated vendor keys
 const formData = ref({
-  customer: "",
+  vendor: "",
   invnumber: "",
   description: "",
   ordnumber: "",
@@ -404,6 +404,8 @@ const formData = ref({
   paidearly: "",
   onhold: "",
   till: "",
+  // Changed customer number to vendor number
+  vendornumber: "",
 });
 
 const filtersOpen = ref(true);
@@ -439,11 +441,11 @@ const baseColumns = ref([
     field: "transdate",
     default: true,
   },
-  { name: "name", label: "Customer", field: "name", default: true },
+  { name: "name", label: "Vendor", field: "name", default: true },
   {
-    name: "customernumber",
-    label: "Customer Number",
-    field: "customernumber",
+    name: "vendornumber",
+    label: "Vendor Number",
+    field: "vendornumber",
     default: false,
   },
   {
@@ -514,7 +516,7 @@ const selectedColumns = ref(
 );
 
 function processFilters() {
-  const savedFilters = Cookies.get("ar_transactions_filters");
+  const savedFilters = Cookies.get("ap_transactions_filters");
 
   if (savedFilters) {
     try {
@@ -537,7 +539,7 @@ function processFilters() {
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove("ar_transactions_filters");
+      Cookies.remove("ap_transactions_filters");
     }
   } else {
     const defaultFilters = {
@@ -548,7 +550,7 @@ function processFilters() {
       order: baseColumns.value.map((col) => col.name),
     };
 
-    Cookies.set("ar_transactions_filters", defaultFilters, { expires: 30 });
+    Cookies.set("ap_transactions_filters", defaultFilters, { expires: 30 });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
@@ -564,7 +566,7 @@ watch(
       order: baseColumns.value.map((col) => col.name),
     };
     try {
-      Cookies.set("ar_transactions_filters", filters, { expires: 30 });
+      Cookies.set("ap_transactions_filters", filters, { expires: 30 });
     } catch (error) {
       console.error("Error saving filters to cookies:", error);
     }
@@ -598,11 +600,12 @@ const filteredResults = computed(() => {
 });
 
 const recordAccounts = ref([]);
+// Update account filter: now check for AP instead of AR
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     const accounts = response.data;
-    recordAccounts.value = accounts.filter((account) => account.link === "AR");
+    recordAccounts.value = accounts.filter((account) => account.link === "AP");
   } catch (error) {
     console.error(error);
     Notify.create({
@@ -613,28 +616,30 @@ const fetchAccounts = async () => {
   }
 };
 
-const customers = ref([]);
-const fetchCustomers = async () => {
+const vendors = ref([]);
+// Changed function name and endpoint to fetch vendors
+const fetchVendors = async () => {
   try {
-    const response = await api.get("/arap/list/customer");
-    customers.value = response.data;
+    const response = await api.get("/ap/list/vendor");
+    vendors.value = response.data;
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching customers",
+      message: error.response?.data?.message || "Error fetching vendors",
       type: "negative",
       position: "center",
     });
   }
 };
 
+// Update flattenParams to use "vendor" instead of "customer"
 const flattenParams = (obj, prefix = "") => {
   const flattened = {};
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
-    if (key === "customer" && typeof value === "object") {
-      if (value.customernumber) {
-        flattened["customernumber"] = value.customernumber;
+    if (key === "vendor" && typeof value === "object") {
+      if (value.vendornumber) {
+        flattened["vendornumber"] = value.vendornumber;
       }
     } else if (key === "account" && typeof value === "object") {
       if (value.accno) {
@@ -657,7 +662,8 @@ const search = async () => {
   loading.value = true;
   try {
     const params = flattenParams(formData.value);
-    const response = await api.get("/arap/transactions/customer", { params });
+    // Changed endpoint to target vendor transactions under AP
+    const response = await api.get("/ap/transactions/vendor", { params });
     filtersOpen.value = false;
     results.value = response.data.transactions;
     totals.value = response.data.totals;
@@ -692,9 +698,11 @@ const getPath = (row) => {
   if (row.till) {
     path = "/pos/sale";
   } else if (row.invoice) {
-    path = "/ar/sales-invoice";
+    // Updated to reflect AP purchase invoice route
+    path = "/ap/purchase-invoice";
   } else {
-    path = "/arap/transaction/customer";
+    // Updated to reflect vendor transactions
+    path = "/ap/transaction/vendor";
   }
   return { path, query: { id: row.id } };
 };
@@ -706,8 +714,8 @@ const downloadTransactions = () => {
 onMounted(() => {
   processFilters();
   fetchAccounts();
-  fetchCustomers();
-  updateTitle("AR Transactions");
+  fetchVendors();
+  updateTitle("AP Transactions");
 });
 </script>
 
