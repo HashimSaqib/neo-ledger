@@ -155,6 +155,11 @@
 
     <!-- Results Table -->
     <div v-if="processedResults.length" class="q-mt-lg">
+      <q-btn
+        label="Download Report"
+        @click="downloadTransactions"
+        color="accent"
+      />
       <q-table
         :rows="processedResults"
         :columns="finalColumns"
@@ -218,6 +223,7 @@ import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 import { formatAmount } from "src/helpers/utils";
+import { utils, writeFile } from "xlsx";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -548,6 +554,87 @@ async function search() {
     });
   }
 }
+const downloadTransactions = () => {
+  // Use the computed columns and processed results as displayed on screen.
+  const columns = finalColumns.value;
+  const rows = processedResults.value;
+
+  // Build the export data array and track group header row indices.
+  const exportData = [];
+  const groupHeaderIndices = [];
+  const headerRow = columns.map((col) => col.label);
+  exportData.push(headerRow);
+
+  // Build the rows.
+  rows.forEach((row) => {
+    if (row.type === "groupHeader") {
+      // For group header rows, combine name and address.
+      const groupText = `${row.name} ${row.address}`.trim();
+      // Create a row with the group text in the first cell and blanks for the rest.
+      const newRow = [groupText, ...new Array(columns.length - 1).fill("")];
+      // Save the row index so we can merge and center later.
+      groupHeaderIndices.push(exportData.length);
+      exportData.push(newRow);
+    } else if (row.type === "groupSubtotal") {
+      // For subtotal rows, fill only the necessary columns.
+      const newRow = columns.map((col) => {
+        if (col.field === "total") {
+          return formatAmount(row.total);
+        } else if (col.field === "description") {
+          return row.label || "";
+        }
+        return "";
+      });
+      exportData.push(newRow);
+    } else {
+      // For regular data rows, output the values.
+      const newRow = columns.map((col) => {
+        if (["sellprice", "discount", "total"].includes(col.field)) {
+          return formatAmount(row[col.field]);
+        }
+        return row[col.field] != null ? row[col.field] : "";
+      });
+      exportData.push(newRow);
+    }
+  });
+
+  // Create worksheet from the 2D array.
+  const worksheet = utils.aoa_to_sheet(exportData);
+
+  // Merge cells for group header rows and set center alignment.
+  worksheet["!merges"] = worksheet["!merges"] || [];
+  groupHeaderIndices.forEach((rowIdx) => {
+    worksheet["!merges"].push({
+      s: { r: rowIdx, c: 0 },
+      e: { r: rowIdx, c: headerRow.length - 1 },
+    });
+    // Set the style for the merged cell to be centered.
+    const cellRef = utils.encode_cell({ r: rowIdx, c: 0 });
+    if (worksheet[cellRef]) {
+      worksheet[cellRef].s = {
+        alignment: { horizontal: "center", vertical: "center" },
+      };
+    }
+  });
+
+  // Auto-adjust column widths based on content.
+  worksheet["!cols"] = headerRow.map((header, index) => {
+    let maxLength = header.length;
+    exportData.forEach((row) => {
+      const cellValue = row[index];
+      maxLength = Math.max(
+        maxLength,
+        cellValue ? cellValue.toString().length : 0
+      );
+    });
+    return { wch: maxLength + 2 };
+  });
+
+  // Create a new workbook, append the worksheet, and export the file.
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "AR Transactions");
+  writeFile(workbook, `${vcType.value}_history.xlsx`, { compression: true });
+};
 </script>
 
 <style scoped>

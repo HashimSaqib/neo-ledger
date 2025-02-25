@@ -1,4 +1,5 @@
 // src/utils.js
+import { utils, writeFile } from "xlsx";
 
 export const formatAmount = (amount) => {
   if (isNaN(amount) || amount === null || amount === undefined) return ""; // return empty string for invalid values
@@ -17,8 +18,58 @@ export const displayDate = (datestring) => {
   return `${day}-${month}-${year}`;
 };
 
-export function filter(val, options) {
+export const filter = (val, options) => {
   if (val === "") return options;
   const needle = val.toLowerCase();
   return options.filter((v) => v.toLowerCase().includes(needle));
-}
+};
+
+export const downloadReport = (filteredResults, columns, totals = null) => {
+  // Build the header row from the computed columns (ensuring the order is correct)
+  const headerRow = columns.map((col) => col.label);
+
+  // Map filteredResults into rows where cell order matches the header order
+  const dataRows = filteredResults.map((row) =>
+    columns.map((col) => row[col.field] || "")
+  );
+
+  // Prepare the totals row if totals are provided
+  const totalsRow = totals
+    ? columns.map((col) => {
+        if (
+          ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(
+            col.name
+          )
+        ) {
+          return totals[col.name] ? formatAmount(totals[col.name]) : "";
+        } else if (col.name === "description") {
+          return "Totals";
+        }
+        return "";
+      })
+    : null;
+
+  // Combine header, data rows, and totals row (if available)
+  const exportData = [headerRow, ...dataRows];
+  if (totalsRow) exportData.push(totalsRow);
+
+  // Create worksheet from the 2D array
+  const worksheet = utils.aoa_to_sheet(exportData);
+
+  // Auto-adjust column widths
+  worksheet["!cols"] = headerRow.map((header, index) => {
+    let maxLength = header.length;
+    dataRows.forEach((row) => {
+      const cellValue = row[index];
+      maxLength = Math.max(maxLength, cellValue?.toString().length || 0);
+    });
+    return { wch: maxLength + 2 };
+  });
+
+  // Create a new workbook and append the worksheet
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "AR Transactions");
+
+  // Export the workbook to a file with compression enabled
+  writeFile(workbook, "ARreport.xlsx", { compression: true });
+};

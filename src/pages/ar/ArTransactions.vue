@@ -260,6 +260,12 @@
 
     <!-- Results Table -->
     <div v-if="results.length > 0">
+      <q-btn
+        label="Download Report"
+        @click="downloadTransactions"
+        color="accent"
+        class="q-mt-md"
+      />
       <q-table
         class="q-mt-md"
         :rows="filteredResults"
@@ -349,13 +355,6 @@
           </q-tr>
         </template>
       </q-table>
-      <q-btn
-        class="q-mt-sm"
-        label="Download XLSX"
-        @click="downloadReport"
-        color="accent"
-        v-if="results.length > 0"
-      />
     </div>
   </q-page>
 </template>
@@ -365,8 +364,7 @@ import { api } from "src/boot/axios";
 import { Cookies, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
-import { formatAmount } from "src/helpers/utils";
-import * as XLSX from "xlsx";
+import { formatAmount, downloadReport } from "src/helpers/utils";
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
@@ -810,52 +808,8 @@ const getPath = (row) => {
 
   return { path, query: { id: row.id } };
 };
-const downloadReport = () => {
-  // Build the header row from the computed columns (ensuring the order is correct)
-  const headerRow = columns.value.map((col) => col.label);
-
-  // Map filteredResults into rows where cell order matches the header order.
-  const dataRows = filteredResults.value.map((row) => {
-    return columns.value.map((col) => row[col.field] || "");
-  });
-
-  // Optionally, add the totals row at the end.
-  const totalsRow = columns.value.map((col) => {
-    if (
-      ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(col.name)
-    ) {
-      return totals.value[col.name] ? formatAmount(totals.value[col.name]) : "";
-    } else if (col.name === "description") {
-      return t("Totals");
-    }
-    return "";
-  });
-
-  // Combine header, data rows, and totals row
-  const exportData = [headerRow, ...dataRows, totalsRow];
-
-  // Create worksheet from the 2D array
-  const worksheet = XLSX.utils.aoa_to_sheet(exportData);
-
-  // (Optional) Auto-adjust column widths if needed
-  const colWidths = headerRow.map((header, index) => {
-    let maxLength = header.length;
-    dataRows.forEach((row) => {
-      const cellValue = row[index];
-      if (cellValue && cellValue.toString().length > maxLength) {
-        maxLength = cellValue.toString().length;
-      }
-    });
-    return { wch: maxLength + 2 };
-  });
-  worksheet["!cols"] = colWidths;
-
-  // Create a new workbook and append the worksheet
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "AR Transactions");
-
-  // Export the workbook
-  XLSX.writeFile(workbook, "ARreport.xlsx", { compression: true });
+const downloadTransactions = () => {
+  downloadReport(filteredResults.value, columns.value, totals.value);
 };
 
 // Lifecycle hooks
