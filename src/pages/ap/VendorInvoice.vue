@@ -1,5 +1,5 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
+  <q-page class="lightbg q-px-sm q-py-sm relative-position">
     <div class="mainbg textmain q-pa-md-md q-pa-sm">
       <div class="row justify-between full-width q-mt-md">
         <div class="col-sm-6 col-12">

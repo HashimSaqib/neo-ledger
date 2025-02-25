@@ -1,7 +1,5 @@
 <template>
-  <q-page class="lightbg q-px-xl q-py-md">
-    <h5 class="q-my-md maintext">Currencies</h5>
-
+  <q-page class="lightbg q-pa-sm">
     <q-table
       :rows="currencies"
       :columns="columns"

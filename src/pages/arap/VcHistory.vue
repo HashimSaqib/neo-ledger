@@ -1,5 +1,5 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
+  <q-page class="lightbg q-pa-sm relative-position">
     <!-- Page title based on customer/vendor mode -->
     <q-form @submit.prevent="search" class="q-px-md q-py-md mainbg">
       <q-expansion-item

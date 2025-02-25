@@ -1,10 +1,10 @@
 <template>
-  <q-page class="lightbg q-px-md" :class="haveProps ? 'q-py-md' : 'q-py-md'">
+  <q-page class="lightbg q-px-sm" :class="haveProps ? 'q-py-sm' : 'q-py-sm'">
     <q-form
       @submit.prevent="submitForm"
       ref="formRef"
       class="q-px-md mainbg"
-      :class="haveProps ? 'q-py-md' : 'q-py-md'"
+      :class="haveProps ? 'q-py-sm' : 'q-py-sm'"
     >
       <div class="mainbg">
         <!-- Type Selection -->

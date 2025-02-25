@@ -1,14 +1,19 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
-    <q-form @submit.prevent class="q-px-md q-py-md mainbg">
+  <q-page class="lightbg q-px-sm q-py-sm relative-position">
+    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg">
       <q-expansion-item
         :label="t('Search Params')"
         header-class="lightbg maintext"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
+        <!-- Loading indicator shown inside params section when fetching -->
+        <div v-if="loading" class="q-mt-xs q-py-xs text-center">
+          <q-spinner-dots color="primary" size="30px" />
+        </div>
+
         <!-- Basic Info Section -->
-        <div class="row q-mt-md q-gutter-md">
+        <div class="row q-mt-sm q-gutter-sm">
           <q-select
             v-model="formData.account"
             class="lightbg col-6 col-md-3"
@@ -233,7 +238,8 @@
             color="primary"
           />
         </div>
-        <div class="q-px-lg q-py-md">
+
+        <div class="q-px-lg q-py-sm">
           <draggable v-model="baseColumns" item-key="name" class="drag-area">
             <template #item="{ element }">
               <q-checkbox
@@ -246,7 +252,7 @@
             </template>
           </draggable>
         </div>
-        <div class="row q-mt-md q-gutter-x-md">
+        <div class="row q-mt-sm q-gutter-x-sm">
           <q-btn
             type="submit"
             :label="t('Search')"
@@ -264,10 +270,10 @@
         label="Download Report"
         @click="downloadTransactions"
         color="accent"
-        class="q-mt-md"
+        class="q-mt-sm"
       />
       <q-table
-        class="q-mt-md"
+        class="q-mt-sm"
         :rows="filteredResults"
         row-key="id"
         :columns="columns"
@@ -297,7 +303,7 @@
           </q-td>
         </template>
 
-        <!-- Customer  Name -->
+        <!-- Customer Name -->
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <div class="wrapped-description">
@@ -358,6 +364,7 @@
     </div>
   </q-page>
 </template>
+
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { api } from "src/boot/axios";
@@ -369,7 +376,7 @@ import { formatAmount, downloadReport } from "src/helpers/utils";
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 
-// Updated form data initialization with Y/empty string values
+// Form data (with defaults)
 const formData = ref({
   customer: "",
   invnumber: "",
@@ -389,7 +396,7 @@ const formData = ref({
   shippingpoint: "",
   shipvia: "",
   waybill: "",
-  open: "Y", // Default to "Y"
+  open: "Y",
   summary: "1",
   outstanding: "",
   closed: "",
@@ -398,16 +405,14 @@ const formData = ref({
   onhold: "",
   till: "",
 });
+
 const filtersOpen = ref(true);
 const results = ref([]);
 const totals = ref({});
+const loading = ref(false);
+
 const baseColumns = ref([
-  {
-    name: "id",
-    label: "ID",
-    field: "id",
-    default: false,
-  },
+  { name: "id", label: "ID", field: "id", default: false },
   {
     name: "invnumber",
     label: "Invoice Number",
@@ -427,24 +432,14 @@ const baseColumns = ref([
     default: true,
     sortable: true,
   },
-  {
-    name: "ponumber",
-    label: "PO Number",
-    field: "ponumber",
-    default: false,
-  },
+  { name: "ponumber", label: "PO Number", field: "ponumber", default: false },
   {
     name: "transdate",
     label: "Invoice Date",
     field: "transdate",
     default: true,
   },
-  {
-    name: "name",
-    label: "Customer",
-    field: "name",
-    default: true,
-  },
+  { name: "name", label: "Customer", field: "name", default: true },
   {
     name: "customernumber",
     label: "Customer Number",
@@ -457,97 +452,31 @@ const baseColumns = ref([
     field: "taxnumber",
     default: false,
   },
-  {
-    name: "shipvia",
-    label: "Ship Via",
-    field: "shipvia",
-    default: false,
-  },
+  { name: "shipvia", label: "Ship Via", field: "shipvia", default: false },
   {
     name: "shippingpoint",
     label: "Shipping Point",
     field: "shippingpoint",
     default: false,
   },
-  {
-    name: "waybill",
-    label: "Waybill",
-    field: "waybill",
-    default: false,
-  },
-  {
-    name: "warehouse",
-    label: "Warehouse",
-    field: "warehouse",
-    default: false,
-  },
-
+  { name: "waybill", label: "Waybill", field: "waybill", default: false },
+  { name: "warehouse", label: "Warehouse", field: "warehouse", default: false },
   {
     name: "department",
     label: "Department",
     field: "department",
     default: false,
   },
-  {
-    name: "address",
-    label: "Address",
-    field: "address",
-    default: false,
-  },
-  {
-    name: "city",
-    label: "City",
-    field: "city",
-    default: false,
-  },
-  {
-    name: "zipcode",
-    label: "Zipcode",
-    field: "zipcode",
-    default: false,
-  },
-  {
-    name: "country",
-    label: "Country",
-    field: "country",
-    default: false,
-  },
-  {
-    name: "netamount",
-    label: "Amount",
-    field: "netamount",
-    default: false,
-  },
-  {
-    name: "paid",
-    label: "Paid",
-    field: "paid",
-    default: false,
-  },
-  {
-    name: "tax",
-    label: "Tax",
-    field: "tax",
-    default: false,
-  },
-  {
-    name: "amount",
-    label: "Total",
-    field: "amount",
-    default: false,
-  },
-  {
-    name: "curr",
-    label: "Currency",
-    field: "curr",
-    default: false,
-  },
-  {
-    name: "datepaid",
-    label: "Date Paid",
-    field: "datepaid",
-    default: true,
-  },
+  { name: "address", label: "Address", field: "address", default: false },
+  { name: "city", label: "City", field: "city", default: false },
+  { name: "zipcode", label: "Zipcode", field: "zipcode", default: false },
+  { name: "country", label: "Country", field: "country", default: false },
+  { name: "netamount", label: "Amount", field: "netamount", default: false },
+  { name: "paid", label: "Paid", field: "paid", default: false },
+  { name: "tax", label: "Tax", field: "tax", default: false },
+  { name: "amount", label: "Total", field: "amount", default: false },
+  { name: "curr", label: "Currency", field: "curr", default: false },
+  { name: "datepaid", label: "Date Paid", field: "datepaid", default: true },
   {
     name: "paymentdifferent",
     label: "Payment Difference",
@@ -566,21 +495,11 @@ const baseColumns = ref([
     field: "paymentmethod",
     default: false,
   },
-  {
-    name: "duedate",
-    label: "Due Date",
-    field: "duedate",
-    default: false,
-  },
-  {
-    name: "notes",
-    label: "Notes",
-    field: "notes",
-    default: false,
-  },
+  { name: "duedate", label: "Due Date", field: "duedate", default: false },
+  { name: "notes", label: "Notes", field: "notes", default: false },
 ]);
 
-// Initialize all columns with left alignment
+// Set all columns to be left-aligned and sortable
 baseColumns.value = baseColumns.value.map((column) => ({
   ...column,
   align: "left",
@@ -603,7 +522,6 @@ function processFilters() {
         typeof savedFilters === "string"
           ? JSON.parse(savedFilters)
           : savedFilters;
-
       if (
         parsedFilters &&
         typeof parsedFilters === "object" &&
@@ -630,10 +548,7 @@ function processFilters() {
       order: baseColumns.value.map((col) => col.name),
     };
 
-    Cookies.set("ar_transactions_filters", defaultFilters, {
-      expires: 30,
-    });
-
+    Cookies.set("ar_transactions_filters", defaultFilters, { expires: 30 });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
@@ -641,7 +556,6 @@ function processFilters() {
   }
 }
 
-// Watch for changes in filters
 watch(
   [selectedColumns, baseColumns],
   () => {
@@ -649,11 +563,8 @@ watch(
       columns: selectedColumns.value,
       order: baseColumns.value.map((col) => col.name),
     };
-
     try {
-      Cookies.set("ar_transactions_filters", filters, {
-        expires: 30,
-      });
+      Cookies.set("ar_transactions_filters", filters, { expires: 30 });
     } catch (error) {
       console.error("Error saving filters to cookies:", error);
     }
@@ -661,7 +572,6 @@ watch(
   { deep: true }
 );
 
-// Computed properties for columns and filtered results
 const columns = computed(() => {
   return baseColumns.value
     .filter((column) => selectedColumns.value[column.name])
@@ -675,22 +585,18 @@ const filteredResults = computed(() => {
   return results.value.map((result) => {
     const filtered = {};
     const requiredKeys = ["id", "invoice", "till"];
-
     requiredKeys.forEach((key) => {
       filtered[key] = result[key];
     });
-
     Object.keys(selectedColumns.value).forEach((key) => {
       if (selectedColumns.value[key]) {
         filtered[key] = result[key];
       }
     });
-
     return filtered;
   });
 });
 
-// Data fetching functions
 const recordAccounts = ref([]);
 const fetchAccounts = async () => {
   try {
@@ -721,53 +627,37 @@ const fetchCustomers = async () => {
     });
   }
 };
+
 const flattenParams = (obj, prefix = "") => {
   const flattened = {};
-
   Object.entries(obj).forEach(([key, value]) => {
-    // Skip null, undefined, or empty string values
-    if (value === null || value === undefined || value === "") {
-      return;
-    }
-
-    // Handle `customer` object differently
+    if (value === null || value === undefined || value === "") return;
     if (key === "customer" && typeof value === "object") {
-      // Add only `customernumber` key-value pair
       if (value.customernumber) {
         flattened["customernumber"] = value.customernumber;
       }
-    }
-    // Handle `account` object differently
-    else if (key === "account" && typeof value === "object") {
-      // Add only `accno` key-value pair
+    } else if (key === "account" && typeof value === "object") {
       if (value.accno) {
         flattened["accno"] = value.accno;
       }
-    }
-    // Handle nested objects for other keys
-    else if (typeof value === "object" && !Array.isArray(value)) {
+    } else if (typeof value === "object" && !Array.isArray(value)) {
       Object.assign(
         flattened,
         flattenParams(value, prefix ? `${prefix}[${key}]` : key)
       );
     } else {
-      // Add non-empty primitive values
       const paramKey = prefix ? `${prefix}[${key}]` : key;
       flattened[paramKey] = value;
     }
   });
-
   return flattened;
 };
 
-// Form actions
 const search = async () => {
+  loading.value = true;
   try {
     const params = flattenParams(formData.value);
-    const response = await api.get("/arap/transactions/customer", {
-      params: params,
-    });
-
+    const response = await api.get("/arap/transactions/customer", { params });
     filtersOpen.value = false;
     results.value = response.data.transactions;
     totals.value = response.data.totals;
@@ -778,6 +668,8 @@ const search = async () => {
       type: "negative",
       position: "center",
     });
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -797,7 +689,6 @@ const clearForm = () => {
 
 const getPath = (row) => {
   let path = "";
-
   if (row.till) {
     path = "/pos/sale";
   } else if (row.invoice) {
@@ -805,14 +696,13 @@ const getPath = (row) => {
   } else {
     path = "/arap/transaction/customer";
   }
-
   return { path, query: { id: row.id } };
 };
+
 const downloadTransactions = () => {
   downloadReport(filteredResults.value, columns.value, totals.value);
 };
 
-// Lifecycle hooks
 onMounted(() => {
   processFilters();
   fetchAccounts();
@@ -820,19 +710,19 @@ onMounted(() => {
   updateTitle("AR Transactions");
 });
 </script>
+
 <style scoped>
+/* Condensed/dense layout adjustments */
 .drag-area {
   display: flex;
   flex-wrap: wrap;
 }
 
-/* Table container height */
 :deep(.q-table__container) {
   height: calc(100vh - 180px);
   position: relative;
 }
 
-/* Sticky header styles */
 :deep(.q-table thead) {
   position: sticky;
   z-index: 2;
@@ -857,13 +747,11 @@ onMounted(() => {
   color: var(--q-mainbg);
 }
 
-/* Loading state */
 .q-table--loading {
   opacity: 0.7;
   transition: opacity 0.3s ease-in-out;
 }
 
-/* Totals row styling */
 :deep(.totals-row) {
   position: sticky !important;
   bottom: 0 !important;
@@ -889,7 +777,6 @@ onMounted(() => {
   text-align: right !important;
 }
 
-/* Number columns alignment */
 :deep(.q-table tbody td[class*="amount"]),
 :deep(.q-table tbody td[class*="paid"]),
 :deep(.q-table tbody td[class*="tax"]),
@@ -897,14 +784,12 @@ onMounted(() => {
   text-align: right;
 }
 
-/* Virtual scroll table content */
 :deep(.q-virtual-scroll__content) {
   margin-bottom: 0 !important;
 }
 
-/* Ensure proper padding */
 :deep(.q-table td) {
-  padding: 8px 16px;
+  padding: 4px 8px;
 }
 
 .wrapped-description {

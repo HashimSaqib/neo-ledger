@@ -1,5 +1,5 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
+  <q-page class="lightbg q-px-sm q-py-sm relative-position">
     <q-form @submit.prevent class="q-px-md q-py-md mainbg">
       <q-expansion-item
         :label="t('Search Params')"

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-sm">
     <!-- Search Params Expansion -->
     <q-expansion-item
       :label="t('Search Params')"

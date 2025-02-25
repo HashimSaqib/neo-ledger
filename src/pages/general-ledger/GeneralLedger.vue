@@ -1,6 +1,6 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
-    <div class="flex q-px-lg q-py-md mainbg column">
+  <q-page class="lightbg q-pa-sm relative-position">
+    <div class="flex q-pa-sm mainbg column">
       <div class="row justify-space-between q-mb-sm">
         <q-input
           :label="t('Reference')"
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <div class="flex q-px-lg q-py-md mainbg column q-mt-lg">
+    <div class="flex q-pa-sm mainbg column q-mt-sm">
       <div
         v-for="(line, index) in lines"
         :key="index"

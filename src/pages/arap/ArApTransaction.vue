@@ -1,10 +1,10 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
+  <q-page class="lightbg q-px-sm q-py-sm relative-position">
     <q-splitter v-model="splitterModel" class="full-width">
       <!-- Left Panel - Invoice Form -->
       <template v-slot:before>
-        <div class="mainbg textmain q-pa-md-md q-pa-sm">
-          <div class="row justify-between full-width q-mt-md">
+        <div class="mainbg textmain q-pa-md-sm q-pa-sm">
+          <div class="row justify-between full-width q-mt-sm">
             <div class="col-12 col-lg-5">
               <div class="row full-width">
                 <s-select
@@ -181,7 +181,7 @@
         </div>
 
         <!-- Items Section -->
-        <div class="mainbg q-my-md q-pa-md">
+        <div class="mainbg q-my-sm q-pa-sm">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
             <q-btn
@@ -348,7 +348,7 @@
         </div>
 
         <!-- Payments Section -->
-        <div class="mainbg q-my-md q-pa-md">
+        <div class="mainbg q-my-sm q-pa-sm">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">
               {{ t("Payments") }}

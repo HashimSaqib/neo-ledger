@@ -1,5 +1,5 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
+  <q-page class="lightbg q-pa-sm relative-position">
     <q-form @submit.prevent class="q-px-lg q-py-md mainbg q-mb-md">
       <div class="row items-center q-gutter-md q-mb-md">
         <q-input

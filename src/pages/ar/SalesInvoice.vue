@@ -1,7 +1,7 @@
 <template>
-  <q-page class="lightbg q-px-md q-py-md relative-position">
+  <q-page class="lightbg q-pa-sm relative-position">
     <div class="mainbg textmain q-pa-md-sm q-pa-sm">
-      <div class="row justify-between full-width q-mt-md">
+      <div class="row justify-between full-width">
         <div class="col-sm-6 col-12">
           <div class="row full-width">
             <s-select
@@ -183,7 +183,7 @@
       </div>
     </div>
     <!-- Line Items Section -->
-    <div class="mainbg q-my-md q-pa-md">
+    <div class="mainbg q-my-sm q-pa-sm">
       <div class="row q-mb-md">
         <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
         <q-btn
@@ -485,7 +485,7 @@
       </div>
     </div>
     <!-- Payment Section -->
-    <div class="mainbg q-my-md q-pa-md">
+    <div class="mainbg q-my-sm q-pa-sm">
       <div class="row q-mb-md">
         <h6 class="q-my-none q-pa-none text-secondary">{{ t("Payments") }}</h6>
         <q-btn
