@@ -12,7 +12,7 @@
                   :options="vcList"
                   option-label="label"
                   :option-value="vcNumberField"
-                  v-model="selectedEntity"
+                  v-model="selectedVc"
                   dense
                   outlined
                   input-class="maintext"
@@ -28,7 +28,7 @@
                     @click.prevent="openEditVc"
                     class="text-primary q-mr-xs"
                     style="text-decoration: none"
-                    v-if="selectedEntity"
+                    v-if="selectedVc"
                     >?</a
                   >
                   <a
@@ -517,7 +517,7 @@
       <q-card style="min-width: 80vw" class="q-pa-none">
         <q-card-section class="q-pa-none">
           <AddVC
-            :id="dialogMode === 'edit' ? selectedEntity.id : null"
+            :id="dialogMode === 'edit' ? selectedVc.id : null"
             :type="type"
             @close="vcDialog = false"
             @saved="vcSaved"
@@ -572,7 +572,9 @@ const dialogMode = ref(null); // "add" or "edit"
 // Entity, Account and Currency State
 // -------------------------
 const vcList = ref([]);
-const selectedEntity = ref(null);
+// The minimal vendor selection (bound to the s-select)
+const selectedVc = ref(null);
+// The full fetched vendor details
 const vc = ref(null);
 const taxAccounts = ref([]);
 const lineTax = ref(false);
@@ -595,6 +597,7 @@ const description = ref("");
 const notes = ref("");
 const intnotes = ref("");
 const invNumber = ref("");
+const invId = ref(route.query.id || "");
 const ordNumber = ref("");
 const invDate = ref(getTodayDate());
 const dueDate = ref(getTodayDate());
@@ -914,7 +917,7 @@ let preserveApiTaxes = ref(false);
 // Invoice Submission & Loading
 // -------------------------
 const postInvoice = async () => {
-  if (!selectedEntity.value) {
+  if (!selectedVc.value) {
     Notify.create({
       message: t("Entity is required: " + vcLabel.value),
       type: "negative",
@@ -952,11 +955,12 @@ const postInvoice = async () => {
 
   const invoiceData = {
     [type.value === "vendor" ? "selectedVendor" : "selectedCustomer"]:
-      selectedEntity.value,
+      selectedVc.value,
     description: description.value,
     notes: notes.value,
     intnotes: intnotes.value,
     invNumber: invNumber.value,
+    invId: invId.value,
     ordNumber: ordNumber.value,
     invDate: invDate.value,
     dueDate: dueDate.value,
@@ -998,13 +1002,17 @@ const postInvoice = async () => {
 
   try {
     loading.value = true;
-    const idParam = route.query.id ? `/${route.query.id}` : "";
-    await api.post(`/arap/transaction/${type.value}${idParam}`, invoiceData);
+    const idParam = invId.value ? invId.value : "";
+    const response = await api.post(
+      `/arap/transaction/${type.value}${idParam}`,
+      invoiceData
+    );
     Notify.create({
       message: t("Transaction posted successfully"),
       type: "positive",
       position: "center",
     });
+    fetchInvoice(response.data.id);
   } catch (error) {
     console.error("Transaction error:", error);
     Notify.create({
@@ -1074,21 +1082,13 @@ const loadInvoice = async (invoice) => {
   try {
     const vcId = invoice[`${type.value}_id`];
     let vcToSelect = vcList.value.find((vc) => vc.id === vcId);
-    if (!vcToSelect) {
-      const fetchedEntity = await fetchEntity(vcId);
-      if (fetchedEntity) {
-        vcList.value.push(fetchedEntity);
-        vcToSelect = fetchedEntity;
-      } else {
-        throw new Error(t("Failed to fetch vc details"));
-      }
-    }
-    selectedEntity.value = {
-      id: vcToSelect.id,
-      label: vcToSelect.name,
-      [vcNumberField.value]: vcToSelect[vcNumberField.value],
-    };
+    // Update the minimal vendor selection used by the s-select.
+    selectedVc.value = vcToSelect;
+    // Ensure vcUpdate completes before updating the rest of the invoice.
     await vcUpdate(vcToSelect);
+    if (!vc.value) {
+      throw new Error("Vendor details update did not complete.");
+    }
 
     if (invoice.taxes && invoice.taxes.length > 0) {
       taxIncluded.value = Boolean(invoice.taxincluded);
@@ -1111,11 +1111,12 @@ const loadInvoice = async (invoice) => {
       account:
         itemAccounts.value.find((acc) => acc.accno == item.accno) || null,
       description: item.description,
-      taxAccount: lineTax.value
-        ? taxAccountList.value.find(
-            (acc) => acc.accno.toString() === item.taxAccount.toString()
-          ) || null
-        : null,
+      taxAccount:
+        lineTax.value && item.taxAccount
+          ? taxAccountList.value.find(
+              (acc) => acc.accno.toString() === item.taxAccount.toString()
+            ) || null
+          : null,
       taxAmount: lineTax.value ? item.taxAmount || 0 : 0,
       apiTaxAmount: lineTax.value ? item.taxAmount || 0 : 0,
       apiTaxAccount: lineTax.value ? item.taxAccount : null,
@@ -1131,10 +1132,11 @@ const loadInvoice = async (invoice) => {
       );
     }
     exchangeRate.value = invoice.exchangerate || 1;
-    description.value = "";
-    notes.value = "";
-    intnotes.value = "";
+    notes.value = invoice.notes || "";
+    intnotes.value = invoice.intNotes || "";
     invNumber.value = invoice.invNumber || "";
+    description.value = invoice.description || "";
+    invId.value = invoice.id;
     ordNumber.value = "";
     poNumber.value = "";
 
@@ -1183,77 +1185,99 @@ const openAddVc = () => {
 };
 
 const openEditVc = () => {
-  if (!selectedEntity.value) return;
+  if (!selectedVc.value) return;
   dialogMode.value = "edit";
   vcDialog.value = true;
 };
 
 const vcSaved = async (savedEntity) => {
   await fetchvcList();
-  selectedEntity.value = vcList.value.find((vc) => vc.id == savedEntity.id);
-  vcUpdate(selectedEntity.value);
+  selectedVc.value = vcList.value.find((vc) => vc.id == savedEntity.id);
+  vcUpdate(selectedVc.value);
   vcDialog.value = false;
 };
 
 // -------------------------
-// Update Entity Details
+// Update Vendor Details (Separate from the minimal selection)
 // -------------------------
+let isUpdatingVc = false;
 const vcUpdate = async (newValue) => {
-  const entityId = newValue.id || newValue;
-  vc.value = await fetchEntity(entityId);
-  if (vc.value) {
-    taxAccounts.value = vc.value.taxaccounts
-      ? vc.value.taxaccounts.split(" ")
-      : [];
-    taxAccountList.value = accounts.value
-      .filter((account) => taxAccounts.value.includes(account.accno))
-      .map((acc) => ({
-        ...acc,
-        rate: parseFloat(vc.value[`${acc.accno}_rate`] || 0),
-      }));
+  // Prevent recursive updates from triggering an infinite loop
+  if (isUpdatingVc) return;
+  isUpdatingVc = true;
+  try {
+    const entityId = newValue.id || newValue;
+    const fetchedEntity = await fetchEntity(entityId);
+    if (fetchedEntity) {
+      // Update the full vendor details (vc) and related state
+      vc.value = fetchedEntity;
+      taxAccounts.value = fetchedEntity.taxaccounts
+        ? fetchedEntity.taxaccounts.split(" ")
+        : [];
+      taxAccountList.value = accounts.value
+        .filter((account) => taxAccounts.value.includes(account.accno))
+        .map((acc) => ({
+          ...acc,
+          rate: parseFloat(fetchedEntity[`${acc.accno}_rate`] || 0),
+        }));
+      intnotes.value = fetchedEntity.intnotes;
 
-    intnotes.value = vc.value.intnotes;
-
-    const recordAccountAccno = vc.value?.AR?.split("--")[0] ?? "";
-    if (recordAccountAccno) {
-      const matchingRecord = recordAccounts.value.find(
-        (account) => account.accno === recordAccountAccno
-      );
-      if (matchingRecord) {
-        recordAccount.value = matchingRecord;
+      const recordAccountAccno = fetchedEntity?.AR?.split("--")[0] ?? "";
+      if (recordAccountAccno) {
+        const matchingRecord = recordAccounts.value.find(
+          (account) => account.accno === recordAccountAccno
+        );
+        if (matchingRecord) {
+          recordAccount.value = matchingRecord;
+        }
       }
-    }
 
-    const paymentAccountAccno = vc.value?.payment_accno?.split("--")[0] || "";
-    defaultPaymentAccount.value =
-      paymentAccounts.value.find(
-        (account) => account.accno === paymentAccountAccno
-      ) || paymentAccounts.value[0];
-    payments.value.forEach(
-      (payment) =>
-        payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
-    );
-
-    if (vc.value?.currency) {
-      const matchingCurrency = currencies.value.find(
-        (curr) => curr.curr === vc.value.currency
+      const paymentAccountAccno =
+        fetchedEntity?.payment_accno?.split("--")[0] || "";
+      defaultPaymentAccount.value =
+        paymentAccounts.value.find(
+          (account) => account.accno === paymentAccountAccno
+        ) || paymentAccounts.value[0];
+      payments.value.forEach(
+        (payment) =>
+          payment.amount === 0 &&
+          (payment.account = defaultPaymentAccount.value)
       );
-      if (matchingCurrency) {
-        selectedCurrency.value = matchingCurrency;
+
+      if (fetchedEntity?.currency) {
+        const matchingCurrency = currencies.value.find(
+          (curr) => curr.curr === fetchedEntity.currency
+        );
+        if (matchingCurrency) {
+          selectedCurrency.value = matchingCurrency;
+        } else {
+          console.warn(
+            `No matching currency found for: ${fetchedEntity.currency}`
+          );
+        }
+      }
+
+      if (invDate.value) {
+        const terms = fetchedEntity?.terms ?? 0;
+        const newDueDate = date.addToDate(invDate.value, { days: terms });
+        dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
       } else {
-        console.warn(`No matching currency found for: ${vc.value.currency}`);
+        console.warn("Invalid invoice date");
       }
-    }
 
-    if (invDate.value) {
-      const terms = vc.value?.terms ?? 0;
-      const newDueDate = date.addToDate(invDate.value, { days: terms });
-      dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
-    } else {
-      console.warn("Invalid invoice date");
+      calculateTaxes();
     }
-
-    calculateTaxes();
+  } catch (error) {
+    console.error("Error in vcUpdate:", error);
+    Notify.create({
+      message:
+        t("Failed to update vc details: ") +
+        (error.message || t("Please try again")),
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    isUpdatingVc = false;
   }
 };
 
@@ -1281,7 +1305,7 @@ watch(
 watch(
   type,
   async (newType) => {
-    selectedEntity.value = null;
+    selectedVc.value = null;
     vc.value = null;
     lines.value = [
       {

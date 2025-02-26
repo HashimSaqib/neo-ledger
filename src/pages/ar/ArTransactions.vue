@@ -1,4 +1,3 @@
-You said:
 <template>
   <q-page class="lightbg q-px-sm q-py-sm relative-position">
     <q-form @submit.prevent class="q-px-sm q-py-sm mainbg">
