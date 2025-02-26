@@ -1,3 +1,4 @@
+You said:
 <template>
   <q-page class="lightbg q-px-sm q-py-sm relative-position">
     <q-form @submit.prevent class="q-px-sm q-py-sm mainbg">
@@ -25,19 +26,19 @@
             :options="recordAccounts"
           />
           <q-select
-            v-model="formData.vendor"
+            v-model="formData.customer"
             class="lightbg col-3"
-            :label="t('Vendors')"
+            :label="t('Customers')"
             input-class="maintext"
             label-color="secondary"
             outlined
             dense
-            :options="vendors"
+            :options="customers"
           />
           <q-input
-            v-model="formData.vendornumber"
+            v-model="formData.customernumber"
             class="lightbg"
-            :label="t('Vendor Number')"
+            :label="t('Customer Number')"
             input-class="maintext"
             label-color="secondary"
             outlined
@@ -303,7 +304,7 @@
           </q-td>
         </template>
 
-        <!-- Vendor Name -->
+        <!-- Customer Name -->
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <div class="wrapped-description">
@@ -376,9 +377,9 @@ import { formatAmount, downloadReport } from "src/helpers/utils";
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 
-// Form data (with defaults) -- updated vendor keys
+// Form data (with defaults)
 const formData = ref({
-  vendor: "",
+  customer: "",
   invnumber: "",
   description: "",
   ordnumber: "",
@@ -404,8 +405,6 @@ const formData = ref({
   paidearly: "",
   onhold: "",
   till: "",
-  // Changed customer number to vendor number
-  vendornumber: "",
 });
 
 const filtersOpen = ref(true);
@@ -441,11 +440,11 @@ const baseColumns = ref([
     field: "transdate",
     default: true,
   },
-  { name: "name", label: "Vendor", field: "name", default: true },
+  { name: "name", label: "Customer", field: "name", default: true },
   {
-    name: "vendornumber",
-    label: "Vendor Number",
-    field: "vendornumber",
+    name: "customernumber",
+    label: "Customer Number",
+    field: "customernumber",
     default: false,
   },
   {
@@ -516,7 +515,7 @@ const selectedColumns = ref(
 );
 
 function processFilters() {
-  const savedFilters = Cookies.get("ap_transactions_filters");
+  const savedFilters = Cookies.get("ar_transactions_filters");
 
   if (savedFilters) {
     try {
@@ -539,7 +538,7 @@ function processFilters() {
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove("ap_transactions_filters");
+      Cookies.remove("ar_transactions_filters");
     }
   } else {
     const defaultFilters = {
@@ -550,7 +549,7 @@ function processFilters() {
       order: baseColumns.value.map((col) => col.name),
     };
 
-    Cookies.set("ap_transactions_filters", defaultFilters, { expires: 30 });
+    Cookies.set("ar_transactions_filters", defaultFilters, { expires: 30 });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
@@ -566,7 +565,7 @@ watch(
       order: baseColumns.value.map((col) => col.name),
     };
     try {
-      Cookies.set("ap_transactions_filters", filters, { expires: 30 });
+      Cookies.set("ar_transactions_filters", filters, { expires: 30 });
     } catch (error) {
       console.error("Error saving filters to cookies:", error);
     }
@@ -600,12 +599,11 @@ const filteredResults = computed(() => {
 });
 
 const recordAccounts = ref([]);
-// Update account filter: now check for AP instead of AR
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     const accounts = response.data;
-    recordAccounts.value = accounts.filter((account) => account.link === "AP");
+    recordAccounts.value = accounts.filter((account) => account.link === "AR");
   } catch (error) {
     console.error(error);
     Notify.create({
@@ -616,30 +614,28 @@ const fetchAccounts = async () => {
   }
 };
 
-const vendors = ref([]);
-// Changed function name and endpoint to fetch vendors
-const fetchVendors = async () => {
+const customers = ref([]);
+const fetchCustomers = async () => {
   try {
-    const response = await api.get("/ap/list/vendor");
-    vendors.value = response.data;
+    const response = await api.get("/arap/list/customer");
+    customers.value = response.data;
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching vendors",
+      message: error.response?.data?.message || "Error fetching customers",
       type: "negative",
       position: "center",
     });
   }
 };
 
-// Update flattenParams to use "vendor" instead of "customer"
 const flattenParams = (obj, prefix = "") => {
   const flattened = {};
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
-    if (key === "vendor" && typeof value === "object") {
-      if (value.vendornumber) {
-        flattened["vendornumber"] = value.vendornumber;
+    if (key === "customer" && typeof value === "object") {
+      if (value.customernumber) {
+        flattened["customernumber"] = value.customernumber;
       }
     } else if (key === "account" && typeof value === "object") {
       if (value.accno) {
@@ -662,8 +658,7 @@ const search = async () => {
   loading.value = true;
   try {
     const params = flattenParams(formData.value);
-    // Changed endpoint to target vendor transactions under AP
-    const response = await api.get("/ap/transactions/vendor", { params });
+    const response = await api.get("/arap/transactions/customer", { params });
     filtersOpen.value = false;
     results.value = response.data.transactions;
     totals.value = response.data.totals;
@@ -698,11 +693,9 @@ const getPath = (row) => {
   if (row.till) {
     path = "/pos/sale";
   } else if (row.invoice) {
-    // Updated to reflect AP purchase invoice route
-    path = "/ap/purchase-invoice";
+    path = "/ar/sales-invoice";
   } else {
-    // Updated to reflect vendor transactions
-    path = "/ap/transaction/vendor";
+    path = "/arap/transaction/customer";
   }
   return { path, query: { id: row.id } };
 };
@@ -714,8 +707,8 @@ const downloadTransactions = () => {
 onMounted(() => {
   processFilters();
   fetchAccounts();
-  fetchVendors();
-  updateTitle("AP Transactions");
+  fetchCustomers();
+  updateTitle("AR Transactions");
 });
 </script>
 

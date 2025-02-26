@@ -3,8 +3,8 @@
     <q-splitter v-model="splitterModel" class="full-width">
       <!-- Left Panel - Invoice Form -->
       <template v-slot:before>
-        <div class="mainbg textmain q-pa-md-md q-pa-sm">
-          <div class="row justify-between full-width q-mt-md">
+        <div class="mainbg textmain q-pa-sm">
+          <div class="row justify-between full-width q-mt-sm">
             <div class="col-12 col-lg-5">
               <div class="row full-width">
                 <s-select
@@ -1083,12 +1083,12 @@ const loadInvoice = async (invoice) => {
         throw new Error(t("Failed to fetch vc details"));
       }
     }
-    await vcUpdate(vcToSelect);
     selectedEntity.value = {
       id: vcToSelect.id,
       label: vcToSelect.name,
       [vcNumberField.value]: vcToSelect[vcNumberField.value],
     };
+    await vcUpdate(vcToSelect);
 
     if (invoice.taxes && invoice.taxes.length > 0) {
       taxIncluded.value = Boolean(invoice.taxincluded);
