@@ -75,64 +75,105 @@
       <div
         v-for="(line, index) in lines"
         :key="index"
-        class="row justify-space-between q-mb-sm"
+        class="row q-gutter-x-sm q-mb-sm"
       >
+        <!-- Account s-select with a ref for auto-focus -->
         <s-select
           outlined
           v-model="line.account"
           :options="accounts"
           :label="t('Account')"
           dense
-          class="lightbg col-4"
+          class="lightbg col-3"
           popup-content-class="mainbg maintext"
           input-class="maintext"
           label-color="secondary"
           search="label"
           account
+          :ref="(el) => setAccountRef(el, index)"
         />
 
+        <!-- Debit input -->
         <fn-input
           v-model="line.debit"
           :label="t('Debit')"
-          class="lightbg col-1 q-ml-md"
+          class="lightbg col-1"
           input-class="maintext"
           label-color="secondary"
           outlined
           dense
+          @keydown.enter="handleEnter($event, index)"
         />
+
+        <!-- Credit input -->
         <fn-input
           v-model="line.credit"
           :label="t('Credit')"
-          class="lightbg col-1 q-ml-md"
+          class="lightbg col-1 m"
           input-class="maintext"
           label-color="secondary"
           outlined
           dense
+          @keydown.enter="handleEnter($event, index)"
         />
+
+        <!-- Conditionally show Tax fields if Linetax is enabled -->
+
+        <!-- Source input -->
         <q-input
           v-model="line.source"
           :label="t('Source')"
-          class="lightbg col-2 q-ml-md"
+          class="lightbg col-2"
           input-class="maintext"
           label-color="secondary"
           outlined
           dense
+          @keydown.enter="handleEnter($event, index)"
         />
+        <!-- Memo input -->
         <q-input
           v-model="line.memo"
           :label="t('Memo')"
-          class="lightbg col-2 q-ml-md"
+          class="lightbg col-2"
           input-class="maintext"
           label-color="secondary"
           outlined
           dense
+          @keydown.enter="handleEnter($event, index)"
         />
+        <template v-if="lineTax">
+          <s-select
+            outlined
+            v-model="line.taxAccno"
+            :options="taxAccounts"
+            option-value="accno"
+            option-label="label"
+            :label="t('Tax Accno')"
+            dense
+            class="lightbg col-1"
+            popup-content-class="mainbg maintext"
+            input-class="maintext"
+            label-color="secondary"
+            account
+            search="label"
+          />
+          <fn-input
+            v-model="line.taxAmount"
+            :label="t('Tax Amount')"
+            class="lightbg col-1"
+            input-class="maintext"
+            label-color="secondary"
+            outlined
+            dense
+            @keydown.enter="handleEnter($event, index)"
+          />
+        </template>
         <q-btn
           color="negative"
           icon="delete"
           dense
           flat
-          class="q-ml-md"
+          class=""
           @click="removeLine(index)"
         />
       </div>
@@ -166,12 +207,13 @@
       :label="buttonLabel"
       class="q-my-md q-px-xl"
       @click="submitTransaction"
+      :loading="loading"
     />
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, inject } from "vue";
+import { ref, computed, onMounted, watch, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -206,6 +248,8 @@ const lines = ref([
     credit: 0,
     source: "",
     memo: "",
+    taxAccno: "",
+    taxAmount: 0,
   },
   {
     account: "",
@@ -213,6 +257,8 @@ const lines = ref([
     credit: 0,
     source: "",
     memo: "",
+    taxAccno: "",
+    taxAmount: 0,
   },
 ]);
 
@@ -227,14 +273,44 @@ const buttonLabel = computed(() => {
   return formData.value.id ? t("Update") : t("Post");
 });
 
+// To auto-focus the first field in a new line
+const accountRefs = ref([]);
+const setAccountRef = (el, index) => {
+  accountRefs.value[index] = el;
+};
+
 const addLine = () => {
   lines.value.push({
     account: "",
     debit: 0,
-    credit: "",
+    credit: 0,
     source: "",
     memo: "",
+    taxAccno: "",
+    taxAmount: 0,
   });
+};
+
+const addLineAt = (index) => {
+  lines.value.splice(index + 1, 0, {
+    account: "",
+    debit: 0,
+    credit: 0,
+    source: "",
+    memo: "",
+    taxAccno: "",
+    taxAmount: 0,
+  });
+  nextTick(() => {
+    if (accountRefs.value[index + 1] && accountRefs.value[index + 1].focus) {
+      accountRefs.value[index + 1].focus();
+    }
+  });
+};
+
+const handleEnter = (event, index) => {
+  event.preventDefault();
+  addLineAt(index);
 };
 
 const removeLine = (index) => {
@@ -264,9 +340,22 @@ const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     const accountsData = response.data;
-
     accounts.value = accountsData;
     filteredAccounts.value = accountsData;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const lineTax = ref(false);
+const taxAccounts = ref([]);
+
+const fetchLinks = async () => {
+  try {
+    const response = await api.get("/create_links/gl");
+    lineTax.value = response.data.linetax;
+    taxAccounts.value = response.data.tax_accounts;
+    console.log(taxAccounts.value);
   } catch (error) {
     console.log(error);
   }
@@ -289,22 +378,57 @@ const filterAccounts = (val, update) => {
 
 const loading = ref(false);
 const submitTransaction = async () => {
+  // Check if at least two lines are provided
+  if (lines.value.length < 2) {
+    Notify.create({
+      message: t("At least two lines are required to post a transaction."),
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  // Check if total debit and credit are balanced
+  if (totalDebit.value !== totalCredit.value) {
+    Notify.create({
+      message: t("The total debit and credit amounts must be balanced."),
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
   loading.value = true;
   const transactionData = {
     curr:
       typeof formData.value.currency === "object"
         ? formData.value.currency.curr
         : formData.value.currency,
-    exchangeRate: formData.value.exchangeRate,
+    exchangeRate: formData.value.exchangeRate
+      ? parseFloat(formData.value.exchangeRate)
+      : 0,
     departmentid: 0,
     description: formData.value.description,
-    lines: lines.value.map((line) => ({
-      accno: line.account.accno,
-      credit: parseFloat(line.credit) || 0,
-      debit: parseFloat(line.debit) || 0,
-      memo: line.memo,
-      source: line.source,
-    })),
+    lines: lines.value.map((line) => {
+      let lineObj = {
+        accno:
+          line.account && line.account.accno
+            ? line.account.accno
+            : line.account,
+        credit: parseFloat(line.credit) || 0,
+        debit: parseFloat(line.debit) || 0,
+        memo: line.memo,
+        source: line.source,
+      };
+      if (lineTax.value) {
+        lineObj.taxAccno =
+          line.taxAccno && typeof line.taxAccno === "object"
+            ? line.taxAccno.accno
+            : line.taxAccno || null;
+        lineObj.taxAmount = parseFloat(line.taxAmount) || 0;
+      }
+      return lineObj;
+    }),
     notes: formData.value.notes,
     reference: formData.value.reference,
     transdate: formData.value.transdate,
@@ -322,19 +446,20 @@ const submitTransaction = async () => {
     }
 
     Notify.create({
-      message: "Transaction Posted Successfully.",
+      message: t("Transaction Posted Successfully."),
       type: "positive",
       position: "center",
     });
 
-    // Call loadTransaction with the returned transaction ID
+    // If the response returns an ID, load the transaction details
     if (response.data?.id) {
       await loadTransaction(response.data.id);
     }
   } catch (error) {
     console.log("Failed to submit transaction:", error);
     Notify.create({
-      message: error.response?.data?.message || "Failed to submit transaction.",
+      message:
+        error.response?.data?.message || t("Failed to submit transaction."),
       type: "negative",
       position: "center",
     });
@@ -348,7 +473,6 @@ const loadTransaction = async (id) => {
     try {
       const response = await api.get(`/gl/transactions/${id}`);
       const transactionData = response.data;
-
       formData.value = {
         id: transactionData.id,
         reference: transactionData.reference,
@@ -361,13 +485,17 @@ const loadTransaction = async (id) => {
 
       lines.value = transactionData.lines.map((line) => {
         const account =
-          accounts.value.find((acc) => acc.accno === line.accno) || {};
+          accounts.value.find((acc) => acc.accno === line.accno) || "";
         return {
           account: account,
           debit: line.debit.toString(),
           credit: line.credit.toString(),
           source: line.source,
           memo: line.memo,
+          taxAccno: line.taxAccno
+            ? taxAccounts.value.find((t) => t.accno === line.taxAccno) || ""
+            : "",
+          taxAmount: line.taxAmount ? line.taxAmount.toString() : "0",
         };
       });
     } catch (error) {
@@ -381,12 +509,11 @@ const fetchCurrencies = async () => {
   try {
     const response = await api.get("/system/currencies");
     currencies.value = response.data;
-    // Ensure there's at least one currency before setting
     if (currencies.value.length > 0) {
       formData.value.currency = currencies.value[0];
     }
   } catch (error) {
-    console.log("Failed to submit Currencies:", error);
+    console.log("Failed to fetch Currencies:", error);
     Notify.create({
       message: error.response.data.message,
       type: "negative",
@@ -398,6 +525,7 @@ const fetchCurrencies = async () => {
 onMounted(() => {
   fetchAccounts();
   fetchCurrencies();
+  fetchLinks();
   loadTransaction(route.query.id);
 });
 </script>

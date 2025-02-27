@@ -173,6 +173,11 @@
                     :label="t('Lineitem')"
                     true-value="AR_amount"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -180,6 +185,11 @@
                     :label="t('Payment')"
                     true-value="AR_paid"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -187,6 +197,11 @@
                     :label="t('Discount')"
                     true-value="AR_discount"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -194,6 +209,11 @@
                     :label="t('Tax')"
                     true-value="AR_tax"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                 </div>
                 <!-- AP Options -->
@@ -205,6 +225,11 @@
                     :label="t('Lineitem')"
                     true-value="AP_amount"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -212,6 +237,11 @@
                     :label="t('Payment')"
                     true-value="AP_paid"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -219,6 +249,11 @@
                     :label="t('Discount')"
                     true-value="AP_discount"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -226,6 +261,11 @@
                     :label="t('Tax')"
                     true-value="AP_tax"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                 </div>
                 <!-- Tracking Items -->
@@ -237,6 +277,11 @@
                     :label="t('Income')"
                     true-value="IC_sale"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -244,6 +289,11 @@
                     :label="t('COGS')"
                     true-value="IC_cogs"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <div></div>
                   <q-checkbox
@@ -253,6 +303,11 @@
                     true-value="IC_taxpart"
                     false-value=""
                     class="col-auto"
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                 </div>
                 <!-- Non-tracking Items -->
@@ -264,6 +319,11 @@
                     :label="t('Income')"
                     true-value="IC_income"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -271,6 +331,11 @@
                     :label="t('Expense')"
                     true-value="IC_expense"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                   <q-checkbox
                     dense
@@ -278,6 +343,11 @@
                     :label="t('Tax')"
                     true-value="IC_taxservice"
                     false-value=""
+                    :disable="
+                      selectedAccount.has_transactions ||
+                      selectedAccount.has_parts ||
+                      selectedAccount.has_defaults
+                    "
                   />
                 </div>
               </div>

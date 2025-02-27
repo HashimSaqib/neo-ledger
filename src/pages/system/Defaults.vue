@@ -159,6 +159,7 @@
             v-model="form.linetax"
             name="linetax"
             :label="t('Line Tax')"
+            :disable="locklinetax"
           />
           <q-checkbox
             v-model="form.namesbynumber"
@@ -633,6 +634,8 @@ function findAccountById(arr, id) {
   return arr.find((acc) => String(acc.id) === String(id)) || null;
 }
 
+const locklinetax = ref(false);
+
 async function loadDefaults() {
   try {
     const { data } = await api.get("/system/companydefaults");
@@ -684,6 +687,10 @@ async function loadDefaults() {
     form.value.lock_customernumber = isChecked(data.lock_customernumber);
     form.value.vendornumber = data.vendornumber || "";
     form.value.lock_vendornumber = isChecked(data.lock_vendornumber);
+
+    if (data.locklinetax) {
+      locklinetax.value = true;
+    }
 
     // Build the arrays for s-select
     if (data.IC) {

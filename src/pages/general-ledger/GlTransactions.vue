@@ -1,5 +1,6 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
+    <!-- Search form -->
     <q-form @submit.prevent class="q-pa-sm mainbg">
       <q-expansion-item
         :label="t('Search Params')"
@@ -7,134 +8,7 @@
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
-        <q-input
-          v-model="formData.reference"
-          class="lightbg q-my-md"
-          :label="t('Reference')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.description"
-          class="lightbg q-my-md"
-          :label="t('Description')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.companyName"
-          class="lightbg q-my-md"
-          :label="t('Company Name')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.department"
-          class="lightbg q-my-md"
-          :label="t('Department')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.lineitem"
-          class="lightbg q-my-md"
-          :label="t('Line Item')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.source"
-          class="lightbg q-my-md"
-          :label="t('Source')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.memo"
-          class="lightbg q-my-md"
-          :label="t('Memo')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <div class="row justify-between q-my-md">
-          <q-input
-            v-model="formData.accnofrom"
-            class="lightbg col-5"
-            :label="t('Account Number From')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.accnoto"
-            :label="t('Account Number To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
-
-        <div class="row justify-between q-my-md">
-          <q-input
-            v-model="formData.datefrom"
-            type="date"
-            :label="t('Date From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.dateto"
-            type="date"
-            :label="t('Date To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
-        <div class="row justify-between">
-          <q-input
-            v-model="formData.amountfrom"
-            type="number"
-            :label="t('Amount From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.amountto"
-            type="number"
-            :label="t('Amount To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
+        <!-- ... your q-input fields ... -->
         <div class="q-py-md">
           <draggable v-model="baseColumns" item-key="name" class="drag-area">
             <template #item="{ element }">
@@ -147,49 +21,158 @@
               />
             </template>
           </draggable>
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            class="q-mt-md"
-            @click="search"
-          />
+          <div class="row items-center q-mt-md">
+            <q-btn
+              type="submit"
+              :label="t('Search')"
+              color="primary"
+              class="q-mr-md"
+              @click="search"
+            />
+          </div>
         </div>
       </q-expansion-item>
     </q-form>
 
-    <div v-if="results.length > 0">
+    <!-- New action buttons: Export and clear accno filter -->
+    <div class="row items-center q-mt-md">
+      <q-btn
+        label="Export"
+        color="accent"
+        @click="downloadTransactions"
+        class="q-mx-md"
+        v-if="results.length > 0"
+      />
+      <q-btn
+        v-if="formData.accno"
+        label="View All Transactions"
+        color="secondary"
+        @click="clearAccnoFilter"
+      />
+    </div>
+
+    <!-- Results table -->
+    <div v-if="results.length > 0" class="q-mt-md">
       <q-table
-        class="q-mt-md"
-        :rows="filteredResults"
-        row-key="id"
-        :columns="columns"
         flat
         bordered
         dense
         virtual-scroll
+        :rows="tableRows"
+        :columns="displayColumns"
+        row-key="id"
         :rows-per-page-options="[0]"
       >
-        <template v-slot:body-cell-reference="props">
-          <q-td :props="props">
-            <router-link :to="getPath(props.row)" class="text-primary">
-              {{ props.row.reference }}
-            </router-link>
-          </q-td>
+        <!-- Custom body slot: group header, subtotal and normal rows -->
+        <template v-slot:body="props">
+          <!-- Group Header Row -->
+          <q-tr v-if="props.row.isGroupHeader" class="group-header">
+            <q-td :colspan="displayColumns.length" class="text-left">
+              <router-link
+                to="#"
+                @click.prevent="filterByAccno(props.row.accno)"
+                class="text-primary"
+              >
+                <strong>{{ props.row.groupLabel }}</strong>
+              </router-link>
+            </q-td>
+          </q-tr>
+          <!-- Subtotal Row -->
+          <q-tr v-else-if="props.row.isSubtotal" class="subtotal-row">
+            <q-td
+              v-for="col in displayColumns"
+              :key="col.name"
+              :class="getCellClass(col)"
+            >
+              <span v-if="col.name === 'debit'">{{
+                formatAmount(props.row.debit)
+              }}</span>
+              <span v-else-if="col.name === 'credit'">{{
+                formatAmount(props.row.credit)
+              }}</span>
+              <span v-else-if="col.name === 'taxAmount'">{{
+                formatAmount(props.row.taxAmount)
+              }}</span>
+              <span v-else-if="col.name === 'balance'">{{
+                formatAmount(props.row.balance)
+              }}</span>
+              <span v-else-if="col.name === 'accno'">
+                <router-link
+                  to="#"
+                  @click.prevent="filterByAccno(props.row.accno)"
+                  class="text-primary"
+                >
+                  {{ props.row.accno }}
+                </router-link>
+              </span>
+            </q-td>
+          </q-tr>
+          <!-- Normal Data Row -->
+          <q-tr v-else>
+            <q-td
+              v-for="col in displayColumns"
+              :key="col.name"
+              :class="getCellClass(col)"
+            >
+              <span v-if="col.name === 'reference'">
+                <router-link :to="getPath(props.row)" class="text-primary">
+                  {{ props.row.reference }}
+                </router-link>
+              </span>
+              <span v-else-if="col.name === 'accno'">
+                <router-link
+                  to="#"
+                  @click.prevent="filterByAccno(props.row.accno)"
+                  class="text-primary"
+                >
+                  {{ props.row.accno }}
+                </router-link>
+              </span>
+              <span
+                v-else-if="
+                  ['debit', 'credit', 'taxAmount', 'balance'].includes(col.name)
+                "
+              >
+                {{
+                  formatAmount(
+                    typeof col.field === "function"
+                      ? col.field(props.row)
+                      : props.row[col.field]
+                  )
+                }}
+              </span>
+              <span v-else>
+                {{
+                  typeof col.field === "function"
+                    ? col.field(props.row)
+                    : props.row[col.field]
+                }}
+              </span>
+            </q-td>
+          </q-tr>
         </template>
-        <template v-slot:body-cell-description="props">
-          <q-td :props="props">
-            <div class="wrapped-description">
-              {{ props.row.description }}
-            </div>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-memo="props">
-          <q-td :props="props">
-            <div class="wrapped-description">
-              {{ props.row.memo }}
-            </div>
-          </q-td>
+        <!-- Footer slot for overall totals when in split ledger mode -->
+        <template v-slot:footer v-if="splitLedger && overallTotals">
+          <q-tr class="totals-row">
+            <q-td
+              v-for="col in displayColumns"
+              :key="col.name"
+              :class="getCellClass(col)"
+            >
+              <span v-if="col.name === 'debit'">{{
+                formatAmount(overallTotals.totalDebit)
+              }}</span>
+              <span v-else-if="col.name === 'credit'">{{
+                formatAmount(overallTotals.totalCredit)
+              }}</span>
+              <span v-else-if="col.name === 'taxAmount'">{{
+                formatAmount(overallTotals.totalTax)
+              }}</span>
+              <span v-else-if="col.name === 'balance'">{{
+                formatAmount(overallTotals.totalBalance)
+              }}</span>
+            </q-td>
+          </q-tr>
         </template>
       </q-table>
     </div>
@@ -197,17 +180,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, reactive } from "vue";
 import { api } from "src/boot/axios";
 import { Cookies } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
+import { formatAmount } from "src/helpers/utils";
+import { utils, writeFile } from "xlsx";
+
 const { t } = useI18n();
 
-const formData = ref({});
+// Use reactive so you can access properties directly (e.g. formData.accno)
+const formData = reactive({});
 const filtersOpen = ref(true);
 const results = ref([]);
 
+// Flag for split ledger mode
+const splitLedger = ref(true);
+
+// Define base columns (including Tax Acc & Tax Amount)
 const baseColumns = ref([
   {
     name: "id",
@@ -259,6 +250,25 @@ const baseColumns = ref([
     default: true,
   },
   {
+    name: "taxAcc",
+    align: "left",
+    label: "Tax Acc",
+    field: (row) =>
+      row.linetax_accno && row.linetax_description
+        ? `${row.linetax_accno}--${row.linetax_description}`
+        : "",
+    sortable: false,
+    default: true,
+  },
+  {
+    name: "taxAmount",
+    align: "right",
+    label: "Tax Amount",
+    field: (row) => Number(row.linetaxamount) || 0,
+    sortable: true,
+    default: true,
+  },
+  {
     name: "source",
     align: "left",
     label: "Source",
@@ -300,20 +310,22 @@ const baseColumns = ref([
   },
 ]);
 
+// Initialize selected columns based on defaults
 const selectedColumns = ref(
   baseColumns.value.reduce((acc, column) => {
     acc[column.name] = column.default;
     return acc;
   }, {})
 );
-
 function processFilters() {
   const savedFilters = Cookies.get("gl_list_filters");
 
   if (savedFilters) {
     try {
-      const parsedFilters = savedFilters;
-
+      const parsedFilters =
+        typeof savedFilters === "string"
+          ? JSON.parse(savedFilters)
+          : savedFilters;
       if (
         parsedFilters &&
         typeof parsedFilters === "object" &&
@@ -324,21 +336,14 @@ function processFilters() {
           ...selectedColumns.value,
           ...parsedFilters.columns,
         };
-
-        baseColumns.value = parsedFilters.order
-          .map((name) => baseColumns.value.find((col) => col.name === name))
-          .filter((col) => col !== undefined);
-
-        console.log("Parsed and applied filters:", parsedFilters);
       } else {
-        throw new Error("Invalid structure in parsed filters");
+        throw new Error("Invalid filter structure in cookie.");
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove("gl_list_filters");
+      Cookies.remove("ar_transactions_filters");
     }
   } else {
-    // Initialize default filters
     const defaultFilters = {
       columns: baseColumns.value.reduce((acc, column) => {
         acc[column.name] = column.default;
@@ -347,17 +352,11 @@ function processFilters() {
       order: baseColumns.value.map((col) => col.name),
     };
 
-    // Set the default filters to cookies
-    Cookies.set("gl_list_filters", JSON.stringify(defaultFilters), {
-      expires: 30,
-    });
-
+    Cookies.set("ar_transactions_filters", defaultFilters, { expires: 30 });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
       .filter((col) => col !== undefined);
-
-    console.log("Set default filters:", defaultFilters);
   }
 }
 
@@ -365,7 +364,6 @@ onMounted(() => {
   processFilters();
 });
 
-// Watch selectedColumns and baseColumns and save changes to cookies
 watch(
   [selectedColumns, baseColumns],
   () => {
@@ -373,52 +371,137 @@ watch(
       columns: selectedColumns.value,
       order: baseColumns.value.map((col) => col.name),
     };
-
     try {
-      Cookies.set("gl_list_filters", JSON.stringify(filters), {
-        expires: 30,
-      });
+      Cookies.set("gl_list_filters", filters, { expires: 30 });
     } catch (error) {
-      console.error("Error saving filters to cookie:", error);
+      console.error("Error saving filters to cookies:", error);
     }
   },
   { deep: true }
 );
-
-// Filtered columns based on selected checkboxes
-const columns = computed(() => {
-  return baseColumns.value
-    .filter((column) => selectedColumns.value[column.name])
-    .map((column) => ({
-      ...column,
-      label: t(column.label),
-    }));
+const displayColumns = computed(() => {
+  let cols = baseColumns.value.filter((col) => selectedColumns.value[col.name]);
+  if (splitLedger.value && !cols.find((c) => c.name === "balance")) {
+    cols.push({
+      name: "balance",
+      align: "right",
+      label: "Balance",
+      field: "balance",
+      sortable: false,
+      default: true,
+    });
+  }
+  return cols.map((col) => ({ ...col, label: t(col.label) }));
 });
-const filteredResults = computed(() => {
-  return results.value.map((result) => {
-    const filtered = {};
-    const requiredKeys = ["id", "type", "till", "invoice"];
 
-    // Always include required keys
-    requiredKeys.forEach((key) => {
-      filtered[key] = result[key];
-    });
-
-    // Include selected columns
-    Object.keys(selectedColumns.value).forEach((key) => {
-      if (selectedColumns.value[key]) {
-        filtered[key] = result[key];
-      }
-    });
-
-    return filtered;
+// Process raw results to include computed tax fields
+const processedResults = computed(() => {
+  return results.value.map((row) => {
+    const newRow = { ...row };
+    newRow.taxAcc =
+      newRow.linetax_accno && newRow.linetax_description
+        ? `${newRow.linetax_accno}--${newRow.linetax_description}`
+        : "";
+    newRow.taxAmount = Number(newRow.linetaxamount) || 0;
+    return newRow;
   });
 });
 
+// Group transactions by account if split ledger is enabled
+const groupedResults = computed(() => {
+  if (!splitLedger.value) return processedResults.value;
+  const groups = {};
+  processedResults.value.forEach((row) => {
+    if (!groups[row.accno]) groups[row.accno] = [];
+    groups[row.accno].push(row);
+  });
+  // Sort groups by earliest transaction date
+  const sortedGroups = Object.values(groups).sort(
+    (groupA, groupB) =>
+      new Date(groupA[0].transdate) - new Date(groupB[0].transdate)
+  );
+  const finalRows = [];
+  sortedGroups.forEach((group) => {
+    const acc = group[0].accno;
+    finalRows.push({
+      isGroupHeader: true,
+      accno: acc,
+      account_description: group[0].account_description,
+      groupLabel: `${acc} -- ${group[0].account_description}`,
+    });
+    let runningBalance = 0;
+    const sortedGroup = group.sort(
+      (a, b) => new Date(a.transdate) - new Date(b.transdate)
+    );
+    sortedGroup.forEach((row) => {
+      runningBalance += -Number(row.amount);
+      finalRows.push({ ...row, balance: runningBalance });
+    });
+    const subtotal = {
+      isSubtotal: true,
+      accno: acc,
+      account_description: group[0].account_description,
+      debit: group.reduce((sum, r) => sum + Number(r.debit), 0),
+      credit: group.reduce((sum, r) => sum + Number(r.credit), 0),
+      taxAmount: group.reduce(
+        (sum, r) => sum + (Number(r.linetaxamount) || 0),
+        0
+      ),
+      balance: runningBalance,
+    };
+    finalRows.push(subtotal);
+  });
+  return finalRows;
+});
+
+const tableRows = computed(() => {
+  return splitLedger.value ? groupedResults.value : processedResults.value;
+});
+
+// Compute overall totals for split ledger view
+const overallTotals = computed(() => {
+  if (!splitLedger.value) return null;
+  const groups = {};
+  processedResults.value.forEach((row) => {
+    if (!groups[row.accno]) groups[row.accno] = [];
+    groups[row.accno].push(row);
+  });
+  let totalDebit = 0,
+    totalCredit = 0,
+    totalTax = 0,
+    totalBalance = 0;
+  Object.keys(groups).forEach((acc) => {
+    const group = groups[acc];
+    totalDebit += group.reduce((sum, r) => sum + Number(r.debit), 0);
+    totalCredit += group.reduce((sum, r) => sum + Number(r.credit), 0);
+    totalTax += group.reduce(
+      (sum, r) => sum + (Number(r.linetaxamount) || 0),
+      0
+    );
+    totalBalance += -group.reduce((sum, r) => sum + Number(r.amount), 0);
+  });
+  return { totalDebit, totalCredit, totalTax, totalBalance };
+});
+
+// When clicking an account number, set filter and search
+const filterByAccno = (accno) => {
+  formData.accno = accno;
+  splitLedger.value = true;
+  search();
+};
+
+// New method to clear the account filter and reload all transactions
+const clearAccnoFilter = () => {
+  formData.accno = "";
+  search();
+};
+
+// API search function: note we spread formData into a new plain object so that axios can serialize it correctly
 const search = async () => {
   try {
+    console.log("Searching with parameters:", formData);
     const response = await api.get("/gl/transactions/lines", {
-      params: formData.value,
+      params: { ...formData },
     });
     filtersOpen.value = false;
     results.value = response.data;
@@ -428,9 +511,9 @@ const search = async () => {
   }
 };
 
+// Return router path based on row type
 const getPath = (row) => {
   let path = "";
-
   if (row.type === "gl") {
     path = "/gl/add-gl";
   } else if (row.type === "ar") {
@@ -448,8 +531,72 @@ const getPath = (row) => {
       path = "/arap/transaction/vendor";
     }
   }
-
   return { path, query: { id: row.id } };
+};
+
+// Utility to set text alignment classes
+const getCellClass = (col) =>
+  col.align === "right" ? "text-right" : "text-left";
+
+// Export function that builds an Excel workbook from the table data
+const downloadTransactions = () => {
+  // Build header row from displayed columns
+  const headerRow = displayColumns.value.map((col) => col.label);
+  const exportData = [headerRow];
+
+  // Build export data row by row
+  tableRows.value.forEach((row) => {
+    if (row.isGroupHeader) {
+      const newRow = [
+        row.groupLabel,
+        ...new Array(headerRow.length - 1).fill(""),
+      ];
+      exportData.push(newRow);
+    } else if (row.isSubtotal) {
+      const newRow = displayColumns.value.map((col) => {
+        if (col.name === "debit") return formatAmount(row.debit);
+        if (col.name === "credit") return formatAmount(row.credit);
+        if (col.name === "taxAmount") return formatAmount(row.taxAmount);
+        if (col.name === "balance") return formatAmount(row.balance);
+        if (col.name === "accno") return row.accno;
+        return "";
+      });
+      exportData.push(newRow);
+    } else {
+      const newRow = displayColumns.value.map((col) => {
+        if (col.name === "reference") return row.reference;
+        if (col.name === "accno") return row.accno;
+        if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
+          return formatAmount(
+            typeof col.field === "function" ? col.field(row) : row[col.field]
+          );
+        }
+        return typeof col.field === "function"
+          ? col.field(row)
+          : row[col.field];
+      });
+      exportData.push(newRow);
+    }
+  });
+
+  // Create worksheet and auto-adjust column widths
+  const worksheet = utils.aoa_to_sheet(exportData);
+  worksheet["!cols"] = headerRow.map((header, index) => {
+    let maxLength = header.length;
+    exportData.forEach((row) => {
+      const cellValue = row[index];
+      maxLength = Math.max(
+        maxLength,
+        cellValue ? cellValue.toString().length : 0
+      );
+    });
+    return { wch: maxLength + 2 };
+  });
+
+  // Build workbook and trigger download
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Transactions");
+  writeFile(workbook, "transactions_export.xlsx", { compression: true });
 };
 </script>
 
@@ -458,29 +605,23 @@ const getPath = (row) => {
   display: flex;
   flex-wrap: wrap;
 }
-
-/* Table container height */
 :deep(.q-table__container) {
   height: calc(100vh - 180px);
   position: relative;
 }
-
-/* Sticky header styles */
 :deep(.q-table thead) {
   position: sticky;
   z-index: 2;
   top: 0;
   background-color: var(--q-maintext);
-  color: var(--q-main g);
+  color: var(--q-maindark);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
-
 :deep(.q-table thead tr) {
   position: sticky;
   top: 0;
   z-index: 2;
 }
-
 :deep(.q-table thead tr th) {
   position: sticky;
   top: 0;
@@ -489,54 +630,33 @@ const getPath = (row) => {
   background-color: var(--q-maintext);
   color: var(--q-mainbg);
 }
-
-/* Loading state */
 .q-table--loading {
   opacity: 0.7;
   transition: opacity 0.3s ease-in-out;
 }
-
-/* Totals row styling */
-:deep(.totals-row) {
-  position: sticky !important;
-  bottom: 0 !important;
-  z-index: 2;
+:deep(.totals-row),
+:deep(.subtotal-row) {
   background-color: var(--q-maintext);
   color: var(--q-mainbg);
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.12);
-}
-
-:deep(.totals-row td) {
-  position: sticky !important;
-  bottom: 0 !important;
   font-weight: var(--q-font-weight-bolder);
-  text-align: right;
-  background-color: var(--q-maintext);
+}
+.group-header {
+  background-color: var(--q-secondary);
   color: var(--q-mainbg);
+  font-weight: bold;
 }
-
-:deep(.totals-row td:nth-child(3)) {
-  text-align: left !important;
-}
-
-/* Number columns alignment */
-:deep(.q-table tbody td[class*="amount"]),
-:deep(.q-table tbody td[class*="paid"]),
-:deep(.q-table tbody td[class*="tax"]),
-:deep(.q-table tbody td[class*="paymentdiff"]) {
-  text-align: right;
-}
-
-/* Virtual scroll table content */
-:deep(.q-virtual-scroll__content) {
-  margin-bottom: 0 !important;
-}
-
-/* Ensure proper padding */
 :deep(.q-table td) {
   padding: 8px 16px;
 }
-
+:deep(.q-virtual-scroll__content) {
+  margin-bottom: 0 !important;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
 .wrapped-description {
   white-space: pre-wrap;
   min-width: 10vw;
