@@ -84,14 +84,4 @@ defineOptions({
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
-
-// Watch route changes to reset title and close the side panel
-watch(
-  () => route.fullPath,
-  () => {
-    title.value = getDefaultTitle();
-    leftDrawerOpen.value = false; // close side panel on route change
-  },
-  { immediate: true }
-);
 </script>
