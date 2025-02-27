@@ -466,7 +466,7 @@
             class="q-mr-md"
             :label="t('Print')"
             color="accent"
-            @click="printInvoice"
+            @click="printTransaction"
           />
           <q-btn :label="t('Delete')" color="warning" @click="deleteInvoice" />
         </div>
@@ -1002,7 +1002,7 @@ const postInvoice = async () => {
 
   try {
     loading.value = true;
-    const idParam = invId.value ? invId.value : "";
+    const idParam = invId.value ? `/${invId.value}` : "";
     const response = await api.post(
       `/arap/transaction/${type.value}${idParam}`,
       invoiceData
@@ -1371,11 +1371,46 @@ const deleteInvoice = () => {
   });
 };
 
-const printInvoice = () => {
-  console.info("Print function placeholder invoked");
-  Notify.create({
-    type: "accent",
-    message: t("Print functionality not implemented yet"),
-  });
+const printTransaction = async () => {
+  loading.value = true;
+  if (!invId.value) {
+    Notify.create({
+      message: t("Invoice ID is required"),
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  try {
+    const response = await api.get(
+      `/print_transaction?id=${invId.value}&vc=${type.value}`,
+      {
+        responseType: "blob",
+      }
+    );
+
+    const blob = new Blob([response.data], { type: "application/pdf" });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "invoice.pdf";
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    loading.value = false;
+  } catch (error) {
+    Notify.create({
+      message: t("Failed to download invoice"),
+      type: "negative",
+      position: "center",
+    });
+    console.error("Error downloading invoice:", error);
+    loading.value = false;
+  }
 };
 </script>

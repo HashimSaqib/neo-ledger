@@ -117,8 +117,6 @@
           @keydown.enter="handleEnter($event, index)"
         />
 
-        <!-- Conditionally show Tax fields if Linetax is enabled -->
-
         <!-- Source input -->
         <q-input
           v-model="line.source"
@@ -141,10 +139,12 @@
           dense
           @keydown.enter="handleEnter($event, index)"
         />
+
+        <!-- Conditionally show Tax fields if Linetax is enabled -->
         <template v-if="lineTax">
           <s-select
             outlined
-            v-model="line.taxAccno"
+            v-model="line.taxAccount"
             :options="taxAccounts"
             option-value="accno"
             option-label="label"
@@ -158,7 +158,7 @@
             search="label"
           />
           <fn-input
-            v-model="line.taxAmount"
+            v-model="line.linetaxamount"
             :label="t('Tax Amount')"
             class="lightbg col-1"
             input-class="maintext"
@@ -168,12 +168,12 @@
             @keydown.enter="handleEnter($event, index)"
           />
         </template>
+
         <q-btn
           color="negative"
           icon="delete"
           dense
           flat
-          class=""
           @click="removeLine(index)"
         />
       </div>
@@ -219,17 +219,15 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import { formatAmount, filter } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
+
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
-
 const { formatDate } = date;
 
-const getTodayDate = () => {
-  return formatDate(new Date(), "YYYY-MM-DD");
-};
+const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 
 const formData = ref({
   reference: "",
@@ -241,6 +239,7 @@ const formData = ref({
   id: null,
 });
 
+// -- Lines state uses taxAccount and linetaxamount --
 const lines = ref([
   {
     account: "",
@@ -248,8 +247,8 @@ const lines = ref([
     credit: 0,
     source: "",
     memo: "",
-    taxAccno: "",
-    taxAmount: 0,
+    taxAccount: "",
+    linetaxamount: 0,
   },
   {
     account: "",
@@ -257,16 +256,16 @@ const lines = ref([
     credit: 0,
     source: "",
     memo: "",
-    taxAccno: "",
-    taxAmount: 0,
+    taxAccount: "",
+    linetaxamount: 0,
   },
 ]);
 
-const transactionTitle = computed(() => {
-  return formData.value.id
+const transactionTitle = computed(() =>
+  formData.value.id
     ? "Update General Ledger Transaction"
-    : "Add General Ledger Transaction";
-});
+    : "Add General Ledger Transaction"
+);
 updateTitle(transactionTitle.value);
 
 const buttonLabel = computed(() => {
@@ -286,8 +285,8 @@ const addLine = () => {
     credit: 0,
     source: "",
     memo: "",
-    taxAccno: "",
-    taxAmount: 0,
+    taxAccount: "",
+    linetaxamount: 0,
   });
 };
 
@@ -298,8 +297,8 @@ const addLineAt = (index) => {
     credit: 0,
     source: "",
     memo: "",
-    taxAccno: "",
-    taxAmount: 0,
+    taxAccount: "",
+    linetaxamount: 0,
   });
   nextTick(() => {
     if (accountRefs.value[index + 1] && accountRefs.value[index + 1].focus) {
@@ -355,12 +354,12 @@ const fetchLinks = async () => {
     const response = await api.get("/create_links/gl");
     lineTax.value = response.data.linetax;
     taxAccounts.value = response.data.tax_accounts;
-    console.log(taxAccounts.value);
   } catch (error) {
     console.log(error);
   }
 };
 
+// For s-select filtering
 const filterAccounts = (val, update) => {
   if (val === "") {
     update(() => {
@@ -420,12 +419,14 @@ const submitTransaction = async () => {
         memo: line.memo,
         source: line.source,
       };
+      // Only include tax info if linetax is enabled
       if (lineTax.value) {
-        lineObj.taxAccno =
-          line.taxAccno && typeof line.taxAccno === "object"
-            ? line.taxAccno.accno
-            : line.taxAccno || null;
-        lineObj.taxAmount = parseFloat(line.taxAmount) || 0;
+        // taxAccount is an object or string, only send the accno (id)
+        lineObj.taxAccount =
+          line.taxAccount && typeof line.taxAccount === "object"
+            ? line.taxAccount.label
+            : line.taxAccount || null;
+        lineObj.linetaxamount = parseFloat(line.linetaxamount) || 0;
       }
       return lineObj;
     }),
@@ -473,6 +474,7 @@ const loadTransaction = async (id) => {
     try {
       const response = await api.get(`/gl/transactions/${id}`);
       const transactionData = response.data;
+
       formData.value = {
         id: transactionData.id,
         reference: transactionData.reference,
@@ -483,19 +485,23 @@ const loadTransaction = async (id) => {
         exchangeRate: transactionData.exchangeRate,
       };
 
+      // Map the lines, hooking up the correct accounts and converting linetaxamount
       lines.value = transactionData.lines.map((line) => {
-        const account =
+        const foundAccount =
           accounts.value.find((acc) => acc.accno === line.accno) || "";
         return {
-          account: account,
+          account: foundAccount,
           debit: line.debit.toString(),
           credit: line.credit.toString(),
           source: line.source,
           memo: line.memo,
-          taxAccno: line.taxAccno
-            ? taxAccounts.value.find((t) => t.accno === line.taxAccno) || ""
+          taxAccount: line.taxAccount
+            ? taxAccounts.value.find((t) => t.chart_id === line.taxAccount) ||
+              ""
             : "",
-          taxAmount: line.taxAmount ? line.taxAmount.toString() : "0",
+          linetaxamount: line.linetaxamount
+            ? line.linetaxamount.toString()
+            : "0",
         };
       });
     } catch (error) {
@@ -522,10 +528,15 @@ const fetchCurrencies = async () => {
   }
 };
 
-onMounted(() => {
-  fetchAccounts();
-  fetchCurrencies();
-  fetchLinks();
-  loadTransaction(route.query.id);
+onMounted(async () => {
+  try {
+    // Wait for all data to load before loading the transaction
+    await Promise.all([fetchAccounts(), fetchCurrencies(), fetchLinks()]);
+
+    // Now safely load the transaction
+    loadTransaction(route.query.id);
+  } catch (error) {
+    console.log("Error in loading initial data:", error);
+  }
 });
 </script>
