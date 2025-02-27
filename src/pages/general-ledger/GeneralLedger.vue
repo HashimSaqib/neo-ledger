@@ -156,6 +156,7 @@
             label-color="secondary"
             account
             search="label"
+            @update:model-value="(val) => updateTaxAmount(val, index)"
           />
           <fn-input
             v-model="line.linetaxamount"
@@ -278,7 +279,31 @@ const setAccountRef = (el, index) => {
   accountRefs.value[index] = el;
 };
 
+// Helper to check if a line is completely empty
+const isEmptyLine = (line) => {
+  const accountEmpty =
+    !line.account ||
+    (typeof line.account === "string" && line.account.trim() === "");
+  return (
+    accountEmpty &&
+    Number(line.debit) === 0 &&
+    Number(line.credit) === 0 &&
+    (!line.source || line.source.trim() === "") &&
+    (!line.memo || line.memo.trim() === "") &&
+    (!line.taxAccount ||
+      (typeof line.taxAccount === "string" && line.taxAccount.trim() === "")) &&
+    Number(line.linetaxamount) === 0
+  );
+};
+
+// Update addLine to remove any existing empty line before pushing a new one
 const addLine = () => {
+  if (lines.value.length > 1) {
+    const emptyIndex = lines.value.findIndex((line) => isEmptyLine(line));
+    if (emptyIndex > -1) {
+      lines.value.splice(emptyIndex, 1);
+    }
+  }
   lines.value.push({
     account: "",
     debit: 0,
@@ -290,7 +315,17 @@ const addLine = () => {
   });
 };
 
+// Update addLineAt similarly. Adjust the index if an empty line before the insertion index is removed.
 const addLineAt = (index) => {
+  if (lines.value.length > 1) {
+    const emptyIndex = lines.value.findIndex((line) => isEmptyLine(line));
+    if (emptyIndex > -1) {
+      lines.value.splice(emptyIndex, 1);
+      if (emptyIndex < index) {
+        index--;
+      }
+    }
+  }
   lines.value.splice(index + 1, 0, {
     account: "",
     debit: 0,
@@ -421,7 +456,6 @@ const submitTransaction = async () => {
       };
       // Only include tax info if linetax is enabled
       if (lineTax.value) {
-        // taxAccount is an object or string, only send the accno (id)
         lineObj.taxAccount =
           line.taxAccount && typeof line.taxAccount === "object"
             ? line.taxAccount.label
@@ -525,6 +559,26 @@ const fetchCurrencies = async () => {
       type: "negative",
       position: "center",
     });
+  }
+};
+
+// New function to update the tax amount based on the selected tax account and line amounts
+const updateTaxAmount = (val, index) => {
+  console.log(val);
+  const taxAcc = taxAccounts.value.find((item) => item.accno === val.accno);
+  if (taxAcc && taxAcc.rate) {
+    const debit = parseFloat(lines.value[index].debit) || 0;
+    const credit = parseFloat(lines.value[index].credit) || 0;
+    let baseAmount = 0;
+    if (debit > 0) {
+      baseAmount = debit;
+    } else if (credit > 0) {
+      baseAmount = credit;
+    }
+    const calculatedTax = baseAmount * taxAcc.rate;
+    lines.value[index].linetaxamount = calculatedTax;
+  } else {
+    lines.value[index].linetaxamount = 0;
   }
 };
 
