@@ -72,121 +72,141 @@
     </div>
 
     <div class="flex q-pa-sm mainbg column q-mt-sm">
-      <div
-        v-for="(line, index) in lines"
-        :key="index"
-        class="row q-gutter-x-sm q-mb-sm"
-      >
-        <!-- Account s-select with a ref for auto-focus -->
-        <s-select
-          outlined
-          v-model="line.account"
-          :options="accounts"
-          :label="t('Account')"
-          dense
-          class="lightbg col-3"
-          popup-content-class="mainbg maintext"
-          input-class="maintext"
-          label-color="secondary"
-          search="label"
-          account
-          :ref="(el) => setAccountRef(el, index)"
-        />
-
-        <!-- Debit input -->
-        <fn-input
-          v-model="line.debit"
-          :label="t('Debit')"
-          class="lightbg col-1"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          @keydown.enter="handleEnter($event, index)"
-        />
-
-        <!-- Credit input -->
-        <fn-input
-          v-model="line.credit"
-          :label="t('Credit')"
-          class="lightbg col-1 m"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          @keydown.enter="handleEnter($event, index)"
-        />
-
-        <!-- Source input -->
-        <q-input
-          v-model="line.source"
-          :label="t('Source')"
-          class="lightbg col-2"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          @keydown.enter="handleEnter($event, index)"
-        />
-        <!-- Memo input -->
-        <q-input
-          v-model="line.memo"
-          :label="t('Memo')"
-          class="lightbg col-2"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          @keydown.enter="handleEnter($event, index)"
-        />
-
-        <!-- Conditionally show Tax fields if Linetax is enabled -->
-        <template v-if="lineTax">
+      <div v-for="(line, index) in lines" :key="index" class="column q-mb-sm">
+        <div class="row q-gutter-x-xs">
+          <!-- Account s-select with a ref for auto-focus -->
           <s-select
             outlined
-            v-model="line.taxAccount"
-            :options="taxAccounts"
-            option-value="accno"
-            option-label="label"
-            :label="t('Tax Accno')"
+            v-model="line.account"
+            :options="accounts"
+            :label="t('Account')"
             dense
-            class="lightbg col-1"
+            class="lightbg col-3"
             popup-content-class="mainbg maintext"
             input-class="maintext"
             label-color="secondary"
-            account
             search="label"
-            @update:model-value="(val) => updateTaxAmount(val, index)"
+            account
+            :ref="(el) => setAccountRef(el, index)"
           />
+
+          <!-- Debit input -->
           <fn-input
-            v-model="line.linetaxamount"
-            :label="t('Tax Amount')"
-            class="lightbg col-1"
+            v-model="line.debit"
+            :label="t('Debit')"
+            class="lightbg col-2"
             input-class="maintext"
             label-color="secondary"
             outlined
             dense
             @keydown.enter="handleEnter($event, index)"
           />
-        </template>
 
-        <q-btn
-          color="negative"
-          icon="delete"
-          dense
-          flat
-          @click="removeLine(index)"
-        />
+          <!-- Credit input -->
+          <fn-input
+            v-model="line.credit"
+            :label="t('Credit')"
+            class="lightbg col-2"
+            input-class="maintext"
+            label-color="secondary"
+            outlined
+            dense
+            @keydown.enter="handleEnter($event, index)"
+          />
+
+          <!-- Tax fields if Linetax is enabled -->
+          <template v-if="lineTax">
+            <s-select
+              outlined
+              v-model="line.taxAccount"
+              :options="taxAccounts"
+              option-value="accno"
+              option-label="label"
+              :label="t('Tax Accno')"
+              dense
+              class="lightbg col-2"
+              popup-content-class="mainbg maintext"
+              input-class="maintext"
+              label-color="secondary"
+              account
+              search="label"
+              @update:model-value="(val) => updateTaxAmount(val, index)"
+            />
+            <fn-input
+              v-model="line.linetaxamount"
+              :label="t('Tax Amount')"
+              class="lightbg col-2"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              @keydown.enter="handleEnter($event, index)"
+            />
+          </template>
+
+          <!-- Toggle Extra Fields Button -->
+          <q-btn
+            flat
+            dense
+            icon="keyboard_arrow_down"
+            :class="line.showExtra ? 'rotate-180' : ''"
+            @click="toggleExtra(index)"
+          />
+
+          <!-- Delete Line Button -->
+          <q-btn
+            color="negative"
+            icon="delete"
+            dense
+            flat
+            @click="removeLine(index)"
+            v-if="!line.showExtra"
+          />
+        </div>
+
+        <!-- Extra Fields for Source and Memo -->
+        <transition name="fade">
+          <div v-if="line.showExtra" class="row q-gutter-x-xs q-mt-xs">
+            <q-input
+              v-model="line.source"
+              :label="t('Source')"
+              class="lightbg col-3"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              @keydown.enter="handleEnter($event, index)"
+            />
+            <q-input
+              v-model="line.memo"
+              :label="t('Memo')"
+              class="lightbg col-3"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              @keydown.enter="handleEnter($event, index)"
+            />
+            <q-btn
+              color="negative"
+              icon="delete"
+              dense
+              flat
+              @click="removeLine(index)"
+              v-if="line.showExtra"
+            />
+          </div>
+        </transition>
       </div>
 
-      <div class="row justify-space-between q-py-md">
-        <div class="q-pa-sm lightbg maintext col-4 text-center">
+      <div class="row q-py-xs q-gutter-x-xs">
+        <div class="q-pa-sm lightbg maintext col-3 text-center">
           {{ t("Total") }}
         </div>
-        <div class="q-ml-md q-pa-sm lightbg maintext col-1 text-center">
+        <div class="q-pa-sm lightbg maintext col-2">
           {{ formatAmount(totalDebit) }}
         </div>
-        <div class="q-ml-md q-pa-sm lightbg col-1 maintext text-center">
+        <div class="q-pa-sm lightbg maintext col-2">
           {{ formatAmount(totalCredit) }}
         </div>
       </div>
@@ -240,7 +260,7 @@ const formData = ref({
   id: null,
 });
 
-// -- Lines state uses taxAccount and linetaxamount --
+// -- Lines state includes showExtra to control visibility of source & memo --
 const lines = ref([
   {
     account: "",
@@ -250,6 +270,7 @@ const lines = ref([
     memo: "",
     taxAccount: "",
     linetaxamount: 0,
+    showExtra: false,
   },
   {
     account: "",
@@ -259,6 +280,7 @@ const lines = ref([
     memo: "",
     taxAccount: "",
     linetaxamount: 0,
+    showExtra: false,
   },
 ]);
 
@@ -312,6 +334,7 @@ const addLine = () => {
     memo: "",
     taxAccount: "",
     linetaxamount: 0,
+    showExtra: false,
   });
 };
 
@@ -334,6 +357,7 @@ const addLineAt = (index) => {
     memo: "",
     taxAccount: "",
     linetaxamount: 0,
+    showExtra: false,
   });
   nextTick(() => {
     if (accountRefs.value[index + 1] && accountRefs.value[index + 1].focus) {
@@ -351,6 +375,10 @@ const removeLine = (index) => {
   if (lines.value.length > 2) {
     lines.value.splice(index, 1);
   }
+};
+
+const toggleExtra = (index) => {
+  lines.value[index].showExtra = !lines.value[index].showExtra;
 };
 
 const totalDebit = computed(() => {
@@ -519,7 +547,7 @@ const loadTransaction = async (id) => {
         exchangeRate: transactionData.exchangeRate,
       };
 
-      // Map the lines, hooking up the correct accounts and converting linetaxamount
+      // Map the lines, setting showExtra to true if source or memo exist
       lines.value = transactionData.lines.map((line) => {
         const foundAccount =
           accounts.value.find((acc) => acc.accno === line.accno) || "";
@@ -536,6 +564,7 @@ const loadTransaction = async (id) => {
           linetaxamount: line.linetaxamount
             ? line.linetaxamount.toString()
             : "0",
+          showExtra: line.source || line.memo ? true : false,
         };
       });
     } catch (error) {
