@@ -53,6 +53,7 @@
           outlined
           dense
           type="textarea"
+          autogrow
           rows="1"
         />
       </div>
@@ -64,8 +65,8 @@
           input-class="maintext"
           label-color="secondary"
           outlined
+          autogrow
           dense
-          type="textarea"
           rows="1"
         />
       </div>
@@ -540,12 +541,14 @@ const loadTransaction = async (id) => {
       formData.value = {
         id: transactionData.id,
         reference: transactionData.reference,
-        currency: transactionData.curr,
         description: transactionData.description,
         notes: transactionData.notes,
         transdate: transactionData.transdate,
         exchangeRate: transactionData.exchangeRate,
       };
+      formData.value.currency = currencies.value.find(
+        (curr) => curr.curr === transactionData.curr
+      );
 
       // Map the lines, setting showExtra to true if source or memo exist
       lines.value = transactionData.lines.map((line) => {
@@ -590,24 +593,47 @@ const fetchCurrencies = async () => {
     });
   }
 };
-
-// New function to update the tax amount based on the selected tax account and line amounts
 const updateTaxAmount = (val, index) => {
+  // Validate that 'val' exists and has a valid 'accno'
+  if (!val || !val.accno) {
+    console.warn("Invalid value provided:", val);
+    return;
+  }
+
+  // Ensure that 'taxAccounts' is available
+  if (!taxAccounts || !taxAccounts.value) {
+    console.warn("taxAccounts is not available");
+    return;
+  }
+
   console.log(val);
   const taxAcc = taxAccounts.value.find((item) => item.accno === val.accno);
-  if (taxAcc && taxAcc.rate) {
-    const debit = parseFloat(lines.value[index].debit) || 0;
-    const credit = parseFloat(lines.value[index].credit) || 0;
-    let baseAmount = 0;
-    if (debit > 0) {
-      baseAmount = debit;
-    } else if (credit > 0) {
-      baseAmount = credit;
-    }
-    const calculatedTax = baseAmount * taxAcc.rate;
-    lines.value[index].linetaxamount = calculatedTax;
-  } else {
+
+  // If there's no valid tax account or tax rate, set tax amount to 0 immediately.
+  if (!taxAcc || !taxAcc.rate) {
     lines.value[index].linetaxamount = 0;
+    return;
+  }
+
+  // Retrieve and parse debit and credit values. If they are null, empty, or invalid, set them to 0.
+  let debit = parseFloat(lines.value[index].debit);
+  let credit = parseFloat(lines.value[index].credit);
+  if (isNaN(debit)) debit = 0;
+  if (isNaN(credit)) credit = 0;
+
+  // Determine the base amount: use debit if available; otherwise, use credit.
+  let baseAmount = 0;
+  if (debit > 0) {
+    baseAmount = debit;
+  } else if (credit > 0) {
+    baseAmount = credit;
+  }
+
+  // If the base amount is null, empty, or 0, then the tax amount is 0.
+  if (!baseAmount) {
+    lines.value[index].linetaxamount = 0;
+  } else {
+    lines.value[index].linetaxamount = baseAmount * taxAcc.rate;
   }
 };
 

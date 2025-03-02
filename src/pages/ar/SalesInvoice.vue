@@ -1,5 +1,5 @@
 <template>
-  <q-page class="lightbg q-pa-sm relative-position">
+  <q-page class="q-pa-sm relative-position">
     <div class="mainbg textmain q-pa-md-sm q-pa-sm">
       <div class="row justify-between full-width">
         <div class="col-sm-6 col-12">
@@ -12,11 +12,11 @@
               v-model="selectedCustomer"
               dense
               outlined
-              input-class="maintext"
               label-color="secondary"
-              class="lightbg q-mb-sm col-12 col-sm-7"
+              class="q-mb-sm col-12 col-sm-7"
               @update:model-value="customerUpdate"
               search="label"
+              bg-color="input"
             />
             <div class="q-ml-sm" style="display: flex; align-items: center">
               <a
@@ -62,9 +62,9 @@
               :label="t('Record In')"
               dense
               popup-content-class="mainbg maintext"
-              input-class="maintext"
               label-color="secondary"
-              class="lightbg q-mb-sm col-sm-7 col-12"
+              bg-color="input"
+              class="q-mb-sm col-sm-7 col-12"
               search="label"
               account
             />
@@ -80,15 +80,16 @@
               option-label="curr"
               :label="t('Currency')"
               dense
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
             />
             <q-input
               v-if="selectedCurrency.rn != 1"
-              class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
+              class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
               :label="t('Exchange Rate')"
               outlined
+              bg-color="input"
               dense
               v-model="exchangeRate"
             />
@@ -98,28 +99,31 @@
               outlined
               :label="t('Shipping Point')"
               v-model="shippingPoint"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               dense
+              autogrow
             />
             <q-input
               outlined
               :label="t('Ship Via')"
               v-model="shipVia"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               dense
+              autogrow
             />
             <q-input
               outlined
               :label="t('Way Bill')"
               v-model="wayBill"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               dense
+              autogrow
             />
           </div>
         </div>
@@ -129,8 +133,8 @@
               outlined
               :label="t('Invoice Number')"
               v-model="invNumber"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               dense
             />
@@ -138,8 +142,8 @@
               outlined
               :label="t('Order Number')"
               v-model="ordNumber"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               dense
             />
@@ -148,8 +152,8 @@
             <q-input
               v-model="invDate"
               :label="t('Invoice Date')"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               outlined
               dense
@@ -158,8 +162,8 @@
             <q-input
               v-model="dueDate"
               :label="t('Due Date')"
-              class="lightbg q-mb-sm col-sm-5 col-12"
-              input-class="maintext"
+              class="q-mb-sm col-sm-5 col-12"
+              bg-color="input"
               label-color="secondary"
               outlined
               dense
@@ -171,12 +175,11 @@
               outlined
               :label="t('Description')"
               v-model="description"
-              input-class="maintext"
+              bg-color="input"
               label-color="secondary"
-              class="lightbg col-sm-11 col-12"
+              class="col-sm-11 col-12"
               dense
-              type="textarea"
-              rows="2"
+              autogrow
             />
           </div>
         </div>
@@ -215,8 +218,8 @@
                 outlined
                 v-model="line.partnumber"
                 :label="t('Number')"
-                class="lightbg col-2"
-                input-class="maintext"
+                class="col-2"
+                bg-color="input"
                 label-color="secondary"
                 dense
                 :options="items"
@@ -230,19 +233,19 @@
                 outlined
                 v-model="line.description"
                 :label="t('Description')"
-                class="lightbg col-2"
-                input-class="maintext"
+                class="col-2"
+                bg-color="input"
                 label-color="secondary"
                 dense
-                @keyup.enter="handleLineEnter(index, $event)"
+                autogrow
               />
               <q-input
                 outlined
                 v-model="line.qty"
                 :label="t('Qty')"
                 type="number"
-                class="lightbg col-1"
-                input-class="maintext"
+                class="col-1"
+                bg-color="input"
                 label-color="secondary"
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
@@ -251,8 +254,8 @@
                 outlined
                 :value="line.oh"
                 :label="t('OH')"
-                class="lightbg col-1"
-                input-class="maintext"
+                class="col-1"
+                bg-color="input"
                 label-color="secondary"
                 dense
                 readonly
@@ -262,8 +265,8 @@
                 outlined
                 v-model="line.unit"
                 :label="t('Unit')"
-                class="lightbg col-1"
-                input-class="maintext"
+                class="col-1"
+                bg-color="input"
                 label-color="secondary"
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
@@ -272,8 +275,8 @@
                 outlined
                 v-model="line.price"
                 :label="t('Price')"
-                class="lightbg col-2"
-                input-class="maintext"
+                class="col-2"
+                bg-color="input"
                 label-color="secondary"
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
@@ -283,8 +286,8 @@
                 v-model="line.discount"
                 :label="t('%')"
                 type="number"
-                class="lightbg col-1"
-                input-class="maintext"
+                class="col-1"
+                bg-color="input"
                 label-color="secondary"
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
@@ -295,8 +298,8 @@
                 :model-value="formatAmount(line.extended)"
                 :label="t('Extended')"
                 dense
-                class="lightbg col-1"
-                input-class="maintext"
+                class="col-1"
+                bg-color="input"
                 label-color="secondary"
                 readonly
                 @keyup.enter="handleLineEnter(index, $event)"
@@ -317,7 +320,8 @@
                 :label="t('Delivery Date')"
                 dense
                 type="date"
-                class="col-2 lightbg"
+                class="col-2"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <q-input
@@ -327,7 +331,8 @@
                 dense
                 type="textarea"
                 rows="1"
-                class="col-4 lightbg"
+                class="col-4"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <q-input
@@ -335,7 +340,8 @@
                 v-model="line.serialnumber"
                 :label="t('Serial No.')"
                 dense
-                class="col-3 lightbg"
+                class="col-3"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <q-input
@@ -343,7 +349,8 @@
                 v-model="line.costvendor"
                 :label="t('Vendor')"
                 dense
-                class="col-3 lightbg"
+                class="col-3"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <fn-input
@@ -351,7 +358,8 @@
                 v-model="line.cost"
                 :label="t('Cost')"
                 dense
-                class="col-2 lightbg"
+                class="col-2"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <q-input
@@ -359,7 +367,8 @@
                 v-model="line.ordernumber"
                 :label="t('Order Number')"
                 dense
-                class="col-3 lightbg"
+                class="col-3"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <q-input
@@ -367,7 +376,8 @@
                 v-model="line.customerponumber"
                 :label="t('PO Number')"
                 dense
-                class="col-3 lightbg"
+                class="col-3"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <q-input
@@ -375,7 +385,8 @@
                 v-model="line.package"
                 :label="t('Packaging')"
                 dense
-                class="col-3 lightbg"
+                class="col-3"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <fn-input
@@ -383,7 +394,8 @@
                 v-model="line.netweight"
                 :label="t('N.W.')"
                 dense
-                class="col-2 lightbg"
+                class="col-2"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <fn-input
@@ -391,7 +403,8 @@
                 v-model="line.weight"
                 :label="t('G.W.')"
                 dense
-                class="col-2 lightbg"
+                class="col-2"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
               <fn-input
@@ -399,7 +412,8 @@
                 v-model="line.volume"
                 :label="t('Volume')"
                 dense
-                class="col-2 lightbg"
+                class="col-2"
+                bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
             </div>
@@ -412,9 +426,9 @@
           <q-input
             dense
             outlined
-            class="lightbg col-sm-10 col-12"
+            class="col-sm-10 col-12"
             rows="2"
-            input-class="maintext"
+            bg-color="input"
             label-color="secondary"
             :label="t('Notes')"
             type="textarea"
@@ -425,9 +439,9 @@
           <q-input
             dense
             outlined
-            class="lightbg col-sm-11 col-12"
+            class="col-sm-11 col-12"
             rows="2"
-            input-class="maintext"
+            bg-color="input"
             label-color="secondary"
             :label="t('Internal Notes')"
             type="textarea"
@@ -507,8 +521,8 @@
           outlined
           v-model="payment.date"
           :label="t('Date')"
-          class="lightbg q-mt-sm"
-          input-class="maintext"
+          class="q-mt-sm"
+          bg-color="input"
           label-color="secondary"
           dense
           type="date"
@@ -519,8 +533,8 @@
           outlined
           v-model="payment.source"
           :label="t('Source')"
-          class="lightbg q-mt-sm"
-          input-class="maintext"
+          class="q-mt-sm"
+          bg-color="input"
           label-color="secondary"
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
@@ -529,8 +543,8 @@
           outlined
           v-model="payment.memo"
           :label="t('Memo')"
-          class="lightbg q-mt-sm"
-          input-class="maintext"
+          class="q-mt-sm"
+          bg-color="input"
           label-color="secondary"
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
@@ -539,8 +553,8 @@
           outlined
           v-model="payment.amount"
           :label="t('Amount')"
-          class="lightbg q-mt-sm"
-          input-class="maintext"
+          class="q-mt-sm"
+          bg-color="input"
           label-color="secondary"
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
@@ -550,7 +564,7 @@
           outlined
           v-model="payment.exchangerate"
           :label="t('Exch')"
-          class="lightbg q-mt-sm col-1"
+          class="q-mt-sm col-1"
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
         />
@@ -561,8 +575,8 @@
           :label="t('Account')"
           option-label="label"
           option-value="id"
-          class="lightbg q-mt-sm col-3"
-          input-class="maintext"
+          class="q-mt-sm col-3"
+          bg-color="input"
           label-color="secondary"
           dense
           search="label"
