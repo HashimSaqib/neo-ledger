@@ -15,7 +15,7 @@
                   v-model="selectedVc"
                   dense
                   outlined
-                  input-class="maintext"
+                  bg-color="input"
                   label-color="secondary"
                   class="q-mb-sm col-12 col-sm-9"
                   @update:model-value="vcUpdate"
@@ -64,10 +64,9 @@
                   :options="recordAccounts"
                   :label="t('Record In')"
                   dense
-                  popup-content-class="mainbg maintext"
-                  input-class="maintext"
+                  bg-color="input"
                   label-color="secondary"
-                  class="lightbg q-mb-sm col-sm-9 col-12"
+                  class="q-mb-sm col-sm-9 col-12"
                   search="label"
                 />
               </div>
@@ -80,8 +79,8 @@
                   option-label="curr"
                   :label="t('Currency')"
                   dense
-                  class="lightbg q-mb-sm col-sm-5 col-12"
-                  input-class="maintext"
+                  class="q-mb-sm col-sm-5 col-12"
+                  bg-color="input"
                   label-color="secondary"
                 />
                 <q-input
@@ -101,7 +100,6 @@
                   dense
                   outlined
                   input-class="maintext"
-                  label-color="secondary"
                   class="lightbg q-mb-sm col-sm-7 col-12"
                   :multiple="false"
                   name="files"
@@ -126,8 +124,8 @@
                   outlined
                   :label="t('Invoice Number')"
                   v-model="invNumber"
-                  class="lightbg q-mb-sm col-sm-5 col-12"
-                  input-class="maintext"
+                  class="q-mb-sm col-sm-5 col-12"
+                  bg-color="input"
                   label-color="secondary"
                   dense
                 />
@@ -135,8 +133,8 @@
                   outlined
                   :label="t('Order Number')"
                   v-model="ordNumber"
-                  class="lightbg q-mb-sm col-sm-5 col-12"
-                  input-class="maintext"
+                  class="q-mb-sm col-sm-5 col-12"
+                  bg-color="input"
                   label-color="secondary"
                   dense
                 />
@@ -145,8 +143,8 @@
                 <q-input
                   v-model="invDate"
                   :label="t('Invoice Date')"
-                  class="lightbg q-mb-sm col-sm-5 col-12"
-                  input-class="maintext"
+                  class="q-mb-sm col-sm-5 col-12"
+                  bg-color="input"
                   label-color="secondary"
                   outlined
                   dense
@@ -168,9 +166,9 @@
                   outlined
                   :label="t('Description')"
                   v-model="description"
-                  input-class="maintext"
+                  bg-color="input"
                   label-color="secondary"
-                  class="lightbg col-sm-11 col-12"
+                  class="col-sm-11 col-12"
                   dense
                   type="textarea"
                   rows="2"
@@ -204,13 +202,12 @@
                   outlined
                   v-model="line.description"
                   :label="t('Description')"
-                  class="lightbg"
                   :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
-                  input-class="maintext"
-                  label-color="secondary"
                   dense
                   :ref="(el) => (lineDescRefs[index] = el)"
-                  @keyup.enter="() => handleLineEnter(index)"
+                  autogrow
+                  label-color="secondary"
+                  bg-color="input"
                 />
                 <s-select
                   outlined
@@ -220,7 +217,7 @@
                   option-label="label"
                   option-value="id"
                   :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
-                  input-class="maintext"
+                  bg-color="input"
                   label-color="secondary"
                   dense
                   search="label"
@@ -231,12 +228,13 @@
                   outlined
                   v-model="line.amount"
                   :label="t('Amount')"
-                  class="lightbg col-2"
-                  input-class="maintext"
+                  class="col-2"
+                  bg-color="input"
                   label-color="secondary"
                   dense
                   @keyup.enter="() => handleLineEnter(index)"
                 />
+
                 <s-select
                   v-if="lineTax && taxAccountList"
                   outlined
@@ -245,8 +243,8 @@
                   :label="t('Tax Account')"
                   option-label="label"
                   option-value="accno"
-                  class="lightbg col-2"
-                  input-class="maintext"
+                  class="col-2"
+                  bg-color="input"
                   label-color="secondary"
                   dense
                   search="label"
@@ -259,8 +257,8 @@
                   outlined
                   v-model="line.taxAmount"
                   :label="t('Tax Amount')"
-                  class="lightbg col-2"
-                  input-class="maintext"
+                  class="col-2"
+                  bg-color="input"
                   label-color="secondary"
                   dense
                   @keyup.enter="() => handleLineEnter(index)"
@@ -282,10 +280,9 @@
               <q-input
                 dense
                 outlined
-                class="lightbg col-sm-10 col-12"
+                class="col-sm-10 col-12"
                 rows="2"
-                input-class="maintext"
-                label-color="secondary"
+                bg-color="input"
                 :label="t('Notes')"
                 type="textarea"
                 v-model="notes"
@@ -295,10 +292,9 @@
               <q-input
                 dense
                 outlined
-                class="lightbg col-sm-11 col-12"
+                class="col-sm-11 col-12"
                 rows="2"
-                input-class="maintext"
-                label-color="secondary"
+                bg-color="input"
                 :label="t('Internal Notes')"
                 type="textarea"
                 v-model="intnotes"
@@ -362,6 +358,7 @@
             </h6>
             <q-btn
               color="primary"
+              label-color="secondary"
               icon="add"
               dense
               flat
@@ -380,8 +377,8 @@
               outlined
               v-model="payment.date"
               :label="t('Date')"
-              class="lightbg q-mt-sm"
-              input-class="maintext"
+              class="q-mt-sm"
+              bg-color="input"
               label-color="secondary"
               dense
               type="date"
@@ -392,8 +389,8 @@
               outlined
               v-model="payment.source"
               :label="t('Source')"
-              class="lightbg q-mt-sm"
-              input-class="maintext"
+              class="q-mt-sm"
+              bg-color="input"
               label-color="secondary"
               dense
               @keyup.enter="() => handlePaymentEnter(index)"
@@ -402,8 +399,8 @@
               outlined
               v-model="payment.memo"
               :label="t('Memo')"
-              class="lightbg q-mt-sm"
-              input-class="maintext"
+              class="q-mt-sm"
+              bg-color="input"
               label-color="secondary"
               dense
               @keyup.enter="() => handlePaymentEnter(index)"
@@ -412,9 +409,9 @@
               outlined
               v-model="payment.amount"
               :label="t('Amount')"
-              class="lightbg q-mt-sm"
-              input-class="maintext"
+              class="q-mt-sm"
               label-color="secondary"
+              bg-color="input"
               dense
               @keyup.enter="() => handlePaymentEnter(index)"
             />
@@ -423,7 +420,9 @@
               outlined
               v-model="payment.exchangerate"
               :label="t('Exhcnage Rate')"
-              class="lightbg q-mt-sm"
+              class="q-mt-sm"
+              bg-color="input"
+              label-color="secondary"
               dense
               @keyup.enter="() => handlePaymentEnter(index)"
             />
@@ -434,12 +433,12 @@
               :label="t('Account')"
               option-label="label"
               option-value="id"
-              class="lightbg col-2 q-mt-sm"
+              label-color="secondary"
+              class="col-2 q-mt-sm"
               :class="
                 selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
               "
-              input-class="maintext"
-              label-color="secondary"
+              bg-color="input"
               dense
               search="label"
               account

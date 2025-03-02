@@ -18,7 +18,7 @@
     hide-selected
     :emit-value="emitValue"
     :map-options="mapOptions"
-    class="lightbg maintext"
+    autogrow
   />
 </template>
 
