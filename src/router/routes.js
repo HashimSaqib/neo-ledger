@@ -102,7 +102,7 @@ const routes = [
       },
       // Goods & Serivices
       {
-        path: "/goodservices/addpart",
+        path: "/goodservices/add/:type",
         component: AddPart,
       },
       // System Settings

@@ -210,6 +210,14 @@
         <div class="q-pa-sm lightbg maintext col-2">
           {{ formatAmount(totalCredit) }}
         </div>
+        <div
+          class="q-pa-sm col-2 lightbg text-bold"
+          :class="
+            totalDebit - totalCredit == 0 ? 'text-positive' : 'text-negative'
+          "
+        >
+          {{ formatAmount(totalDebit - totalCredit) }}
+        </div>
       </div>
 
       <div class="row justify-end">
