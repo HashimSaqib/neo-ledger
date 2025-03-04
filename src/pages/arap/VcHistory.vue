@@ -193,14 +193,10 @@
               <q-td
                 v-for="col in finalColumns"
                 :key="col.name"
-                :class="{ 'text-center': col.align === 'center' }"
+                :class="'text-' + (col.align || 'left')"
               >
                 <span
-                  v-if="
-                    col.field === 'sellprice' ||
-                    col.field === 'discount' ||
-                    col.field === 'total'
-                  "
+                  v-if="['sellprice', 'discount', 'total'].includes(col.field)"
                 >
                   {{ formatAmount(props.row[col.field]) }}
                 </span>
@@ -217,13 +213,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, inject } from "vue";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 import { formatAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
+const updateTitle = inject("updateTitle");
 
 const { t } = useI18n();
 const route = useRoute();
@@ -233,8 +230,8 @@ const defaultFormData = {
   contact: "",
   month: "",
   year: "",
-  interval: "0", // 0:Current, 1:Month, 3:Quarter, 12:Year
-  type: "invoice",
+  interval: "0",
+  type: "invoice", // already exists for selecting transaction type
   open: true,
   closed: true,
   historyMode: "summary",
@@ -248,6 +245,10 @@ const defaultFormData = {
   l_deliverydate: false,
   l_projectnumber: false,
   l_serialnumber: false,
+
+  l_invnumber: false,
+  l_ordnumber: false,
+  l_quonumber: false,
 };
 
 const formData = ref({ ...defaultFormData });
@@ -256,6 +257,7 @@ const vcType = ref(route.params.type || "customer");
 const historyTitle = computed(() =>
   vcType.value === "vendor" ? t("Vendor History") : t("Customer History")
 );
+updateTitle(historyTitle.value);
 
 const transactionOptions = computed(() => {
   return vcType.value === "vendor"
@@ -300,46 +302,46 @@ const allColumns = [
     name: "partnumber",
     label: t("Part Number"),
     field: "partnumber",
-    align: "center",
+    align: "left",
   },
   {
     name: "description",
     label: t("Description"),
     field: "description",
-    align: "center",
+    align: "left",
   },
-  { name: "qty", label: t("Qty"), field: "qty", align: "center" },
+  { name: "qty", label: t("Qty"), field: "qty", align: "right" },
   {
     name: "sellprice",
     label: t("Sell Price"),
     field: "sellprice",
-    align: "center",
+    align: "right",
   },
-  { name: "curr", label: t("Currency"), field: "curr", align: "center" },
-  { name: "unit", label: t("Unit"), field: "unit", align: "center" },
+  { name: "curr", label: t("Currency"), field: "curr", align: "left" },
+  { name: "unit", label: t("Unit"), field: "unit", align: "left" },
   {
     name: "discount",
     label: t("Discount"),
     field: "discount",
-    align: "center",
+    align: "left",
   },
   {
     name: "deliverydate",
     label: t("Delivery Date"),
     field: "deliverydate",
-    align: "center",
+    align: "left",
   },
   {
     name: "projectnumber",
     label: t("Project Number"),
     field: "projectnumber",
-    align: "center",
+    align: "left",
   },
   {
     name: "serialnumber",
     label: t("Serial Number"),
     field: "serialnumber",
-    align: "center",
+    align: "left",
   },
 ];
 
@@ -352,7 +354,7 @@ const finalColumns = computed(() => {
         name: "total",
         label: t("Total"),
         field: "total",
-        align: "center",
+        align: "right",
       });
     }
   }
