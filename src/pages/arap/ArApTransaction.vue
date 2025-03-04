@@ -83,6 +83,7 @@
                   bg-color="input"
                   label-color="secondary"
                 />
+
                 <q-input
                   v-if="selectedCurrency && selectedCurrency.rn != 1"
                   class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm"
@@ -90,6 +91,24 @@
                   outlined
                   dense
                   v-model="exchangeRate"
+                />
+              </div>
+              <div class="row q-mb-sm">
+                <q-select
+                  v-if="departments.length > 0"
+                  outlined
+                  v-model="selectedDepartment"
+                  :options="departments"
+                  option-value="description"
+                  option-label="description"
+                  :label="t('Department')"
+                  dense
+                  bg-color="input"
+                  label-color="secondary"
+                  clearable
+                  autogrow
+                  hide-bottom-space
+                  class="col-5"
                 />
               </div>
               <div class="row">
@@ -585,6 +604,7 @@ const paymentAccounts = ref([]);
 const itemAccounts = ref([]);
 const accounts = ref([]);
 
+const selectedDepartment = ref();
 const selectedCurrency = ref(null);
 const currencies = ref([]);
 const exchangeRate = ref(1);
@@ -826,10 +846,12 @@ const handlePaymentEnter = (index) => {
 // -------------------------
 // Data Fetching Functions
 // -------------------------
+const departments = ref([]);
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/${type.value}/`);
     lineTax.value = response.data.linetax;
+    departments.value = response.data.departments;
   } catch (error) {
     console.error("Failed to fetch links:", error);
     Notify.create({
@@ -966,6 +988,7 @@ const postInvoice = async () => {
     poNumber: poNumber.value,
     recordAccount: recordAccount.value,
     selectedCurrency: selectedCurrency.value,
+
     curr: selectedCurrency.value.curr,
     lines: lines.value.map((line) => ({
       amount: line.amount,
@@ -986,6 +1009,9 @@ const postInvoice = async () => {
       exchangerate: payment.exchangerate,
     })),
   };
+  if (selectedDepartment.value) {
+    invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;
+  }
 
   if (selectedCurrency.value.rn !== 1) {
     invoiceData.exchangerate = exchangeRate.value;
@@ -1131,6 +1157,11 @@ const loadInvoice = async (invoice) => {
       );
     }
     exchangeRate.value = invoice.exchangerate || 1;
+    if (departments.value?.length) {
+      selectedDepartment.value = departments.value.find(
+        (dpt) => dpt.id === invoice.department_id
+      );
+    }
     notes.value = invoice.notes || "";
     intnotes.value = invoice.intNotes || "";
     invNumber.value = invoice.invNumber || "";

@@ -201,6 +201,7 @@
         :columns="displayColumns"
         row-key="id"
         :rows-per-page-options="[0]"
+        virtual-scroll-slice-size="500"
       >
         <!-- Custom body slot: group header, subtotal and normal rows -->
         <template v-slot:body="props">
@@ -376,6 +377,46 @@ const baseColumns = ref([
     default: true,
   },
   {
+    name: "name",
+    align: "left",
+    label: "Company Name",
+    field: "name",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "name",
+    align: "left",
+    label: "Company Name",
+    field: "name",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "vcnumber",
+    align: "left",
+    label: "Company Number",
+    field: "vcnumber",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "address",
+    align: "left",
+    label: "Address",
+    field: "address",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "department",
+    align: "left",
+    label: "Department",
+    field: "department",
+    sortable: true,
+    default: false,
+  },
+  {
     name: "debit",
     align: "right",
     label: "Debit",
@@ -515,6 +556,7 @@ watch(
     };
     try {
       Cookies.set("gl_list_filters", filters, { expires: 30 });
+      tableKey.value++;
     } catch (error) {
       console.error("Error saving filters to cookies:", error);
     }

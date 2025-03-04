@@ -25,7 +25,7 @@
         />
         <div class="col-2">
           <q-select
-            v-if="departments"
+            v-if="departments.length > 0"
             outlined
             v-model="formData.selectedDepartment"
             :options="departments"
