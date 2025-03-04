@@ -23,7 +23,7 @@
         </q-td>
       </template>
 
-      <!-- Actions column -->
+      <!-- Actions column: Edit button is always visible. Delete is shown only when transactions is 0 -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn
@@ -32,6 +32,15 @@
             @click="openEditPopup(props.row)"
             flat
             size="sm"
+          />
+          <q-btn
+            v-if="props.row.transactions === 0"
+            :label="t('Delete')"
+            color="negative"
+            @click="deleteDepartment(props.row)"
+            flat
+            size="sm"
+            class="q-ml-sm"
           />
         </q-td>
       </template>
@@ -61,13 +70,15 @@
             class="q-my-sm"
           />
 
-          <!-- Radio group for Cost Center / Profit Center -->
+          <!-- Radio group for Cost Center / Profit Center.
+               Disable the option group if transactions is 1 -->
           <q-option-group
             v-model="selectedDepartment.roleType"
             :options="roleOptions"
             type="radio"
             inline
             class="q-my-sm"
+            :disable="selectedDepartment.transactions === 1"
           />
         </q-card-section>
 
@@ -98,11 +109,13 @@ const departments = ref([]);
 const editDialog = ref(false);
 const isEditMode = ref(false);
 
-// Instead of separate booleans, store a single value: 'C' or 'P'.
+// Store department data, including transactions property.
+// For new department, transactions is not used.
 const selectedDepartment = ref({
   description: "",
   roleType: "", // Will be 'C' or 'P'
   id: null,
+  transactions: 0,
 });
 
 // Table columns configuration
@@ -160,12 +173,14 @@ const openAddPopup = () => {
     description: "",
     roleType: "",
     id: null,
+    transactions: 0,
   };
   isEditMode.value = false;
   editDialog.value = true;
 };
 
-// Open the edit dialog with the department's data
+// Open the edit dialog with the department's data.
+// Also store the transactions property so we can disable role editing if needed.
 const openEditPopup = (department) => {
   let roleType = "";
   if (department.role?.includes("C")) {
@@ -178,20 +193,20 @@ const openEditPopup = (department) => {
     description: department.description,
     roleType,
     id: department.id,
+    transactions: department.transactions,
   };
   isEditMode.value = true;
   editDialog.value = true;
 };
 
-// Save the department (POST for add, PUT for update)
-// The payload is now sent as JSON containing id (if editing), description, and role (C or P)
+// Save the department (POST for add, POST for update)
+// For editing, if transactions is 1, the role remains unchanged.
 const saveDepartment = async () => {
   try {
-    // Using "role" key instead of "role"
     const role = selectedDepartment.value.roleType || "";
 
     if (isEditMode.value) {
-      // Update existing department: send id, description, and role in JSON
+      // Update existing department: send id, description, and role
       await api.post(`/system/departments`, {
         id: selectedDepartment.value.id,
         description: selectedDepartment.value.description,
@@ -211,7 +226,7 @@ const saveDepartment = async () => {
       // Add new department: POST to /system/departments without id
       await api.post("/system/departments", {
         description: selectedDepartment.value.description,
-        roll: role,
+        role: role,
       });
       Notify.create({
         message:
@@ -225,6 +240,30 @@ const saveDepartment = async () => {
       });
     }
     editDialog.value = false;
+    getDepartments(); // Refresh the table data
+  } catch (error) {
+    Notify.create({
+      message: error.response?.data?.message || t("An error occurred"),
+      type: "negative",
+      position: "center",
+    });
+  }
+};
+
+// Delete a department with no transactions
+const deleteDepartment = async (department) => {
+  try {
+    await api.delete(`/system/departments/${department.id}`);
+    Notify.create({
+      message:
+        t("Department") +
+        " " +
+        department.description +
+        " " +
+        t("deleted successfully!"),
+      type: "positive",
+      position: "center",
+    });
     getDepartments(); // Refresh the table data
   } catch (error) {
     Notify.create({
