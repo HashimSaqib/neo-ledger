@@ -8,7 +8,134 @@
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
-        <!-- ... your q-input fields ... -->
+        <q-input
+          v-model="formData.reference"
+          class="lightbg q-my-md"
+          :label="t('Reference')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <q-input
+          v-model="formData.description"
+          class="lightbg q-my-md"
+          :label="t('Description')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <q-input
+          v-model="formData.companyName"
+          class="lightbg q-my-md"
+          :label="t('Company Name')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <q-input
+          v-model="formData.department"
+          class="lightbg q-my-md"
+          :label="t('Department')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <q-input
+          v-model="formData.lineitem"
+          class="lightbg q-my-md"
+          :label="t('Line Item')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <q-input
+          v-model="formData.source"
+          class="lightbg q-my-md"
+          :label="t('Source')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <q-input
+          v-model="formData.memo"
+          class="lightbg q-my-md"
+          :label="t('Memo')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+        />
+        <div class="row justify-between q-my-md">
+          <q-input
+            v-model="formData.accnofrom"
+            class="lightbg col-5"
+            :label="t('Account Number From')"
+            input-class="maintext"
+            label-color="secondary"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.accnoto"
+            :label="t('Account Number To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+        </div>
+
+        <div class="row justify-between q-my-md">
+          <q-input
+            v-model="formData.datefrom"
+            type="date"
+            :label="t('Date From')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.dateto"
+            type="date"
+            :label="t('Date To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+        </div>
+        <div class="row justify-between">
+          <q-input
+            v-model="formData.amountfrom"
+            type="number"
+            :label="t('Amount From')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.amountto"
+            type="number"
+            :label="t('Amount To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+        </div>
         <div class="q-py-md">
           <draggable v-model="baseColumns" item-key="name" class="drag-area">
             <template #item="{ element }">
@@ -21,15 +148,13 @@
               />
             </template>
           </draggable>
-          <div class="row items-center q-mt-md">
-            <q-btn
-              type="submit"
-              :label="t('Search')"
-              color="primary"
-              class="q-mr-md"
-              @click="search"
-            />
-          </div>
+          <q-btn
+            type="submit"
+            :label="t('Search')"
+            color="primary"
+            class="q-mt-md"
+            @click="search"
+          />
         </div>
       </q-expansion-item>
     </q-form>
