@@ -1,13 +1,9 @@
 export const menuLinks = [
   {
-    title: "Dashboard",
-    icon: "dashboard",
-    link: "/",
-  },
-  {
-    title: "AR",
-    perm: "AR--AR",
+    title: "Customers",
+    icon: "people",
     sublinks: [
+      // Non-report items from AR and Customers
       {
         title: "AR Transaction",
         link: "/arap/transaction/customer",
@@ -24,38 +20,26 @@ export const menuLinks = [
         perm: "AR--Credit Invoice",
       },
       {
-        title: "Reports",
-        perm: "AR--Reports",
-        sublinks: [
-          {
-            title: "Transactions",
-            link: "/ar/reports/transactions",
-            perm: "General Ledger--Reports--Transactions",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Customers",
-    perm: "Customers--Customers",
-    sublinks: [
-      {
         title: "Add Customer",
         link: "/arap/customer",
         perm: "Customers--Add Customers",
       },
+
       {
         title: "Reports",
-        perm: "Customers--Reports",
         sublinks: [
           {
-            title: "Search",
+            title: "AR Transactions",
+            link: "/ar/reports/transactions",
+            perm: "General Ledger--Reports--Transactions",
+          },
+          {
+            title: "Customer Search",
             link: "/arap/search/customer",
             perm: "Customers--Reports--Search",
           },
           {
-            title: "History",
+            title: "Customer History",
             link: "/history/customer",
             perm: "Customers--Reports--History",
           },
@@ -64,20 +48,10 @@ export const menuLinks = [
     ],
   },
   {
-    title: "POS",
-    perm: "POS--POS",
+    title: "Vendors",
+    icon: "storefront",
     sublinks: [
-      {
-        title: "Sale",
-        link: "/pos/sale",
-        perm: "POS--Sale",
-      },
-    ],
-  },
-  {
-    title: "AP",
-    perm: "AP--AP",
-    sublinks: [
+      // Non-report items from AP and Vendors
       {
         title: "Add Transaction",
         link: "/arap/transaction/vendor",
@@ -94,38 +68,26 @@ export const menuLinks = [
         perm: "AP--Debit Invoice",
       },
       {
-        title: "Reports",
-        perm: "AP--Reports",
-        sublinks: [
-          {
-            title: "Transactions",
-            link: "/ap/reports/transactions",
-            perm: "AP--Reports--Transactions",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Vendors",
-    perm: "Vendors--Vendors",
-    sublinks: [
-      {
         title: "Add Vendor",
         link: "/arap/Vendor",
         perm: "Vendors--Add Vendor",
       },
+      // Combined Reports submenu for AP & Vendors
       {
         title: "Reports",
-        perm: "Vendors--Reports",
         sublinks: [
           {
-            title: "Search",
+            title: "AP Transactions",
+            link: "/ap/reports/transactions",
+            perm: "AP--Reports--Transactions",
+          },
+          {
+            title: "Vendor Search",
             link: "/arap/search/vendor",
             perm: "Vendors--Reports--Search",
           },
           {
-            title: "History",
+            title: "Vendor History",
             link: "/history/vendor",
             perm: "Vendors--Reports--History",
           },
@@ -134,7 +96,20 @@ export const menuLinks = [
     ],
   },
   {
+    title: "POS",
+    icon: "shopping_cart",
+    perm: "POS--POS",
+    sublinks: [
+      {
+        title: "Sale",
+        link: "/pos/sale",
+        perm: "POS--Sale",
+      },
+    ],
+  },
+  {
     title: "Cash",
+    icon: "attach_money",
     perm: "Cash--Cash",
     sublinks: [
       {
@@ -146,6 +121,7 @@ export const menuLinks = [
   },
   {
     title: "General Ledger",
+    icon: "account_balance",
     perm: "General Ledger--General Ledger",
     sublinks: [
       {
@@ -161,7 +137,39 @@ export const menuLinks = [
     ],
   },
   {
+    title: "Goods & Services",
+    perm: "Goods & Services--Goods & Services",
+    sublinks: [
+      {
+        title: "Add Part",
+        link: "/ic/add/part",
+      },
+      { title: "Add Service", link: "/ic/add/service" },
+      {
+        title: "Reports",
+        sublinks: [
+          {
+            title: "All Items",
+            perm: "Goods & Services-All Items",
+            link: "/ic/search/allitems",
+          },
+          {
+            title: "Parts",
+            perm: "Goods & Services-Parts",
+            link: "/ic/search/parts",
+          },
+          {
+            title: "Services",
+            perm: "Goods & Services-Services",
+            link: "/ic/search/services",
+          },
+        ],
+      },
+    ],
+  },
+  {
     title: "Reports",
+    icon: "bar_chart",
     perm: "Reports--Reports",
     sublinks: [
       {
@@ -173,6 +181,7 @@ export const menuLinks = [
   },
   {
     title: "System",
+    icon: "settings",
     perm: "System--System",
     sublinks: [
       {

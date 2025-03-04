@@ -9,6 +9,7 @@ import AddVC from "src/pages/arap/AddVC.vue";
 import VcHistory from "src/pages/arap/VcHistory.vue";
 import SearchVC from "src/pages/arap/SearchVC.vue";
 import AddPart from "src/pages/goodservices/AddPart.vue";
+import SearchPart from "src/pages/goodservices/SearchPart.vue";
 import PointOfSale from "src/pages/pos/PointOfSale.vue";
 import ApTransactions from "src/pages/ap/ApTransactions.vue";
 import VendorInvoice from "src/pages/ap/VendorInvoice.vue";
@@ -102,8 +103,12 @@ const routes = [
       },
       // Goods & Serivices
       {
-        path: "/goodservices/add/:type",
+        path: "/ic/add/:type",
         component: AddPart,
+      },
+      {
+        path: "/ic/search/:type",
+        component: SearchPart,
       },
       // System Settings
       {
