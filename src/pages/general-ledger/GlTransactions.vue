@@ -136,7 +136,12 @@
             dense
           />
         </div>
-        <div class="q-py-md">
+        <div class="q-py-md justify-center align-items-center">
+          <q-checkbox
+            v-model="splitLedger"
+            :label="t('Split Ledger')"
+            size="2rem"
+          />
           <draggable v-model="baseColumns" item-key="name" class="drag-area">
             <template #item="{ element }">
               <q-checkbox
@@ -148,6 +153,7 @@
               />
             </template>
           </draggable>
+
           <q-btn
             type="submit"
             :label="t('Search')"
@@ -156,6 +162,9 @@
             @click="search"
           />
         </div>
+        <q-inner-loading :showing="loading">
+          <q-spinner-gears size="50px" color="primary" />
+        </q-inner-loading>
       </q-expansion-item>
     </q-form>
 
@@ -179,6 +188,7 @@
     <!-- Results table -->
     <div v-if="results.length > 0" class="q-mt-md">
       <q-table
+        :key="tableKey"
         flat
         bordered
         dense
@@ -305,25 +315,28 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, reactive } from "vue";
+import { ref, computed, onMounted, watch, inject } from "vue";
 import { api } from "src/boot/axios";
 import { Cookies } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
-
+const updateTitle = inject("updateTitle");
+updateTitle("General Ledger");
 const { t } = useI18n();
 
-// Use reactive so you can access properties directly (e.g. formData.accno)
-const formData = reactive({});
+// Form data and UI flags
+const formData = ref({});
 const filtersOpen = ref(true);
 const results = ref([]);
 
-// Flag for split ledger mode
+// Flag for split ledger mode (user selectable)
 const splitLedger = ref(true);
+// New variable to "freeze" the grouping mode at search time
+const appliedSplitLedger = ref(splitLedger.value);
 
-// Define base columns (including Tax Acc & Tax Amount)
+// Define base columns
 const baseColumns = ref([
   {
     name: "id",
@@ -332,7 +345,7 @@ const baseColumns = ref([
     field: "id",
     sortable: true,
     slot: true,
-    default: true,
+    default: false,
   },
   {
     name: "transdate",
@@ -442,9 +455,9 @@ const selectedColumns = ref(
     return acc;
   }, {})
 );
+
 function processFilters() {
   const savedFilters = Cookies.get("gl_list_filters");
-
   if (savedFilters) {
     try {
       const parsedFilters =
@@ -476,8 +489,7 @@ function processFilters() {
       }, {}),
       order: baseColumns.value.map((col) => col.name),
     };
-
-    Cookies.set("ar_transactions_filters", defaultFilters, { expires: 30 });
+    Cookies.set("gl_list_filters", defaultFilters, { expires: 30 });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
@@ -504,9 +516,12 @@ watch(
   },
   { deep: true }
 );
+
+// Compute display columns based on selected columns and add a "Balance" column if needed.
+// Now we use appliedSplitLedger so that changes to splitLedger don't affect the table until a new search.
 const displayColumns = computed(() => {
   let cols = baseColumns.value.filter((col) => selectedColumns.value[col.name]);
-  if (splitLedger.value && !cols.find((c) => c.name === "balance")) {
+  if (appliedSplitLedger.value && !cols.find((c) => c.name === "balance")) {
     cols.push({
       name: "balance",
       align: "right",
@@ -519,28 +534,13 @@ const displayColumns = computed(() => {
   return cols.map((col) => ({ ...col, label: t(col.label) }));
 });
 
-// Process raw results to include computed tax fields
-const processedResults = computed(() => {
-  return results.value.map((row) => {
-    const newRow = { ...row };
-    newRow.taxAcc =
-      newRow.linetax_accno && newRow.linetax_description
-        ? `${newRow.linetax_accno}--${newRow.linetax_description}`
-        : "";
-    newRow.taxAmount = Number(newRow.linetaxamount) || 0;
-    return newRow;
-  });
-});
-
-// Group transactions by account if split ledger is enabled
-const groupedResults = computed(() => {
-  if (!splitLedger.value) return processedResults.value;
+// Helper function that groups the data if grouping is desired at search time
+function groupData(data) {
   const groups = {};
-  processedResults.value.forEach((row) => {
+  data.forEach((row) => {
     if (!groups[row.accno]) groups[row.accno] = [];
     groups[row.accno].push(row);
   });
-  // Sort groups by earliest transaction date
   const sortedGroups = Object.values(groups).sort(
     (groupA, groupB) =>
       new Date(groupA[0].transdate) - new Date(groupB[0].transdate)
@@ -562,7 +562,7 @@ const groupedResults = computed(() => {
       runningBalance += -Number(row.amount);
       finalRows.push({ ...row, balance: runningBalance });
     });
-    const subtotal = {
+    finalRows.push({
       isSubtotal: true,
       accno: acc,
       account_description: group[0].account_description,
@@ -573,67 +573,66 @@ const groupedResults = computed(() => {
         0
       ),
       balance: runningBalance,
-    };
-    finalRows.push(subtotal);
+    });
   });
   return finalRows;
-});
+}
+const loading = ref(false);
+// API search function: fetch data and apply grouping based on the current split ledger setting.
+// The appliedSplitLedger flag is "frozen" at search time.
+const tableKey = ref(0); // needed to fix virtual scroll by forcing rerender on search
+const search = async () => {
+  try {
+    loading.value = true;
+    console.log("Searching with parameters:", formData.value);
+    const response = await api.get("/gl/transactions/lines", {
+      params: { ...formData.value },
+    });
+    filtersOpen.value = false;
+    const data = response.data;
+    appliedSplitLedger.value = splitLedger.value;
+    results.value = appliedSplitLedger.value ? groupData(data) : data;
+    tableKey.value++;
+    loading.value = false;
+  } catch (error) {
+    console.error(error);
+    loading.value = false;
+  }
+};
 
-const tableRows = computed(() => {
-  return splitLedger.value ? groupedResults.value : processedResults.value;
-});
+// Use results directly for your table rows
+const tableRows = computed(() => results.value);
 
-// Compute overall totals for split ledger view
+// Compute overall totals (this example computes totals on ungrouped data; adjust as needed)
+// Now using appliedSplitLedger so totals reflect the state at search time.
 const overallTotals = computed(() => {
-  if (!splitLedger.value) return null;
-  const groups = {};
-  processedResults.value.forEach((row) => {
-    if (!groups[row.accno]) groups[row.accno] = [];
-    groups[row.accno].push(row);
-  });
-  let totalDebit = 0,
-    totalCredit = 0,
-    totalTax = 0,
-    totalBalance = 0;
-  Object.keys(groups).forEach((acc) => {
-    const group = groups[acc];
-    totalDebit += group.reduce((sum, r) => sum + Number(r.debit), 0);
-    totalCredit += group.reduce((sum, r) => sum + Number(r.credit), 0);
-    totalTax += group.reduce(
-      (sum, r) => sum + (Number(r.linetaxamount) || 0),
-      0
-    );
-    totalBalance += -group.reduce((sum, r) => sum + Number(r.amount), 0);
-  });
+  if (!appliedSplitLedger.value) return null;
+  const data = results.value.filter(
+    (row) => !row.isGroupHeader && !row.isSubtotal
+  );
+  let totalDebit = data.reduce((sum, r) => sum + Number(r.debit), 0);
+  let totalCredit = data.reduce((sum, r) => sum + Number(r.credit), 0);
+  let totalTax = data.reduce(
+    (sum, r) => sum + (Number(r.linetaxamount) || 0),
+    0
+  );
+  let totalBalance = -data.reduce((sum, r) => sum + Number(r.amount), 0);
   return { totalDebit, totalCredit, totalTax, totalBalance };
 });
 
-// When clicking an account number, set filter and search
+// When clicking an account number, set filter and trigger a search
 const filterByAccno = (accno) => {
-  formData.accno = accno;
-  splitLedger.value = true;
+  formData.value.accnofrom = accno;
+  formData.value.accnoto = accno;
   search();
 };
 
-// New method to clear the account filter and reload all transactions
+// Clear account filters and trigger a search
 const clearAccnoFilter = () => {
-  formData.accno = "";
+  formData.value.accnofrom = "";
+  ``;
+  formData.value.accnoto = "";
   search();
-};
-
-// API search function: note we spread formData into a new plain object so that axios can serialize it correctly
-const search = async () => {
-  try {
-    console.log("Searching with parameters:", formData);
-    const response = await api.get("/gl/transactions/lines", {
-      params: { ...formData },
-    });
-    filtersOpen.value = false;
-    results.value = response.data;
-    console.log(results.value);
-  } catch (error) {
-    console.error(error);
-  }
 };
 
 // Return router path based on row type
@@ -659,9 +658,13 @@ const getPath = (row) => {
   return { path, query: { id: row.id } };
 };
 
-// Utility to set text alignment classes
-const getCellClass = (col) =>
-  col.align === "right" ? "text-right" : "text-left";
+// Utility to set text alignment classes.
+// Here we explicitly set numeric columns (debit, credit, taxAmount, balance) to be right aligned
+// and all other columns to be left aligned.
+const getCellClass = (col) => {
+  const numericColumns = ["debit", "credit", "taxAmount", "balance"];
+  return numericColumns.includes(col.name) ? "text-right" : "text-left";
+};
 
 // Export function that builds an Excel workbook from the table data
 const downloadTransactions = () => {
