@@ -1,11 +1,10 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
     <div class="flex q-pa-sm mainbg column">
-      <div class="row justify-space-between q-mb-sm">
+      <div class="row q-gutter-sm q-mb-sm">
         <q-input
           :label="t('Reference')"
-          class="lightbg"
-          input-class="maintext"
+          bg-color="input"
           label-color="secondary"
           outlined
           dense
@@ -20,14 +19,33 @@
           option-label="curr"
           :label="t('Currency')"
           dense
-          class="lightbg col-2 q-ml-md"
-          input-class="maintext"
+          class="col-2"
+          bg-color="input"
           label-color="secondary"
         />
+        <div class="col-2">
+          <q-select
+            v-if="departments"
+            outlined
+            v-model="formData.selectedDepartment"
+            :options="departments"
+            option-value="description"
+            option-label="description"
+            :label="t('Department')"
+            dense
+            bg-color="input"
+            label-color="secondary"
+            clearable
+            autogrow
+            hide-bottom-space
+          />
+        </div>
         <q-input
           v-if="formData.currency.rn != 1"
-          class="lightbg col-2 q-ml-md"
+          class="col-2"
           :label="t('Exchange Rate')"
+          bg-color="input"
+          label-color="secondary"
           outlined
           dense
           v-model="formData.exchangeRate"
@@ -35,20 +53,21 @@
         <q-input
           v-model="formData.transdate"
           :label="t('Date')"
-          class="lightbg col-2 q-ml-md"
-          input-class="maintext"
+          class="col-2"
+          bg-color="input"
           label-color="secondary"
           outlined
           dense
           type="date"
         />
       </div>
+
       <div class="row q-mb-sm">
         <q-input
           v-model="formData.description"
           :label="t('Description')"
-          class="lightbg col-6"
-          input-class="maintext"
+          class="col-6"
+          bg-color="input"
           label-color="secondary"
           outlined
           dense
@@ -61,8 +80,8 @@
         <q-input
           v-model="formData.notes"
           :label="t('Notes')"
-          class="lightbg col-6"
-          input-class="maintext"
+          class="col-6"
+          bg-color="input"
           label-color="secondary"
           outlined
           autogrow
@@ -82,9 +101,9 @@
             :options="accounts"
             :label="t('Account')"
             dense
-            class="lightbg col-3"
+            class="col-3"
             popup-content-class="mainbg maintext"
-            input-class="maintext"
+            bg-color="input"
             label-color="secondary"
             search="label"
             account
@@ -95,8 +114,8 @@
           <fn-input
             v-model="line.debit"
             :label="t('Debit')"
-            class="lightbg col-2"
-            input-class="maintext"
+            class="col-2"
+            bg-color="input"
             label-color="secondary"
             outlined
             dense
@@ -107,8 +126,8 @@
           <fn-input
             v-model="line.credit"
             :label="t('Credit')"
-            class="lightbg col-2"
-            input-class="maintext"
+            class="col-2"
+            bg-color="input"
             label-color="secondary"
             outlined
             dense
@@ -125,9 +144,9 @@
               option-label="label"
               :label="t('Tax Accno')"
               dense
-              class="lightbg col-2"
+              class="col-2"
               popup-content-class="mainbg maintext"
-              input-class="maintext"
+              bg-color="input"
               label-color="secondary"
               account
               search="label"
@@ -136,8 +155,8 @@
             <fn-input
               v-model="line.linetaxamount"
               :label="t('Tax Amount')"
-              class="lightbg col-2"
-              input-class="maintext"
+              class="col-2"
+              bg-color="input"
               label-color="secondary"
               outlined
               dense
@@ -171,8 +190,8 @@
             <q-input
               v-model="line.source"
               :label="t('Source')"
-              class="lightbg col-3"
-              input-class="maintext"
+              class="col-3"
+              bg-color="input"
               label-color="secondary"
               outlined
               dense
@@ -181,8 +200,8 @@
             <q-input
               v-model="line.memo"
               :label="t('Memo')"
-              class="lightbg col-3"
-              input-class="maintext"
+              class="col-3"
+              bg-color="input"
               label-color="secondary"
               outlined
               dense
@@ -421,11 +440,13 @@ const fetchAccounts = async () => {
 const lineTax = ref(false);
 const taxAccounts = ref([]);
 
+const departments = ref([]);
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl");
     lineTax.value = response.data.linetax;
     taxAccounts.value = response.data.tax_accounts;
+    departments.value = response.data.departments;
   } catch (error) {
     console.log(error);
   }
@@ -478,7 +499,6 @@ const submitTransaction = async () => {
     exchangeRate: formData.value.exchangeRate
       ? parseFloat(formData.value.exchangeRate)
       : 0,
-    departmentid: 0,
     description: formData.value.description,
     lines: lines.value.map((line) => {
       let lineObj = {
@@ -505,7 +525,10 @@ const submitTransaction = async () => {
     reference: formData.value.reference,
     transdate: formData.value.transdate,
   };
-
+  const { selectedDepartment } = formData.value;
+  if (selectedDepartment) {
+    transactionData.department = `${selectedDepartment.description}--${selectedDepartment.id}`;
+  }
   try {
     let response;
     if (formData.value.id) {
@@ -554,6 +577,11 @@ const loadTransaction = async (id) => {
         transdate: transactionData.transdate,
         exchangeRate: transactionData.exchangeRate,
       };
+      if (departments.value?.length) {
+        formData.value.selectedDepartment = departments.value.find(
+          (dpt) => dpt.id === transactionData.department_id
+        );
+      }
       formData.value.currency = currencies.value.find(
         (curr) => curr.curr === transactionData.curr
       );

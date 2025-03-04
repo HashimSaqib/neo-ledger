@@ -35,14 +35,18 @@
           outlined
           dense
         />
-        <q-input
-          v-model="formData.department"
+        <q-select
+          :options="departments"
+          option-label="description"
+          optionvalue="id"
+          v-model="formData.selectedDepartment"
           class="lightbg q-my-md"
           :label="t('Department')"
           input-class="maintext"
           label-color="secondary"
           outlined
           dense
+          clearable
         />
         <q-input
           v-model="formData.lineitem"
@@ -499,6 +503,7 @@ function processFilters() {
 
 onMounted(() => {
   processFilters();
+  fetchLinks();
 });
 
 watch(
@@ -577,6 +582,15 @@ function groupData(data) {
   });
   return finalRows;
 }
+const departments = ref([]);
+const fetchLinks = async () => {
+  try {
+    const response = await api.get("/create_links/gl");
+    departments.value = response.data.departments;
+  } catch (error) {
+    console.log(error);
+  }
+};
 const loading = ref(false);
 // API search function: fetch data and apply grouping based on the current split ledger setting.
 // The appliedSplitLedger flag is "frozen" at search time.
@@ -584,18 +598,31 @@ const tableKey = ref(0); // needed to fix virtual scroll by forcing rerender on 
 const search = async () => {
   try {
     loading.value = true;
-    console.log("Searching with parameters:", formData.value);
+    formData.value.selectedDepartment
+      ? (formData.value.department = `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`)
+      : (formData.value.department = "");
+
     const response = await api.get("/gl/transactions/lines", {
       params: { ...formData.value },
     });
+
     filtersOpen.value = false;
     const data = response.data;
     appliedSplitLedger.value = splitLedger.value;
     results.value = appliedSplitLedger.value ? groupData(data) : data;
     tableKey.value++;
-    loading.value = false;
   } catch (error) {
-    console.error(error);
+    if (error.response) {
+      if (error.response.status === 404) {
+        console.warn("No data found (404).");
+        results.value = [];
+      } else {
+        console.error("API Error:", error.response.status, error.response.data);
+      }
+    } else {
+      console.error("Network or unexpected error:", error);
+    }
+  } finally {
     loading.value = false;
   }
 };

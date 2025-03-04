@@ -20,6 +20,7 @@ import SysCurrencies from "src/pages/system/Currencies.vue";
 import SysDefaults from "src/pages/system/Defaults.vue";
 import ListAccounts from "src/pages/system/chart/ListAccounts.vue";
 import AddAccount from "src/pages/system/chart/AddAccount.vue";
+import ListDepartments from "src/pages/system/departments/ListDepartments.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 
@@ -126,6 +127,10 @@ const routes = [
       {
         path: "/system/chart/addaccount",
         component: AddAccount,
+      },
+      {
+        path: "/system/departments",
+        component: ListDepartments,
       },
       {
         path: "/reconciliation",
