@@ -35,13 +35,28 @@
           outlined
           dense
         />
-        <q-select
+        <s-select
           :options="departments"
           option-label="description"
+          search="description"
           optionvalue="id"
           v-model="formData.selectedDepartment"
           class="lightbg q-my-md"
           :label="t('Department')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+          clearable
+        />
+        <s-select
+          :options="projects"
+          option-label="description"
+          search="description"
+          optionvalue="id"
+          v-model="formData.selectedProject"
+          class="lightbg q-my-md"
+          :label="t('Project')"
           input-class="maintext"
           label-color="secondary"
           outlined
@@ -330,7 +345,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { api } from "src/boot/axios";
-import { Cookies } from "quasar";
+import { Cookies, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount } from "src/helpers/utils";
@@ -413,6 +428,14 @@ const baseColumns = ref([
     align: "left",
     label: "Department",
     field: "department",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "project",
+    align: "left",
+    label: "Project",
+    field: "project_description",
     sortable: true,
     default: false,
   },
@@ -626,11 +649,13 @@ function groupData(data) {
 }
 const accounts = ref([]);
 const departments = ref([]);
+const projects = ref([]);
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl_report");
     departments.value = response.data.departments;
     accounts.value = response.data.accounts.all;
+    projects.value = response.data.projects;
   } catch (error) {
     console.log(error);
   }
@@ -645,6 +670,9 @@ const search = async () => {
     formData.value.selectedDepartment
       ? (formData.value.department = `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`)
       : (formData.value.department = "");
+    formData.value.selectedProject
+      ? (formData.value.project_id = `${formData.value.selectedProject.id}`)
+      : (formData.value.project_id = "");
 
     formData.value.accnofrom =
       formData.value.accnofrom &&
@@ -671,9 +699,15 @@ const search = async () => {
     tableKey.value++;
   } catch (error) {
     if (error.response) {
+      console.log(error.response);
       if (error.response.status === 404) {
         console.warn("No data found (404).");
         results.value = [];
+        Notify.create({
+          message: error.response?.data?.message || "No transactions found.",
+          type: "negative",
+          position: "center",
+        });
       } else {
         console.error("API Error:", error.response.status, error.response.data);
       }
