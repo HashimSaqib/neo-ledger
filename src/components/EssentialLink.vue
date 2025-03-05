@@ -1,44 +1,76 @@
 <template>
   <div>
-    <q-item clickable tag="a" :to="props.link" v-if="!hasDropdown">
-      <q-item-section>
-        <q-item-label class="maintext q-py-md">{{ displayTitle }}</q-item-label>
-      </q-item-section>
+    <!-- For links without sublinks -->
+    <q-item
+      clickable
+      tag="a"
+      :to="props.link"
+      v-if="!hasDropdown"
+      class="q-pa-none"
+    >
+      <!-- Inner wrapper applies left padding without shifting on hover -->
+      <div :style="innerStyle" class="row items-center">
+        <q-item-section avatar v-if="props.icon" :style="iconStyle">
+          <q-icon :name="props.icon" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label class="maintext">
+            {{ props.title }}
+          </q-item-label>
+        </q-item-section>
+      </div>
     </q-item>
 
-    <!-- For items with sublinks -->
+    <!-- For links with sublinks -->
     <q-expansion-item
       v-if="hasDropdown"
-      :label="t(displayTitle)"
       expand-separator
-      header-class="maintext"
-      expand-icon-class="maintext"
-      class="q-py-none"
+      header-class="maintext "
+      :icon="props.icon"
+      :label="t(props.title)"
     >
       <!-- Loop through sublinks -->
-      <template v-for="(sublink, index) in props.sublinks">
-        <!-- Sublink without further sub-sublinks -->
+      <template v-for="(sublink, index) in props.sublinks" :key="index">
+        <!-- Sublink without further sublinks -->
         <q-item
           v-if="!hasSubDropdown(sublink)"
-          :key="index"
           clickable
           tag="a"
           :to="sublink.link"
+          class="q-pa-none"
         >
-          <q-item-section class="maintext">
-            {{ getPrefixedTitle(sublink.title, props.depth + 1) }}
-          </q-item-section>
+          <div
+            :style="computeInnerStyle(props.depth + 1)"
+            class="row items-center"
+          >
+            <q-item-section class="maintext">
+              {{ sublink.title }}
+            </q-item-section>
+          </div>
         </q-item>
 
-        <!-- Sublink with further sub-sublinks -->
+        <!-- Sublink with further sublinks -->
         <q-expansion-item
           v-if="hasSubDropdown(sublink)"
           :key="'dropdown-' + index"
-          :label="t(getPrefixedTitle(sublink.title, props.depth + 1))"
           expand-separator
-          header-class="maintext"
-          expand-icon-class="maintext"
+          header-class="maintext q-pa-none"
+          content-class="q-pa-none"
+          class="q-pa-none"
         >
+          <template v-slot:header>
+            <q-item class="q-pa-none">
+              <div
+                :style="computeInnerStyle(props.depth + 1)"
+                class="row items-center"
+              >
+                <q-item-section>
+                  {{ t(sublink.title) }}
+                </q-item-section>
+              </div>
+            </q-item>
+          </template>
+
           <!-- Recursively render sub-sublinks -->
           <EssentialLink
             v-for="(nestedLink, nestedIndex) in sublink.sublinks"
@@ -58,6 +90,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
+
 defineOptions({
   name: "EssentialLink",
 });
@@ -71,6 +104,10 @@ const props = defineProps({
     type: String,
     default: "#",
   },
+  icon: {
+    type: String,
+    default: "",
+  },
   sublinks: {
     type: Array,
     default: () => [],
@@ -81,15 +118,21 @@ const props = defineProps({
   },
 });
 
+// Check if this link has sublinks (dropdown)
 const hasDropdown = computed(() => props.sublinks && props.sublinks.length > 0);
 const hasSubDropdown = (sublink) =>
   sublink.sublinks && sublink.sublinks.length > 0;
 
-// Computed property for the display title
-const displayTitle = computed(() => "─ ".repeat(props.depth) + props.title);
+// Inner wrapper style applies left padding to the entire content.
+// This remains unchanged for top-level links.
+const innerStyle = computed(() => ({
+  paddingLeft: `${(props.depth + 1) * 1.7}rem`,
+}));
 
-// Helper function to prefix titles
-function getPrefixedTitle(title, depth) {
-  return "─ ".repeat(depth) + title;
+// For sublinks, compute an inner style based on the passed depth.
+function computeInnerStyle(depth) {
+  return {
+    paddingLeft: `${(depth + 1) * 2.1}rem`,
+  };
 }
 </script>

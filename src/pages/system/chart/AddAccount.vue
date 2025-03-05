@@ -249,11 +249,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
-
+const updateTitle = inject("updateTitle");
+updateTitle("Add Chart");
 const { t } = useI18n();
 
 // Initialize a reactive object with default values for a new account

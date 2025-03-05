@@ -66,10 +66,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
-
+const updateTitle = inject("updateTitle");
+updateTitle("Currencies");
 const currencies = ref([]);
 const editDialog = ref(false);
 const isEditMode = ref(false);

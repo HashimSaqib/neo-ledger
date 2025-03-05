@@ -5,7 +5,7 @@
       <template v-slot:before>
         <div class="mainbg textmain q-pa-sm">
           <div class="row justify-between full-width q-mt-sm">
-            <div class="col-12 col-lg-5">
+            <div class="col-12 col-sm-5">
               <div class="row full-width">
                 <s-select
                   :label="t(vcLabel)"
@@ -137,7 +137,7 @@
                 </a>
               </div>
             </div>
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-sm-6">
               <div class="row q-gutter-sm">
                 <q-input
                   outlined

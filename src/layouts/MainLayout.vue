@@ -2,15 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header>
       <q-toolbar class="mainbg maintext">
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-        <q-toolbar-title>
+        <q-toolbar-title class="q-ml-xs">
           {{ t(title) }}
         </q-toolbar-title>
       </q-toolbar>
@@ -20,6 +12,9 @@
       show-if-above
       bordered
       class="mainbg column"
+      :mini="miniState"
+      @mouseenter="miniState = false"
+      @mouseleave="miniState = true"
       style="height: 100%"
     >
       <div class="column no-wrap" style="height: 100%">
@@ -59,7 +54,7 @@ import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
 import { menuLinks } from "src/layouts/Menu.js";
 import { Cookies } from "quasar";
-
+const miniState = ref(false);
 const { t } = useI18n();
 const route = useRoute();
 const leftDrawerOpen = ref(false);

@@ -97,11 +97,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
-
+const updateTitle = inject("updateTitle");
+updateTitle("Departments");
 const { t } = useI18n();
 
 // State variables

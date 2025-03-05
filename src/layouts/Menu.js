@@ -53,7 +53,7 @@ export const menuLinks = [
     sublinks: [
       // Non-report items from AP and Vendors
       {
-        title: "Add Transaction",
+        title: "AP Transaction",
         link: "/arap/transaction/vendor",
         perm: "AP--Add Transaction",
       },
@@ -97,7 +97,7 @@ export const menuLinks = [
   },
   {
     title: "POS",
-    icon: "shopping_cart",
+    icon: "receipt",
     perm: "POS--POS",
     sublinks: [
       {
@@ -139,6 +139,7 @@ export const menuLinks = [
   {
     title: "Goods & Services",
     perm: "Goods & Services--Goods & Services",
+    icon: "local_offer",
     sublinks: [
       {
         title: "Add Part",

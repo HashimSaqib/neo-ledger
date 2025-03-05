@@ -529,11 +529,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
-
+const updateTitle = inject("updateTitle");
+updateTitle("Company Defaults");
 const { t } = useI18n();
 
 const formRef = ref(null);
