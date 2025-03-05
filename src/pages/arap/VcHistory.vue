@@ -218,7 +218,7 @@ import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, roundAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
 const updateTitle = inject("updateTitle");
 
@@ -581,7 +581,7 @@ const downloadTransactions = () => {
       // For subtotal rows, fill only the necessary columns.
       const newRow = columns.map((col) => {
         if (col.field === "total") {
-          return formatAmount(row.total);
+          return roundAmount(row.total);
         } else if (col.field === "description") {
           return row.label || "";
         }
@@ -592,7 +592,7 @@ const downloadTransactions = () => {
       // For regular data rows, output the values.
       const newRow = columns.map((col) => {
         if (["sellprice", "discount", "total"].includes(col.field)) {
-          return formatAmount(row[col.field]);
+          return roundAmount(row[col.field]);
         }
         return row[col.field] != null ? row[col.field] : "";
       });

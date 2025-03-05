@@ -36,6 +36,7 @@
           dense
         />
         <s-select
+          v-if="departments.length > 0"
           :options="departments"
           option-label="description"
           search="description"
@@ -50,6 +51,7 @@
           clearable
         />
         <s-select
+          v-if="projects.length > 0"
           :options="projects"
           option-label="description"
           search="description"
@@ -348,7 +350,7 @@ import { api } from "src/boot/axios";
 import { Cookies, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, roundAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
 const updateTitle = inject("updateTitle");
 updateTitle("General Ledger");
@@ -801,10 +803,10 @@ const downloadTransactions = () => {
       exportData.push(newRow);
     } else if (row.isSubtotal) {
       const newRow = displayColumns.value.map((col) => {
-        if (col.name === "debit") return row.debit;
-        if (col.name === "credit") return row.credit;
-        if (col.name === "taxAmount") return row.taxAmount;
-        if (col.name === "balance") return row.balance;
+        if (col.name === "debit") return roundAmount(row.debit);
+        if (col.name === "credit") return roundAmount(row.credit);
+        if (col.name === "taxAmount") return roundAmount(row.taxAmount);
+        if (col.name === "balance") return roundAmount(row.balance);
         if (col.name === "accno") return row.accno;
         return "";
       });
@@ -814,9 +816,9 @@ const downloadTransactions = () => {
         if (col.name === "reference") return row.reference;
         if (col.name === "accno") return row.accno;
         if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
-          return typeof col.field === "function"
-            ? col.field(row)
-            : row[col.field];
+          return roundAmount(
+            typeof col.field === "function" ? col.field(row) : row[col.field]
+          );
         }
         return typeof col.field === "function"
           ? col.field(row)

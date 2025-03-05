@@ -10,6 +10,13 @@ export const formatAmount = (amount) => {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas every three digits
 };
 
+export const roundAmount = (amount) => {
+  if (isNaN(amount) || amount === null || amount === undefined) return ""; // return empty string for invalid values
+
+  // Convert amount to string and format it
+  return parseFloat(amount).toFixed(2); // Ensure it's a two-decimal float (optional)
+};
+
 export const displayDate = (datestring) => {
   // Split the input date by hyphen
   const [year, month, day] = datestring.split("-");
@@ -23,14 +30,25 @@ export const filter = (val, options) => {
   const needle = val.toLowerCase();
   return options.filter((v) => v.toLowerCase().includes(needle));
 };
-
 export const downloadReport = (filteredResults, columns, totals = null) => {
   // Build the header row from the computed columns (ensuring the order is correct)
   const headerRow = columns.map((col) => col.label);
 
-  // Map filteredResults into rows where cell order matches the header order
+  // Map filteredResults into rows where cell order matches the header order,
+  // applying roundAmount for totals columns if a value is present
   const dataRows = filteredResults.map((row) =>
-    columns.map((col) => row[col.field] || "")
+    columns.map((col) => {
+      let value = row[col.field] || "";
+      if (
+        ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(
+          col.name
+        ) &&
+        value !== ""
+      ) {
+        value = roundAmount(value);
+      }
+      return value;
+    })
   );
 
   // Prepare the totals row if totals are provided
@@ -41,7 +59,7 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
             col.name
           )
         ) {
-          return totals[col.name] ? formatAmount(totals[col.name]) : "";
+          return totals[col.name] ? roundAmount(totals[col.name]) : "";
         } else if (col.name === "description") {
           return "Totals";
         }
