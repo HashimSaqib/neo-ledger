@@ -251,22 +251,24 @@
       </div>
     </div>
 
-    <q-btn
-      color="primary"
-      :label="buttonLabel"
-      class="q-my-md q-px-xl"
-      @click="submitTransaction"
-      :loading="loading"
-    />
+    <!-- Two buttons: Save and Post -->
+    <div class="row q-my-sm q-px-sm">
+      <q-btn
+        color="primary"
+        :label="t('Post')"
+        @click="submitTransaction(true)"
+        :loading="loading"
+      />
+    </div>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, inject, nextTick } from "vue";
+import { ref, computed, onMounted, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount, filter } from "src/helpers/utils";
+import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 
 const updateTitle = inject("updateTitle");
@@ -278,7 +280,8 @@ const { formatDate } = date;
 
 const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 
-const formData = ref({
+// Initial form and line data for reset
+const initialFormData = {
   reference: "",
   currency: "",
   exchangeRate: "",
@@ -286,31 +289,23 @@ const formData = ref({
   notes: "",
   transdate: getTodayDate(),
   id: null,
-});
+};
+
+const initialLine = {
+  account: "",
+  debit: 0,
+  credit: 0,
+  source: "",
+  memo: "",
+  taxAccount: "",
+  linetaxamount: 0,
+  showExtra: false,
+};
+
+const formData = ref({ ...initialFormData });
 
 // -- Lines state includes showExtra to control visibility of source & memo --
-const lines = ref([
-  {
-    account: "",
-    debit: 0,
-    credit: 0,
-    source: "",
-    memo: "",
-    taxAccount: "",
-    linetaxamount: 0,
-    showExtra: false,
-  },
-  {
-    account: "",
-    debit: 0,
-    credit: 0,
-    source: "",
-    memo: "",
-    taxAccount: "",
-    linetaxamount: 0,
-    showExtra: false,
-  },
-]);
+const lines = ref([{ ...initialLine }, { ...initialLine }]);
 
 const transactionTitle = computed(() =>
   formData.value.id
@@ -319,17 +314,12 @@ const transactionTitle = computed(() =>
 );
 updateTitle(transactionTitle.value);
 
-const buttonLabel = computed(() => {
-  return formData.value.id ? t("Update") : t("Post");
-});
-
-// To auto-focus the first field in a new line
+const accounts = ref([]);
 const accountRefs = ref([]);
 const setAccountRef = (el, index) => {
   accountRefs.value[index] = el;
 };
 
-// Helper to check if a line is completely empty
 const isEmptyLine = (line) => {
   const accountEmpty =
     !line.account ||
@@ -346,7 +336,6 @@ const isEmptyLine = (line) => {
   );
 };
 
-// Update addLine to remove any existing empty line before pushing a new one
 const addLine = () => {
   if (lines.value.length > 1) {
     const emptyIndex = lines.value.findIndex((line) => isEmptyLine(line));
@@ -354,19 +343,9 @@ const addLine = () => {
       lines.value.splice(emptyIndex, 1);
     }
   }
-  lines.value.push({
-    account: "",
-    debit: 0,
-    credit: 0,
-    source: "",
-    memo: "",
-    taxAccount: "",
-    linetaxamount: 0,
-    showExtra: false,
-  });
+  lines.value.push({ ...initialLine });
 };
 
-// Update addLineAt similarly. Adjust the index if an empty line before the insertion index is removed.
 const addLineAt = (index) => {
   if (lines.value.length > 1) {
     const emptyIndex = lines.value.findIndex((line) => isEmptyLine(line));
@@ -377,16 +356,7 @@ const addLineAt = (index) => {
       }
     }
   }
-  lines.value.splice(index + 1, 0, {
-    account: "",
-    debit: 0,
-    credit: 0,
-    source: "",
-    memo: "",
-    taxAccount: "",
-    linetaxamount: 0,
-    showExtra: false,
-  });
+  lines.value.splice(index + 1, 0, { ...initialLine });
   nextTick(() => {
     if (accountRefs.value[index + 1] && accountRefs.value[index + 1].focus) {
       accountRefs.value[index + 1].focus();
@@ -409,68 +379,42 @@ const toggleExtra = (index) => {
   lines.value[index].showExtra = !lines.value[index].showExtra;
 };
 
-const totalDebit = computed(() => {
-  return lines.value.reduce(
-    (sum, line) => sum + parseFloat(line.debit || 0),
-    0
-  );
-});
+const totalDebit = computed(() =>
+  lines.value.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0)
+);
 
-const totalCredit = computed(() => {
-  return lines.value.reduce(
-    (sum, line) => sum + parseFloat(line.credit || 0),
-    0
-  );
-});
-
-const accounts = ref([]);
-const filteredAccounts = ref([]);
-
-const fetchAccounts = async () => {
-  try {
-    const response = await api.get("/charts");
-    const accountsData = response.data;
-    accounts.value = accountsData;
-    filteredAccounts.value = accountsData;
-  } catch (error) {
-    console.log(error);
-  }
-};
+const totalCredit = computed(() =>
+  lines.value.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0)
+);
 
 const lineTax = ref(false);
 const taxAccounts = ref([]);
-
 const departments = ref([]);
+
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl");
     lineTax.value = response.data.linetax;
     taxAccounts.value = response.data.tax_accounts;
     departments.value = response.data.departments;
+    accounts.value = response.data.accounts.all;
+    currencies.value = response.data.currencies;
+    if (currencies.value.length > 0) {
+      formData.value.currency = currencies.value[0];
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-// For s-select filtering
-const filterAccounts = (val, update) => {
-  if (val === "") {
-    update(() => {
-      filteredAccounts.value = accounts.value;
-    });
-    return;
-  }
-  update(() => {
-    const needle = val.toLowerCase();
-    filteredAccounts.value = accounts.value.filter(
-      (v) => v.label.toLowerCase().indexOf(needle) > -1
-    );
-  });
-};
-
 const loading = ref(false);
-const submitTransaction = async () => {
-  // Check if at least two lines are provided
+
+/**
+ * submitTransaction handles both saving and posting.
+ * @param {boolean} clearAfter - When true, clear the form after posting.
+ */
+const submitTransaction = async (clearAfter = false) => {
+  // Validate at least two lines exist
   if (lines.value.length < 2) {
     Notify.create({
       message: t("At least two lines are required to post a transaction."),
@@ -480,7 +424,7 @@ const submitTransaction = async () => {
     return;
   }
 
-  // Check if total debit and credit are balanced
+  // Validate that total debit and credit amounts are balanced
   if (totalDebit.value !== totalCredit.value) {
     Notify.create({
       message: t("The total debit and credit amounts must be balanced."),
@@ -511,7 +455,6 @@ const submitTransaction = async () => {
         memo: line.memo,
         source: line.source,
       };
-      // Only include tax info if linetax is enabled
       if (lineTax.value) {
         lineObj.taxAccount =
           line.taxAccount && typeof line.taxAccount === "object"
@@ -546,9 +489,20 @@ const submitTransaction = async () => {
       position: "center",
     });
 
-    // If the response returns an ID, load the transaction details
-    if (response.data?.id) {
-      await loadTransaction(response.data.id);
+    if (clearAfter) {
+      // Clear the form and lines for a new entry
+      const prevDate = formData.value.transdate;
+      formData.value = { ...initialFormData, transdate: prevDate };
+      if (currencies.value.length > 0) {
+        formData.value.currency = currencies.value[0];
+      }
+      formData.value.selectedDepartment = null;
+      lines.value = [{ ...initialLine }, { ...initialLine }];
+    } else {
+      // For Save, load the transaction data if an ID is returned
+      if (response.data?.id) {
+        await loadTransaction(response.data.id);
+      }
     }
   } catch (error) {
     console.log("Failed to submit transaction:", error);
@@ -586,7 +540,6 @@ const loadTransaction = async (id) => {
         (curr) => curr.curr === transactionData.curr
       );
 
-      // Map the lines, setting showExtra to true if source or memo exist
       lines.value = transactionData.lines.map((line) => {
         const foundAccount =
           accounts.value.find((acc) => acc.accno === line.accno) || "";
@@ -613,72 +566,32 @@ const loadTransaction = async (id) => {
 };
 
 const currencies = ref([]);
-const fetchCurrencies = async () => {
-  try {
-    const response = await api.get("/system/currencies");
-    currencies.value = response.data;
-    if (currencies.value.length > 0) {
-      formData.value.currency = currencies.value[0];
-    }
-  } catch (error) {
-    console.log("Failed to fetch Currencies:", error);
-    Notify.create({
-      message: error.response.data.message,
-      type: "negative",
-      position: "center",
-    });
-  }
-};
+
 const updateTaxAmount = (val, index) => {
-  // Validate that 'val' exists and has a valid 'accno'
   if (!val || !val.accno) {
     console.warn("Invalid value provided:", val);
     return;
   }
-
-  // Ensure that 'taxAccounts' is available
   if (!taxAccounts || !taxAccounts.value) {
     console.warn("taxAccounts is not available");
     return;
   }
-
-  console.log(val);
   const taxAcc = taxAccounts.value.find((item) => item.accno === val.accno);
-
-  // If there's no valid tax account or tax rate, set tax amount to 0 immediately.
   if (!taxAcc || !taxAcc.rate) {
     lines.value[index].linetaxamount = 0;
     return;
   }
-
-  // Retrieve and parse debit and credit values. If they are null, empty, or invalid, set them to 0.
   let debit = parseFloat(lines.value[index].debit);
   let credit = parseFloat(lines.value[index].credit);
   if (isNaN(debit)) debit = 0;
   if (isNaN(credit)) credit = 0;
-
-  // Determine the base amount: use debit if available; otherwise, use credit.
-  let baseAmount = 0;
-  if (debit > 0) {
-    baseAmount = debit;
-  } else if (credit > 0) {
-    baseAmount = credit;
-  }
-
-  // If the base amount is null, empty, or 0, then the tax amount is 0.
-  if (!baseAmount) {
-    lines.value[index].linetaxamount = 0;
-  } else {
-    lines.value[index].linetaxamount = baseAmount * taxAcc.rate;
-  }
+  let baseAmount = debit > 0 ? debit : credit;
+  lines.value[index].linetaxamount = baseAmount ? baseAmount * taxAcc.rate : 0;
 };
 
 onMounted(async () => {
   try {
-    // Wait for all data to load before loading the transaction
-    await Promise.all([fetchAccounts(), fetchCurrencies(), fetchLinks()]);
-
-    // Now safely load the transaction
+    await Promise.all([fetchLinks()]);
     loadTransaction(route.query.id);
   } catch (error) {
     console.log("Error in loading initial data:", error);

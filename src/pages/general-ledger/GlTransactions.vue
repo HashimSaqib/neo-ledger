@@ -76,7 +76,10 @@
           dense
         />
         <div class="row justify-between q-my-md">
-          <q-input
+          <s-select
+            :options="accounts"
+            option-label="label"
+            option-value="accno"
             v-model="formData.accnofrom"
             class="lightbg col-5"
             :label="t('Account Number From')"
@@ -84,8 +87,12 @@
             label-color="secondary"
             outlined
             dense
+            account
           />
-          <q-input
+          <s-select
+            :options="accounts"
+            option-label="label"
+            option-value="accno"
             v-model="formData.accnoto"
             :label="t('Account Number To')"
             input-class="maintext"
@@ -93,6 +100,7 @@
             class="lightbg col-5"
             outlined
             dense
+            account
           />
         </div>
 
@@ -337,7 +345,7 @@ const filtersOpen = ref(true);
 const results = ref([]);
 
 // Flag for split ledger mode (user selectable)
-const splitLedger = ref(true);
+const splitLedger = ref(false);
 // New variable to "freeze" the grouping mode at search time
 const appliedSplitLedger = ref(splitLedger.value);
 
@@ -375,14 +383,6 @@ const baseColumns = ref([
     field: "description",
     sortable: true,
     default: true,
-  },
-  {
-    name: "name",
-    align: "left",
-    label: "Company Name",
-    field: "name",
-    sortable: true,
-    default: false,
   },
   {
     name: "name",
@@ -624,11 +624,13 @@ function groupData(data) {
   });
   return finalRows;
 }
+const accounts = ref([]);
 const departments = ref([]);
 const fetchLinks = async () => {
   try {
-    const response = await api.get("/create_links/gl");
+    const response = await api.get("/create_links/gl_report");
     departments.value = response.data.departments;
+    accounts.value = response.data.accounts.all;
   } catch (error) {
     console.log(error);
   }
@@ -643,6 +645,20 @@ const search = async () => {
     formData.value.selectedDepartment
       ? (formData.value.department = `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`)
       : (formData.value.department = "");
+
+    formData.value.accnofrom =
+      formData.value.accnofrom &&
+      typeof formData.value.accnofrom === "object" &&
+      formData.value.accnofrom.accno
+        ? formData.value.accnofrom.accno
+        : formData.value.accnofrom || "";
+
+    formData.value.accnoto =
+      formData.value.accnoto &&
+      typeof formData.value.accnoto === "object" &&
+      formData.value.accnoto.accno
+        ? formData.value.accnoto.accno
+        : formData.value.accnoto || "";
 
     const response = await api.get("/gl/transactions/lines", {
       params: { ...formData.value },
@@ -751,10 +767,10 @@ const downloadTransactions = () => {
       exportData.push(newRow);
     } else if (row.isSubtotal) {
       const newRow = displayColumns.value.map((col) => {
-        if (col.name === "debit") return formatAmount(row.debit);
-        if (col.name === "credit") return formatAmount(row.credit);
-        if (col.name === "taxAmount") return formatAmount(row.taxAmount);
-        if (col.name === "balance") return formatAmount(row.balance);
+        if (col.name === "debit") return row.debit;
+        if (col.name === "credit") return row.credit;
+        if (col.name === "taxAmount") return row.taxAmount;
+        if (col.name === "balance") return row.balance;
         if (col.name === "accno") return row.accno;
         return "";
       });
@@ -764,9 +780,9 @@ const downloadTransactions = () => {
         if (col.name === "reference") return row.reference;
         if (col.name === "accno") return row.accno;
         if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
-          return formatAmount(
-            typeof col.field === "function" ? col.field(row) : row[col.field]
-          );
+          return typeof col.field === "function"
+            ? col.field(row)
+            : row[col.field];
         }
         return typeof col.field === "function"
           ? col.field(row)
