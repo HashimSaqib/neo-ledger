@@ -187,6 +187,21 @@
         <!-- Extra Fields for Source and Memo -->
         <transition name="fade">
           <div v-if="line.showExtra" class="row q-gutter-x-xs q-mt-xs">
+            <s-select
+              v-if="filteredProjects.length > 0"
+              outlined
+              :options="filteredProjects"
+              :label="t('Project')"
+              option-label="description"
+              option-value="description"
+              v-model="line.project"
+              class="col-3"
+              bg-color="input"
+              label-color="secondary"
+              dense
+              search="description"
+            />
+
             <q-input
               v-model="line.source"
               :label="t('Source')"
@@ -391,6 +406,25 @@ const lineTax = ref(false);
 const taxAccounts = ref([]);
 const departments = ref([]);
 
+const projects = ref([]);
+const filteredProjects = ref([]);
+
+const filterProjects = () => {
+  if (!formData.value.transdate) return;
+
+  filteredProjects.value = projects.value.filter((project) => {
+    const start = project.startdate ? new Date(project.startdate) : null;
+    const end = project.enddate ? new Date(project.enddate) : null;
+    const invDateObj = new Date(formData.value.transdate);
+
+    if (!start && !end) return true; // Include if both are null
+    if (!start) return invDateObj <= end; // Include if only end date exists
+    if (!end) return invDateObj >= start; // Include if only start date exists
+
+    return invDateObj >= start && invDateObj <= end; // Include if within range
+  });
+};
+
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl");
@@ -398,6 +432,8 @@ const fetchLinks = async () => {
     taxAccounts.value = response.data.tax_accounts;
     departments.value = response.data.departments;
     accounts.value = response.data.accounts.all;
+    projects.value = response.data.projects;
+    filterProjects();
     currencies.value = response.data.currencies;
     if (currencies.value.length > 0) {
       formData.value.currency = currencies.value[0];
@@ -454,6 +490,9 @@ const submitTransaction = async (clearAfter = false) => {
         debit: parseFloat(line.debit) || 0,
         memo: line.memo,
         source: line.source,
+        project: line.project
+          ? `${line.project.projectnumber}--${line.project.id}`
+          : null,
       };
       if (lineTax.value) {
         lineObj.taxAccount =
@@ -556,7 +595,11 @@ const loadTransaction = async (id) => {
           linetaxamount: line.linetaxamount
             ? line.linetaxamount.toString()
             : "0",
-          showExtra: line.source || line.memo ? true : false,
+          project:
+            projects.value.length > 0 && line.project
+              ? projects.value.find((proj) => proj.id === line.project)
+              : null,
+          showExtra: line.source || line.memo || line.project ? true : false,
         };
       });
     } catch (error) {
