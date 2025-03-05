@@ -190,6 +190,11 @@ export const menuLinks = [
         perm: "System--Currencies",
       },
       {
+        title: "Projects",
+        link: "/system/projects",
+        perm: "System--projects",
+      },
+      {
         title: "Departments",
         link: "/system/departments",
         perm: "System--Departments",

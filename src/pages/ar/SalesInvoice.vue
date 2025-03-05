@@ -128,6 +128,24 @@
           </div>
         </div>
         <div class="col-sm-4 col-12">
+          <div class="row">
+            <q-select
+              v-if="departments.length > 0"
+              outlined
+              v-model="selectedDepartment"
+              :options="departments"
+              option-value="description"
+              option-label="description"
+              :label="t('Department')"
+              dense
+              bg-color="input"
+              label-color="secondary"
+              clearable
+              autogrow
+              hide-bottom-space
+              class="col-12 q-px-md q-mb-sm"
+            />
+          </div>
           <div class="row justify-around">
             <q-input
               outlined
@@ -212,7 +230,6 @@
               class="row justify-between"
               :class="line.lineitemdetail ? '' : 'q-mb-sm'"
             >
-              <q-checkbox v-model="line.lineitemdetail" />
               <s-select
                 :key="line.id"
                 outlined
@@ -303,6 +320,13 @@
                 label-color="secondary"
                 readonly
                 @keyup.enter="handleLineEnter(index, $event)"
+              />
+              <q-btn
+                flat
+                dense
+                icon="keyboard_arrow_down"
+                :class="line.lineitemdetail ? 'rotate-180' : ''"
+                @click="toggleDetail(line)"
               />
               <q-btn
                 color="negative"
@@ -805,29 +829,29 @@ const fetchAccounts = async () => {
     });
   }
 };
-
-// Currencies
-const selectedCurrency = ref();
-const currencies = ref([]);
-const exchangeRate = ref();
-const fetchCurrencies = async () => {
+// Links
+const departments = ref([]);
+const selectedDepartment = ref();
+const fetchLinks = async () => {
   try {
-    const response = await api.get("/system/currencies");
-    currencies.value = response.data;
+    const response = await api.get(`/create_links/customer`);
+    console.log(response.data);
+    departments.value = response.data.departments;
+    currencies.value = response.data.currencies;
     if (currencies.value) {
       selectedCurrency.value = currencies.value.find(
         (currency) => currency.rn === 1
       );
     }
+    console.log(response.data);
   } catch (error) {
-    console.log("Failed to submit Currencies:", error);
-    Notify.create({
-      message: error.response.data.message,
-      type: "negative",
-      position: "center",
-    });
+    console.log(error);
   }
 };
+// Currencies
+const selectedCurrency = ref();
+const currencies = ref([]);
+const exchangeRate = ref();
 
 // Other Header Info
 const shippingPoint = ref("");
@@ -879,6 +903,10 @@ const lines = ref([
     discount: 0,
   },
 ]);
+
+const toggleDetail = (line) => {
+  line.lineitemdetail = !line.lineitemdetail;
+};
 
 // Lock flags to prevent duplicate additions on enter key
 let lineEnterLock = false;
@@ -1231,6 +1259,10 @@ const postInvoice = async () => {
     })),
   };
 
+  if (selectedDepartment.value) {
+    invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;
+  }
+
   if (selectedCurrency.value.rn !== 1) {
     invoiceData.exchangerate = exchangeRate.value;
   }
@@ -1292,7 +1324,7 @@ const loadInvoice = async (invoice) => {
       fetchCustomers(),
       fetchItems(),
       fetchAccounts(),
-      fetchCurrencies(),
+      fetchLinks(),
     ]);
   }
 
@@ -1322,6 +1354,12 @@ const loadInvoice = async (invoice) => {
       position: "center",
     });
     return;
+  }
+
+  if (departments.value?.length) {
+    selectedDepartment.value = departments.value.find(
+      (dpt) => dpt.id === invoice.department_id
+    );
   }
 
   shippingPoint.value = invoice.shippingPoint;
@@ -1424,7 +1462,7 @@ watch(
 
 onMounted(() => {
   fetchAccounts();
-  fetchCurrencies();
+  fetchLinks();
   fetchItems();
   fetchCustomers();
   fetchInvoice(route.query.id);

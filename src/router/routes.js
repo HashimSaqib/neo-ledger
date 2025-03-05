@@ -21,6 +21,7 @@ import SysDefaults from "src/pages/system/Defaults.vue";
 import ListAccounts from "src/pages/system/chart/ListAccounts.vue";
 import AddAccount from "src/pages/system/chart/AddAccount.vue";
 import ListDepartments from "src/pages/system/department/ListDepartments.vue";
+import ListProjects from "src/pages/projectsjobs/ListProjects.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 
@@ -131,6 +132,10 @@ const routes = [
       {
         path: "/system/departments",
         component: ListDepartments,
+      },
+      {
+        path: "/system/projects",
+        component: ListProjects,
       },
       {
         path: "/reconciliation",

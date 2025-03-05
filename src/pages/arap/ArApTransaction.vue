@@ -168,6 +168,7 @@
                   outlined
                   dense
                   type="date"
+                  @change="filterProjects"
                 />
                 <q-input
                   v-model="dueDate"
@@ -215,8 +216,6 @@
           <draggable v-model="lines" item-key="id">
             <template #item="{ element: line, index }">
               <div class="row q-mb-md justify-between">
-                <q-btn icon="drag_indicator" class="lighttext" flat dense />
-                <!-- Description field with inline ref and enter key -->
                 <q-input
                   outlined
                   v-model="line.description"
@@ -253,6 +252,20 @@
                   dense
                   @keyup.enter="() => handleLineEnter(index)"
                 />
+                <s-select
+                  v-if="filteredProjects.length > 0"
+                  outlined
+                  :options="filteredProjects"
+                  :label="t('Project')"
+                  option-label="description"
+                  option-value="description"
+                  v-model="line.project"
+                  class="col-2"
+                  bg-color="input"
+                  label-color="secondary"
+                  dense
+                  search="description"
+                />
 
                 <s-select
                   v-if="lineTax && taxAccountList"
@@ -276,7 +289,7 @@
                   outlined
                   v-model="line.taxAmount"
                   :label="t('Tax Amount')"
-                  class="col-2"
+                  class="col-1"
                   bg-color="input"
                   label-color="secondary"
                   dense
@@ -847,11 +860,31 @@ const handlePaymentEnter = (index) => {
 // Data Fetching Functions
 // -------------------------
 const departments = ref([]);
+const projects = ref([]);
+const filteredProjects = ref([]);
+
+const filterProjects = () => {
+  if (!invDate.value) return;
+
+  filteredProjects.value = projects.value.filter((project) => {
+    const start = project.startdate ? new Date(project.startdate) : null;
+    const end = project.enddate ? new Date(project.enddate) : null;
+    const invDateObj = new Date(invDate.value);
+
+    if (!start && !end) return true; // Include if both are null
+    if (!start) return invDateObj <= end; // Include if only end date exists
+    if (!end) return invDateObj >= start; // Include if only start date exists
+
+    return invDateObj >= start && invDateObj <= end; // Include if within range
+  });
+};
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/${type.value}/`);
     lineTax.value = response.data.linetax;
     departments.value = response.data.departments;
+    projects.value = response.data.projects;
+    filterProjects();
   } catch (error) {
     console.error("Failed to fetch links:", error);
     Notify.create({
@@ -996,6 +1029,9 @@ const postInvoice = async () => {
       description: line.description,
       taxAccount: line.taxAccount ? line.taxAccount.accno : null,
       taxAmount: line.taxAmount,
+      project: line.project
+        ? `${line.project.projectnumber}--${line.project.id}`
+        : null,
     })),
     payments: payments.value.map((payment) => ({
       date: payment.date,
@@ -1145,8 +1181,12 @@ const loadInvoice = async (invoice) => {
       taxAmount: lineTax.value ? item.taxAmount || 0 : 0,
       apiTaxAmount: lineTax.value ? item.taxAmount || 0 : 0,
       apiTaxAccount: lineTax.value ? item.taxAccount : null,
+      project:
+        projects.value.length > 0 && item.project
+          ? projects.value.find((proj) => proj.id === item.project)
+          : null,
     }));
-
+    console.log(projects.value);
     recordAccount.value = recordAccounts.value[0] || null;
     invDate.value = invoice.invDate || "";
     dueDate.value = invoice.dueDate || "";
