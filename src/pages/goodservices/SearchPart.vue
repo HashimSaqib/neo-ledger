@@ -101,83 +101,122 @@
             <div class="text-subtitle1">Transaction Filters</div>
           </div>
           <div class="col-12 row q-col-gutter-md">
-            <q-checkbox v-model="formData.sold" label="Sales Invoices" />
-            <q-checkbox v-model="formData.ordered" label="Sales Orders" />
-            <q-checkbox v-model="formData.quoted" label="Quotations" />
-            <q-checkbox v-model="formData.bought" label="Vendor Invoices" />
-            <q-checkbox v-model="formData.onorder" label="Purchase Orders" />
-            <q-checkbox v-model="formData.rfq" label="RFQ" />
-          </div>
-        </div>
-
-        <!-- Date Filters and Period Selection (common) -->
-        <div class="row q-mt-sm q-gutter-sm">
-          <q-input
-            v-model="formData.transdatefrom"
-            type="date"
-            label="Transaction Date From"
-            outlined
-            dense
-            class="col-6 col-md-3"
-          />
-          <q-input
-            v-model="formData.transdateto"
-            type="date"
-            label="Transaction Date To"
-            outlined
-            dense
-            class="col-6 col-md-3"
-          />
-          <q-select
-            v-model="formData.month"
-            :options="monthOptions"
-            label="Period: Month"
-            outlined
-            dense
-            class="col-6 col-md-3"
-          />
-          <q-select
-            v-model="formData.year"
-            :options="yearOptions"
-            label="Period: Year"
-            outlined
-            dense
-            class="col-6 col-md-3"
-          />
-          <div class="col-12 q-mt-sm">
-            <q-option-group
-              v-model="formData.interval"
-              :options="intervalOptions"
-              type="radio"
-              inline
-              label="Interval"
+            <q-toggle
+              v-model="formData.sold"
+              label="Sales Invoices"
+              :true-value="1"
+              :false-value="0"
+            />
+            <q-toggle
+              v-model="formData.ordered"
+              label="Sales Orders"
+              :true-value="1"
+              :false-value="0"
+            />
+            <q-toggle
+              v-model="formData.quoted"
+              label="Quotations"
+              :true-value="1"
+              :false-value="0"
+            />
+            <q-toggle
+              v-model="formData.bought"
+              label="Vendor Invoices"
+              :true-value="1"
+              :false-value="0"
+            />
+            <q-toggle
+              v-model="formData.onorder"
+              label="Purchase Orders"
+              :true-value="1"
+              :false-value="0"
+            />
+            <q-toggle
+              v-model="formData.rfq"
+              label="RFQ"
+              :true-value="1"
+              :false-value="0"
             />
           </div>
         </div>
+        <div
+          v-if="
+            formData.sold ||
+            formData.ordered ||
+            formData.quoted ||
+            formData.bought ||
+            formData.onorder ||
+            formData.rfq
+          "
+        >
+          <div class="row q-mt-sm q-gutter-sm">
+            <q-input
+              v-model="formData.transdatefrom"
+              type="date"
+              label="Transaction Date From"
+              outlined
+              dense
+              class="col-6 col-md-3"
+            />
+            <q-input
+              v-model="formData.transdateto"
+              type="date"
+              label="Transaction Date To"
+              outlined
+              dense
+              class="col-6 col-md-3"
+            />
+            <q-select
+              v-model="formData.month"
+              :options="monthOptions"
+              label="Period: Month"
+              outlined
+              dense
+              class="col-6 col-md-3"
+            />
+            <q-select
+              v-model="formData.year"
+              :options="yearOptions"
+              label="Period: Year"
+              outlined
+              dense
+              class="col-6 col-md-3"
+            />
+            <div class="col-12 q-mt-sm">
+              <q-option-group
+                v-model="formData.interval"
+                :options="intervalOptions"
+                type="radio"
+                inline
+                label="Interval"
+              />
+            </div>
+          </div>
 
-        <!-- Method, Status & Report Detail (common) -->
-        <div class="row q-gutter-sm">
-          <div class="col">
-            <q-option-group
-              v-model="formData.method"
-              :options="methodOptions"
-              type="radio"
-              inline
-              label="Method"
-            />
-          </div>
-          <div class="col">
-            <q-checkbox v-model="formData.open" label="Open" />
-            <q-checkbox v-model="formData.closed" label="Closed" />
-          </div>
-          <div class="col">
-            <q-option-group
-              v-model="formData.summary"
-              :options="summaryOptions"
-              type="radio"
-              inline
-              label="Report Detail"
-            />
+          <!-- Method, Status & Report Detail (common) -->
+          <div class="row q-gutter-sm">
+            <div class="col">
+              <q-option-group
+                v-model="formData.method"
+                :options="methodOptions"
+                type="radio"
+                inline
+                label="Method"
+              />
+            </div>
+            <div class="col">
+              <q-checkbox v-model="formData.open" label="Open" />
+              <q-checkbox v-model="formData.closed" label="Closed" />
+            </div>
+            <div class="col">
+              <q-option-group
+                v-model="formData.summary"
+                :options="summaryOptions"
+                type="radio"
+                inline
+                label="Report Detail"
+              />
+            </div>
           </div>
         </div>
 
@@ -264,7 +303,32 @@
         </template>
         <template v-slot:body-cell="props">
           <q-td :props="props">
-            {{ props.row[props.col.field] }}
+            <span
+              v-if="
+                ['sellprice', 'lastcost', 'listprice', 'qty'].includes(
+                  props.col.name
+                )
+              "
+            >
+              {{ formatAmount(props.row[props.col.name]) }}
+            </span>
+            <span v-else class="multiline">
+              {{ props.row[props.col.name] }}
+            </span>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-invnumber="props">
+          <q-td :props="props">
+            <router-link :to="getinvPath(props.row)" class="text-primary">
+              {{ props.row.invnumber }}
+            </router-link>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-name="props">
+          <q-td :props="props">
+            <router-link :to="getVcPath(props.row)" class="text-primary">
+              {{ props.row.name }}
+            </router-link>
           </q-td>
         </template>
       </q-table>
@@ -278,6 +342,7 @@ import { useRoute } from "vue-router";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
+import { formatAmount } from "src/helpers/utils";
 const updateTitle = inject("updateTitle");
 
 const { t } = useI18n();
@@ -308,12 +373,12 @@ const formData = ref({
   microfiche: "",
   barcode: "",
   itemstatus: "active",
-  sold: false,
-  ordered: false,
-  quoted: false,
-  bought: false,
-  onorder: false,
-  rfq: false,
+  sold: 0,
+  ordered: 0,
+  quoted: 0,
+  bought: 0,
+  onorder: 0,
+  rfq: 0,
   transdatefrom: "",
   transdateto: "",
   month: "",
@@ -410,54 +475,107 @@ const summaryOptions = [
 ];
 
 // Unified master list of columns (all possible fields)
-const unifiedColumns = [
-  { name: "runningnumber", label: "No.", field: "runningnumber" },
-  { name: "id", label: "ID", field: "id" },
-  { name: "partnumber", label: "Number", field: "partnumber" },
-  { name: "description", label: "Description", field: "description" },
-  { name: "qty", label: "Qty", field: "qty" },
-  { name: "unit", label: "Unit", field: "unit" },
-  { name: "priceupdate", label: "Updated", field: "priceupdate" },
-  { name: "lot", label: "Lot", field: "lot" },
-  { name: "expires", label: "Expires", field: "expires" },
-  { name: "checkinventory", label: "Check Inventory", field: "checkinventory" },
-  { name: "cost", label: "Cost", field: "cost" },
-  { name: "sellprice", label: "Sell Price", field: "sellprice" },
-  { name: "listprice", label: "List Price", field: "listprice" },
-  { name: "lastcost", label: "Last Cost", field: "lastcost" },
-  { name: "avgcost", label: "Average Cost", field: "avgcost" },
-  { name: "linetotal", label: "Extended", field: "linetotal" },
-  { name: "markup", label: "Markup", field: "markup" },
-  { name: "bin", label: "Bin", field: "bin" },
-  { name: "rop", label: "ROP", field: "rop" },
-  { name: "weight", label: "Weight", field: "weight" },
-  { name: "notes", label: "Notes", field: "notes" },
-  { name: "image", label: "Image", field: "image" },
-  { name: "drawing", label: "Drawing", field: "drawing" },
-  { name: "toolnumber", label: "Tool Number", field: "toolnumber" },
-  { name: "microfiche", label: "Microfiche", field: "microfiche" },
-  { name: "make", label: "Make", field: "make" },
-  { name: "model", label: "Model", field: "model" },
-  { name: "account", label: "Accounts", field: "account" },
-  { name: "name", label: "Name", field: "name" },
-  { name: "curr", label: "Currency", field: "curr" },
-  { name: "employee", label: "Employee", field: "employee" },
-  { name: "serialnumber", label: "Serial Number", field: "serialnumber" },
-  { name: "countryorigin", label: "Country of Origin", field: "countryorigin" },
-  { name: "tariff_hscode", label: "HS Code", field: "tariff_hscode" },
-  { name: "barcode", label: "Barcode", field: "barcode" },
-  { name: "subtotal", label: "Subtotal", field: "subtotal" },
+const baseColumns = [
+  {
+    name: "runningnumber",
+    label: "No.",
+    field: "runningnumber",
+    align: "left",
+  },
+  { name: "id", label: "ID", field: "id", align: "left" },
+  { name: "partnumber", label: "Number", field: "partnumber", align: "left" },
+  {
+    name: "description",
+    label: "Description",
+    field: "description",
+    align: "let",
+  },
+  { name: "qty", label: "Qty", field: "qty", align: "right" },
+  { name: "unit", label: "Unit", field: "unit", align: "left" },
+  {
+    name: "priceupdate",
+    label: "Updated",
+    field: "priceupdate",
+    align: "left",
+  },
+  { name: "lot", label: "Lot", field: "lot", align: "left" },
+  { name: "expires", label: "Expires", field: "expires", align: "left" },
+  {
+    name: "checkinventory",
+    label: "Check Inventory",
+    field: "checkinventory",
+    align: "left",
+  },
+  { name: "cost", label: "Cost", field: "cost", align: "right" },
+  {
+    name: "sellprice",
+    label: "Sell Price",
+    field: "sellprice",
+    align: "right",
+  },
+  {
+    name: "listprice",
+    label: "List Price",
+    field: "listprice",
+    align: "right",
+  },
+  { name: "lastcost", label: "Last Cost", field: "lastcost", align: "right" },
+  { name: "avgcost", label: "Average Cost", field: "avgcost", align: "right" },
+  { name: "linetotal", label: "Extended", field: "linetotal", align: "right" },
+  { name: "markup", label: "Markup", field: "markup", align: "right" },
+  { name: "bin", label: "Bin", field: "bin", align: "left" },
+  { name: "rop", label: "ROP", field: "rop", align: "left" },
+  { name: "weight", label: "Weight", field: "weight", align: "left" },
+  { name: "notes", label: "Notes", field: "notes", align: "left" },
+  { name: "image", label: "Image", field: "image", align: "left" },
+  { name: "drawing", label: "Drawing", field: "drawing", align: "left" },
+  {
+    name: "toolnumber",
+    label: "Tool Number",
+    field: "toolnumber",
+    align: "left",
+  },
+  {
+    name: "microfiche",
+    label: "Microfiche",
+    field: "microfiche",
+    align: "left",
+  },
+  { name: "make", label: "Make", field: "make", align: "left" },
+  { name: "model", label: "Model", field: "model", align: "left" },
+  { name: "account", label: "Accounts", field: "account", align: "left" },
+  { name: "name", label: "Name", field: "name", align: "left" },
+  { name: "curr", label: "Currency", field: "curr", align: "left" },
+  { name: "employee", label: "Employee", field: "employee", align: "left" },
+  {
+    name: "serialnumber",
+    label: "Serial Number",
+    field: "serialnumber",
+    align: "left",
+  },
+  {
+    name: "countryorigin",
+    label: "Country of Origin",
+    field: "countryorigin",
+    align: "left",
+  },
+  {
+    name: "tariff_hscode",
+    label: "HS Code",
+    field: "tariff_hscode",
+    align: "left",
+  },
+  { name: "barcode", label: "Barcode", field: "barcode", align: "left" },
+  { name: "subtotal", label: "Subtotal", field: "subtotal", align: "right" },
 ];
-
-// Compute the final columns based on the inclusion toggles and item type.
-// For services, remove fields that are part-specific.
 const finalColumns = computed(() => {
-  let cols = unifiedColumns.filter(
+  // 1. Filter out any columns the user has not toggled on.
+  let cols = baseColumns.filter(
     (col) => formData.value["l_" + col.name] === true
   );
 
+  // 2. If itemType is "services", remove the part-specific columns.
   if (itemType.value === "services") {
-    // Define columns that should be excluded for services.
     const removeForServices = [
       "lot",
       "expires",
@@ -478,8 +596,49 @@ const finalColumns = computed(() => {
     ];
     cols = cols.filter((col) => !removeForServices.includes(col.name));
   }
-  // If type is "parts", you can optionally remove service-specific columns here.
-  // For now, we leave everything intact for parts.
+
+  // 3. If `sold` or `bought` is 1, insert 'invnumber' after 'lastcost'.
+  if (formData.value.sold === 1 || formData.value.bought === 1) {
+    const lastCostIndex = cols.findIndex((col) => col.name === "lastcost");
+    if (lastCostIndex !== -1) {
+      cols.splice(lastCostIndex + 1, 0, {
+        name: "invnumber",
+        label: "Invoice",
+        field: "invnumber",
+        align: "right",
+      });
+    }
+  }
+
+  // 4. If "accounts" is checked, remove the 'account' column and
+  //    replace it with two columns: 'income' and 'expense'.
+  if (formData.value.l_accounts === true) {
+    // Find the 'account' column (if it exists after toggling).
+    const accountIndex = cols.findIndex((col) => col.name === "account");
+    if (accountIndex !== -1) {
+      // Remove the 'account' column.
+      cols.splice(accountIndex, 1);
+
+      // Insert 'income' and 'expense' columns at the same position.
+      cols.splice(
+        accountIndex,
+        0,
+        {
+          name: "income",
+          label: "Income",
+          field: "income",
+          align: "right",
+        },
+        {
+          name: "expense",
+          label: "Expense",
+          field: "expense",
+          align: "right",
+        }
+      );
+    }
+  }
+
   return cols;
 });
 
@@ -534,10 +693,23 @@ function getPath(row) {
   }
   return { path: "/ic/add/part", query: { id: row.id } };
 }
+function getinvPath(row) {
+  const base =
+    row.module === "ir"
+      ? "/ap/vendor-invoice/"
+      : row.module === "is"
+      ? "/ar/sales-invoice/"
+      : "";
 
-onMounted(() => {
-  // Optionally, load stored preferences or perform additional setup.
-});
+  return { path: base, query: { id: row.trans_id } };
+}
+function getVcPath(row) {
+  const base = `/arap/${row.vc}/`;
+
+  return { path: base, query: { id: row.vc_id } };
+}
+
+onMounted(() => {});
 </script>
 
 <style scoped>
@@ -560,6 +732,10 @@ onMounted(() => {
   background-color: var(--q-maintext);
   color: var(--q-mainbg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+.multiline {
+  white-space: pre-wrap; /* Allows wrapping and respects newline characters */
+  word-wrap: break-word; /* Helps prevent overly long words from overflowing */
 }
 
 :deep(.q-table td) {
