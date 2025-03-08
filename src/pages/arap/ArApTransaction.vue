@@ -43,11 +43,11 @@
                   <p class="q-px-sm maintext q-ma-none">
                     <strong>{{ t("Credit Limit") }}</strong>
                     <span class="text-primary q-mx-sm">
-                      {{ vc.creditlimit }}
+                      {{ formatAmount(vc.creditlimit) }}
                     </span>
                     <strong>{{ t("Remaining") }}</strong>
                     <span class="text-negative q-ml-sm">
-                      {{ vc.creditremaining }}
+                      {{ formatAmount(vc.creditremaining) }}
                     </span>
                   </p>
                 </div>
@@ -498,8 +498,14 @@
             :label="t('Print')"
             color="accent"
             @click="printTransaction"
+            v-if="invId"
           />
-          <q-btn :label="t('Delete')" color="warning" @click="deleteInvoice" />
+          <q-btn
+            :label="t('Delete')"
+            color="warning"
+            @click="deleteTransaction"
+            v-if="invId"
+          />
         </div>
       </template>
 
@@ -564,7 +570,7 @@ import { ref, onMounted, watch, computed, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, confirmDelete } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
@@ -970,6 +976,35 @@ let preserveApiTaxes = ref(false);
 // -------------------------
 // Invoice Submission & Loading
 // -------------------------
+const resetForm = () => {
+  selectedVc.value = null;
+  vc.value = null;
+  lines.value = [
+    {
+      id: Date.now(),
+      amount: 0,
+      account: null,
+      description: "",
+      taxAccount: null,
+      taxAmount: 0,
+    },
+  ];
+  payments.value = [
+    { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
+  ];
+  description.value = "";
+  notes.value = "";
+  intnotes.value = "";
+  invNumber.value = "";
+  ordNumber.value = "";
+  poNumber.value = "";
+  taxIncluded.value = false;
+  invoiceTaxes.value = [];
+  preserveApiTaxes.value = false;
+  invoicePreview.value = null;
+  selectedFile.value = null;
+  splitterModel.value = 100;
+};
 const postInvoice = async () => {
   if (!selectedVc.value) {
     Notify.create({
@@ -1021,7 +1056,6 @@ const postInvoice = async () => {
     poNumber: poNumber.value,
     recordAccount: recordAccount.value,
     selectedCurrency: selectedCurrency.value,
-
     curr: selectedCurrency.value.curr,
     lines: lines.value.map((line) => ({
       amount: line.amount,
@@ -1045,6 +1079,7 @@ const postInvoice = async () => {
       exchangerate: payment.exchangerate,
     })),
   };
+
   if (selectedDepartment.value) {
     invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;
   }
@@ -1073,7 +1108,14 @@ const postInvoice = async () => {
       type: "positive",
       position: "center",
     });
-    fetchInvoice(response.data.id);
+    // If there's a callback route, redirect with query params.
+    if (route.query.callback) {
+      const query = { ...route.query, search: 1 };
+      router.push({ path: route.query.callback, query: query });
+    } else {
+      // Otherwise, reset form data for a new transaction.
+      resetForm();
+    }
   } catch (error) {
     console.error("Transaction error:", error);
     Notify.create({
@@ -1086,6 +1128,49 @@ const postInvoice = async () => {
   }
 };
 
+// -------------------------
+// Deleting a Transaction
+// -------------------------
+async function deleteTransaction(id) {
+  try {
+    const confirmed = await confirmDelete({
+      title: t("Confirm Deletion"),
+      message: t(
+        "Are you sure you want to delete this transaction? This action cannot be undone."
+      ),
+    });
+
+    if (confirmed) {
+      await api.delete(`/arap/transaction/${type.value}/${invId.value}`);
+
+      Notify.create({
+        message: t("Transaction deleted successfully"),
+        color: "positive",
+        position: "center",
+      });
+
+      if (route.query.callback) {
+        const query = { ...route.query, search: 1 };
+        router.push({ path: route.query.callback, query: query });
+      } else {
+        resetForm();
+      }
+    } else {
+      Notify.create({
+        message: t("Transaction Delete canceled"),
+        color: "warning",
+        position: "center",
+      });
+    }
+  } catch (error) {
+    Notify.create({
+      message: t("Unable to delete transaction") + error,
+      color: "negative",
+      position: "center",
+    });
+    console.error(error);
+  }
+}
 const uploadInvoice = async () => {
   loading.value = true;
   const formData = new FormData();
@@ -1432,14 +1517,6 @@ onMounted(() => {
   fetchvcList();
   fetchInvoice(route.query.id);
 });
-
-const deleteInvoice = () => {
-  console.warn("Delete function placeholder invoked");
-  Notify.create({
-    type: "warning",
-    message: t("Delete functionality not implemented yet"),
-  });
-};
 
 const printTransaction = async () => {
   loading.value = true;

@@ -3,15 +3,14 @@ import IndexPage from "src/pages/IndexPage.vue";
 import GeneralLedger from "src/pages/general-ledger/GeneralLedger.vue";
 import GlTransactions from "src/pages/general-ledger/GlTransactions.vue";
 import ArApTransaction from "src/pages/arap/ArApTransaction.vue";
+import ArApTransactions from "src/pages/arap/ArApTransactions.vue";
 import SalesInvoice from "src/pages/ar/SalesInvoice.vue";
-import ArTransactions from "src/pages/ar/ArTransactions.vue";
 import AddVC from "src/pages/arap/AddVC.vue";
 import VcHistory from "src/pages/arap/VcHistory.vue";
 import SearchVC from "src/pages/arap/SearchVC.vue";
 import AddPart from "src/pages/goodservices/AddPart.vue";
 import SearchPart from "src/pages/goodservices/SearchPart.vue";
 import PointOfSale from "src/pages/pos/PointOfSale.vue";
-import ApTransactions from "src/pages/ap/ApTransactions.vue";
 import VendorInvoice from "src/pages/ap/VendorInvoice.vue";
 import TrialBalance from "src/pages/reports/TrialBalance.vue";
 import TrialTransactions from "src/pages/reports/TrialTransactions.vue";
@@ -48,6 +47,10 @@ const routes = [
         props: (route) => ({ id: route.query.id }),
       },
       {
+        path: "/arap/transactions/:type",
+        component: ArApTransactions,
+      },
+      {
         path: "/history/:type",
         component: VcHistory,
       },
@@ -66,20 +69,11 @@ const routes = [
         props: (route) => ({ id: route.query.id }),
       },
       {
-        path: "/ar/reports/transactions",
-        component: ArTransactions,
-      },
-      // Point Of Sale
-      {
         path: "/pos/sale",
         component: PointOfSale,
         props: (route) => ({ id: route.query.id }),
       },
-      // Account Payables
-      {
-        path: "/ap/reports/transactions",
-        component: ApTransactions,
-      },
+
       {
         path: "/ap/vendor-invoice",
         component: VendorInvoice,

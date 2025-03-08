@@ -91,3 +91,23 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
   // Export the workbook to a file with compression enabled
   writeFile(workbook, "ARreport.xlsx", { compression: true });
 };
+
+// Delete Confirmation
+import { Dialog } from "quasar";
+export const confirmDelete = ({
+  title,
+  message,
+  cancel = true,
+  persistent = true,
+}) => {
+  return new Promise((resolve, reject) => {
+    Dialog.create({
+      title,
+      message,
+      cancel,
+      persistent,
+    })
+      .onOk(() => resolve(true))
+      .onCancel(() => resolve(false));
+  });
+};

@@ -30,7 +30,7 @@ export const menuLinks = [
         sublinks: [
           {
             title: "AR Transactions",
-            link: "/ar/reports/transactions",
+            link: "/arap/transactions/customer",
             perm: "General Ledger--Reports--Transactions",
           },
           {
@@ -78,7 +78,7 @@ export const menuLinks = [
         sublinks: [
           {
             title: "AP Transactions",
-            link: "/ap/reports/transactions",
+            link: "/arap/transactions/vendor",
             perm: "AP--Reports--Transactions",
           },
           {

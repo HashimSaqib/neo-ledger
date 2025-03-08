@@ -27,7 +27,7 @@
           <q-select
             v-model="formData.customer"
             class="lightbg col-3"
-            :label="t('Customers')"
+            :label="partyListLabel"
             input-class="maintext"
             label-color="secondary"
             outlined
@@ -37,7 +37,7 @@
           <q-input
             v-model="formData.customernumber"
             class="lightbg"
-            :label="t('Customer Number')"
+            :label="partyNumberLabel"
             input-class="maintext"
             label-color="secondary"
             outlined
@@ -303,7 +303,7 @@
           </q-td>
         </template>
 
-        <!-- Customer Name -->
+        <!-- Party Name Column -->
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <div class="wrapped-description">
@@ -367,6 +367,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
+import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import { Cookies, Notify } from "quasar";
 import draggable from "vuedraggable";
@@ -375,6 +376,20 @@ import { formatAmount, downloadReport } from "src/helpers/utils";
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
+const route = useRoute();
+
+// Initialize the type based on route param ("customer" or "vendor")
+const type = ref(route.params.type || "customer");
+// linkType: if type is vendor, plain "ar" strings become "ap"
+const linkType = computed(() => (type.value === "customer" ? "ar" : "ap"));
+
+// Computed labels for party selection and number
+const partyListLabel = computed(() =>
+  type.value === "customer" ? t("Customers") : t("Vendors")
+);
+const partyNumberLabel = computed(() =>
+  type.value === "customer" ? t("Customer Number") : t("Vendor Number")
+);
 
 // Form data (with defaults)
 const formData = ref({
@@ -451,14 +466,14 @@ const baseColumns = ref([
   },
   {
     name: "name",
-    label: "Customer",
+    label: partyListLabel.value.slice(0, -1), // singular version e.g. "Customer" or "Vendor"
     field: "name",
     default: true,
     align: "left",
   },
   {
     name: "customernumber",
-    label: "Customer Number",
+    label: partyNumberLabel.value,
     field: "customernumber",
     default: false,
     align: "left",
@@ -613,8 +628,9 @@ const selectedColumns = ref(
   }, {})
 );
 
+// Process filters from cookies (unchanged)
 function processFilters() {
-  const savedFilters = Cookies.get("ar_transactions_filters");
+  const savedFilters = Cookies.get(`${type.value}_transactions_filters`);
 
   if (savedFilters) {
     try {
@@ -637,7 +653,7 @@ function processFilters() {
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove("ar_transactions_filters");
+      Cookies.remove(`${type.value}_transactions_filters`);
     }
   } else {
     const defaultFilters = {
@@ -648,7 +664,9 @@ function processFilters() {
       order: baseColumns.value.map((col) => col.name),
     };
 
-    Cookies.set("ar_transactions_filters", defaultFilters, { expires: 30 });
+    Cookies.set(`${type.value}_transactions_filters`, defaultFilters, {
+      expires: 30,
+    });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
@@ -664,7 +682,9 @@ watch(
       order: baseColumns.value.map((col) => col.name),
     };
     try {
-      Cookies.set("ar_transactions_filters", filters, { expires: 30 });
+      Cookies.set(`${type.value}_transactions_filters`, filters, {
+        expires: 30,
+      });
     } catch (error) {
       console.error("Error saving filters to cookies:", error);
     }
@@ -702,7 +722,10 @@ const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
     const accounts = response.data;
-    recordAccounts.value = accounts.filter((account) => account.link === "AR");
+    // Filter by AR for customer transactions, AP for vendor transactions.
+    recordAccounts.value = accounts.filter(
+      (account) => account.link === (type.value === "customer" ? "AR" : "AP")
+    );
   } catch (error) {
     console.error(error);
     Notify.create({
@@ -716,12 +739,13 @@ const fetchAccounts = async () => {
 const customers = ref([]);
 const fetchCustomers = async () => {
   try {
-    const response = await api.get("/arap/list/customer");
+    // Use dynamic endpoint: /arap/list/customer or /arap/list/vendor
+    const response = await api.get(`/arap/list/${type.value}`);
     customers.value = response.data;
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching customers",
+      message: error.response?.data?.message || "Error fetching " + type.value,
       type: "negative",
       position: "center",
     });
@@ -753,11 +777,74 @@ const flattenParams = (obj, prefix = "") => {
   return flattened;
 };
 
+/**
+ * loadParams: Loads query parameters into formData.
+ *
+ * For example, if the URL includes ?accno=123&customer=Acme&invnumber=INV001,
+ * this function will find the matching account from recordAccounts and assign it
+ * to formData.account, and similarly for customer/vendor. Other parameters are loaded directly.
+ *
+ * Additionally, if a query parameter "search" equals "1", the search() function is called.
+ */
+const loadParams = () => {
+  const query = route.query;
+
+  // Load account using "accno"
+  if (query.accno) {
+    const account = recordAccounts.value.find(
+      (acc) => acc.accno === query.accno
+    );
+    formData.value.account = account || query.accno;
+  }
+
+  // Load party using "customernumber" (remains the same key)
+  if (query.customernumber) {
+    const cust = customers.value.find(
+      (c) =>
+        c.customernumber.toLowerCase() === query.customernumber.toLowerCase()
+    );
+    formData.value.customer = cust || query.customer;
+  }
+
+  // Simplify loading of other parameters using an array of keys
+  const simpleParams = [
+    "invnumber",
+    "ordnumber",
+    "ponumber",
+    "shipvia",
+    "shippingpoint",
+    "waybill",
+    "warehouse",
+    "employee",
+    "department",
+    "description",
+    "notes",
+    "memo",
+    "source",
+    "transdatefrom",
+    "transdateto",
+  ];
+
+  simpleParams.forEach((key) => {
+    if (query[key]) {
+      formData.value[key] = query[key];
+    }
+  });
+
+  // Auto-trigger search if "search" equals "1"
+  if (query.search === "1") {
+    search();
+  }
+};
+
 const search = async () => {
   loading.value = true;
   try {
     const params = flattenParams(formData.value);
-    const response = await api.get("/arap/transactions/customer", { params });
+    // Dynamic endpoint: /arap/transactions/customer or /arap/transactions/vendor
+    const response = await api.get(`/arap/transactions/${type.value}`, {
+      params,
+    });
     filtersOpen.value = false;
     results.value = response.data.transactions;
     totals.value = response.data.totals;
@@ -792,22 +879,38 @@ const getPath = (row) => {
   if (row.till) {
     path = "/pos/sale";
   } else if (row.invoice) {
-    path = "/ar/sales-invoice";
+    path =
+      type.value === "customer" ? "/ar/sales-invoice" : "/ap/vendor-invoice";
   } else {
-    path = "/arap/transaction/customer";
+    path = `/arap/transaction/${type.value}`;
   }
-  return { path, query: { id: row.id } };
+
+  // Use flattenParams to flatten formData before spreading into query
+  const flatParams = flattenParams(formData.value);
+  return {
+    path,
+    query: {
+      id: row.id,
+      ...flatParams,
+      callback: `/arap/transactions/${type.value}/`,
+    },
+  };
 };
 
 const downloadTransactions = () => {
   downloadReport(filteredResults.value, columns.value, totals.value);
 };
 
-onMounted(() => {
+onMounted(async () => {
   processFilters();
-  fetchAccounts();
-  fetchCustomers();
-  updateTitle("AR Transactions");
+  await fetchAccounts();
+  await fetchCustomers();
+  updateTitle(
+    type.value === "customer" ? "Customer Transactions" : "Vendor Transactions"
+  );
+
+  // Load any query parameters into the form
+  loadParams();
 });
 </script>
 

@@ -831,6 +831,51 @@ const printInvoice = async () => {
     loading.value = false;
   }
 };
+const resetForm = () => {
+  // Reset basic form fields
+  selectedVendor.value = null;
+  recordAccount.value = null;
+  selectedCurrency.value = null;
+  shippingPoint.value = "";
+  shipVia.value = "";
+  wayBill.value = "";
+  description.value = "";
+  notes.value = "";
+  intnotes.value = "";
+  invNumber.value = "";
+  ordNumber.value = "";
+  invDate.value = "";
+  dueDate.value = "";
+  poNumber.value = "";
+
+  lines.value = [
+    {
+      partnumber: null,
+      description: "",
+      qty: 0,
+      oh: "",
+      unit: "",
+      price: 0,
+      discount: 0,
+    },
+  ];
+
+  payments.value = [
+    {
+      date: "",
+      source: "",
+      memo: "",
+      amount: 0,
+      account: { label: "" },
+      exchangerate: 1,
+    },
+  ];
+
+  // Reset exchange rate and tax related fields
+  exchangeRate.value = 1;
+  invoiceTaxes.value = [];
+  taxIncluded.value = false;
+};
 
 const postInvoice = async () => {
   if (!selectedVendor.value) {
@@ -932,7 +977,12 @@ const postInvoice = async () => {
       type: "positive",
       position: "center",
     });
-    fetchInvoice(response.data.id);
+    if (route.query.callback) {
+      const query = { ...route.query, search: 1 };
+      router.push({ path: route.query.callback, query: query });
+    } else {
+      resetForm();
+    }
   } catch (error) {
     console.log(error);
     Notify.create({
