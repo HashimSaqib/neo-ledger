@@ -529,7 +529,6 @@ const submitTransaction = async (clearAfter = false) => {
     });
 
     if (clearAfter) {
-      // Clear the form and lines for a new entry
       const prevDate = formData.value.transdate;
       formData.value = { ...initialFormData, transdate: prevDate };
       if (currencies.value.length > 0) {

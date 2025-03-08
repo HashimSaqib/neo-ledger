@@ -352,6 +352,9 @@ import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount, roundAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 const updateTitle = inject("updateTitle");
 updateTitle("General Ledger");
 const { t } = useI18n();
@@ -570,6 +573,7 @@ function processFilters() {
 onMounted(() => {
   processFilters();
   fetchLinks();
+  loadParams();
 });
 
 watch(
@@ -662,6 +666,103 @@ const fetchLinks = async () => {
     console.log(error);
   }
 };
+const flattenParams = (obj) => {
+  const result = {};
+  Object.keys(obj).forEach((key) => {
+    const value = obj[key];
+
+    // Special handling for selectedDepartment: map to department.
+    if (key === "selectedDepartment" && value && typeof value === "object") {
+      result["department"] = `${value.description}--${value.id}`;
+      return;
+    }
+
+    // Special handling for selectedProject: map to project_id.
+    if (key === "selectedProject" && value && typeof value === "object") {
+      result["project_id"] = `${value.id}`;
+      return;
+    }
+
+    // Special handling for accnofrom and accnoto.
+    if (
+      (key === "accnofrom" || key === "accnoto") &&
+      value &&
+      typeof value === "object"
+    ) {
+      result[key] = value.accno ? value.accno : "";
+      return;
+    }
+
+    // If the value is an object (but not an array), flatten it recursively.
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const flatChild = flattenParams(value);
+      Object.keys(flatChild).forEach((childKey) => {
+        result[`${key}.${childKey}`] = flatChild[childKey];
+      });
+    } else {
+      // For primitives or arrays, assign directly.
+      result[key] = value;
+    }
+  });
+  return result;
+};
+
+const loadParams = () => {
+  const query = route.query;
+
+  // Load selectedDepartment from flattened "department" query (format: "description--id")
+  if (query.department) {
+    const [desc, id] = query.department.split("--");
+    const dept = departments.find(
+      (d) => d.id.toString() === id && d.description === desc
+    );
+    formData.value.selectedDepartment = dept || { description: desc, id };
+  }
+
+  // Load selectedProject from "project_id" query
+  if (query.project_id) {
+    const proj = projects.find((p) => p.id.toString() === query.project_id);
+    formData.value.selectedProject = proj || { id: query.project_id };
+  }
+
+  // Load account numbers for "accnofrom" and "accnoto"
+  if (query.accnofrom) {
+    const accountFrom = accounts.value.find(
+      (acc) => acc.accno === query.accnofrom
+    );
+    formData.value.accnofrom = accountFrom || query.accnofrom;
+  }
+  if (query.accnoto) {
+    const accountTo = accounts.value.find((acc) => acc.accno === query.accnoto);
+    formData.value.accnoto = accountTo || query.accnoto;
+  }
+
+  // Load simple parameters available on this page.
+  // Adjust the keys in this array based on your formData fields.
+  const simpleParams = [
+    "reference",
+    "description",
+    "companyName",
+    "lineitem",
+    "source",
+    "memo",
+    "datefrom",
+    "dateto",
+    "amountfrom",
+    "amountto",
+  ];
+  simpleParams.forEach((key) => {
+    if (query[key]) {
+      formData.value[key] = query[key];
+    }
+  });
+
+  // Auto-trigger search if "search" equals "1"
+  if (query.search === "1") {
+    search();
+  }
+};
+
 const loading = ref(false);
 // API search function: fetch data and apply grouping based on the current split ledger setting.
 // The appliedSplitLedger flag is "frozen" at search time.
@@ -669,50 +770,20 @@ const tableKey = ref(0); // needed to fix virtual scroll by forcing rerender on 
 const search = async () => {
   try {
     loading.value = true;
-    formData.value.selectedDepartment
-      ? (formData.value.department = `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`)
-      : (formData.value.department = "");
-    formData.value.selectedProject
-      ? (formData.value.project_id = `${formData.value.selectedProject.id}`)
-      : (formData.value.project_id = "");
+    // Flatten formData using the arrow function.
+    const params = flattenParams(formData.value);
 
-    formData.value.accnofrom =
-      formData.value.accnofrom &&
-      typeof formData.value.accnofrom === "object" &&
-      formData.value.accnofrom.accno
-        ? formData.value.accnofrom.accno
-        : formData.value.accnofrom || "";
-
-    formData.value.accnoto =
-      formData.value.accnoto &&
-      typeof formData.value.accnoto === "object" &&
-      formData.value.accnoto.accno
-        ? formData.value.accnoto.accno
-        : formData.value.accnoto || "";
-
-    const response = await api.get("/gl/transactions/lines", {
-      params: { ...formData.value },
-    });
-
+    // Use the flattened parameters in your API call.
+    const response = await api.get("/gl/transactions/lines", { params });
     filtersOpen.value = false;
     const data = response.data;
     appliedSplitLedger.value = splitLedger.value;
     results.value = appliedSplitLedger.value ? groupData(data) : data;
     tableKey.value++;
   } catch (error) {
+    // Handle errors as needed.
     if (error.response) {
-      console.log(error.response);
-      if (error.response.status === 404) {
-        console.warn("No data found (404).");
-        results.value = [];
-        Notify.create({
-          message: error.response?.data?.message || "No transactions found.",
-          type: "negative",
-          position: "center",
-        });
-      } else {
-        console.error("API Error:", error.response.status, error.response.data);
-      }
+      console.error("API Error:", error.response.status, error.response.data);
     } else {
       console.error("Network or unexpected error:", error);
     }
@@ -776,7 +847,15 @@ const getPath = (row) => {
       path = "/arap/transaction/vendor";
     }
   }
-  return { path, query: { id: row.id } };
+  const flatParams = flattenParams(formData.value);
+  return {
+    path,
+    query: {
+      id: row.id,
+      ...flatParams,
+      callback: `/gl/reports`,
+    },
+  };
 };
 
 // Utility to set text alignment classes.
