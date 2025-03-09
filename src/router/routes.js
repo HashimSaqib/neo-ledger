@@ -14,6 +14,7 @@ import PointOfSale from "src/pages/pos/PointOfSale.vue";
 import VendorInvoice from "src/pages/ap/VendorInvoice.vue";
 import TrialBalance from "src/pages/reports/TrialBalance.vue";
 import TrialTransactions from "src/pages/reports/TrialTransactions.vue";
+import IncomeStatement from "src/pages/reports/IncomeStatement.vue";
 import Reconciliation from "src/pages/cash/Reconciliation.vue";
 import SysCurrencies from "src/pages/system/Currencies.vue";
 import SysDefaults from "src/pages/system/Defaults.vue";
@@ -96,6 +97,10 @@ const routes = [
           from: route.query.fromdate,
           to: route.query.todate,
         }),
+      },
+      {
+        path: "/reports/income_statement",
+        component: IncomeStatement,
       },
       // Goods & Serivices
       {

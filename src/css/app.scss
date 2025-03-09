@@ -8,9 +8,15 @@
 .lightbg {
   background-color: var(--q-lightbg);
 }
+.lightbgtext {
+  color: var(--q-lightbg);
+}
 
 .mutedbg {
   background-color: var(--q-mutedbg);
+}
+.mutedbgtext {
+  color: var(--q-mutedbg);
 }
 
 /* Text Colors */

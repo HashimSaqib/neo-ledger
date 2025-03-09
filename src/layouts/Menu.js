@@ -178,6 +178,11 @@ export const menuLinks = [
         link: "/reports/trial_balance",
         perm: "Reports--Trial Balance",
       },
+      {
+        title: "Income Statement",
+        link: "/reports/income_statement",
+        perm: "Reports--Income Statement",
+      },
     ],
   },
   {
