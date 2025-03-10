@@ -207,7 +207,11 @@
     </q-expansion-item>
 
     <!-- Report Output -->
-    <q-card v-if="results && Object.keys(results).length" class="shadow-2">
+    <q-card
+      v-if="results && Object.keys(results).length"
+      class="shadow-2"
+      ref="reportContent"
+    >
       <!-- Report Header -->
       <q-card-section v-if="results.company" class="mutedbg">
         <div class="text-center q-pa-sm">
@@ -451,7 +455,7 @@
 
       <!-- Report Actions -->
       <q-card-actions class="q-pa-sm">
-        <q-btn icon="print" :label="t('Download PDF')" @click="printPDF" />
+        <q-btn icon="print" :label="t('Print')" @click="printPDF" />
       </q-card-actions>
     </q-card>
   </q-page>
@@ -594,46 +598,30 @@ const search = async () => {
     loading.value = false;
   }
 };
-
 const printPDF = async () => {
   try {
     const paramData = { ...formData.value, usetemplate: "Y" };
     const response = await api.get("/reports/income_statement", {
       params: paramData,
+      responseType: "blob", // Expect a binary PDF blob
     });
-    const container = document.createElement("div");
-    container.innerHTML = response.data.html_content;
 
-    // Add a style element to modify h4 font size
-    const style = document.createElement("style");
-    style.textContent = `
-    h4 {
-      font-size: 1.2rem;
-    }
-  `;
-    container.prepend(style);
+    // Create a blob from the PDF data and generate a download URL
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const downloadUrl = window.URL.createObjectURL(blob);
 
-    document.body.appendChild(container);
+    // Create a temporary download link and trigger a click to download the PDF
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "income_statement.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-    const options = {
-      margin: 0.5, // inches
-      filename: `income-statement-${Date.now()}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-
-    // Generate and download the PDF
-    html2pdf()
-      .set(options)
-      .from(container)
-      .save()
-      .then(() => {
-        // Remove the temporary container after PDF generation
-        document.body.removeChild(container);
-      });
+    // Clean up the URL object
+    window.URL.revokeObjectURL(downloadUrl);
   } catch (error) {
-    console.log(error);
+    console.error("Download error:", error);
   }
 };
 
