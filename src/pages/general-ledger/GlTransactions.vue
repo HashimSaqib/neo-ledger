@@ -1,7 +1,7 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
     <!-- Search form -->
-    <q-form @submit.prevent class="q-pa-sm mainbg form">
+    <q-form @submit.prevent class="q-pa-sm mainbg form no-print">
       <q-expansion-item
         :label="t('Search Params')"
         header-class="lightbg maintext"
@@ -198,12 +198,19 @@
     </q-form>
 
     <!-- New action buttons: Export and clear accno filter -->
-    <div class="row items-center q-mt-md">
+    <div class="row items-center q-mt-md no-print">
+      <q-btn
+        label="Print"
+        color="primary"
+        @click="triggerPrint"
+        class="q-mx-sm"
+        v-if="results.length > 0"
+      />
       <q-btn
         label="Export"
         color="accent"
         @click="downloadTransactions"
-        class="q-mx-md"
+        class="q-mx-sm"
         v-if="results.length > 0"
       />
       <q-btn
@@ -356,7 +363,7 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const updateTitle = inject("updateTitle");
-const togglePrintMode = inject("togglePrintMode");
+const triggerPrint = inject("triggerPrint");
 updateTitle("General Ledger");
 const { t } = useI18n();
 
