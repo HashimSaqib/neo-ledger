@@ -66,7 +66,7 @@
               label-color="secondary"
             />
             <q-input
-              v-if="selectedCurrency.rn != 1"
+              v-if="selectedCurrency && selectedCurrency.rn != 1"
               class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
               :label="t('Exchange Rate')"
               outlined
@@ -521,6 +521,10 @@ const fetchVendor = async (id) => {
 };
 const taxAccounts = ref([]);
 const vendorUpdate = async (newValue) => {
+  if (!newValue) {
+    vendor.value = {};
+    return;
+  }
   vendor.value = await fetchVendor(newValue.id);
   taxAccounts.value = vendor.value.taxaccounts
     ? vendor.value.taxaccounts.split(" ")
@@ -844,7 +848,6 @@ const resetForm = () => {
   intnotes.value = "";
   invNumber.value = "";
   ordNumber.value = "";
-  invDate.value = "";
   dueDate.value = "";
   poNumber.value = "";
 

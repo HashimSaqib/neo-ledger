@@ -85,7 +85,7 @@
               label-color="secondary"
             />
             <q-input
-              v-if="selectedCurrency.rn != 1"
+              v-if="selectedCurrency && selectedCurrency.rn != 1"
               class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
               :label="t('Exchange Rate')"
               outlined
@@ -738,6 +738,10 @@ const customerSaved = async (id) => {
 };
 
 const customerUpdate = async (newValue) => {
+  if (!newValue) {
+    customer.value = {};
+    return;
+  }
   customer.value = await fetchCustomer(newValue.id);
   taxAccounts.value = customer.value.taxaccounts
     ? customer.value.taxaccounts.split(" ")
@@ -804,7 +808,50 @@ const openEditCustomer = () => {
   dialogMode.value = "edit";
   customerDialog.value = true;
 };
+const resetForm = () => {
+  // Reset basic form fields
+  selectedCustomer.value = null;
+  recordAccount.value = null;
+  selectedCurrency.value = null;
+  shippingPoint.value = "";
+  shipVia.value = "";
+  wayBill.value = "";
+  description.value = "";
+  notes.value = "";
+  intnotes.value = "";
+  invNumber.value = "";
+  ordNumber.value = "";
+  dueDate.value = "";
+  poNumber.value = "";
 
+  lines.value = [
+    {
+      partnumber: null,
+      description: "",
+      qty: 0,
+      oh: "",
+      unit: "",
+      price: 0,
+      discount: 0,
+    },
+  ];
+
+  payments.value = [
+    {
+      date: "",
+      source: "",
+      memo: "",
+      amount: 0,
+      account: { label: "" },
+      exchangerate: 1,
+    },
+  ];
+
+  // Reset exchange rate and tax related fields
+  exchangeRate.value = 1;
+  invoiceTaxes.value = [];
+  taxIncluded.value = false;
+};
 // Accounts
 const recordAccount = ref();
 const recordAccounts = ref([]);
@@ -1288,7 +1335,12 @@ const postInvoice = async () => {
       type: "positive",
       position: "center",
     });
-    fetchInvoice(response.data.id);
+    if (route.query.callback) {
+      const query = { ...route.query, search: 1 };
+      router.push({ path: route.query.callback, query: query });
+    } else {
+      resetForm();
+    }
   } catch (error) {
     console.log(error);
     Notify.create({

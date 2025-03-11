@@ -1357,6 +1357,10 @@ const vcSaved = async (savedEntity) => {
 // -------------------------
 let isUpdatingVc = false;
 const vcUpdate = async (newValue) => {
+  if (!newValue) {
+    vc.value = {};
+    return;
+  }
   // Prevent recursive updates from triggering an infinite loop
   if (isUpdatingVc) return;
   isUpdatingVc = true;
