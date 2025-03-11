@@ -9,12 +9,11 @@ export const formatAmount = (amount) => {
     .toFixed(2) // Ensure it's a two-decimal float (optional)
     .replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas every three digits
 };
-
 export const roundAmount = (amount) => {
-  if (isNaN(amount) || amount === null || amount === undefined) return ""; // return empty string for invalid values
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return NaN; // or you could choose another fallback value
 
-  // Convert amount to string and format it
-  return parseFloat(amount).toFixed(2); // Ensure it's a two-decimal float (optional)
+  return Math.round(parsed * 100) / 100;
 };
 
 export const displayDate = (datestring) => {
