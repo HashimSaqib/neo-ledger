@@ -74,6 +74,18 @@
               v-model="exchangeRate"
             />
           </div>
+          <div class="row q-mb-sm">
+            <q-input
+              outlined
+              :label="t('Description')"
+              v-model="description"
+              bg-color="input"
+              label-color="secondary"
+              class="col-sm-7 col-12"
+              dense
+              autogrow
+            />
+          </div>
           <div class="row">
             <q-input
               outlined
@@ -146,19 +158,6 @@
               outlined
               dense
               type="date"
-            />
-          </div>
-          <div class="row justify-around">
-            <q-input
-              outlined
-              :label="t('Description')"
-              v-model="description"
-              input-class="maintext"
-              label-color="secondary"
-              class="lightbg col-sm-11 col-12"
-              dense
-              type="textarea"
-              rows="2"
             />
           </div>
         </div>

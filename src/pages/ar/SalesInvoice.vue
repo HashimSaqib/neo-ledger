@@ -94,6 +94,18 @@
               v-model="exchangeRate"
             />
           </div>
+          <div class="row q-mb-sm">
+            <q-input
+              outlined
+              :label="t('Description')"
+              v-model="description"
+              bg-color="input"
+              label-color="secondary"
+              class="col-sm-10 col-12"
+              dense
+              autogrow
+            />
+          </div>
           <div class="row q-gutter-x-sm">
             <q-input
               outlined
@@ -125,10 +137,6 @@
               dense
               autogrow
             />
-          </div>
-        </div>
-        <div class="col-sm-4 col-12">
-          <div class="row">
             <q-select
               v-if="departments.length > 0"
               outlined
@@ -143,9 +151,11 @@
               clearable
               autogrow
               hide-bottom-space
-              class="col-12 q-px-md q-mb-sm"
+              class="col-sm-5 col-12 q-mb-sm"
             />
           </div>
+        </div>
+        <div class="col-sm-4 col-12">
           <div class="row justify-around">
             <q-input
               outlined
@@ -186,18 +196,6 @@
               outlined
               dense
               type="date"
-            />
-          </div>
-          <div class="row justify-around">
-            <q-input
-              outlined
-              :label="t('Description')"
-              v-model="description"
-              bg-color="input"
-              label-color="secondary"
-              class="col-sm-11 col-12"
-              dense
-              autogrow
             />
           </div>
         </div>
