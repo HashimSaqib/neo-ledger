@@ -1,7 +1,7 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
     <!-- Search form -->
-    <q-form @submit.prevent class="q-pa-sm mainbg">
+    <q-form @submit.prevent class="q-pa-sm mainbg form">
       <q-expansion-item
         :label="t('Search Params')"
         header-class="lightbg maintext"
@@ -356,6 +356,7 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const updateTitle = inject("updateTitle");
+const togglePrintMode = inject("togglePrintMode");
 updateTitle("General Ledger");
 const { t } = useI18n();
 
@@ -933,6 +934,21 @@ const downloadTransactions = () => {
   display: flex;
   flex-wrap: wrap;
 }
+@media print {
+  .form,
+  .q-btn {
+    display: none;
+  }
+  :deep(.q-table__container) {
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+  :deep(.q-virtual-scroll__content) {
+    transform: none !important;
+  }
+}
+
 :deep(.q-table__container) {
   height: calc(100vh - 180px);
   position: relative;

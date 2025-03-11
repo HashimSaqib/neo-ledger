@@ -1,20 +1,25 @@
 <template>
   <q-page class="lightbg q-px-md q-py-md relative-position">
-    <router-link
-      :to="{ path: `/reports/trial_balance`, query: formData }"
-      class="text-primary q-pa-sm"
-    >
-      <template v-if="formData.fromdate || formData.todate">
-        <span v-if="formData.fromdate">{{
-          displayDate(formData.fromdate)
-        }}</span>
-        <span v-if="formData.fromdate && formData.todate"> - </span>
-        <span v-if="formData.todate">{{ displayDate(formData.todate) }}</span>
-      </template>
-    </router-link>
+    <!-- Actions: Print PDF & Export -->
+    <div class="q-mb-md hide-print">
+      <q-btn
+        flat
+        round
+        icon="print"
+        label="Print PDF"
+        class="q-mr-sm"
+        @click="triggerPrint"
+        q
+      />
+      <q-btn flat round icon="save" label="Export" @click="downloadExcel" />
+    </div>
+    <h6 class="q-my-none q-py-none">
+      {{ `Account ${accno} - ${description}` }}
+    </h6>
+    <!-- Transactions Table -->
     <div v-if="filteredResults.length > 0" class="q-mt-sm">
       <q-table
-        table-class="mainbg maintext "
+        table-class="mainbg maintext"
         :rows="filteredResults"
         row-key="rowKey"
         :columns="columns"
@@ -24,18 +29,6 @@
         hide-bottom
         rows-per-page-options="0"
       >
-        <template v-slot:top="props" class="row">
-          <h6 class="q-my-none q-py-none">
-            {{ `Account ${accno} - ${description}` }}
-          </h6>
-          <q-btn
-            flat
-            round
-            dense
-            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-            @click="props.toggleFullscreen"
-          />
-        </template>
         <template v-slot:body="props">
           <q-tr
             :props="props"
@@ -48,7 +41,6 @@
             ]"
           >
             <q-td v-for="col in columns" :key="col.name" :props="props">
-              <!-- Total Row -->
               <template v-if="props.row.isTotalRow">
                 <template v-if="col.name === 'description'">
                   <strong>{{ props.row.description }}</strong>
@@ -62,29 +54,26 @@
                 >
                   <strong>{{ formatAmount(props.row[col.field]) }}</strong>
                 </template>
-                <template v-else>
-                  <!-- Empty cell for other columns -->
-                </template>
-              </template>
-
-              <!-- Normal Rows -->
-              <template v-if="col.name === 'reference'">
-                <router-link :to="getPath(props.row)" class="text-primary">
-                  {{ props.row.reference }}
-                </router-link>
               </template>
               <template v-else>
-                <template
-                  v-if="
-                    col.name === 'debit' ||
-                    col.name === 'credit' ||
-                    col.name === 'balance'
-                  "
-                >
-                  {{ formatAmount(props.row[col.field]) }}
+                <template v-if="col.name === 'reference'">
+                  <router-link :to="getPath(props.row)" class="text-primary">
+                    {{ props.row.reference }}
+                  </router-link>
                 </template>
                 <template v-else>
-                  {{ props.row[col.field] }}
+                  <template
+                    v-if="
+                      col.name === 'debit' ||
+                      col.name === 'credit' ||
+                      col.name === 'balance'
+                    "
+                  >
+                    {{ formatAmount(props.row[col.field]) }}
+                  </template>
+                  <template v-else>
+                    {{ props.row[col.field] }}
+                  </template>
                 </template>
               </template>
             </q-td>
@@ -96,24 +85,31 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+/* Imports & Dependencies */
+import { ref, computed, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { formatAmount } from "src/helpers/utils";
 import { useRoute } from "vue-router";
-import { displayDate } from "src/helpers/utils";
-const route = useRoute();
+import { utils, writeFile } from "xlsx";
 
+/* Update Page Title & Inject Print Function */
+const updateTitle = inject("updateTitle");
+updateTitle("Transactions");
+const triggerPrint = inject("triggerPrint");
+
+/* Reactive State & Form Data */
+const route = useRoute();
 const formData = ref({
   accno: route.query.accno,
-  todate: route.query.todate,
   fromdate: route.query.fromdate,
+  todate: route.query.todate,
 });
 const filtersOpen = ref(true);
 const results = ref([]);
+const accno = ref("");
+const description = ref("");
 
-const showHeadings = ref(false);
-const allAccounts = ref(false);
-
+/* Base Columns & Column Selection */
 const baseColumns = ref([
   {
     name: "transdate",
@@ -182,59 +178,45 @@ const selectedColumns = ref(
   }, {})
 );
 
-// Filtered columns based on selected checkboxes
 const columns = computed(() => {
   return baseColumns.value.filter(
     (column) => selectedColumns.value[column.name]
   );
 });
 
+/* Helper: Format Each Row */
 function formatRow(result) {
   const formatted = {};
-
-  // Include selected columns
   Object.keys(selectedColumns.value).forEach((key) => {
     if (selectedColumns.value[key]) {
       formatted[key] = result[key];
     }
   });
-
-  // Always include necessary fields for rendering
+  // Additional fields for linking and identification
   formatted.charttype = result.charttype;
   formatted.type = result.module;
   formatted.id = result.id;
   formatted.till = result.till;
   formatted.accno = result.accno;
   formatted.rowKey = result.id;
-
   return formatted;
 }
 
-// Computed property to process results using formatRow
+/* Computed: Processed (Filtered) Results with Totals */
 const filteredResults = computed(() => {
   let balance = 0;
   let totalDebits = 0;
   let totalCredits = 0;
-
   const processedResults = results.value.map((result) => {
     const formatted = formatRow(result);
-
-    // Parse debit and credit as numbers
     const debit = parseFloat(formatted.debit) || 0;
     const credit = parseFloat(formatted.credit) || 0;
-
-    // Update totals
     totalDebits += debit;
     totalCredits += credit;
-
-    // Update balance
     balance += debit - credit;
     formatted.balance = balance;
-
     return formatted;
   });
-
-  // Add total row at the end
   processedResults.push({
     description: "Total",
     debit: totalDebits,
@@ -243,12 +225,41 @@ const filteredResults = computed(() => {
     isTotalRow: true,
     rowKey: "total-row",
   });
-
   return processedResults;
 });
 
-const accno = ref("");
-const description = ref("");
+/* Helper: Get Navigation Path for a Transaction Row */
+const getPath = (row) => {
+  let path = "";
+  if (row.type === "gl") {
+    path = "/gl/add-gl";
+  } else if (row.type === "ar") {
+    if (row.till) {
+      path = "/pos/sale";
+    } else if (row.invoice) {
+      path = "/ar/sales-invoice";
+    } else {
+      path = "/arap/transaction/customer";
+    }
+  } else if (row.type === "ap") {
+    if (row.invoice) {
+      path = "/ap/vendor-invoice";
+    } else {
+      path = "/arap/transaction/vendor";
+    }
+  }
+  return {
+    path,
+    query: {
+      id: row.id,
+      ...formData.value,
+      search: 1,
+      callback: `/reports/trial_transactions`,
+    },
+  };
+};
+
+/* Fetch Transactions from API */
 const search = async () => {
   try {
     const response = await api.get("/reports/transactions", {
@@ -258,31 +269,80 @@ const search = async () => {
     results.value = response.data.transactions;
     accno.value = response.data.accno;
     description.value = response.data.description;
-    console.log(results.value);
   } catch (error) {
     console.error(error);
   }
 };
 
-const getPath = (row) => {
-  let path = "";
-
-  if (row.type === "gl") {
-    path = "/gl/add-gl";
-  } else if (row.type === "is") {
-    if (row.till) {
-      path = "/pos/sale";
-    } else {
-      path = "/ar/sales-invoice";
-    }
-  } else if (row.type === "ir") {
-    path = "/ap/vendor-invoice";
-  }
-
-  return { path, query: { id: row.id } };
-};
-
 onMounted(() => {
   search();
 });
+
+/* Export Transactions as Excel */
+const downloadExcel = () => {
+  // Create header row from baseColumns labels
+  const headerRow = baseColumns.value.map((col) => col.label);
+  const exportData = [];
+  exportData.push(["Trial Transactions"]);
+  exportData.push([]);
+  exportData.push(headerRow);
+
+  // Add transaction rows (excluding the total row)
+  filteredResults.value.forEach((row) => {
+    if (!row.isTotalRow) {
+      const dataRow = baseColumns.value.map((col) => {
+        if (["debit", "credit", "balance"].includes(col.name)) {
+          return row[col.field] ? parseFloat(row[col.field]) : 0;
+        }
+        return row[col.field] || "";
+      });
+      exportData.push(dataRow);
+    }
+  });
+
+  // Append total row
+  const totalRow = filteredResults.value.find((row) => row.isTotalRow);
+  if (totalRow) {
+    const totalDataRow = baseColumns.value.map((col) => {
+      if (col.name === "description") return totalRow.description;
+      if (["debit", "credit", "balance"].includes(col.name)) {
+        return totalRow[col.field] ? parseFloat(totalRow[col.field]) : 0;
+      }
+      return "";
+    });
+    exportData.push([]);
+    exportData.push(totalDataRow);
+  }
+
+  // Create worksheet from exportData
+  const worksheet = utils.aoa_to_sheet(exportData);
+  worksheet["!merges"] = worksheet["!merges"] || [];
+  // Merge the first row (title) across all header columns
+  worksheet["!merges"].push({
+    s: { r: 0, c: 0 },
+    e: { r: 0, c: headerRow.length - 1 },
+  });
+  // Auto-adjust column widths
+  worksheet["!cols"] = headerRow.map((header, colIdx) => {
+    let maxLength = header.length;
+    exportData.forEach((row) => {
+      const cellValue = row[colIdx];
+      if (cellValue != null) {
+        maxLength = Math.max(maxLength, cellValue.toString().length);
+      }
+    });
+    return { wch: maxLength + 2 };
+  });
+
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Trial Transactions");
+  writeFile(workbook, "trial_transactions.xlsx", { compression: true });
+};
 </script>
+
+<style scoped>
+.total-row {
+  background-color: var(--q-color-primary-light);
+  font-weight: bold;
+}
+</style>

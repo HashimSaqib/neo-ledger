@@ -1,13 +1,17 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header>
+    <!-- Only render header if printMode is false -->
+    <q-header v-if="!printMode">
       <q-toolbar class="mainbg maintext">
         <q-toolbar-title class="q-ml-xs">
           {{ t(title) }}
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
+
+    <!-- Only render drawer if printMode is false -->
     <q-drawer
+      v-if="!printMode"
       v-model="leftDrawerOpen"
       show-if-above
       bordered
@@ -18,9 +22,7 @@
       style="height: 100%"
     >
       <div class="column no-wrap" style="height: 100%">
-        <!-- Scroll area is flex: 1 so it grows to fill leftover space -->
         <q-scroll-area class="col">
-          <!-- Add bottom padding so last item can scroll above the pinned panel -->
           <div>
             <q-list>
               <EssentialLink
@@ -32,7 +34,6 @@
           </div>
         </q-scroll-area>
 
-        <!-- Pinned at the bottom -->
         <div class="q-pa-md">
           <SettingsPanel />
         </div>
@@ -46,14 +47,16 @@
     </q-page-container>
   </q-layout>
 </template>
+
 <script setup>
-import { ref, provide, watch } from "vue";
+import { ref, provide } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
 import { menuLinks } from "src/layouts/Menu.js";
 import { Cookies } from "quasar";
+
 const miniState = ref(false);
 const { t } = useI18n();
 const route = useRoute();
@@ -61,9 +64,7 @@ const leftDrawerOpen = ref(false);
 const company = Cookies.get("company");
 const dbname = Cookies.get("client");
 
-// Create a function to get the default title
 const getDefaultTitle = () => company || dbname || t("Neo Ledger");
-
 const title = ref(getDefaultTitle());
 
 // Provide title and update function to child components
@@ -72,11 +73,33 @@ provide("updateTitle", (newTitle) => {
   title.value = `${t(newTitle)} / ${getDefaultTitle()}` || getDefaultTitle();
 });
 
+// Reactive printMode variable
+const printMode = ref(false);
+// Function to toggle print mode
+const togglePrintMode = () => {
+  printMode.value = !printMode.value;
+};
+const printPDF = async () => {
+  await togglePrintMode();
+  window.print();
+};
+
+provide("triggerPrint", printPDF);
+provide("printToggle", printMode);
 defineOptions({
   name: "MainLayout",
 });
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+window.addEventListener("afterprint", () => {
+  if (printMode.value) {
+    togglePrintMode();
+  }
+});
 </script>
+<style>
+@media print {
+  .hide-print {
+    display: none;
+  }
+}
+</style>

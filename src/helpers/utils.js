@@ -111,3 +111,57 @@ export const confirmDelete = ({
       .onCancel(() => resolve(false));
   });
 };
+import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
+export const downloadPDFReport = (filteredResults, columns, totals = null) => {
+  // Create a new jsPDF instance
+  const doc = new jsPDF();
+
+  // Build the header row from the computed columns (ensuring the order is correct)
+  const headerRow = columns.map((col) => col.label);
+
+  // Map filteredResults into rows where cell order matches the header order,
+  // applying roundAmount for totals columns if a value is present
+  const dataRows = filteredResults.map((row) =>
+    columns.map((col) => {
+      let value = row[col.field] || "";
+      if (
+        ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(
+          col.name
+        ) &&
+        value !== ""
+      ) {
+        value = roundAmount(value);
+      }
+      return value;
+    })
+  );
+
+  // Prepare the totals row if totals are provided
+  const totalsRow = totals
+    ? columns.map((col) => {
+        if (
+          ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(
+            col.name
+          )
+        ) {
+          return totals[col.name] ? roundAmount(totals[col.name]) : "";
+        } else if (col.name === "description") {
+          return "Totals";
+        }
+        return "";
+      })
+    : null;
+
+  // Combine data rows and totals row (if available)
+  const tableBody = totalsRow ? [...dataRows, totalsRow] : dataRows;
+
+  // Generate the table in the PDF using autoTable
+  autoTable(doc, {
+    head: [headerRow],
+    body: tableBody,
+  });
+
+  // Save the generated PDF
+  doc.save("table.pdf");
+};
