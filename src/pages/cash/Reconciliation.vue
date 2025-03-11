@@ -9,7 +9,7 @@
       class="mainbg textmain q-pa-md-md q-pa-sm"
     >
       <q-form @submit.prevent="loadTransactions">
-        <q-select
+        <s-select
           v-model="form.accno"
           :label="t('Account Number')"
           :options="paymentAccounts"
@@ -21,6 +21,8 @@
           dense
           class="q-my-md"
           outlined
+          account
+          search="accno"
         />
         <div class="row q-col-gutter-md q-mb-md">
           <q-input

@@ -14,7 +14,7 @@
 
         <!-- Basic Info Section -->
         <div class="row q-mt-xs q-gutter-sm">
-          <q-select
+          <s-select
             v-model="formData.account"
             class="lightbg col-6 col-md-3"
             :label="t('Accounts')"
@@ -23,8 +23,9 @@
             outlined
             dense
             :options="recordAccounts"
+            account
           />
-          <q-select
+          <s-select
             v-model="formData.customer"
             class="lightbg col-3"
             :label="partyListLabel"
@@ -33,6 +34,7 @@
             outlined
             dense
             :options="customers"
+            search="label"
           />
           <q-input
             v-model="formData.customernumber"

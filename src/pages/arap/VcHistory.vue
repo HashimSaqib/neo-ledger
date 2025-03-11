@@ -33,7 +33,7 @@
 
         <!-- Period Selection -->
         <div class="row q-gutter-md q-mt-md">
-          <q-select
+          <s-select
             v-model="formData.month"
             :options="monthOptions"
             :label="t('Month')"
@@ -42,14 +42,16 @@
             label-color="secondary"
             outlined
             dense
+            search="label"
           />
-          <q-select
+          <s-select
             v-model="formData.year"
             :options="yearOptions"
             :label="t('Year')"
             class="col-3 lightbg"
             outlined
             dense
+            search="label"
           />
 
           <q-radio :label="t('Current')" val="0" v-model="formData.interval" />
