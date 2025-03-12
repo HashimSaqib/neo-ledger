@@ -1,7 +1,7 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
     <!-- Page title based on customer/vendor mode -->
-    <q-form @submit.prevent="search" class="q-px-md q-py-md mainbg">
+    <q-form @submit.prevent="search" class="q-px-md q-py-md mainbg hide-print">
       <q-expansion-item
         label="Search Params"
         v-model="filtersOpen"
@@ -157,11 +157,20 @@
 
     <!-- Results Table -->
     <div v-if="processedResults.length" class="q-mt-lg">
-      <q-btn
-        label="Download Report"
-        @click="downloadTransactions"
-        color="accent"
-      />
+      <div class="row q-mb-sm hide-print">
+        <q-btn
+          :label="t('Export')"
+          @click="downloadExcel"
+          class="q-mr-sm"
+          color="accent"
+        />
+        <q-btn
+          :label="t('Print')"
+          @click="triggerPrint"
+          class="q-mr-sm"
+          color="info"
+        />
+      </div>
       <q-table
         :rows="processedResults"
         :columns="finalColumns"
@@ -222,6 +231,7 @@ import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 import { formatAmount, roundAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
+const triggerPrint = inject("triggerPrint");
 const updateTitle = inject("updateTitle");
 
 const { t } = useI18n();
@@ -558,7 +568,7 @@ async function search() {
     });
   }
 }
-const downloadTransactions = () => {
+const downloadExcel = () => {
   // Use the computed columns and processed results as displayed on screen.
   const columns = finalColumns.value;
   const rows = processedResults.value;

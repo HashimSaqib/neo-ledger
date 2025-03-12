@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, provide } from "vue";
+import { ref, provide, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import EssentialLink from "components/EssentialLink.vue";
@@ -68,7 +68,9 @@ const getDefaultTitle = () => company || dbname || t("Neo Ledger");
 const title = ref(getDefaultTitle());
 
 // Provide title and update function to child components
+
 provide("title", title);
+console.log("Providing title:", title);
 provide("updateTitle", (newTitle) => {
   title.value = `${t(newTitle)} / ${getDefaultTitle()}` || getDefaultTitle();
 });
@@ -100,6 +102,10 @@ window.addEventListener("afterprint", () => {
 @media print {
   .hide-print {
     display: none;
+  }
+  :deep(.q-table__container) {
+    height: auto !important;
+    position: relative;
   }
 }
 </style>

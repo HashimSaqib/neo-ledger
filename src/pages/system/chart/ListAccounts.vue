@@ -1,5 +1,19 @@
 <template>
   <q-page class="q-pa-sm">
+    <div class="row q-mb-sm hide-print">
+      <q-btn
+        :label="t('Export')"
+        @click="downloadExcel"
+        class="q-mr-sm"
+        color="accent"
+      />
+      <q-btn
+        :label="t('Print')"
+        @click="triggerPrint"
+        class="q-mr-sm"
+        color="info"
+      />
+    </div>
     <q-table
       :rows="results"
       :columns="columns"
@@ -9,7 +23,6 @@
       dense
       virtual-scroll
       :rows-per-page-options="[0]"
-      hide-bottom
     >
       <template v-slot:body="props">
         <q-tr
@@ -396,11 +409,11 @@ import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify, Dialog } from "quasar";
-
+import { utils, writeFile } from "xlsx";
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Chart Of Accounts"));
-
+const triggerPrint = inject("triggerPrint");
 const results = ref([]);
 
 const columns = [
@@ -719,6 +732,73 @@ async function deleteAccount(accountId) {
     console.error(error);
   }
 }
+
+const downloadExcel = () => {
+  const headerRow = [
+    "Account",
+    "GIFI",
+    "Description",
+    "Type",
+    "Contra",
+    "Drop-down",
+    "Closed",
+    "Chart Type",
+  ];
+
+  const exportData = [];
+
+  exportData.push(["Chart Of Accounts"]);
+  exportData.push([]);
+  exportData.push(headerRow);
+
+  results.value.forEach((account) => {
+    const row = [
+      account.accno,
+      account.gifi_accno || "",
+      account.description,
+      mapCategory(account.category),
+      account.contra === 1 ? "*" : "",
+      account.link
+        ? splitLink(account.link)
+            .map((code) => mapLink(code))
+            .join(", ")
+        : "",
+      account.closed === 1 ? t("Yes") : "",
+      account.charttype,
+    ];
+
+    exportData.push(row);
+  });
+
+  const worksheet = utils.aoa_to_sheet(exportData);
+
+  worksheet["!merges"] = [
+    {
+      s: { r: 0, c: 0 },
+      e: { r: 0, c: headerRow.length - 1 },
+    },
+  ];
+
+  const titleCell = utils.encode_cell({ r: 0, c: 0 });
+  worksheet[titleCell].s = {
+    alignment: { horizontal: "center", vertical: "center" },
+  };
+
+  worksheet["!cols"] = headerRow.map((header, colIdx) => {
+    let maxLength = header.length;
+    exportData.forEach((row) => {
+      const cellValue = row[colIdx];
+      if (cellValue != null) {
+        maxLength = Math.max(maxLength, cellValue.toString().length);
+      }
+    });
+    return { wch: maxLength + 2 };
+  });
+
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Chart of Accounts");
+  writeFile(workbook, "chart_of_accounts.xlsx", { compression: true });
+};
 
 onMounted(() => {
   fetchData();

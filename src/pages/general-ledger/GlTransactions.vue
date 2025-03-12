@@ -202,7 +202,7 @@
       <q-btn
         label="Print"
         color="primary"
-        @click="triggerPrint"
+        @click="createPDF"
         class="q-mx-sm"
         v-if="results.length > 0"
       />
@@ -890,7 +890,7 @@ const downloadTransactions = () => {
       exportData.push(newRow);
     } else if (row.isSubtotal) {
       const newRow = displayColumns.value.map((col) => {
-        if (col.name === "debit") return roundAmount(row.debit);
+        if (col.name === "debit") return formatAmount(row.debit);
         if (col.name === "credit") return roundAmount(row.credit);
         if (col.name === "taxAmount") return roundAmount(row.taxAmount);
         if (col.name === "balance") return roundAmount(row.balance);
@@ -933,6 +933,84 @@ const downloadTransactions = () => {
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, worksheet, "Transactions");
   writeFile(workbook, "transactions_export.xlsx", { compression: true });
+};
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+const title = inject("title");
+
+const createPDF = () => {
+  const doc = new jsPDF({ orientation: "landscape" });
+  let yPosition = 10; // Track vertical position
+  const leftPadding = 15; // Align params with the table start
+  doc.setFontSize(18);
+  doc.text(title.value, doc.internal.pageSize.width / 2, yPosition, {
+    align: "center",
+  });
+  doc.setFontSize(16);
+
+  // Extract headers
+  const headerRow = displayColumns.value.map((col) => col.label);
+  const exportData = [];
+
+  // Prepare columnStyles: numeric columns right aligned, others left aligned.
+  const numericColumns = ["debit", "credit", "taxAmount", "balance"];
+  const columnStyles = {};
+  displayColumns.value.forEach((col, index) => {
+    columnStyles[index] = numericColumns.includes(col.name)
+      ? { halign: "right" }
+      : { halign: "left" };
+  });
+
+  // Extract rows
+  tableRows.value.forEach((row) => {
+    if (row.isGroupHeader) {
+      exportData.push([
+        {
+          content: row.groupLabel,
+          colSpan: headerRow.length,
+          styles: { fontStyle: "bold" },
+        },
+      ]);
+    } else if (row.isSubtotal) {
+      exportData.push(
+        displayColumns.value.map((col) => {
+          if (numericColumns.includes(col.name))
+            return formatAmount(row[col.name]);
+          if (col.name === "accno") return row.accno;
+          return "";
+        })
+      );
+    } else {
+      exportData.push(
+        displayColumns.value.map((col) => {
+          if (col.name === "reference") return row.reference;
+          if (col.name === "accno") return row.accno;
+          if (numericColumns.includes(col.name)) {
+            return formatAmount(
+              typeof col.field === "function" ? col.field(row) : row[col.field]
+            );
+          }
+          return typeof col.field === "function"
+            ? col.field(row)
+            : row[col.field];
+        })
+      );
+    }
+  });
+
+  // Generate table with updated columnStyles
+  autoTable(doc, {
+    head: [headerRow],
+    body: exportData,
+    startY: 20,
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
+    columnStyles: columnStyles,
+    theme: "striped",
+  });
+
+  // Save the PDF
+  doc.save("transactions_report.pdf");
 };
 </script>
 

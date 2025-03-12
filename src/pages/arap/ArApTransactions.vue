@@ -1,6 +1,6 @@
 <template>
   <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg">
+    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg hide-print">
       <q-expansion-item
         :label="t('Search Params')"
         header-class="lightbg maintext"
@@ -268,12 +268,20 @@
 
     <!-- Results Table -->
     <div v-if="results.length > 0">
-      <q-btn
-        label="Download Report"
-        @click="downloadTransactions"
-        color="accent"
-        class="q-mt-sm"
-      />
+      <div class="row q-mb-sm hide-print">
+        <q-btn
+          :label="t('Export')"
+          @click="downloadExcel"
+          class="q-mr-sm"
+          color="accent"
+        />
+        <q-btn
+          :label="t('Print')"
+          @click="downloadPDF"
+          class="q-mr-sm"
+          color="info"
+        />
+      </div>
       <q-table
         class="q-mt-sm"
         :rows="filteredResults"
@@ -283,7 +291,7 @@
         bordered
         dense
         :rows-per-page-options="[0]"
-        virtual-scroll
+        :virtual-scroll="!printMode"
         virtual-scroll-sticky-end
         hide-bottom
       >
@@ -374,7 +382,7 @@ import { api } from "src/boot/axios";
 import { Cookies, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
-import { formatAmount, downloadReport } from "src/helpers/utils";
+import { formatAmount, downloadReport, createPDF } from "src/helpers/utils";
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
@@ -899,10 +907,24 @@ const getPath = (row) => {
   };
 };
 
-const downloadTransactions = () => {
+const downloadExcel = () => {
   downloadReport(filteredResults.value, columns.value, totals.value);
 };
+const title = inject("title");
+const downloadPDF = () => {
+  const params = {};
 
+  type.value === "customer" ? "Customer Transactions" : "Vendor Transactions";
+  createPDF(
+    filteredResults.value,
+    columns.value,
+    totals.value,
+    title.value,
+    params
+  );
+};
+
+const printMode = inject("printToggle");
 onMounted(async () => {
   processFilters();
   await fetchAccounts();

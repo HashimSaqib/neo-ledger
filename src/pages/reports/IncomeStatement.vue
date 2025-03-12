@@ -253,6 +253,10 @@
       class="shadow-2"
       ref="reportContent"
     >
+      <q-card-actions class="q-pa-sm no-print">
+        <q-btn :label="t('Export')" @click="downloadExcel" color="accent" />
+        <q-btn :label="t('Print')" @click="triggerPrint" color="info" />
+      </q-card-actions>
       <!-- Report Header -->
       <q-card-section v-if="results.company" class="mutedbg">
         <div class="text-center q-pa-sm">
@@ -429,12 +433,6 @@
           </q-item-section>
         </q-item>
       </q-card-section>
-
-      <!-- Report Actions -->
-      <q-card-actions class="q-pa-sm">
-        <q-btn icon="print" :label="t('Print')" @click="triggerPrint" />
-        <q-btn :label="t('Export')" @click="downloadExcel" />
-      </q-card-actions>
     </q-card>
   </q-page>
 </template>
