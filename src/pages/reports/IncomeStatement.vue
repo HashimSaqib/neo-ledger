@@ -79,109 +79,155 @@
             </div>
           </div>
 
-          <!-- Custom Periods Section -->
+          <!-- Custom Periods Section with Drag & Drop -->
           <div class="q-mt-md">
             <div class="text-h6">{{ t("Custom Periods") }}</div>
-            <div
-              v-for="(period, index) in formData.periods"
-              :key="index"
-              class="row q-gutter-sm q-mt-xs items-center"
+            <!-- draggable component wraps the period list -->
+            <draggable
+              v-model="formData.periods"
+              group="periods"
+              handle=".drag-handle"
             >
-              <!-- For "Current" mode: only a year dropdown -->
-              <template v-if="formData.periodMode === 'current'">
-                <div class="col-12 col-md-3">
-                  <q-select
-                    v-model="period.year"
-                    :options="yearOptions"
-                    outlined
-                    dense
-                    :label="t('Year')"
-                    emit-value
-                    map-options
-                    @update:model-value="() => updatePeriod(period)"
-                  />
+              <template #item="{ element, index }">
+                <div class="row q-gutter-sm q-mt-xs items-center">
+                  <!-- Drag handle icon for rearranging -->
+                  <div class="col-auto">
+                    <q-icon
+                      name="drag_indicator"
+                      class="cursor-move drag-handle"
+                    />
+                  </div>
+                  <!-- Current Mode: only year -->
+                  <template v-if="formData.periodMode === 'current'">
+                    <div class="col-12 col-md-3">
+                      <s-select
+                        v-model="element.year"
+                        :options="yearOptions"
+                        outlined
+                        dense
+                        :label="t('Year')"
+                        emit-value
+                        map-options
+                        @update:model-value="() => updatePeriod(element)"
+                        search="label"
+                      />
+                    </div>
+                  </template>
+                  <!-- Monthly Mode: month and year -->
+                  <template v-else-if="formData.periodMode === 'monthly'">
+                    <div class="col-12 col-md-3">
+                      <s-select
+                        v-model="element.month"
+                        :options="monthOptions"
+                        outlined
+                        dense
+                        :label="t('Month')"
+                        emit-value
+                        map-options
+                        @update:model-value="() => updatePeriod(element)"
+                        search="label"
+                      />
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <s-select
+                        v-model="element.year"
+                        :options="yearOptions"
+                        outlined
+                        dense
+                        :label="t('Year')"
+                        emit-value
+                        map-options
+                        @update:model-value="() => updatePeriod(element)"
+                        search="label"
+                      />
+                    </div>
+                  </template>
+                  <!-- Quarterly Mode: quarter and year -->
+                  <template v-else-if="formData.periodMode === 'quarterly'">
+                    <div class="col-12 col-md-3">
+                      <s-select
+                        v-model="element.quarter"
+                        :options="quarterOptions"
+                        outlined
+                        dense
+                        :label="t('Quarter')"
+                        emit-value
+                        map-options
+                        @update:model-value="() => updatePeriod(element)"
+                        search="label"
+                      />
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <s-select
+                        v-model="element.year"
+                        :options="yearOptions"
+                        outlined
+                        dense
+                        :label="t('Year')"
+                        emit-value
+                        map-options
+                        @update:model-value="() => updatePeriod(element)"
+                        search="label"
+                      />
+                    </div>
+                  </template>
+                  <!-- Yearly Mode: only year -->
+                  <template v-else-if="formData.periodMode === 'yearly'">
+                    <div class="col-12 col-md-3">
+                      <s-select
+                        v-model="element.year"
+                        :options="yearOptions"
+                        outlined
+                        dense
+                        :label="t('Year')"
+                        emit-value
+                        map-options
+                        @update:model-value="() => updatePeriod(element)"
+                        search="label"
+                      />
+                    </div>
+                  </template>
+                  <!-- Custom Mode: date pickers for fromdate & todate -->
+                  <template v-else-if="formData.periodMode === 'custom'">
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="element.fromdate"
+                        type="date"
+                        outlined
+                        dense
+                        :label="t('From Date')"
+                        @update:model-value="() => updatePeriod(element)"
+                      />
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="element.todate"
+                        type="date"
+                        outlined
+                        dense
+                        :label="t('To Date')"
+                        @update:model-value="() => updatePeriod(element)"
+                      />
+                    </div>
+                    <!-- Hidden input to store the automatic label -->
+                    <div style="display: none">
+                      <q-input v-model="element.label" readonly />
+                    </div>
+                  </template>
+
+                  <!-- Delete Button -->
+                  <div class="col-12 col-md-1">
+                    <q-btn
+                      icon="delete"
+                      color="negative"
+                      flat
+                      round
+                      @click="removePeriod(index)"
+                    />
+                  </div>
                 </div>
               </template>
-              <!-- For "Monthly" mode: month and year dropdowns -->
-              <template v-else-if="formData.periodMode === 'monthly'">
-                <div class="col-12 col-md-3">
-                  <q-select
-                    v-model="period.month"
-                    :options="monthOptions"
-                    outlined
-                    dense
-                    :label="t('Month')"
-                    emit-value
-                    map-options
-                    @update:model-value="() => updatePeriod(period)"
-                  />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-select
-                    v-model="period.year"
-                    :options="yearOptions"
-                    outlined
-                    dense
-                    :label="t('Year')"
-                    emit-value
-                    map-options
-                    @update:model-value="() => updatePeriod(period)"
-                  />
-                </div>
-              </template>
-              <!-- For "Quarterly" mode: quarter and year dropdowns -->
-              <template v-else-if="formData.periodMode === 'quarterly'">
-                <div class="col-12 col-md-3">
-                  <q-select
-                    v-model="period.quarter"
-                    :options="quarterOptions"
-                    outlined
-                    dense
-                    :label="t('Quarter')"
-                    emit-value
-                    map-options
-                    @update:model-value="() => updatePeriod(period)"
-                  />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-select
-                    v-model="period.year"
-                    :options="yearOptions"
-                    outlined
-                    dense
-                    :label="t('Year')"
-                    emit-value
-                    map-options
-                    @update:model-value="() => updatePeriod(period)"
-                  />
-                </div>
-              </template>
-              <!-- For "Yearly" mode: only a year dropdown -->
-              <template v-else-if="formData.periodMode === 'yearly'">
-                <div class="col-12 col-md-3">
-                  <q-select
-                    v-model="period.year"
-                    :options="yearOptions"
-                    outlined
-                    dense
-                    :label="t('Year')"
-                    emit-value
-                    map-options
-                    @update:model-value="() => updatePeriod(period)"
-                  />
-                </div>
-              </template>
-              <!-- Delete Button -->
-              <div class="col-12 col-md-1">
-                <q-btn
-                  icon="delete"
-                  color="negative"
-                  flat
-                  round
-                  @click="removePeriod(index)"
-                />
-              </div>
-            </div>
+            </draggable>
             <q-btn
               icon="add"
               :label="t('Add Period')"
@@ -278,7 +324,6 @@
         <!-- Income Section -->
         <div>
           <q-item class="q-pa-xs q-my-none">
-            <!-- When showing accnos, we now display them as a link -->
             <q-item-section v-if="formData.l_accno" avatar></q-item-section>
             <q-item-section>{{ t("Description") }}</q-item-section>
             <q-item-section
@@ -301,7 +346,6 @@
                 }"
               >
                 <q-item-section v-if="formData.l_accno" avatar>
-                  <!-- Render accno as a link using getPath -->
                   <router-link
                     :to="getPath(account.accno)"
                     target="_blank"
@@ -362,7 +406,6 @@
                 }"
               >
                 <q-item-section v-if="formData.l_accno" avatar>
-                  <!-- Render accno as a link using getPath -->
                   <router-link
                     :to="getPath(account.accno)"
                     target="_blank"
@@ -438,24 +481,29 @@
 </template>
 
 <script setup>
+// Imports and dependency registration
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { date } from "quasar";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import { formatAmount, roundAmount } from "src/helpers/utils.js";
+import { utils, writeFile } from "xlsx";
+// Import draggable for drag & drop functionality
+import draggable from "vuedraggable";
+
 const triggerPrint = inject("triggerPrint");
 const updateTitle = inject("updateTitle");
 updateTitle("Income Statement");
 const printToggle = inject("printToggle");
-import { utils, writeFile } from "xlsx";
+
 const { t } = useI18n();
 const route = useRoute();
-
 const now = new Date();
 const currentYear = String(now.getFullYear());
 const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
 
+// Main form data
 const formData = ref({
   department: route.query.department || "",
   projectnumber: route.query.projectnumber || "",
@@ -469,21 +517,20 @@ const formData = ref({
   previousyear: "0",
   reversedisplay: false,
   accounttype: "standard",
-  periodMode: "current", // Options: current, monthly, quarterly, yearly
+  periodMode: "current", // Options: current, monthly, quarterly, yearly, custom
   periods: [],
 });
 
-onMounted(() => {
-  if (route.query.fromdate || route.query.todate) {
-    search();
-  }
-  fetchLinks();
-  if (formData.value.periods.length === 0) {
-    addPeriod();
-  }
-});
+// Options for period modes, including the new "custom" option
+const periodModeOptions = [
+  { label: t("Current"), value: "current" },
+  { label: t("Monthly"), value: "monthly" },
+  { label: t("Quarterly"), value: "quarterly" },
+  { label: t("Yearly"), value: "yearly" },
+  { label: t("Custom"), value: "custom" },
+];
 
-const currencies = ref([]);
+// Options for months, years, and quarters
 const monthOptions = Array.from({ length: 12 }, (_, i) => ({
   value: String(i + 1).padStart(2, "0"),
   label: date.formatDate(new Date(2000, i, 1), "MMMM"),
@@ -494,13 +541,6 @@ const yearOptions = Array.from({ length: 5 }, (_, i) => {
   return { value: yr, label: yr };
 });
 
-const periodModeOptions = [
-  { label: t("Current"), value: "current" },
-  { label: t("Monthly"), value: "monthly" },
-  { label: t("Quarterly"), value: "quarterly" },
-  { label: t("Yearly"), value: "yearly" },
-];
-
 const quarterOptions = [
   { label: "Q1", value: "Q1" },
   { label: "Q2", value: "Q2" },
@@ -510,8 +550,12 @@ const quarterOptions = [
 
 const departments = ref([]);
 const projects = ref([]);
+const currencies = ref([]);
 const filtersOpen = ref(true);
+const loading = ref(false);
+const results = ref({});
 
+// Computed property to format the date range from periods
 const formattedDateRange = computed(() => {
   if (formData.value.periods.length) {
     return formData.value.periods.map((p) => p.label).join(", ");
@@ -519,6 +563,7 @@ const formattedDateRange = computed(() => {
   return t("N/A");
 });
 
+// Update period details based on current mode
 const updatePeriod = (period) => {
   if (formData.value.periodMode === "current") {
     if (period.year) {
@@ -569,30 +614,61 @@ const updatePeriod = (period) => {
       period.todate = period.year + "1231";
       period.label = period.year;
     }
+  } else if (formData.value.periodMode === "custom") {
+    if (period.fromdate && period.todate) {
+      period.label = period.fromdate + " - " + period.todate;
+    }
   }
 };
 
+// Add a new period line
+// If a period already exists, clone its values; otherwise, set defaults.
 const addPeriod = () => {
-  let newPeriod = { fromdate: "", todate: "", label: "" };
-  if (formData.value.periodMode === "current") {
-    newPeriod.year = currentYear;
-  } else if (formData.value.periodMode === "monthly") {
-    newPeriod.month = currentMonth;
-    newPeriod.year = currentYear;
-  } else if (formData.value.periodMode === "quarterly") {
-    newPeriod.quarter = "Q1";
-    newPeriod.year = currentYear;
-  } else if (formData.value.periodMode === "yearly") {
-    newPeriod.year = currentYear;
+  let newPeriod = {};
+  if (formData.value.periods.length > 0) {
+    const lastPeriod =
+      formData.value.periods[formData.value.periods.length - 1];
+    newPeriod = { ...lastPeriod };
+  } else {
+    if (formData.value.periodMode === "current") {
+      newPeriod = { year: currentYear, fromdate: "", todate: "", label: "" };
+    } else if (formData.value.periodMode === "monthly") {
+      newPeriod = {
+        month: currentMonth,
+        year: currentYear,
+        fromdate: "",
+        todate: "",
+        label: "",
+      };
+    } else if (formData.value.periodMode === "quarterly") {
+      newPeriod = {
+        quarter: "Q1",
+        year: currentYear,
+        fromdate: "",
+        todate: "",
+        label: "",
+      };
+    } else if (formData.value.periodMode === "yearly") {
+      newPeriod = { year: currentYear, fromdate: "", todate: "", label: "" };
+    } else if (formData.value.periodMode === "custom") {
+      const today = date.formatDate(new Date(), "YYYY-MM-DD");
+      newPeriod = {
+        fromdate: today,
+        todate: today,
+        label: today + " - " + today,
+      };
+    }
   }
   formData.value.periods.push(newPeriod);
   updatePeriod(newPeriod);
 };
 
+// Remove a period line
 const removePeriod = (index) => {
   formData.value.periods.splice(index, 1);
 };
 
+// Sum amounts for a given period label from an array of accounts
 const sumAccounts = (accountsArray, periodLabel) => {
   return accountsArray.reduce((sum, account) => {
     const amount = account.periods[periodLabel]?.amount || 0;
@@ -600,12 +676,14 @@ const sumAccounts = (accountsArray, periodLabel) => {
   }, 0);
 };
 
+// Calculate net income from income and expense accounts for a period
 const netIncome = (periodLabel) => {
   const incomeSum = sumAccounts(incomeAccounts.value, periodLabel);
   const expenseSum = sumAccounts(expenseAccounts.value, periodLabel);
   return incomeSum + expenseSum;
 };
 
+// Execute search/report generation
 const search = async () => {
   try {
     loading.value = true;
@@ -620,8 +698,6 @@ const search = async () => {
     loading.value = false;
   }
 };
-
-const results = ref({});
 
 // Helper function to build the trial transaction URL from the first period
 const getPath = (accno) => {
@@ -640,6 +716,7 @@ const getPath = (accno) => {
   )}`;
 };
 
+// Compute income accounts from results
 const incomeAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
   return Object.keys(rawAccounts).reduce((acc, accno) => {
@@ -662,6 +739,7 @@ const incomeAccounts = computed(() => {
   }, []);
 });
 
+// Compute expense accounts from results
 const expenseAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
   return Object.keys(rawAccounts).reduce((acc, accno) => {
@@ -684,6 +762,7 @@ const expenseAccounts = computed(() => {
   }, []);
 });
 
+// Fetch lookup data for links and select options
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/incomestatement");
@@ -802,6 +881,7 @@ const downloadExcel = () => {
   writeFile(workbook, "income_statement.xlsx", { compression: true });
 };
 
+// Watch for changes in period mode and reset periods accordingly
 watch(
   () => formData.value.periodMode,
   () => {
@@ -810,8 +890,17 @@ watch(
   }
 );
 
-const loading = ref(false);
+onMounted(() => {
+  if (route.query.fromdate || route.query.todate) {
+    search();
+  }
+  fetchLinks();
+  if (formData.value.periods.length === 0) {
+    addPeriod();
+  }
+});
 </script>
+
 <style scoped>
 @media print {
   .q-page {
