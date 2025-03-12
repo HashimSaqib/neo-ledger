@@ -1,23 +1,26 @@
 <template>
   <q-page class="lightbg q-px-md q-py-md relative-position">
     <!-- Actions: Print PDF & Export -->
-    <div class="q-mb-md hide-print">
-      <q-btn
-        flat
-        round
-        icon="print"
-        label="Print PDF"
-        class="q-mr-sm"
-        @click="triggerPrint"
-        q
-      />
-      <q-btn flat round icon="save" label="Export" @click="downloadExcel" />
-    </div>
+
     <h6 class="q-my-none q-py-none">
       {{ `Account ${accno} - ${description}` }}
     </h6>
     <!-- Transactions Table -->
     <div v-if="filteredResults.length > 0" class="q-mt-sm">
+      <div class="row q-mb-sm hide-print">
+        <q-btn
+          :label="t('Export')"
+          @click="downloadExcel"
+          class="q-mr-sm"
+          color="accent"
+        />
+        <q-btn
+          :label="t('Print')"
+          @click="downloadPDF"
+          class="q-mr-sm"
+          color="info"
+        />
+      </div>
       <q-table
         table-class="mainbg maintext"
         :rows="filteredResults"
@@ -88,10 +91,11 @@
 /* Imports & Dependencies */
 import { ref, computed, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, createPDF } from "src/helpers/utils";
 import { useRoute } from "vue-router";
 import { utils, writeFile } from "xlsx";
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 /* Update Page Title & Inject Print Function */
 const updateTitle = inject("updateTitle");
 updateTitle("Transactions");
@@ -337,6 +341,10 @@ const downloadExcel = () => {
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, worksheet, "Trial Transactions");
   writeFile(workbook, "trial_transactions.xlsx", { compression: true });
+};
+const title = inject("title");
+const downloadPDF = () => {
+  createPDF(filteredResults.value, columns.value, [], title.value);
 };
 </script>
 

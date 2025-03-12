@@ -130,7 +130,16 @@ export const createPDF = (
   const headerRow = columns.map((col) => col.label);
 
   // Identify number columns for right alignment
-  const numberColumns = ["amount", "netamount", "paid", "tax", "paymentdiff"];
+  const numberColumns = [
+    "amount",
+    "netamount",
+    "paid",
+    "tax",
+    "paymentdiff",
+    "debit",
+    "credit",
+    "balance",
+  ];
 
   // Map filteredResults into rows where cell order matches the header order
   const dataRows = filteredResults.map((row) =>
