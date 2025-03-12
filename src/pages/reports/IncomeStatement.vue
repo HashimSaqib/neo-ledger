@@ -13,34 +13,39 @@
           <!-- Filters Section -->
           <div class="row q-gutter-sm q-mt-none">
             <div class="col-12 col-md-3">
-              <q-select
+              <s-select
                 v-if="departments.length > 0"
                 v-model="formData.department"
                 :options="departments"
                 :label="t('Department')"
+                option-value="sinumber"
                 option-label="description"
                 outlined
                 dense
                 clearable
                 emit-value
                 map-options
+                search="description"
               />
             </div>
             <div class="col-12 col-md-3">
-              <q-select
+              <s-select
                 v-model="formData.projectnumber"
                 :options="projects"
                 option-label="description"
+                option-value="projectnumber"
                 :label="t('Project')"
                 outlined
                 dense
                 clearable
                 emit-value
                 map-options
+                s
+                search="description"
               />
             </div>
             <div class="col-12 col-md-3">
-              <q-select
+              <s-select
                 v-model="formData.currency"
                 :options="currencies"
                 option-value="curr"
@@ -50,6 +55,7 @@
                 outlined
                 dense
                 :label="t('Currency')"
+                search="curr"
               />
             </div>
             <div class="col-12 col-md-3">
@@ -95,6 +101,7 @@
                     <q-icon
                       name="drag_indicator"
                       class="cursor-move drag-handle"
+                      size="sm"
                     />
                   </div>
                   <!-- Current Mode: only year -->
@@ -925,6 +932,9 @@ onMounted(() => {
 .border-top {
   border-top: 2px solid #eee;
   padding-top: 1rem;
+}
+.drag-handle:hover {
+  cursor: grab;
 }
 @media (max-width: 600px) {
   .text-h4 {
