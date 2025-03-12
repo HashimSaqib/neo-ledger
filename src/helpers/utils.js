@@ -174,9 +174,7 @@ export const createPDF = (
     columnStyles: Object.fromEntries(
       columns.map((col, index) => [
         index,
-        numberColumns.includes(col.name) || col.name === "description"
-          ? { halign: "right" }
-          : {},
+        numberColumns.includes(col.name) ? { halign: "right" } : {},
       ])
     ),
   });

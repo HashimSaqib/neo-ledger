@@ -200,16 +200,16 @@
     <!-- New action buttons: Export and clear accno filter -->
     <div class="row items-center q-mt-md no-print">
       <q-btn
-        label="Print"
-        color="primary"
-        @click="createPDF"
+        label="Export"
+        color="accent"
+        @click="downloadTransactions"
         class="q-mx-sm"
         v-if="results.length > 0"
       />
       <q-btn
-        label="Export"
-        color="accent"
-        @click="downloadTransactions"
+        label="Print"
+        color="primary"
+        @click="createPDF"
         class="q-mx-sm"
         v-if="results.length > 0"
       />

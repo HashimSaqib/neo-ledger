@@ -166,7 +166,7 @@
         />
         <q-btn
           :label="t('Print')"
-          @click="triggerPrint"
+          @click="createPDF"
           class="q-mr-sm"
           color="info"
         />
@@ -648,6 +648,84 @@ const downloadExcel = () => {
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, worksheet, "AR Transactions");
   writeFile(workbook, `${vcType.value}_history.xlsx`, { compression: true });
+};
+
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+const title = inject("title");
+const createPDF = () => {
+  const doc = new jsPDF({ orientation: "landscape" });
+  let yPosition = 10; // Track vertical position
+  doc.setFontSize(18);
+  // Center the title on the page
+  doc.text(title.value, doc.internal.pageSize.width / 2, yPosition, {
+    align: "center",
+  });
+  doc.setFontSize(16);
+
+  // Extract headers from the finalColumns computed property
+  const headerRow = finalColumns.value.map((col) => col.label);
+  const exportData = [];
+
+  // Define numeric columns to apply right alignment in PDF cells
+  const numericColumns = ["sellprice", "discount", "total"];
+  const columnStyles = {};
+  finalColumns.value.forEach((col, index) => {
+    columnStyles[index] = numericColumns.includes(col.name)
+      ? { halign: "right" }
+      : { halign: "left" };
+  });
+
+  // Process table rows to build the export data
+  processedResults.value.forEach((row) => {
+    if (row.type === "groupHeader") {
+      exportData.push([
+        {
+          content: `${row.name} ${row.address}`.trim(),
+          colSpan: headerRow.length,
+          styles: { fontStyle: "bold" },
+        },
+      ]);
+    } else if (row.type === "groupSubtotal") {
+      exportData.push(
+        finalColumns.value.map((col) => {
+          if (numericColumns.includes(col.name))
+            return formatAmount(row[col.name]);
+          if (col.name === "description") return row.label;
+          return "";
+        })
+      );
+    } else {
+      exportData.push(
+        finalColumns.value.map((col) => {
+          if (col.name === "reference") return row.reference;
+          if (col.name === "accno") return row.accno;
+          if (numericColumns.includes(col.name)) {
+            return formatAmount(
+              typeof col.field === "function" ? col.field(row) : row[col.field]
+            );
+          }
+          return typeof col.field === "function"
+            ? col.field(row)
+            : row[col.field];
+        })
+      );
+    }
+  });
+
+  // Use autoTable to generate a table in the PDF with the correct styles
+  autoTable(doc, {
+    head: [headerRow],
+    body: exportData,
+    startY: 20,
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
+    columnStyles: columnStyles,
+    theme: "striped",
+  });
+
+  // Trigger the download of the PDF file
+  doc.save("transactions_report.pdf");
 };
 </script>
 
