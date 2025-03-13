@@ -618,7 +618,12 @@
 
       <div class="row justify-start q-mt-md">
         <!-- Changed click event to submitForm -->
-        <q-btn label="Save" @click="submitForm" color="primary" />
+        <q-btn :label="t('Save')" @click="submitForm(false)" color="primary" />
+        <q-btn
+          :label="t('Save As New')"
+          @click="submitForm(true)"
+          class="q-mx-sm"
+        />
       </div>
     </q-form>
   </q-page>
@@ -629,7 +634,8 @@ import { ref, onMounted, inject, nextTick, computed } from "vue";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useRoute } from "vue-router";
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const route = useRoute();
 // -------------------------
 // Transaction Type & Page Title
@@ -851,7 +857,7 @@ const loadData = async () => {
     });
   }
 };
-const submitForm = async () => {
+const submitForm = async (isNew = false) => {
   if (!form.value.partnumber || !form.value.description) {
     Notify.create({
       message: "Please fill in the required fields",
@@ -947,16 +953,17 @@ const submitForm = async () => {
   convertBooleans(postData);
 
   const id = componentId.value;
-
+  postData.id = id;
   postData.item = componentType.value;
 
+  let response;
   try {
-    if (id) {
+    if (id && !isNew) {
       // Update existing item
-      await api.post(`/ic/items/${id}`, postData);
+      response = await api.post(`/ic/items/${id}`, postData);
     } else {
       // Create a new item
-      await api.post("/ic/items", postData);
+      response = await api.post("/ic/items", postData);
     }
 
     Notify.create({
@@ -964,11 +971,21 @@ const submitForm = async () => {
       type: "positive",
       position: "center",
     });
-
-    await loadData();
+    const fetchId = response.data.id;
+    if (fetchId) {
+      console.log("hello");
+      componentId.value = fetchId;
+      await loadData();
+      emit("saved");
+    }
   } catch (error) {
+    const errorMessage =
+      error?.response?.data?.error ||
+      error.message ||
+      "An unexpected error occurred";
+
     Notify.create({
-      message: "Error saving Part/Service",
+      message: `Error saving Part/Service: ${errorMessage}`,
       type: "negative",
       position: "center",
     });

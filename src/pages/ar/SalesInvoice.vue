@@ -1,7 +1,9 @@
 <template>
   <q-page class="q-pa-sm relative-position">
+    <!-- Main Form Header Section -->
     <div class="mainbg textmain q-pa-md-sm q-pa-sm">
       <div class="row justify-between full-width">
+        <!-- Customer Selection and Information -->
         <div class="col-sm-6 col-12">
           <div class="row full-width">
             <s-select
@@ -54,6 +56,7 @@
             </p>
           </div>
 
+          <!-- Record Account & Currency Selection -->
           <div class="row">
             <s-select
               outlined
@@ -94,6 +97,8 @@
               v-model="exchangeRate"
             />
           </div>
+
+          <!-- Additional Header Fields -->
           <div class="row q-mb-sm">
             <q-input
               outlined
@@ -103,6 +108,7 @@
               label-color="secondary"
               class="col-sm-10 col-12"
               dense
+              autogrow
             />
           </div>
           <div class="row q-gutter-x-sm">
@@ -154,6 +160,8 @@
             />
           </div>
         </div>
+
+        <!-- Invoice Number and Date Fields -->
         <div class="col-sm-4 col-12">
           <div class="row justify-around">
             <q-input
@@ -201,6 +209,7 @@
         </div>
       </div>
     </div>
+
     <!-- Line Items Section -->
     <div class="mainbg q-my-sm q-pa-sm">
       <div class="row q-mb-md">
@@ -223,13 +232,12 @@
       >
         <template #item="{ element: line, index }">
           <div :key="line.id">
-            <!-- Main line fields -->
+            <!-- Main Line Fields -->
             <div
               class="row justify-between align-center"
               :class="line.lineitemdetail ? '' : 'q-mb-sm'"
             >
               <s-select
-                v
                 :key="line.id"
                 outlined
                 v-model="line.partnumber"
@@ -245,13 +253,8 @@
                 search="label"
                 :ref="(el) => (lineSelects[index] = el)"
               />
-              <a
-                class="btn btn-primary"
-                v-if="line.partnumber"
-                style="text-decoration: none"
-              >
-                ?</a
-              >
+              <!-- Edit Product Button -->
+
               <s-select
                 v-if="!line.partnumber"
                 :key="line.id"
@@ -344,8 +347,20 @@
                 bg-color="input"
                 label-color="secondary"
                 readonly
+                class="col-1"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
+              <q-btn
+                flat
+                dense
+                icon="question_mark"
+                size="0.4rem"
+                href="#"
+                @click.prevent="openEditPart(line)"
+                class="text-primary items-center"
+                v-if="line.partnumber"
+              />
+
               <q-btn
                 flat
                 dense
@@ -362,6 +377,7 @@
               />
             </div>
 
+            <!-- Detailed Line Item Section -->
             <div v-if="line.lineitemdetail" class="row q-pa-sm q-gutter-xs">
               <s-select
                 outlined
@@ -481,6 +497,7 @@
         </template>
       </draggable>
 
+      <!-- Invoice Totals and Notes -->
       <div class="row justify-between items-end">
         <div class="col">
           <q-input
@@ -530,7 +547,6 @@
               </p>
             </div>
           </div>
-
           <div
             class="row justify-end maintext"
             v-for="tax in invoiceTaxes"
@@ -558,6 +574,7 @@
         </div>
       </div>
     </div>
+
     <!-- Payment Section -->
     <div class="mainbg q-my-sm q-pa-sm">
       <div class="row q-mb-md">
@@ -652,6 +669,8 @@
         />
       </div>
     </div>
+
+    <!-- Print Options Section (shown if invoice exists) -->
     <div class="row q-gutter-x-md" v-if="invId">
       <q-select
         :options="['Invoice']"
@@ -691,6 +710,8 @@
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
+
+    <!-- Customer Dialog for Adding/Editing Customer -->
     <q-dialog v-model="customerDialog">
       <q-card style="min-width: 80vw" class="q-pa-none">
         <q-card-section class="q-pa-none">
@@ -703,10 +724,31 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- Product (Part) Dialog for Editing Products -->
+    <q-dialog v-model="partDialog">
+      <q-card style="min-width: 80vw" class="q-pa-none">
+        <q-card-section class="q-pa-none">
+          <AddPart
+            :id="
+              selectedPartLine && selectedPartLine.partnumber
+                ? selectedPartLine.partnumber.id
+                : null
+            "
+            :type="selectedPartType"
+            @close="closePartDialog"
+            @saved="partSaved"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
+// =====================
+// Imports & Initialization
+// =====================
 import {
   ref,
   onMounted,
@@ -724,35 +766,84 @@ import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import AddPart from "src/pages/goodservices/AddPart.vue";
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const loading = ref(false);
 const updateTitle = inject("updateTitle");
+
+// =====================
+// Dialogs: Customer & Product
+// =====================
+// Customer Dialog
+const customerDialog = ref(false);
+const dialogMode = ref("add"); // "add" or "edit"
+
+// Product (Part) Dialog
+const partDialog = ref(false);
+const selectedPartLine = ref(null);
+const selectedPartType = ref("");
+
+// Open Customer Dialogs
+const openAddCustomer = () => {
+  dialogMode.value = "add";
+  customerDialog.value = true;
+};
+const openEditCustomer = () => {
+  if (!selectedCustomer.value) return;
+  dialogMode.value = "edit";
+  customerDialog.value = true;
+};
+
+// Open Product (Part) Dialog for Editing
+const openEditPart = (line) => {
+  selectedPartLine.value = line;
+  // Determine type based on inventory_accno_id property
+  selectedPartType.value =
+    line.partnumber && line.partnumber.inventory_accno_id ? "part" : "service";
+  partDialog.value = true;
+};
+const closePartDialog = () => {
+  partDialog.value = false;
+};
+const partSaved = async () => {
+  // When a part is saved, re-fetch the items list.
+  await fetchItems();
+  partDialog.value = false;
+};
+
+// =====================
+// Title & Invoice Type Setup
+// =====================
 const printOptions = ref({
   type: "Invoice",
   format: "PDF",
   location: "Download",
 });
-// Set title based on invoice type
 updateTitle("Customer Invoice");
 if (route.query.credit_invoice) {
   updateTitle("Credit Invoice");
 }
+const invType = ref(route.query.credit_invoice ? "credit_invoice" : "invoice");
 
-// Unique line id counter
+// =====================
+// Counters & Refs for Dynamic Elements
+// =====================
 let lineId = 1;
-
-// Dragging flag for reordering
 const dragging = ref(false);
-
-// Refs for auto-focusing newly added items
 const lineSelects = ref([]);
 const paymentDateInputs = ref([]);
+const descriptionInputs = ref([]);
+
+// =====================
+// Data: Customers, Items, Accounts, Links, and Currencies
+// =====================
 
 // Customers
 const customers = ref([]);
 const selectedCustomer = ref();
+const customer = ref();
 const fetchCustomers = async () => {
   try {
     const response = await api.get("/arap/list/customer");
@@ -761,7 +852,6 @@ const fetchCustomers = async () => {
     console.log(error);
   }
 };
-const customer = ref();
 const fetchCustomer = async (id) => {
   try {
     const response = await api.get(`/arap/list/customer/${id}`);
@@ -771,132 +861,28 @@ const fetchCustomer = async (id) => {
     return null;
   }
 };
-const taxAccounts = ref([]);
 const customerSaved = async (id) => {
-  console.log(id.id);
   await fetchCustomers();
   selectedCustomer.value = customers.value.find((cus) => cus.id == id.id);
-  console.log("SELECTED CUSTOMER");
-  console.log(selectedCustomer.value);
   customerUpdate(id);
   customerDialog.value = false;
 };
 
-const customerUpdate = async (newValue) => {
-  if (!newValue) {
-    customer.value = {};
-    return;
+// Items
+const items = ref([]);
+const fetchItems = async () => {
+  try {
+    const response = await api.get("/items");
+    items.value = response.data.parts.map((item) => ({
+      ...item,
+      label: `${item.partnumber} -- ${item.description}`,
+    }));
+    console.log(items.value);
+  } catch (error) {
+    console.log(error);
   }
-  customer.value = await fetchCustomer(newValue.id);
-  taxAccounts.value = customer.value.taxaccounts
-    ? customer.value.taxaccounts.split(" ")
-    : [];
-  console.log(customer.value);
-  intnotes.value = customer.value.intnotes;
-  const recordAccountAccno = customer.value?.AR?.split("--")[0] ?? "";
-
-  if (recordAccountAccno) {
-    const matchingRecord = recordAccounts.value.find(
-      (account) => account.accno === recordAccountAccno
-    );
-    if (matchingRecord) {
-      recordAccount.value = matchingRecord;
-    } else {
-    }
-  }
-  const paymentAccountAccno =
-    customer.value?.payment_accno?.split("--")[0] || "";
-  defaultPaymentAccount.value =
-    paymentAccounts.value.find(
-      (account) => account.accno === paymentAccountAccno
-    ) || paymentAccounts.value[0];
-
-  payments.value.forEach(
-    (payment) =>
-      payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
-  );
-
-  if (customer.value?.currency) {
-    const customerCurrency = currencies.value.find(
-      (curr) => curr.curr === customer.value.currency
-    );
-    if (customerCurrency) {
-      selectedCurrency.value = customerCurrency;
-    } else {
-      console.warn(
-        `No matching currency found for: ${customer.value.currency}`
-      );
-    }
-  }
-  if (invDate.value) {
-    console.log(invDate.value);
-    const terms = customer.value?.terms ?? 0;
-    const newDueDate = date.addToDate(invDate.value, { days: terms });
-    dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
-
-    console.log(dueDate.value);
-  } else {
-    console.warn("Invalid invoice date");
-  }
-  calculateTaxes();
-};
-const customerDialog = ref(false);
-const dialogMode = ref("add"); // "add" or "edit"
-
-const openAddCustomer = () => {
-  dialogMode.value = "add";
-  customerDialog.value = true;
 };
 
-const openEditCustomer = () => {
-  if (!selectedCustomer.value) return;
-  dialogMode.value = "edit";
-  customerDialog.value = true;
-};
-const resetForm = () => {
-  // Reset basic form fields
-  selectedCustomer.value = null;
-  recordAccount.value = null;
-  selectedCurrency.value = null;
-  shippingPoint.value = "";
-  shipVia.value = "";
-  wayBill.value = "";
-  description.value = "";
-  notes.value = "";
-  intnotes.value = "";
-  invNumber.value = "";
-  ordNumber.value = "";
-  dueDate.value = "";
-  poNumber.value = "";
-
-  lines.value = [
-    {
-      partnumber: null,
-      description: "",
-      qty: 0,
-      oh: "",
-      unit: "",
-      price: 0,
-      discount: 0,
-    },
-  ];
-
-  payments.value = [
-    {
-      date: "",
-      source: "",
-      memo: "",
-      amount: 0,
-      account: { label: "" },
-      exchangerate: 1,
-    },
-  ];
-
-  // Reset exchange rate and tax related fields
-  exchangeRate.value = 1;
-  invoiceTaxes.value = [];
-  taxIncluded.value = false;
-};
 // Accounts
 const recordAccount = ref();
 const recordAccounts = ref([]);
@@ -921,15 +907,17 @@ const fetchAccounts = async () => {
     });
   }
 };
-// Links
+
+// Links & Currencies
 const departments = ref([]);
 const selectedDepartment = ref();
 const projects = ref([]);
 const filteredProjects = ref([]);
+const currencies = ref([]);
+const exchangeRate = ref();
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/customer`);
-    console.log(response.data);
     departments.value = response.data.departments;
     currencies.value = response.data.currencies;
     if (currencies.value) {
@@ -938,70 +926,37 @@ const fetchLinks = async () => {
       );
     }
     projects.value = response.data.projects;
-
     filterProjects();
-    console.log(response.data);
   } catch (error) {
     console.log(error);
   }
 };
-const filterProjects = () => {
-  if (!invDate.value) return;
 
-  filteredProjects.value = projects.value.filter((project) => {
-    const start = project.startdate ? new Date(project.startdate) : null;
-    const end = project.enddate ? new Date(project.enddate) : null;
-    const invDateObj = new Date(invDate.value);
-
-    if (!start && !end) return true;
-    if (!start) return invDateObj <= end;
-    if (!end) return invDateObj >= start;
-
-    return invDateObj >= start && invDateObj <= end;
-  });
-};
-// Currencies
+// =====================
+// Form Fields & Invoice Information
+// =====================
 const selectedCurrency = ref();
-const currencies = ref([]);
-const exchangeRate = ref();
-
-// Other Header Info
 const shippingPoint = ref("");
 const shipVia = ref("");
 const wayBill = ref("");
 const description = ref("");
 const notes = ref("");
 const intnotes = ref("");
+const invNumber = ref("");
+const ordNumber = ref("");
+const poNumber = ref("");
+const invId = ref(route.query.id ? `${route.query.id}` : "");
 
-// Invoice Information
 const { formatDate, addToDate } = date;
 const getTodayDate = () => {
   return formatDate(new Date(), "YYYY-MM-DD");
 };
-
-const invType = ref(route.query.credit_invoice ? "credit_invoice" : "invoice");
-
-const invNumber = ref("");
-const invId = ref(route.query.id ? `${route.query.id}` : "");
-const ordNumber = ref("");
 const invDate = ref(getTodayDate());
 const dueDate = ref(getTodayDate());
-const poNumber = ref("");
 
-const items = ref([]);
-const fetchItems = async () => {
-  try {
-    const response = await api.get("/items");
-    items.value = response.data.parts.map((item) => ({
-      ...item,
-      label: `${item.partnumber} -- ${item.description}`,
-    }));
-    console.log(items.value);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
+// =====================
+// Invoice Lines & Calculations
+// =====================
 const lines = ref([
   {
     id: lineId++,
@@ -1015,16 +970,16 @@ const lines = ref([
     discount: 0,
   },
 ]);
-
+const calculateExtended = (qty, price, discount) => {
+  const baseValue = qty * price;
+  const discountedValue = baseValue - (baseValue * discount) / 100;
+  return discountedValue.toFixed(2);
+};
 const toggleDetail = (line) => {
   line.lineitemdetail = !line.lineitemdetail;
 };
 
-// Lock flags to prevent duplicate additions on enter key
-let lineEnterLock = false;
-let paymentEnterLock = false;
-
-// Function to add a new line at a given index
+// Add/Remove Line Functions
 const addLineAt = (index) => {
   const newLine = {
     id: lineId++,
@@ -1046,132 +1001,33 @@ const addLineAt = (index) => {
     }
   });
 };
-
-// Called when enter is pressed on any field in a line
-const handleLineEnter = (index, event) => {
-  if (lineEnterLock) return;
-  lineEnterLock = true;
-
-  // If Shift is not pressed, prevent new line and move to next line
-  if (!event.shiftKey) {
-    event.preventDefault(); // Prevents adding a new line inside the input
-    event.stopPropagation();
-    addLineAt(index); // Moves to the next line (outside of input)
-  }
-
-  setTimeout(() => {
-    lineEnterLock = false;
-  }, 300);
-};
-
-// Function to add a new line when the Add Line button is clicked
 const addLine = () => {
   addLineAt(lines.value.length - 1);
 };
-
 const removeLine = (index) => {
   if (lines.value.length > 1) {
     lines.value.splice(index, 1);
   }
 };
 
-// Invoice Taxes
-const taxIncluded = ref(false);
-const invoiceTaxes = ref([]);
-const calculateTaxes = () => {
-  invoiceTaxes.value = [];
-
-  lines.value.forEach((line) => {
-    if (!line.partnumber || !line.partnumber.id) {
-      return;
-    }
-
-    const selectedItem = items.value.find(
-      (item) => item.id === line.partnumber.id
-    );
-    if (selectedItem && selectedItem.taxaccounts) {
-      selectedItem.taxaccounts.forEach((taxAccount) => {
-        if (taxAccounts.value.includes(taxAccount)) {
-          const name =
-            customer.value[`${taxAccount}_description`] || "Tax Name Not Found";
-          const taxRate = customer.value[`${taxAccount}_rate`] || 0;
-
-          let taxAmount = 0;
-          let netAmount = parseFloat(line.extended);
-
-          if (taxIncluded.value) {
-            taxAmount = netAmount * (taxRate / (1 + taxRate));
-            netAmount -= taxAmount;
-          } else {
-            taxAmount = netAmount * taxRate;
-          }
-
-          const existingTax = invoiceTaxes.value.find(
-            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(0)}%`
-          );
-
-          if (existingTax) {
-            existingTax.amount += parseFloat(taxAmount.toFixed(2));
-          } else {
-            invoiceTaxes.value.push({
-              name: `${name} ${(taxRate * 100).toFixed(0)}%`,
-              amount: parseFloat(taxAmount.toFixed(2)),
-              acc: taxAccount,
-              rate: taxRate,
-            });
-          }
-        }
-      });
-    }
-  });
-};
-
-const subtotal = computed(() => {
-  let totalValue = lines.value.reduce((acc, line) => {
-    return acc + (parseFloat(line.extended) || 0);
-  }, 0);
-
-  if (taxIncluded.value) {
-    const totalTaxes = invoiceTaxes.value.reduce((acc, tax) => {
-      return acc + (parseFloat(tax.amount) || 0);
-    }, 0);
-
-    totalValue -= totalTaxes;
+// Handle Enter Key for Lines
+let lineEnterLock = false;
+const handleLineEnter = (index, event) => {
+  if (lineEnterLock) return;
+  lineEnterLock = true;
+  if (!event.shiftKey) {
+    event.preventDefault();
+    event.stopPropagation();
+    addLineAt(index);
   }
-
-  return parseFloat(totalValue.toFixed(2));
-});
-
-const taxInclude = () => {
-  calculateTaxes();
+  setTimeout(() => {
+    lineEnterLock = false;
+  }, 300);
 };
 
-const total = computed(() => {
-  const totalTaxes = invoiceTaxes.value.reduce((acc, tax) => {
-    return acc + (parseFloat(tax.amount) || 0);
-  }, 0);
-
-  let totalValue = lines.value.reduce((acc, line) => {
-    return acc + (parseFloat(line.extended) || 0);
-  }, 0);
-
-  if (!taxIncluded.value) {
-    totalValue += totalTaxes;
-  }
-
-  return parseFloat(totalValue.toFixed(2));
-});
-
-const calculateExtended = (qty, price, discount) => {
-  const baseValue = qty * price;
-  const discountedValue = baseValue - (baseValue * discount) / 100;
-  return discountedValue.toFixed(2);
-};
-// ref needed for focus
-const descriptionInputs = ref([]);
+// Handle Line Item Change (update details based on selected item)
 const handleLineItemChange = (newValue, index) => {
   if (dragging.value) return;
-
   if (newValue && newValue.partnumber) {
     if (!newValue.noupdate) {
       const line = lines.value[index];
@@ -1197,7 +1053,105 @@ const handleLineItemChange = (newValue, index) => {
   });
 };
 
-// Payment Data
+// Watch Lines for Recalculation
+watch(
+  lines,
+  (newLines) => {
+    newLines.forEach((line, index) => {
+      line.extended = calculateExtended(
+        line.qty || 1,
+        line.price,
+        line.discount || 0
+      );
+    });
+    calculateTaxes();
+  },
+  { deep: true }
+);
+
+// =====================
+// Taxes & Totals Calculation
+// =====================
+const taxIncluded = ref(false);
+const invoiceTaxes = ref([]);
+const calculateTaxes = () => {
+  if (!customer.value) {
+    return;
+  }
+  invoiceTaxes.value = [];
+  lines.value.forEach((line) => {
+    if (!line.partnumber || !line.partnumber.id) {
+      return;
+    }
+    const selectedItem = items.value.find(
+      (item) => item.id === line.partnumber.id
+    );
+    if (selectedItem && selectedItem.taxaccounts) {
+      selectedItem.taxaccounts.forEach((taxAccount) => {
+        if (
+          customer.value.taxaccounts &&
+          customer.value.taxaccounts.split(" ").includes(taxAccount)
+        ) {
+          const name =
+            customer.value[`${taxAccount}_description`] || "Tax Name Not Found";
+          const taxRate = customer.value[`${taxAccount}_rate`] || 0;
+          let taxAmount = 0;
+          let netAmount = parseFloat(line.extended);
+          if (taxIncluded.value) {
+            taxAmount = netAmount * (taxRate / (1 + taxRate));
+            netAmount -= taxAmount;
+          } else {
+            taxAmount = netAmount * taxRate;
+          }
+          const existingTax = invoiceTaxes.value.find(
+            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(0)}%`
+          );
+          if (existingTax) {
+            existingTax.amount += parseFloat(taxAmount.toFixed(2));
+          } else {
+            invoiceTaxes.value.push({
+              name: `${name} ${(taxRate * 100).toFixed(0)}%`,
+              amount: parseFloat(taxAmount.toFixed(2)),
+              acc: taxAccount,
+              rate: taxRate,
+            });
+          }
+        }
+      });
+    }
+  });
+};
+const taxInclude = () => {
+  calculateTaxes();
+};
+const subtotal = computed(() => {
+  let totalValue = lines.value.reduce((acc, line) => {
+    return acc + (parseFloat(line.extended) || 0);
+  }, 0);
+  if (taxIncluded.value) {
+    const totalTaxes = invoiceTaxes.value.reduce((acc, tax) => {
+      return acc + (parseFloat(tax.amount) || 0);
+    }, 0);
+    totalValue -= totalTaxes;
+  }
+  return parseFloat(totalValue.toFixed(2));
+});
+const total = computed(() => {
+  const totalTaxes = invoiceTaxes.value.reduce((acc, tax) => {
+    return acc + (parseFloat(tax.amount) || 0);
+  }, 0);
+  let totalValue = lines.value.reduce((acc, line) => {
+    return acc + (parseFloat(line.extended) || 0);
+  }, 0);
+  if (!taxIncluded.value) {
+    totalValue += totalTaxes;
+  }
+  return parseFloat(totalValue.toFixed(2));
+});
+
+// =====================
+// Payments Handling
+// =====================
 const payments = ref([
   {
     date: getTodayDate(),
@@ -1207,8 +1161,6 @@ const payments = ref([
     account: defaultPaymentAccount.value,
   },
 ]);
-
-// Function to add a new payment at a given index
 const addPaymentAt = (index) => {
   const newPayment = {
     date: getTodayDate(),
@@ -1227,8 +1179,7 @@ const addPaymentAt = (index) => {
     }
   });
 };
-
-// Called when enter is pressed on any payment field
+let paymentEnterLock = false;
 const handlePaymentEnter = (index, event) => {
   if (paymentEnterLock) return;
   paymentEnterLock = true;
@@ -1239,18 +1190,199 @@ const handlePaymentEnter = (index, event) => {
     paymentEnterLock = false;
   }, 300);
 };
-
-// Function to add a new payment when the Add Payment button is clicked
 const addPayment = () => {
   addPaymentAt(payments.value.length - 1);
 };
-
 const removePayment = (index) => {
   if (payments.value.length > 1) {
     payments.value.splice(index, 1);
   }
 };
 
+// =====================
+// Customer Update & Invoice Loading Functions
+// =====================
+const customerUpdate = async (newValue) => {
+  if (!newValue) {
+    customer.value = {};
+    return;
+  }
+  customer.value = await fetchCustomer(newValue.id);
+  customer.value.taxaccounts = customer.value.taxaccounts || "";
+  const taxAccountsArray = customer.value.taxaccounts.split(" ");
+  const recordAccountAccno = customer.value?.AR?.split("--")[0] ?? "";
+  if (recordAccountAccno) {
+    const matchingRecord = recordAccounts.value.find(
+      (account) => account.accno === recordAccountAccno
+    );
+    if (matchingRecord) {
+      recordAccount.value = matchingRecord;
+    }
+  }
+  const paymentAccountAccno =
+    customer.value?.payment_accno?.split("--")[0] || "";
+  defaultPaymentAccount.value =
+    paymentAccounts.value.find(
+      (account) => account.accno === paymentAccountAccno
+    ) || paymentAccounts.value[0];
+  payments.value.forEach(
+    (payment) =>
+      payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
+  );
+  if (customer.value?.currency) {
+    const customerCurrency = currencies.value.find(
+      (curr) => curr.curr === customer.value.currency
+    );
+    if (customerCurrency) {
+      selectedCurrency.value = customerCurrency;
+    } else {
+      console.warn(
+        `No matching currency found for: ${customer.value.currency}`
+      );
+    }
+  }
+  if (invDate.value) {
+    const terms = customer.value?.terms ?? 0;
+    const newDueDate = date.addToDate(invDate.value, { days: terms });
+    dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
+  } else {
+    console.warn("Invalid invoice date");
+  }
+  calculateTaxes();
+};
+
+const fetchInvoice = async (id) => {
+  if (id) {
+    try {
+      const response = await api.get(`/arap/invoice/customer/${id}`);
+      loadInvoice(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
+const loadInvoice = async (invoice) => {
+  if (
+    customers.value.length === 0 ||
+    items.value.length === 0 ||
+    recordAccounts.value.length === 0 ||
+    currencies.value.length === 0
+  ) {
+    await Promise.all([
+      fetchCustomers(),
+      fetchItems(),
+      fetchAccounts(),
+      fetchLinks(),
+    ]);
+  }
+  selectedCustomer.value = customers.value.find(
+    (cust) => cust.customernumber === invoice.customernumber
+  );
+  if (!selectedCustomer.value) {
+    Notify.create({
+      message: `Customer with number ${invoice.customernumber} not found.`,
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+  await customerUpdate(selectedCustomer.value);
+  recordAccount.value = recordAccounts.value.find(
+    (account) => account.accno === invoice.recordAccount.accno
+  );
+  if (!recordAccount.value) {
+    Notify.create({
+      message: `Sales account ${invoice.recordAccount.accno} not found.`,
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+  if (departments.value?.length) {
+    selectedDepartment.value = departments.value.find(
+      (dpt) => dpt.id === invoice.department_id
+    );
+  }
+  shippingPoint.value = invoice.shippingPoint;
+  shipVia.value = invoice.shipVia;
+  wayBill.value = invoice.wayBill;
+  description.value = invoice.description;
+  notes.value = invoice.notes;
+  intnotes.value = invoice.intnotes;
+  invNumber.value = invoice.invNumber;
+  invId.value = invoice.id;
+  invType.value = invoice.type;
+  ordNumber.value = invoice.ordNumber;
+  invDate.value = invoice.invDate;
+  dueDate.value = invoice.dueDate;
+  poNumber.value = invoice.poNumber;
+  if (invType.value === "credit_invoice") {
+    updateTitle("Credit Invoice");
+  }
+  if (invoice.currency) {
+    selectedCurrency.value = currencies.value.find(
+      (curr) => curr.curr === invoice.currency
+    );
+  }
+  exchangeRate.value = invoice.exchangerate || 1;
+  taxIncluded.value = !!invoice.taxincluded;
+  lines.value = invoice.lines.map((line) => {
+    return {
+      id: lineId++,
+      partnumber: line,
+      description: line.description,
+      qty: line.qty,
+      oh: line.oh,
+      unit: line.unit,
+      price: line.price,
+      discount: line.discount,
+      extended:
+        line.qty * line.price - (line.qty * line.price * line.discount) / 100,
+      lineitemdetail: line.lineitemdetail ? true : false,
+      devliverydate: line.deliverydate,
+      itemnotes: line.itemnotes,
+      ordernumber: line.ordernumber,
+      serialnumber: line.serialnumber,
+      customerponumber: line.customerponumber,
+      costvendor: line.costvendor,
+      package: line.package,
+      volume: line.volume,
+      weight: line.weight,
+      netweight: line.netweight,
+      cost: line.cost,
+      noupdate: true,
+    };
+  });
+  calculateTaxes();
+  payments.value = invoice.payments.map((payment) => {
+    const account = paymentAccounts.value.find(
+      (acc) => acc.id === payment.account || acc.label === payment.account
+    );
+    if (!account) {
+      Notify.create({
+        message: `Payment account ${payment.account} not found.`,
+        type: "negative",
+        position: "center",
+      });
+      return {};
+    }
+    return {
+      date: payment.date,
+      source: payment.source,
+      memo: payment.memo,
+      amount: payment.amount,
+      account: account,
+      exchangerate: payment.exchangerate,
+    };
+  });
+  if (payments.value.length === 0) {
+    addPayment();
+  }
+};
+
+// =====================
+// Print & Post Invoice Functions
+// =====================
 const printInvoice = async () => {
   loading.value = true;
   if (!invId.value) {
@@ -1261,7 +1393,6 @@ const printInvoice = async () => {
     });
     return;
   }
-
   try {
     const response = await api.get(
       `/print_invoice?id=${invId.value}&vc=customer`,
@@ -1269,17 +1400,13 @@ const printInvoice = async () => {
         responseType: "blob",
       }
     );
-
     const blob = new Blob([response.data], { type: "application/pdf" });
-
     const url = window.URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = "invoice.pdf";
     document.body.appendChild(a);
     a.click();
-
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
     loading.value = false;
@@ -1303,7 +1430,6 @@ const postInvoice = async () => {
     });
     return;
   }
-
   if (!recordAccount.value) {
     Notify.create({
       message: t("Account is required."),
@@ -1312,7 +1438,6 @@ const postInvoice = async () => {
     });
     return;
   }
-
   if (!selectedCurrency.value) {
     Notify.create({
       message: t("Currency is required."),
@@ -1321,7 +1446,6 @@ const postInvoice = async () => {
     });
     return;
   }
-
   if (
     lines.value.length === 0 ||
     !lines.value.some((line) => line.partnumber)
@@ -1350,7 +1474,7 @@ const postInvoice = async () => {
     selectedCurrency: selectedCurrency.value,
     type: invType.value,
     lines: lines.value
-      .filter((line) => line.partnumber && line.partnumber.id) // Filter out empty partnumbers
+      .filter((line) => line.partnumber && line.partnumber.id)
       .map((line) => ({
         number: line.partnumber.id,
         description: line.description,
@@ -1381,15 +1505,12 @@ const postInvoice = async () => {
       exchangerate: payment.exchangerate,
     })),
   };
-
   if (selectedDepartment.value) {
     invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;
   }
-
   if (selectedCurrency.value.rn !== 1) {
     invoiceData.exchangerate = exchangeRate.value;
   }
-
   if (invoiceTaxes.value.length > 0) {
     invoiceData.taxes = invoiceTaxes.value.map((tax) => ({
       accno: tax.acc,
@@ -1398,7 +1519,6 @@ const postInvoice = async () => {
     }));
     invoiceData.taxincluded = taxIncluded.value;
   }
-
   console.log("Invoice Data:", invoiceData);
   try {
     loading.value = true;
@@ -1429,173 +1549,62 @@ const postInvoice = async () => {
   }
 };
 
-const fetchInvoice = async (id) => {
-  if (id) {
-    try {
-      const response = await api.get(`/arap/invoice/customer/${id}`);
-      console.log(response.data);
-      loadInvoice(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+// =====================
+// Reset Form Function
+// =====================
+const resetForm = () => {
+  selectedCustomer.value = null;
+  recordAccount.value = null;
+  selectedCurrency.value = null;
+  shippingPoint.value = "";
+  shipVia.value = "";
+  wayBill.value = "";
+  description.value = "";
+  notes.value = "";
+  intnotes.value = "";
+  invNumber.value = "";
+  ordNumber.value = "";
+  dueDate.value = "";
+  poNumber.value = "";
+  lines.value = [
+    {
+      partnumber: null,
+      description: "",
+      qty: 0,
+      oh: "",
+      unit: "",
+      price: 0,
+      discount: 0,
+    },
+  ];
+  payments.value = [
+    {
+      date: "",
+      source: "",
+      memo: "",
+      amount: 0,
+      account: { label: "" },
+      exchangerate: 1,
+    },
+  ];
+  exchangeRate.value = 1;
+  invoiceTaxes.value = [];
+  taxIncluded.value = false;
 };
 
-const loadInvoice = async (invoice) => {
-  if (
-    customers.value.length === 0 ||
-    items.value.length === 0 ||
-    recordAccounts.value.length === 0 ||
-    currencies.value.length === 0
-  ) {
-    await Promise.all([
-      fetchCustomers(),
-      fetchItems(),
-      fetchAccounts(),
-      fetchLinks(),
-    ]);
-  }
-
-  selectedCustomer.value = customers.value.find(
-    (cust) => cust.customernumber === invoice.customernumber
-  );
-
-  if (!selectedCustomer.value) {
-    Notify.create({
-      message: `Customer with number ${invoice.customernumber} not found.`,
-      type: "negative",
-      position: "center",
-    });
-    return;
-  }
-
-  await customerUpdate(selectedCustomer.value);
-
-  recordAccount.value = recordAccounts.value.find(
-    (account) => account.accno === invoice.recordAccount.accno
-  );
-
-  if (!recordAccount.value) {
-    Notify.create({
-      message: `Sales account ${invoice.recordAccount.accno} not found.`,
-      type: "negative",
-      position: "center",
-    });
-    return;
-  }
-
-  if (departments.value?.length) {
-    selectedDepartment.value = departments.value.find(
-      (dpt) => dpt.id === invoice.department_id
-    );
-  }
-
-  shippingPoint.value = invoice.shippingPoint;
-  shipVia.value = invoice.shipVia;
-  wayBill.value = invoice.wayBill;
-  description.value = invoice.description;
-  notes.value = invoice.notes;
-  intnotes.value = invoice.intnotes;
-  invNumber.value = invoice.invNumber;
-  invId.value = invoice.id;
-  invType.value = invoice.type;
-  ordNumber.value = invoice.ordNumber;
-  invDate.value = invoice.invDate;
-  dueDate.value = invoice.dueDate;
-  poNumber.value = invoice.poNumber;
-
-  if (invType.value === "credit_invoice") {
-    updateTitle("Credit Invoice");
-  }
-
-  if (invoice.currency) {
-    selectedCurrency.value = currencies.value.find(
-      (curr) => curr.curr === invoice.currency
-    );
-  }
-  exchangeRate.value = invoice.exchangerate || 1;
-  taxIncluded.value = !!invoice.taxincluded;
-
-  lines.value = invoice.lines.map((line) => {
-    return {
-      id: lineId++,
-      partnumber: line,
-      description: line.description,
-      qty: line.qty,
-      oh: line.oh,
-      unit: line.unit,
-      price: line.price,
-      discount: line.discount,
-      extended:
-        line.qty * line.price - (line.qty * line.price * line.discount) / 100,
-      lineitemdetail: line.lineitemdetail ? true : false,
-      devliverydate: line.deliverydate,
-      itemnotes: line.itemnotes,
-      ordernumber: line.ordernumber,
-      serialnumber: line.serialnumber,
-      customerponumber: line.customerponumber,
-      costvendor: line.costvendor,
-      package: line.package,
-      volume: line.volume,
-      weight: line.weight,
-      netweight: line.netweight,
-      cost: line.cost,
-      volume: line.cost,
-      noupdate: true,
-    };
-  });
-  console.log(invoice.lines);
-  calculateTaxes();
-
-  payments.value = invoice.payments.map((payment) => {
-    const account = paymentAccounts.value.find(
-      (acc) => acc.id === payment.account || acc.label === payment.account
-    );
-    if (!account) {
-      Notify.create({
-        message: `Payment account ${payment.account} not found.`,
-        type: "negative",
-        position: "center",
-      });
-      return {};
-    }
-    return {
-      date: payment.date,
-      source: payment.source,
-      memo: payment.memo,
-      amount: payment.amount,
-      account: account,
-      exchangerate: payment.exchangerate,
-    };
-  });
-  if (payments.value.length === 0) {
-    addPayment();
-  }
-};
+// =====================
+// Shift Key Listener for Description Autogrow
+// =====================
 const description_autogrow = ref(false);
-
 const toggleShift = (e) => (description_autogrow.value = e.shiftKey);
-
 onUnmounted(() => {
   window.removeEventListener("keydown", toggleShift);
   window.removeEventListener("keyup", toggleShift);
 });
 
-watch(
-  lines,
-  (newLines) => {
-    newLines.forEach((line, index) => {
-      line.extended = calculateExtended(
-        line.qty || 1,
-        line.price,
-        line.discount || 0
-      );
-    });
-    calculateTaxes();
-  },
-  { deep: true }
-);
-
+// =====================
+// Mounted & Initialization
+// =====================
 onMounted(() => {
   window.addEventListener("keydown", toggleShift);
   window.addEventListener("keyup", toggleShift);
