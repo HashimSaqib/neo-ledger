@@ -103,7 +103,6 @@
               label-color="secondary"
               class="col-sm-10 col-12"
               dense
-              autogrow
             />
           </div>
           <div class="row q-gutter-x-sm">
@@ -186,6 +185,7 @@
               outlined
               dense
               type="date"
+              @change="filterProjects"
             />
             <q-input
               v-model="dueDate"
@@ -225,10 +225,11 @@
           <div :key="line.id">
             <!-- Main line fields -->
             <div
-              class="row justify-between"
+              class="row justify-between align-center"
               :class="line.lineitemdetail ? '' : 'q-mb-sm'"
             >
               <s-select
+                v
                 :key="line.id"
                 outlined
                 v-model="line.partnumber"
@@ -244,7 +245,32 @@
                 search="label"
                 :ref="(el) => (lineSelects[index] = el)"
               />
+              <a
+                class="btn btn-primary"
+                v-if="line.partnumber"
+                style="text-decoration: none"
+              >
+                ?</a
+              >
+              <s-select
+                v-if="!line.partnumber"
+                :key="line.id"
+                outlined
+                v-model="line.partnumber"
+                :label="t('Description')"
+                class="col-2"
+                bg-color="input"
+                label-color="secondary"
+                dense
+                :options="items"
+                option-label="description"
+                option-value="partnumber"
+                @update:model-value="handleLineItemChange(line, index)"
+                search="label"
+                :ref="(el) => (descriptionInputs[index] = el)"
+              />
               <q-input
+                v-else
                 outlined
                 v-model="line.description"
                 :label="t('Description')"
@@ -253,6 +279,8 @@
                 label-color="secondary"
                 dense
                 autogrow
+                @keydown.enter="handleLineEnter(index, $event)"
+                :ref="(el) => (descriptionInputs[index] = el)"
               />
               <q-input
                 outlined
@@ -313,7 +341,6 @@
                 :model-value="formatAmount(line.extended)"
                 :label="t('Extended')"
                 dense
-                class="col-1"
                 bg-color="input"
                 label-color="secondary"
                 readonly
@@ -336,6 +363,17 @@
             </div>
 
             <div v-if="line.lineitemdetail" class="row q-pa-sm q-gutter-xs">
+              <s-select
+                outlined
+                v-model="line.project"
+                :options="filteredProjects"
+                option-label="projectnumber"
+                option-value="value"
+                emit-value
+                map-options
+                :label="t('Project')"
+                @keydown.enter="handleLineEnter(index, $event)"
+              />
               <q-input
                 outlined
                 v-model="line.devliverydate"
@@ -669,7 +707,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, inject, nextTick } from "vue";
+import {
+  ref,
+  onMounted,
+  watch,
+  computed,
+  inject,
+  nextTick,
+  onUnmounted,
+} from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -677,6 +723,7 @@ import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
+import AddPart from "src/pages/goodservices/AddPart.vue";
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -877,6 +924,8 @@ const fetchAccounts = async () => {
 // Links
 const departments = ref([]);
 const selectedDepartment = ref();
+const projects = ref([]);
+const filteredProjects = ref([]);
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/customer`);
@@ -888,10 +937,28 @@ const fetchLinks = async () => {
         (currency) => currency.rn === 1
       );
     }
+    projects.value = response.data.projects;
+
+    filterProjects();
     console.log(response.data);
   } catch (error) {
     console.log(error);
   }
+};
+const filterProjects = () => {
+  if (!invDate.value) return;
+
+  filteredProjects.value = projects.value.filter((project) => {
+    const start = project.startdate ? new Date(project.startdate) : null;
+    const end = project.enddate ? new Date(project.enddate) : null;
+    const invDateObj = new Date(invDate.value);
+
+    if (!start && !end) return true;
+    if (!start) return invDateObj <= end;
+    if (!end) return invDateObj >= start;
+
+    return invDateObj >= start && invDateObj <= end;
+  });
 };
 // Currencies
 const selectedCurrency = ref();
@@ -984,9 +1051,14 @@ const addLineAt = (index) => {
 const handleLineEnter = (index, event) => {
   if (lineEnterLock) return;
   lineEnterLock = true;
-  event.preventDefault();
-  event.stopPropagation();
-  addLineAt(index);
+
+  // If Shift is not pressed, prevent new line and move to next line
+  if (!event.shiftKey) {
+    event.preventDefault(); // Prevents adding a new line inside the input
+    event.stopPropagation();
+    addLineAt(index); // Moves to the next line (outside of input)
+  }
+
   setTimeout(() => {
     lineEnterLock = false;
   }, 300);
@@ -1095,7 +1167,8 @@ const calculateExtended = (qty, price, discount) => {
   const discountedValue = baseValue - (baseValue * discount) / 100;
   return discountedValue.toFixed(2);
 };
-
+// ref needed for focus
+const descriptionInputs = ref([]);
 const handleLineItemChange = (newValue, index) => {
   if (dragging.value) return;
 
@@ -1117,6 +1190,11 @@ const handleLineItemChange = (newValue, index) => {
     }
   }
   calculateTaxes();
+  nextTick(() => {
+    if (descriptionInputs.value[index]) {
+      descriptionInputs.value[index].focus();
+    }
+  });
 };
 
 // Payment Data
@@ -1494,6 +1572,14 @@ const loadInvoice = async (invoice) => {
     addPayment();
   }
 };
+const description_autogrow = ref(false);
+
+const toggleShift = (e) => (description_autogrow.value = e.shiftKey);
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", toggleShift);
+  window.removeEventListener("keyup", toggleShift);
+});
 
 watch(
   lines,
@@ -1511,6 +1597,8 @@ watch(
 );
 
 onMounted(() => {
+  window.addEventListener("keydown", toggleShift);
+  window.addEventListener("keyup", toggleShift);
   fetchAccounts();
   fetchLinks();
   fetchItems();
