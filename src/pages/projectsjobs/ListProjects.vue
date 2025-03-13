@@ -41,7 +41,7 @@
 
           <q-input
             v-model="selectedProject.projectnumber"
-            :label="t('projectnumber')"
+            :label="t('Number')"
             outlined
             dense
             class="q-my-sm"
