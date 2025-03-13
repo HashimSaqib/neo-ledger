@@ -625,7 +625,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, nextTick } from "vue";
+import { ref, onMounted, inject, nextTick, computed } from "vue";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useRoute } from "vue-router";
@@ -635,13 +635,25 @@ const route = useRoute();
 // Transaction Type & Page Title
 // -------------------------
 const updateTitle = inject("updateTitle");
-const type = ref(route.params.type || route.query.type || "part");
+
+const props = defineProps({
+  id: { type: [String, Number], default: null },
+  type: { type: String, default: null },
+});
+const emit = defineEmits(["saved"]);
+const haveProps = computed(() => props.id !== null || props.type !== null);
+const componentId = computed(() => {
+  return props.id ?? route.params.id ?? route.query.id;
+});
+const componentType = computed(() => {
+  return props.type ?? route.params.type;
+});
+const type = ref(componentType.value || "part");
 if (type.value === "part") {
   updateTitle("Add Part");
 } else if (type.value === "service") {
   updateTitle("Add Service");
 }
-
 const form = ref({
   // Basic Information
   partnumber: "",
@@ -745,7 +757,7 @@ const getLinks = async () => {
 
 // Load item data if an id is provided in the route
 const loadData = async () => {
-  const id = route.query.id || route.params.id;
+  const id = componentId.value;
   if (!id) return;
   try {
     const response = await api.get(`/ic/items/${id}`);
@@ -934,9 +946,9 @@ const submitForm = async () => {
   // Convert any boolean values in the postData to "1" or "0"
   convertBooleans(postData);
 
-  const id = route.query.id || route.params.id;
+  const id = componentId.value;
 
-  postData.item = type.value;
+  postData.item = componentType.value;
 
   try {
     if (id) {
@@ -1054,7 +1066,7 @@ function handleCustomerEnter(index) {
 onMounted(async () => {
   await getLinks();
   // Load item data if an id is provided in the route
-  const id = route.query.id || route.params.id;
+  const id = componentId.value;
   if (id) {
     await loadData();
   }
