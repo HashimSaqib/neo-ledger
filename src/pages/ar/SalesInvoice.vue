@@ -908,13 +908,29 @@ const fetchAccounts = async () => {
   }
 };
 
-// Links & Currencies
+// Links & Currencies & Projects
 const departments = ref([]);
 const selectedDepartment = ref();
 const projects = ref([]);
 const filteredProjects = ref([]);
+
 const currencies = ref([]);
 const exchangeRate = ref();
+const filterProjects = () => {
+  if (!invDate.value) return;
+
+  filteredProjects.value = projects.value.filter((project) => {
+    const start = project.startdate ? new Date(project.startdate) : null;
+    const end = project.enddate ? new Date(project.enddate) : null;
+    const invDateObj = new Date(invDate.value);
+
+    if (!start && !end) return true; // Include if both are null
+    if (!start) return invDateObj <= end; // Include if only end date exists
+    if (!end) return invDateObj >= start; // Include if only start date exists
+
+    return invDateObj >= start && invDateObj <= end; // Include if within range
+  });
+};
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/customer`);
@@ -1351,6 +1367,14 @@ const loadInvoice = async (invoice) => {
       netweight: line.netweight,
       cost: line.cost,
       noupdate: true,
+      project: (() => {
+        const foundProject = projects.value.find(
+          (project) => project.id === line.project
+        );
+        return foundProject
+          ? `${foundProject.projectnumber}--${foundProject.id}`
+          : "";
+      })(),
     };
   });
   calculateTaxes();
@@ -1495,6 +1519,7 @@ const postInvoice = async () => {
         weight: line.weight,
         netweight: line.netweight,
         cost: line.cost,
+        project: line.project,
       })),
     payments: payments.value.map((payment) => ({
       date: payment.date,
