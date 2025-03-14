@@ -325,7 +325,6 @@
           </div>
         </div>
       </q-card-section>
-
       <q-card-section>
         <!-- Income Section -->
         <div>
@@ -376,11 +375,11 @@
                         <template
                           v-if="account.periods[period.label].amount < 0"
                         >
-                          ({{
+                          {{
                             formatAmount(
                               Math.abs(account.periods[period.label].amount)
                             )
-                          }})
+                          }}
                         </template>
                         <template v-else>
                           {{
@@ -391,11 +390,11 @@
                     </template>
                     <template v-else>
                       <template v-if="account.periods[period.label].amount < 0">
-                        ({{
+                        {{
                           formatAmount(
                             Math.abs(account.periods[period.label].amount)
                           )
-                        }})
+                        }}
                       </template>
                       <template v-else>
                         {{ formatAmount(account.periods[period.label].amount) }}
@@ -411,9 +410,7 @@
           <!-- Income Subtotal Row -->
           <q-item class="q-pa-sm items-center">
             <q-item-section v-if="formData.l_accno" avatar></q-item-section>
-            <q-item-section>
-              {{ t("Total Income") }}
-            </q-item-section>
+            <q-item-section>{{ t("Total Income") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
@@ -438,7 +435,7 @@
                   <q-badge color="primary">{{ account.accno }}</q-badge>
                 </q-item-section>
                 <q-item-section>{{ account.description }}</q-item-section>
-                <!-- For each period, render the amount as a clickable link if applicable -->
+                <!-- For each period, render the expense amount as a clickable link if applicable -->
                 <q-item-section
                   v-for="period in results.periods"
                   :key="period.label"
@@ -455,29 +452,41 @@
                         <template
                           v-if="account.periods[period.label].amount < 0"
                         >
-                          ({{
+                          {{
                             formatAmount(
                               Math.abs(account.periods[period.label].amount)
                             )
-                          }})
+                          }}
+                        </template>
+                        <template
+                          v-else-if="account.periods[period.label].amount > 0"
+                        >
+                          {{
+                            formatAmount(-account.periods[period.label].amount)
+                          }}
                         </template>
                         <template v-else>
-                          {{
-                            formatAmount(account.periods[period.label].amount)
-                          }}
+                          {{ formatAmount(0) }}
                         </template>
                       </router-link>
                     </template>
                     <template v-else>
                       <template v-if="account.periods[period.label].amount < 0">
-                        ({{
+                        {{
                           formatAmount(
                             Math.abs(account.periods[period.label].amount)
                           )
-                        }})
+                        }}
+                      </template>
+                      <template
+                        v-else-if="account.periods[period.label].amount > 0"
+                      >
+                        {{
+                          formatAmount(-account.periods[period.label].amount)
+                        }}
                       </template>
                       <template v-else>
-                        {{ formatAmount(account.periods[period.label].amount) }}
+                        {{ formatAmount(0) }}
                       </template>
                     </template>
                   </template>
@@ -490,15 +499,27 @@
           <!-- Expense Subtotal Row -->
           <q-item class="q-pa-sm items-center">
             <q-item-section v-if="formData.l_accno" avatar></q-item-section>
-            <q-item-section>
-              {{ t("Total Expenses") }}
-            </q-item-section>
+            <q-item-section>{{ t("Total Expenses") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
               class="col text-right text-bold"
             >
-              {{ formatAmount(sumAccounts(expenseAccounts, period.label)) }}
+              <template v-if="sumAccounts(expenseAccounts, period.label) < 0">
+                {{
+                  formatAmount(
+                    Math.abs(sumAccounts(expenseAccounts, period.label))
+                  )
+                }}
+              </template>
+              <template
+                v-else-if="sumAccounts(expenseAccounts, period.label) > 0"
+              >
+                {{ formatAmount(-sumAccounts(expenseAccounts, period.label)) }}
+              </template>
+              <template v-else>
+                {{ formatAmount(0) }}
+              </template>
             </q-item-section>
           </q-item>
         </div>
