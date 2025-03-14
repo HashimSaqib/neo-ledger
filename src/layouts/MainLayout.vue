@@ -47,15 +47,14 @@
     </q-page-container>
   </q-layout>
 </template>
-
 <script setup>
-import { ref, provide, computed } from "vue";
+import { ref, provide } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
 import { menuLinks } from "src/layouts/Menu.js";
-import { Cookies } from "quasar";
+import { Cookies, Dark } from "quasar"; // import Dark plugin
 
 const miniState = ref(false);
 const { t } = useI18n();
@@ -68,7 +67,6 @@ const getDefaultTitle = () => company || dbname || t("Neo Ledger");
 const title = ref(getDefaultTitle());
 
 // Provide title and update function to child components
-
 provide("title", title);
 console.log("Providing title:", title);
 provide("updateTitle", (newTitle) => {
@@ -77,35 +75,43 @@ provide("updateTitle", (newTitle) => {
 
 // Reactive printMode variable
 const printMode = ref(false);
+
+// Keep track of original theme state
+let wasDarkMode = Dark.isActive;
+
 // Function to toggle print mode
 const togglePrintMode = () => {
   printMode.value = !printMode.value;
 };
+
 const printPDF = async () => {
+  // Save current dark mode state
+  wasDarkMode = Dark.isActive;
+
+  // If in dark mode, switch to light mode for printing
+  if (wasDarkMode) {
+    Dark.set(false); // switch to light mode
+  }
+
+  // Toggle print mode and trigger print
   await togglePrintMode();
   window.print();
 };
 
 provide("triggerPrint", printPDF);
 provide("printToggle", printMode);
+
 defineOptions({
   name: "MainLayout",
 });
 
+// Listen for the afterprint event to restore the original theme
 window.addEventListener("afterprint", () => {
+  if (wasDarkMode && !Dark.isActive) {
+    Dark.set(true); // revert back to dark mode if it was originally active
+  }
   if (printMode.value) {
     togglePrintMode();
   }
 });
 </script>
-<style>
-@media print {
-  .hide-print {
-    display: none;
-  }
-  :deep(.q-table__container) {
-    height: auto !important;
-    position: relative;
-  }
-}
-</style>
