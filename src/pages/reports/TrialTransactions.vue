@@ -107,6 +107,8 @@ const formData = ref({
   accno: route.query.accno,
   fromdate: route.query.fromdate,
   todate: route.query.todate,
+  project: route.query.project,
+  department: route.query.department,
 });
 const filtersOpen = ref(true);
 const results = ref([]);
@@ -206,13 +208,19 @@ function formatRow(result) {
   return formatted;
 }
 
-/* Computed: Processed (Filtered) Results with Totals */
 const filteredResults = computed(() => {
   let balance = 0;
   let totalDebits = 0;
   let totalCredits = 0;
+  // Always include these columns
+  const requiredKeys = ["module", "invoice", "till", "db"];
   const processedResults = results.value.map((result) => {
+    // Process row as before
     const formatted = formatRow(result);
+    // Ensure required columns are always added
+    requiredKeys.forEach((key) => {
+      formatted[key] = result[key];
+    });
     const debit = parseFloat(formatted.debit) || 0;
     const credit = parseFloat(formatted.credit) || 0;
     totalDebits += debit;
@@ -234,32 +242,40 @@ const filteredResults = computed(() => {
 
 /* Helper: Get Navigation Path for a Transaction Row */
 const getPath = (row) => {
+  console.log(row);
+  if (!row || !row.module) return null;
+
   let path = "";
-  if (row.type === "gl") {
+
+  if (row.module === "gl") {
     path = "/gl/add-gl";
-  } else if (row.type === "ar") {
-    if (row.till) {
+  } else if (row.module === "ar" || row.module === "is") {
+    if (!!row.till) {
+      // Ensures falsy values are treated correctly
       path = "/pos/sale";
-    } else if (row.invoice) {
+    } else if (!!row.invoice) {
       path = "/ar/sales-invoice";
     } else {
       path = "/arap/transaction/customer";
     }
-  } else if (row.type === "ap") {
-    if (row.invoice) {
+  } else if (row.module === "ir") {
+    if (!!row.invoice) {
       path = "/ap/vendor-invoice";
     } else {
       path = "/arap/transaction/vendor";
     }
   }
+
+  if (!path) return null;
+
   return {
-    path,
     query: {
       id: row.id,
       ...formData.value,
       search: 1,
-      callback: `/reports/trial_transactions`,
+      callback: "/reports/trial_transactions",
     },
+    path,
   };
 };
 

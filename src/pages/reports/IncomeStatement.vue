@@ -18,7 +18,7 @@
                 v-model="formData.department"
                 :options="departments"
                 :label="t('Department')"
-                option-value="sinumber"
+                option-value="value"
                 option-label="description"
                 outlined
                 dense
@@ -33,14 +33,13 @@
                 v-model="formData.projectnumber"
                 :options="projects"
                 option-label="description"
-                option-value="projectnumber"
+                option-value="value"
                 :label="t('Project')"
                 outlined
                 dense
                 clearable
                 emit-value
                 map-options
-                s
                 search="description"
               />
             </div>
@@ -88,7 +87,7 @@
           <!-- Custom Periods Section with Drag & Drop -->
           <div class="q-mt-md">
             <div class="text-h6">{{ t("Custom Periods") }}</div>
-            <!-- draggable component wraps the period list -->
+            <!-- Draggable component wraps the period list -->
             <draggable
               v-model="formData.periods"
               group="periods"
@@ -330,8 +329,12 @@
       <q-card-section>
         <!-- Income Section -->
         <div>
+          <!-- Header Row -->
           <q-item class="q-pa-xs q-my-none">
-            <q-item-section v-if="formData.l_accno" avatar></q-item-section>
+            <!-- Display static header text instead of account.accno -->
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-badge color="primary">{{ t("Acc No") }}</q-badge>
+            </q-item-section>
             <q-item-section>{{ t("Description") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
@@ -346,38 +349,57 @@
           </div>
           <q-separator />
           <q-list bordered separator>
+            <!-- Iterate over income accounts -->
             <template v-for="(account, index) in incomeAccounts" :key="index">
               <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                }"
+                :class="{ 'mutedbg text-bold': account.charttype === 'H' }"
               >
+                <!-- Show account number as plain text -->
                 <q-item-section v-if="formData.l_accno" avatar>
-                  <router-link
-                    :to="getPath(account.accno)"
-                    target="_blank"
-                    v-if="account.charttype === 'A'"
-                  >
-                    <q-badge color="primary">{{ account.accno }}</q-badge>
-                  </router-link>
-                  <q-badge color="primary" v-else>{{ account.accno }}</q-badge>
+                  <q-badge color="primary">{{ account.accno }}</q-badge>
                 </q-item-section>
                 <q-item-section>{{ account.description }}</q-item-section>
+                <!-- For each period, render the amount as a clickable link if applicable -->
                 <q-item-section
                   v-for="period in results.periods"
                   :key="period.label"
                   class="col text-right"
                 >
                   <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.periods[period.label].amount < 0">
-                      ({{
-                        formatAmount(
-                          Math.abs(account.periods[period.label].amount)
-                        )
-                      }})
+                    <template v-if="account.charttype === 'A'">
+                      <router-link
+                        :to="getPath(account.accno, period)"
+                        target="_blank"
+                        style="text-decoration: none"
+                        class="maintext"
+                      >
+                        <template
+                          v-if="account.periods[period.label].amount < 0"
+                        >
+                          ({{
+                            formatAmount(
+                              Math.abs(account.periods[period.label].amount)
+                            )
+                          }})
+                        </template>
+                        <template v-else>
+                          {{
+                            formatAmount(account.periods[period.label].amount)
+                          }}
+                        </template>
+                      </router-link>
                     </template>
                     <template v-else>
-                      {{ formatAmount(account.periods[period.label].amount) }}
+                      <template v-if="account.periods[period.label].amount < 0">
+                        ({{
+                          formatAmount(
+                            Math.abs(account.periods[period.label].amount)
+                          )
+                        }})
+                      </template>
+                      <template v-else>
+                        {{ formatAmount(account.periods[period.label].amount) }}
+                      </template>
                     </template>
                   </template>
                   <template v-else>-</template>
@@ -406,38 +428,57 @@
         <div>
           <div class="text-h5 text-primary q-mb-md">{{ t("Expenses") }}</div>
           <q-list bordered separator>
+            <!-- Iterate over expense accounts -->
             <template v-for="(account, index) in expenseAccounts" :key="index">
               <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                }"
+                :class="{ 'mutedbg text-bold': account.charttype === 'H' }"
               >
+                <!-- Show account number as plain text -->
                 <q-item-section v-if="formData.l_accno" avatar>
-                  <router-link
-                    :to="getPath(account.accno)"
-                    target="_blank"
-                    v-if="account.charttype === 'A'"
-                  >
-                    <q-badge color="primary">{{ account.accno }}</q-badge>
-                  </router-link>
-                  <q-badge color="primary" v-else>{{ account.accno }}</q-badge>
+                  <q-badge color="primary">{{ account.accno }}</q-badge>
                 </q-item-section>
                 <q-item-section>{{ account.description }}</q-item-section>
+                <!-- For each period, render the amount as a clickable link if applicable -->
                 <q-item-section
                   v-for="period in results.periods"
                   :key="period.label"
                   class="col text-right"
                 >
                   <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.periods[period.label].amount < 0">
-                      ({{
-                        formatAmount(
-                          Math.abs(account.periods[period.label].amount)
-                        )
-                      }})
+                    <template v-if="account.charttype === 'A'">
+                      <router-link
+                        :to="getPath(account.accno, period)"
+                        target="_blank"
+                        style="text-decoration: none"
+                        class="maintext"
+                      >
+                        <template
+                          v-if="account.periods[period.label].amount < 0"
+                        >
+                          ({{
+                            formatAmount(
+                              Math.abs(account.periods[period.label].amount)
+                            )
+                          }})
+                        </template>
+                        <template v-else>
+                          {{
+                            formatAmount(account.periods[period.label].amount)
+                          }}
+                        </template>
+                      </router-link>
                     </template>
                     <template v-else>
-                      {{ formatAmount(account.periods[period.label].amount) }}
+                      <template v-if="account.periods[period.label].amount < 0">
+                        ({{
+                          formatAmount(
+                            Math.abs(account.periods[period.label].amount)
+                          )
+                        }})
+                      </template>
+                      <template v-else>
+                        {{ formatAmount(account.periods[period.label].amount) }}
+                      </template>
                     </template>
                   </template>
                   <template v-else>-</template>
@@ -462,7 +503,7 @@
           </q-item>
         </div>
 
-        <!-- Net Income -->
+        <!-- Net Income Section -->
         <q-separator />
         <q-item class="items-center q-my-none q-py-none text-bold">
           <q-item-section v-if="formData.l_accno" avatar></q-item-section>
@@ -488,7 +529,9 @@
 </template>
 
 <script setup>
-// Imports and dependency registration
+// =====================================================
+// Imports and Dependency Registration
+// =====================================================
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { date } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -496,21 +539,24 @@ import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import { formatAmount, roundAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
-// Import draggable for drag & drop functionality
 import draggable from "vuedraggable";
 
+// =====================================================
+// Injection and Initial Setup
+// =====================================================
 const triggerPrint = inject("triggerPrint");
 const updateTitle = inject("updateTitle");
 updateTitle("Income Statement");
 const printToggle = inject("printToggle");
-
 const { t } = useI18n();
 const route = useRoute();
 const now = new Date();
 const currentYear = String(now.getFullYear());
 const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
 
-// Main form data
+// =====================================================
+// Reactive Data and Options
+// =====================================================
 const formData = ref({
   department: route.query.department || "",
   projectnumber: route.query.projectnumber || "",
@@ -528,7 +574,6 @@ const formData = ref({
   periods: [],
 });
 
-// Options for period modes, including the new "custom" option
 const periodModeOptions = [
   { label: t("Current"), value: "current" },
   { label: t("Monthly"), value: "monthly" },
@@ -537,7 +582,6 @@ const periodModeOptions = [
   { label: t("Custom"), value: "custom" },
 ];
 
-// Options for months, years, and quarters
 const monthOptions = Array.from({ length: 12 }, (_, i) => ({
   value: String(i + 1).padStart(2, "0"),
   label: date.formatDate(new Date(2000, i, 1), "MMMM"),
@@ -562,7 +606,11 @@ const filtersOpen = ref(true);
 const loading = ref(false);
 const results = ref({});
 
-// Computed property to format the date range from periods
+// =====================================================
+// Computed Properties
+// =====================================================
+
+// Formats the date range by joining period labels
 const formattedDateRange = computed(() => {
   if (formData.value.periods.length) {
     return formData.value.periods.map((p) => p.label).join(", ");
@@ -570,7 +618,60 @@ const formattedDateRange = computed(() => {
   return t("N/A");
 });
 
-// Update period details based on current mode
+// Compute income accounts from results
+const incomeAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  return Object.keys(rawAccounts).reduce((acc, accno) => {
+    const accountPeriods = rawAccounts[accno];
+    let periodsData = {};
+    Object.keys(accountPeriods).forEach((periodLabel) => {
+      if (accountPeriods[periodLabel].I) {
+        periodsData[periodLabel] = accountPeriods[periodLabel].I;
+      }
+    });
+    if (Object.keys(periodsData).length > 0) {
+      acc.push({
+        accno,
+        description: results.value.accounts?.[accno]?.description,
+        charttype: results.value.accounts?.[accno]?.charttype,
+        periods: periodsData,
+      });
+    }
+    return acc;
+  }, []);
+});
+
+// Compute expense accounts from results
+const expenseAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  return Object.keys(rawAccounts).reduce((acc, accno) => {
+    const accountPeriods = rawAccounts[accno];
+    let periodsData = {};
+    Object.keys(accountPeriods).forEach((periodLabel) => {
+      if (accountPeriods[periodLabel].E) {
+        periodsData[periodLabel] = accountPeriods[periodLabel].E;
+      }
+    });
+    if (Object.keys(periodsData).length > 0) {
+      acc.push({
+        accno,
+        description: results.value.accounts?.[accno]?.description,
+        charttype: results.value.accounts?.[accno]?.charttype,
+        periods: periodsData,
+      });
+    }
+    return acc;
+  }, []);
+});
+
+// =====================================================
+// Helper Functions
+// =====================================================
+
+/**
+ * Updates a period object based on the current period mode.
+ * This sets the fromdate, todate, and label properties accordingly.
+ */
 const updatePeriod = (period) => {
   if (formData.value.periodMode === "current") {
     if (period.year) {
@@ -628,8 +729,10 @@ const updatePeriod = (period) => {
   }
 };
 
-// Add a new period line
-// If a period already exists, clone its values; otherwise, set defaults.
+/**
+ * Adds a new period line.
+ * If a period exists, its values are cloned; otherwise, default values are set.
+ */
 const addPeriod = () => {
   let newPeriod = {};
   if (formData.value.periods.length > 0) {
@@ -670,12 +773,16 @@ const addPeriod = () => {
   updatePeriod(newPeriod);
 };
 
-// Remove a period line
+/**
+ * Removes a period line based on its index.
+ */
 const removePeriod = (index) => {
   formData.value.periods.splice(index, 1);
 };
 
-// Sum amounts for a given period label from an array of accounts
+/**
+ * Sums the amounts for a given period label from an array of accounts.
+ */
 const sumAccounts = (accountsArray, periodLabel) => {
   return accountsArray.reduce((sum, account) => {
     const amount = account.periods[periodLabel]?.amount || 0;
@@ -683,14 +790,18 @@ const sumAccounts = (accountsArray, periodLabel) => {
   }, 0);
 };
 
-// Calculate net income from income and expense accounts for a period
+/**
+ * Calculates net income (income + expenses) for a given period label.
+ */
 const netIncome = (periodLabel) => {
   const incomeSum = sumAccounts(incomeAccounts.value, periodLabel);
   const expenseSum = sumAccounts(expenseAccounts.value, periodLabel);
   return incomeSum + expenseSum;
 };
 
-// Execute search/report generation
+/**
+ * Generates the report by calling the API with formData parameters.
+ */
 const search = async () => {
   try {
     loading.value = true;
@@ -706,81 +817,34 @@ const search = async () => {
   }
 };
 
-// Helper function to build the trial transaction URL from the first period
-const getPath = (accno) => {
-  if (!formData.value.periods || formData.value.periods.length === 0) {
-    return "";
-  }
+/**
+ * Returns the path to the trial transactions report.
+ * Accepts an account number and a specific period.
+ * Formats the fromdate and todate from the period and includes other query parameters.
+ */
+const getPath = (accno, period) => {
+  // Helper to format "YYYYMMDD" to "YYYY-MM-DD"
   const formatDateStr = (dateStr) =>
     `${dateStr.substr(0, 4)}-${dateStr.substr(4, 2)}-${dateStr.substr(6, 2)}`;
-  const period = formData.value.periods[0];
+
   const fromdate = formatDateStr(period.fromdate);
   const todate = formatDateStr(period.todate);
-  return `/reports/trial_transactions?accno=${encodeURIComponent(
-    accno
-  )}&fromdate=${encodeURIComponent(fromdate)}&todate=${encodeURIComponent(
-    todate
-  )}`;
+  const project = formData.value.projectnumber || "";
+  const department = formData.value.department || "";
+
+  const params = new URLSearchParams({
+    accno,
+    fromdate,
+    todate,
+    project,
+    department,
+  });
+  return `/reports/trial_transactions?${params.toString()}`;
 };
 
-// Compute income accounts from results
-const incomeAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].I) {
-        periodsData[periodLabel] = accountPeriods[periodLabel].I;
-      }
-    });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype: results.value.accounts?.[accno]?.charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
-});
-
-// Compute expense accounts from results
-const expenseAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].E) {
-        periodsData[periodLabel] = accountPeriods[periodLabel].E;
-      }
-    });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype: results.value.accounts?.[accno]?.charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
-});
-
-// Fetch lookup data for links and select options
-const fetchLinks = async () => {
-  try {
-    const response = await api.get("/create_links/incomestatement");
-    departments.value = response.data.departments;
-    projects.value = response.data.projects;
-    currencies.value = response.data.currencies;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
+/**
+ * Exports the report data to an Excel file.
+ */
 const downloadExcel = () => {
   const includeAccNo = formData.value.l_accno;
   let headerRow = includeAccNo ? ["Acc No", "Description"] : ["Description"];
@@ -888,7 +952,11 @@ const downloadExcel = () => {
   writeFile(workbook, "income_statement.xlsx", { compression: true });
 };
 
-// Watch for changes in period mode and reset periods accordingly
+// =====================================================
+// Watchers and Lifecycle Hooks
+// =====================================================
+
+// When period mode changes, clear periods and add a new one.
 watch(
   () => formData.value.periodMode,
   () => {
@@ -906,6 +974,20 @@ onMounted(() => {
     addPeriod();
   }
 });
+
+// =====================================================
+// Fetch Lookup Data for Links and Select Options
+// =====================================================
+const fetchLinks = async () => {
+  try {
+    const response = await api.get("/create_links/incomestatement");
+    departments.value = response.data.departments;
+    projects.value = response.data.projects;
+    currencies.value = response.data.currencies;
+  } catch (error) {
+    console.error(error);
+  }
+};
 </script>
 
 <style scoped>
