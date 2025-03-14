@@ -431,7 +431,7 @@ const formData = ref({
   till: "",
 });
 
-const filtersOpen = ref(true);
+const filtersOpen = route.query.search == 1 ? ref(false) : ref(true);
 const results = ref([]);
 const totals = ref({});
 const loading = ref(false);

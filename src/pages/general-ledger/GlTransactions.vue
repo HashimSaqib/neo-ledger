@@ -369,7 +369,7 @@ const { t } = useI18n();
 
 // Form data and UI flags
 const formData = ref({});
-const filtersOpen = ref(true);
+const filtersOpen = route.query.search == 1 ? ref(false) : ref(true);
 const results = ref([]);
 
 // Flag for split ledger mode (user selectable)
