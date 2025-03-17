@@ -26,7 +26,7 @@
           <div>
             <q-list>
               <EssentialLink
-                v-for="link in menuLinks"
+                v-for="link in filteredMenu"
                 :key="link.title"
                 v-bind="link"
               />
@@ -48,7 +48,7 @@
   </q-layout>
 </template>
 <script setup>
-import { ref, provide } from "vue";
+import { ref, provide, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import EssentialLink from "components/EssentialLink.vue";
@@ -113,5 +113,35 @@ window.addEventListener("afterprint", () => {
   if (printMode.value) {
     togglePrintMode();
   }
+});
+const filteredMenu = ref();
+onMounted(async () => {
+  let acs = Cookies.get("acs");
+
+  try {
+    acs = acs ? acs : [];
+    if (!Array.isArray(acs)) throw new Error("Invalid permissions format");
+  } catch (error) {
+    console.error("Error parsing permissions:", error);
+    acs = []; // Fallback to an empty array
+  }
+
+  const filterMenu = (menu) => {
+    return menu
+      .map((item) => {
+        // Recursively filter sublinks if they exist
+        const sublinks = item.sublinks ? filterMenu(item.sublinks) : [];
+
+        // Include the item if it has a valid permission OR has valid sublinks
+        if (acs.includes(item.perm) || sublinks.length) {
+          return { ...item, sublinks };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  };
+
+  filteredMenu.value = filterMenu(menuLinks);
+  console.log(filteredMenu.value);
 });
 </script>

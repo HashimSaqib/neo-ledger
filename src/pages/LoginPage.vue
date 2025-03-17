@@ -61,6 +61,7 @@ onMounted(() => {
   $q.cookies.remove("client");
   $q.cookies.remove("sessionkey");
   $q.cookies.remove("company");
+  $q.cookies.remove("acs");
 });
 
 const login = async () => {
@@ -70,10 +71,11 @@ const login = async () => {
       "https://api.neo-ledger.com/client/neoledger/auth/login",
       loginData.value
     );
-    const { client, sessionkey, company } = response.data;
+    const { client, sessionkey, company, acs } = response.data;
     $q.cookies.set("client", client, { path: "/" });
     $q.cookies.set("sessionkey", sessionkey, { path: "/" });
     $q.cookies.set("company", company, { path: "/" });
+    $q.cookies.set("acs", acs, { path: "/" });
     loading.value = false;
     router.push("/");
   } catch (error) {

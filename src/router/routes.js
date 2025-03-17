@@ -24,6 +24,7 @@ import ListDepartments from "src/pages/system/department/ListDepartments.vue";
 import ListProjects from "src/pages/projectsjobs/ListProjects.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
+import Roles from "src/pages/system/roles.vue";
 
 const routes = [
   {
@@ -139,6 +140,10 @@ const routes = [
       {
         path: "/reconciliation",
         component: Reconciliation,
+      },
+      {
+        path: "/system/roles",
+        component: Roles,
       },
     ],
   },

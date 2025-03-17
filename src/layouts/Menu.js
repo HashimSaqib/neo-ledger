@@ -2,27 +2,28 @@ export const menuLinks = [
   {
     title: "Customers",
     icon: "people",
+    perm: "customer",
     sublinks: [
       // Non-report items from AR and Customers
       {
         title: "AR Transaction",
         link: "/arap/transaction/customer",
-        perm: "AR--Transaction",
+        perm: "customer.transaction",
       },
       {
         title: "Sales Invoice",
         link: "/ar/sales-invoice",
-        perm: "AR--Sales Invoice",
+        perm: "customer.invoice",
       },
       {
         title: "Credit Invoice",
         link: "/ar/sales-invoice?credit_invoice=1",
-        perm: "AR--Credit Invoice",
+        perm: "customer.creditinvoice",
       },
       {
         title: "Add Customer",
         link: "/arap/customer",
-        perm: "Customers--Add Customers",
+        perm: "customer.addcustomer",
       },
 
       {
@@ -31,17 +32,17 @@ export const menuLinks = [
           {
             title: "AR Transactions",
             link: "/arap/transactions/customer",
-            perm: "General Ledger--Reports--Transactions",
+            perm: "customer.transactions",
           },
           {
             title: "Customer Search",
             link: "/arap/search/customer",
-            perm: "Customers--Reports--Search",
+            perm: "customer.search",
           },
           {
             title: "Customer History",
             link: "/history/customer",
-            perm: "Customers--Reports--History",
+            perm: "customer.history",
           },
         ],
       },
@@ -50,27 +51,28 @@ export const menuLinks = [
   {
     title: "Vendors",
     icon: "storefront",
+    perm: "vendor",
     sublinks: [
       // Non-report items from AP and Vendors
       {
         title: "AP Transaction",
         link: "/arap/transaction/vendor",
-        perm: "AP--Add Transaction",
+        perm: "vendor.transaction",
       },
       {
         title: "Vendor Invoice",
         link: "/ap/vendor-invoice",
-        perm: "AP--Vendor Invoice",
+        perm: "vendor.invoice",
       },
       {
         title: "Debit Invoice",
         link: "/ap/vendor-invoice?debit_invoice=1",
-        perm: "AP--Debit Invoice",
+        perm: "vendor.debitinvoice",
       },
       {
         title: "Add Vendor",
         link: "/arap/Vendor",
-        perm: "Vendors--Add Vendor",
+        perm: "vendor.addvendor",
       },
       // Combined Reports submenu for AP & Vendors
       {
@@ -79,17 +81,17 @@ export const menuLinks = [
           {
             title: "AP Transactions",
             link: "/arap/transactions/vendor",
-            perm: "AP--Reports--Transactions",
+            perm: "vendor.transactions",
           },
           {
             title: "Vendor Search",
             link: "/arap/search/vendor",
-            perm: "Vendors--Reports--Search",
+            perm: "vendor.search",
           },
           {
             title: "Vendor History",
             link: "/history/vendor",
-            perm: "Vendors--Reports--History",
+            perm: "vendor.history",
           },
         ],
       },
@@ -98,41 +100,41 @@ export const menuLinks = [
   {
     title: "POS",
     icon: "receipt",
-    perm: "POS--POS",
+    perm: "pos",
     sublinks: [
       {
         title: "Sale",
         link: "/pos/sale",
-        perm: "POS--Sale",
+        perm: "pos.sale",
       },
     ],
   },
   {
     title: "Cash",
     icon: "attach_money",
-    perm: "Cash--Cash",
+    perm: "cash",
     sublinks: [
       {
         title: "Reconciliation",
         link: "/reconciliation",
-        perm: "System--Reconciliation",
+        perm: "cash.recon",
       },
     ],
   },
   {
     title: "General Ledger",
     icon: "account_balance",
-    perm: "General Ledger--General Ledger",
+    perm: "gl",
     sublinks: [
       {
         title: "Add Transaction",
         link: "/gl/add-gl",
-        perm: "General Ledger--Add Transaction",
+        perm: "gl.add",
       },
       {
         title: "Reports",
         link: "/gl/reports",
-        perm: "General Ledger--Reports",
+        perm: "gl.transactions",
       },
     ],
   },
@@ -140,12 +142,14 @@ export const menuLinks = [
     title: "Goods & Services",
     perm: "Goods & Services--Goods & Services",
     icon: "local_offer",
+    perm: "items",
     sublinks: [
       {
         title: "Add Part",
         link: "/ic/add/part",
+        perm: "items.part",
       },
-      { title: "Add Service", link: "/ic/add/service" },
+      { title: "Add Service", link: "/ic/add/service", perm: "items.service" },
       {
         title: "Reports",
         sublinks: [
@@ -153,16 +157,19 @@ export const menuLinks = [
             title: "All Items",
             perm: "Goods & Services-All Items",
             link: "/ic/search/allitems",
+            perm: "items.search.allitems",
           },
           {
             title: "Parts",
             perm: "Goods & Services-Parts",
             link: "/ic/search/parts",
+            perm: "items.search.parts",
           },
           {
             title: "Services",
             perm: "Goods & Services-Services",
             link: "/ic/search/services",
+            perm: "items.search.services",
           },
         ],
       },
@@ -171,58 +178,63 @@ export const menuLinks = [
   {
     title: "Reports",
     icon: "bar_chart",
-    perm: "Reports--Reports",
+    perm: "reports",
     sublinks: [
       {
         title: "Trial Balance",
         link: "/reports/trial_balance",
-        perm: "Reports--Trial Balance",
+        perm: "reports.trial",
       },
       {
         title: "Income Statement",
         link: "/reports/income_statement",
-        perm: "Reports--Income Statement",
+        perm: "reports.income",
       },
     ],
   },
   {
     title: "System",
     icon: "settings",
-    perm: "System--System",
+    perm: "system",
     sublinks: [
       {
         title: "Currencies",
         link: "/system/currencies",
-        perm: "System--Currencies",
+        perm: "system.currencies",
       },
       {
         title: "Projects",
         link: "/system/projects",
-        perm: "System--projects",
+        perm: "system.projects",
       },
       {
         title: "Departments",
         link: "/system/departments",
-        perm: "System--Departments",
+        perm: "system.departments",
       },
       {
         title: "Defaults",
         link: "/system/defaults",
-        perm: "System--Defaults",
+        perm: "system.defaults",
+      },
+      {
+        title: "Roles",
+        link: "/system/roles",
+        perm: "system.user.roles",
       },
       {
         title: "Chart Of Accounts",
-        perm: "System--Chart Of accounts",
+        perm: "system.chart",
         sublinks: [
           {
             title: "List Accounts",
             link: "/system/chart/list",
-            perl: "System--Chart Of Accounts--List Accounts",
+            perm: "system.chart.list",
           },
           {
             title: "Add Account",
             link: "/system/chart/addaccount",
-            perl: "System--Chart Of Accounts--Add Account",
+            perm: "system.chart.add",
           },
         ],
       },
