@@ -86,7 +86,15 @@
 
           <!-- Custom Periods Section with Drag & Drop -->
           <div class="q-mt-md">
-            <div class="text-h6">{{ t("Custom Periods") }}</div>
+            <div class="row">
+              <div class="text-h6">{{ t("Custom Periods") }}</div>
+              <q-btn
+                icon="add"
+                :label="t('Add Period')"
+                flat
+                @click="addPeriod"
+              />
+            </div>
             <!-- Draggable component wraps the period list -->
             <draggable
               v-model="formData.periods"
@@ -234,13 +242,6 @@
                 </div>
               </template>
             </draggable>
-            <q-btn
-              icon="add"
-              :label="t('Add Period')"
-              flat
-              @click="addPeriod"
-              class="q-mt-sm"
-            />
           </div>
 
           <!-- Accounting Method -->
@@ -307,7 +308,7 @@
     >
       <q-card-actions class="q-pa-sm no-print">
         <q-btn :label="t('Export')" @click="downloadExcel" color="accent" />
-        <q-btn :label="t('Print')" @click="triggerPrint" color="info" />
+        <q-btn :label="t('Print')" @click="getPDF" color="info" />
       </q-card-actions>
       <!-- Report Header -->
       <q-card-section v-if="results.company" class="mutedbg">
@@ -565,7 +566,7 @@ import draggable from "vuedraggable";
 // =====================================================
 // Injection and Initial Setup
 // =====================================================
-const triggerPrint = inject("triggerPrint");
+
 const updateTitle = inject("updateTitle");
 updateTitle("Income Statement");
 const printToggle = inject("printToggle");
@@ -756,11 +757,59 @@ const updatePeriod = (period) => {
  */
 const addPeriod = () => {
   let newPeriod = {};
+  // Get allowed years as numbers from the yearOptions array.
+  const allowedYears = yearOptions.map((y) => parseInt(y.value, 10));
+  const minYear = Math.min(...allowedYears);
+
   if (formData.value.periods.length > 0) {
+    // Compute the "before" period based on the last period and current mode.
     const lastPeriod =
       formData.value.periods[formData.value.periods.length - 1];
-    newPeriod = { ...lastPeriod };
+
+    if (
+      formData.value.periodMode === "current" ||
+      formData.value.periodMode === "yearly"
+    ) {
+      let newYear = Number(lastPeriod.year) - 1;
+      if (newYear < minYear) newYear = minYear;
+      newPeriod = { ...lastPeriod, year: newYear.toString() };
+    } else if (formData.value.periodMode === "monthly") {
+      let month = Number(lastPeriod.month);
+      let year = Number(lastPeriod.year);
+      if (month === 1) {
+        month = 12;
+        year = year - 1;
+      } else {
+        month = month - 1;
+      }
+      if (year < minYear) {
+        year = minYear;
+      }
+      newPeriod = {
+        ...lastPeriod,
+        month: month.toString().padStart(2, "0"),
+        year: year.toString(),
+      };
+    } else if (formData.value.periodMode === "quarterly") {
+      let quarter = lastPeriod.quarter; // Expected format: "Q1", "Q2", etc.
+      let year = Number(lastPeriod.year);
+      const qNumber = parseInt(quarter.substring(1), 10);
+      if (qNumber === 1) {
+        quarter = "Q4";
+        year = year - 1;
+      } else {
+        quarter = "Q" + (qNumber - 1);
+      }
+      if (year < minYear) {
+        year = minYear;
+      }
+      newPeriod = { ...lastPeriod, quarter, year: year.toString() };
+    } else if (formData.value.periodMode === "custom") {
+      // For custom, simply copy the current period.
+      newPeriod = { ...lastPeriod };
+    }
   } else {
+    // No period exists yet; create one with the current values.
     if (formData.value.periodMode === "current") {
       newPeriod = { year: currentYear, fromdate: "", todate: "", label: "" };
     } else if (formData.value.periodMode === "monthly") {
@@ -831,6 +880,34 @@ const search = async () => {
     });
     results.value = response.data;
     filtersOpen.value = false;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
+};
+const getPDF = async () => {
+  try {
+    loading.value = true;
+    const params = { ...formData.value, usetemplate: "Y" };
+    const response = await api.get("/reports/income_statement", {
+      params: params,
+      responseType: "blob",
+    });
+    // Create a Blob from the response data
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    // Generate a URL for the Blob
+    const url = window.URL.createObjectURL(blob);
+    // Create a temporary link element
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "income_statement.pdf");
+    document.body.appendChild(link);
+    // Trigger the download by simulating a click
+    link.click();
+    // Cleanup: remove the link and revoke the Blob URL
+    link.parentNode.removeChild(link);
+    window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error(error);
   } finally {
