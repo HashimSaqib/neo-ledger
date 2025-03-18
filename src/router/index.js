@@ -1,30 +1,71 @@
-import { route } from 'quasar/wrappers'
-import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
-import routes from './routes'
+import { route } from "quasar/wrappers";
+import {
+  createRouter,
+  createMemoryHistory,
+  createWebHistory,
+  createWebHashHistory,
+} from "vue-router";
+import routes from "./routes";
+import { Cookies, Notify } from "quasar";
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
-
-export default route(function (/* { store, ssrContext } */) {
+export default route(function () {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
+    : process.env.VUE_ROUTER_MODE === "history"
+    ? createWebHistory
+    : createWebHashHistory;
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
+    history: createMemoryHistory(),
+  });
 
-    // Leave this as is and make changes in quasar.conf.js instead!
-    // quasar.conf.js -> build -> vueRouterMode
-    // quasar.conf.js -> build -> publicPath
-    history: createHistory(process.env.VUE_ROUTER_BASE)
-  })
+  Router.beforeEach((to, from, next) => {
+    // Retrieve user permissions from cookies.
+    let acs = Cookies.get("acs");
+    try {
+      acs = acs ? (typeof acs === "string" ? JSON.parse(acs) : acs) : [];
+    } catch (e) {
+      acs = [];
+    }
 
-  return Router
-})
+    let requiredPerm = to.meta && to.meta.permission;
+    // If the permission is defined as a function, call it with the current route.
+    if (typeof requiredPerm === "function") {
+      requiredPerm = requiredPerm(to);
+    }
+    // If the permission is an array, allow if at least one permission is present.
+    if (Array.isArray(requiredPerm)) {
+      const hasPermission = requiredPerm.some((perm) => acs.includes(perm));
+      if (hasPermission) {
+        next();
+      } else {
+        Notify.create({
+          type: "negative",
+          message: "You do not have permission to access this page.",
+        });
+        next(false);
+      }
+    }
+    // Otherwise, if a permission is defined as a string, check for it.
+    else if (requiredPerm) {
+      if (acs.includes(requiredPerm)) {
+        next();
+      } else {
+        Notify.create({
+          type: "negative",
+          message: "Permission denied",
+          position: "center",
+        });
+        next(false);
+      }
+    }
+    // If no permission is defined, simply allow navigation.
+    else {
+      next();
+    }
+  });
+
+  return Router;
+});

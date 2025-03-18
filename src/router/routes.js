@@ -26,60 +26,109 @@ import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 import Roles from "src/pages/system/Roles.vue";
 import Employees from "src/pages/system/Employees.vue";
+
 const routes = [
   {
     path: "/",
     component: MainLayout,
     children: [
-      { path: "", component: IndexPage },
+      {
+        path: "",
+        component: IndexPage,
+      },
       // General Ledger
       {
         path: "/gl/add-gl",
         component: GeneralLedger,
         props: (route) => ({ id: route.query.id }),
+        meta: { permission: "gl.add" },
       },
       {
         path: "/gl/reports",
         component: GlTransactions,
+        meta: { permission: "gl.transactions" },
       },
       // ARAP
       {
         path: "/arap/transaction/:type",
         component: ArApTransaction,
         props: (route) => ({ id: route.query.id }),
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.transaction"
+              : "vendor.transaction";
+          },
+        },
       },
       {
         path: "/arap/transactions/:type",
         component: ArApTransactions,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.transactions"
+              : "vendor.transactions";
+          },
+        },
       },
       {
         path: "/history/:type",
         component: VcHistory,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.history"
+              : "vendor.history";
+          },
+        },
       },
       {
         path: "/arap/:type",
         component: AddVC,
         props: (route) => ({ id: route.query.id }),
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.addcustomer"
+              : "vendor.addvendor";
+          },
+        },
       },
       {
         path: "/arap/search/:type",
         component: SearchVC,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.search"
+              : "vendor.search";
+          },
+        },
       },
       {
         path: "/ar/sales-invoice",
         component: SalesInvoice,
         props: (route) => ({ id: route.query.id }),
+        meta: {
+          permission: (route) => {
+            return route.query.credit_invoice === "1"
+              ? "customer.creditinvoice"
+              : "customer.invoice";
+          },
+        },
       },
       {
         path: "/pos/sale",
         component: PointOfSale,
         props: (route) => ({ id: route.query.id }),
+        meta: { permission: "pos.sale" },
       },
-
       {
         path: "/ap/vendor-invoice",
         component: VendorInvoice,
         props: (route) => ({ id: route.query.id }),
+        meta: { permission: "vendor.invoice" },
       },
       // Reports
       {
@@ -89,6 +138,7 @@ const routes = [
           from: route.query.fromdate,
           to: route.query.todate,
         }),
+        meta: { permission: "reports.trial" },
       },
       {
         path: "/reports/trial_transactions",
@@ -98,56 +148,89 @@ const routes = [
           from: route.query.fromdate,
           to: route.query.todate,
         }),
+        meta: {
+          permission: () => {
+            // Return an array so that either permission is sufficient
+            return ["reports.income", "reports.trial"];
+          },
+        },
       },
       {
         path: "/reports/income_statement",
         component: IncomeStatement,
+        meta: { permission: "reports.income" },
       },
-      // Goods & Serivices
+      // Goods & Services
       {
         path: "/ic/add/:type",
         component: AddPart,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "part"
+              ? "items.part"
+              : "items.service";
+          },
+        },
       },
       {
         path: "/ic/search/:type",
         component: SearchPart,
+        meta: {
+          permission: (route) => {
+            if (route.params.type === "allitems")
+              return "items.search.allitems";
+            if (route.params.type === "parts") return "items.search.parts";
+            if (route.params.type === "services")
+              return "items.search.services";
+            return null;
+          },
+        },
       },
       // System Settings
       {
         path: "/system/currencies",
         component: SysCurrencies,
+        meta: { permission: "system.currencies" },
       },
       {
         path: "/system/defaults",
         component: SysDefaults,
+        meta: { permission: "system.defaults" },
       },
       {
         path: "/system/chart/list",
         component: ListAccounts,
+        meta: { permission: "system.chart.list" },
       },
       {
         path: "/system/chart/addaccount",
         component: AddAccount,
+        meta: { permission: "system.chart.add" },
       },
       {
         path: "/system/departments",
         component: ListDepartments,
+        meta: { permission: "system.departments" },
       },
       {
         path: "/system/projects",
         component: ListProjects,
+        meta: { permission: "system.projects" },
       },
       {
         path: "/reconciliation",
         component: Reconciliation,
+        meta: { permission: "system.recon" },
       },
       {
         path: "/system/roles",
         component: Roles,
+        meta: { permission: "system.user.roles" },
       },
       {
         path: "/system/employees",
         component: Employees,
+        meta: { permission: "system.user.employees" },
       },
     ],
   },
@@ -155,9 +238,7 @@ const routes = [
     path: "/login",
     component: LoginPage,
   },
-
-  // Always leave this as last one,
-  // but you can also remove it
+  // Catch-all for undefined routes
   {
     path: "/:catchAll(.*)*",
     component: ErrorNotFound,
