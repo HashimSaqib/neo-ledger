@@ -738,7 +738,7 @@ const customerInputRefs = [];
 // Fetch static links and accounts data
 const getLinks = async () => {
   try {
-    const response = await api.get("/create_links/goodsservices");
+    const response = await api.get("/create_links/ic");
     const links = response.data;
     taxAccounts.value = links.tax_accounts;
     taxAccounts.value.forEach((tax) => {
