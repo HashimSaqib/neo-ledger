@@ -223,6 +223,11 @@ export const menuLinks = [
         perm: "system.user.roles",
       },
       {
+        title: "Employees",
+        link: "/system/employees",
+        perm: "system.user.employees",
+      },
+      {
         title: "Chart Of Accounts",
         perm: "system.chart",
         sublinks: [

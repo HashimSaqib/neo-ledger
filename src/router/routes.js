@@ -25,7 +25,7 @@ import ListProjects from "src/pages/projectsjobs/ListProjects.vue";
 import LoginPage from "src/pages/LoginPage.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 import Roles from "src/pages/system/Roles.vue";
-
+import Employees from "src/pages/system/Employees.vue";
 const routes = [
   {
     path: "/",
@@ -144,6 +144,10 @@ const routes = [
       {
         path: "/system/roles",
         component: Roles,
+      },
+      {
+        path: "/system/employees",
+        component: Employees,
       },
     ],
   },
