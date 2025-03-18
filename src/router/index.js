@@ -18,7 +18,7 @@ export default route(function () {
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
-    history: createMemoryHistory(),
+    history: createWebHistory(),
   });
 
   Router.beforeEach((to, from, next) => {

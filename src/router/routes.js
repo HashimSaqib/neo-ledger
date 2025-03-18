@@ -150,7 +150,6 @@ const routes = [
         }),
         meta: {
           permission: () => {
-            // Return an array so that either permission is sufficient
             return ["reports.income", "reports.trial"];
           },
         },
@@ -220,7 +219,7 @@ const routes = [
       {
         path: "/reconciliation",
         component: Reconciliation,
-        meta: { permission: "system.recon" },
+        meta: { permission: "cash.recon" },
       },
       {
         path: "/system/roles",
