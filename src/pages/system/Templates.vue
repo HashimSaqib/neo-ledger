@@ -287,7 +287,8 @@ const saving = ref(false);
 const fileLoading = ref(true);
 const editorLoading = ref(true);
 const client = ref(null); // Add client ref to handle client parameter
-const monacoInstance = ref(null);
+const monacoLoaded = ref(false);
+const monacoLoading = ref(false);
 
 // Upload Functionality
 const newTemplateFile = ref(null);
@@ -373,24 +374,60 @@ const templateIncludes = computed(() => {
   });
 });
 
-// Dynamically load Monaco editor
-// Replace the loadMonaco function with this version
-const loadMonaco = async () => {
-  if (monacoInstance.value) return monacoInstance.value;
+// Load Monaco from CDN
+const loadMonaco = () => {
+  if (monacoLoaded.value) return Promise.resolve(window.monaco);
+  if (monacoLoading.value) {
+    // Wait for the ongoing loading to complete
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (window.monaco) {
+          clearInterval(checkInterval);
+          resolve(window.monaco);
+        }
+      }, 100);
+    });
+  }
 
-  // First, import the core editor API
-  const monaco = await import("monaco-editor/esm/vs/editor/editor.api");
+  monacoLoading.value = true;
 
-  // Explicitly load the HTML language contribution to ensure it's available
-  await import("monaco-editor/esm/vs/basic-languages/html/html.contribution");
+  return new Promise((resolve, reject) => {
+    // Use a stable version of Monaco from CDN
+    const monacoVersion = "0.43.0";
+    const script = document.createElement("script");
+    script.src = `https://cdn.jsdelivr.net/npm/monaco-editor@${monacoVersion}/min/vs/loader.js`;
+    script.onload = () => {
+      // Configure require paths
+      window.require.config({
+        paths: {
+          vs: `https://cdn.jsdelivr.net/npm/monaco-editor@${monacoVersion}/min/vs`,
+        },
+      });
 
-  monacoInstance.value = monaco;
-  return monaco;
+      // Load monaco editor
+      window.require(["vs/editor/editor.main"], () => {
+        monacoLoaded.value = true;
+        monacoLoading.value = false;
+
+        // Register languages and themes
+        registerCustomLanguages(window.monaco);
+        resolve(window.monaco);
+      });
+    };
+
+    script.onerror = (err) => {
+      console.error("Failed to load Monaco from CDN", err);
+      monacoLoading.value = false;
+      reject(new Error("Failed to load Monaco Editor from CDN"));
+    };
+
+    document.head.appendChild(script);
+  });
 };
 
 // Register custom language definitions with Monaco
-const registerCustomLanguages = async () => {
-  const monaco = await loadMonaco();
+const registerCustomLanguages = (monaco) => {
+  if (!monaco) return;
 
   // Create custom themes first
   monaco.editor.defineTheme("customLightTheme", {
@@ -771,32 +808,59 @@ const initializeEditor = async () => {
   if (editor) editor.dispose();
 
   // Load Monaco if not already loaded
-  const monaco = await loadMonaco();
+  let monaco;
+  try {
+    monaco = await loadMonaco();
+  } catch (error) {
+    console.error("Could not load Monaco editor:", error);
+    editorLoading.value = false;
+    $q.notify({
+      message: "Failed to load code editor. Please refresh and try again.",
+      color: "negative",
+      position: "center",
+    });
+    return;
+  }
 
-  editor = monaco.editor.create(editorContainer.value, {
-    value: templateContent.value,
-    language: editorLanguage.value,
-    theme: $q.dark.isActive ? "customDarkTheme" : "customLightTheme",
-    automaticLayout: true,
-    minimap: { enabled: true },
-    scrollBeyondLastLine: false,
-    readOnly: isReadOnly.value,
-    fontSize: 14,
-    lineNumbers: "on",
-    renderWhitespace: "all",
-    wordWrap: "on",
-  });
+  try {
+    editor = monaco.editor.create(editorContainer.value, {
+      value: templateContent.value,
+      language: editorLanguage.value,
+      theme: $q.dark.isActive ? "customDarkTheme" : "customLightTheme",
+      automaticLayout: true,
+      minimap: { enabled: true },
+      scrollBeyondLastLine: false,
+      readOnly: isReadOnly.value,
+      fontSize: 14,
+      lineNumbers: "on",
+      renderWhitespace: "all",
+      wordWrap: "on",
+    });
 
-  editorLoading.value = false;
+    editorLoading.value = false;
+  } catch (error) {
+    console.error("Error initializing editor:", error);
+    editorLoading.value = false;
+    $q.notify({
+      message: "Failed to initialize editor. Please try again.",
+      color: "negative",
+      position: "center",
+    });
+  }
 };
 
 /** Lifecycle and watchers **/
-onMounted(async () => {
+onMounted(() => {
   // Get templates first
   getTemplates();
 
   // Try to get client info if needed for your app
   client.value = localStorage.getItem("client") || null;
+
+  // Start preloading Monaco immediately in the background
+  loadMonaco().catch((err) => {
+    console.warn("Preloading Monaco failed, will retry when needed:", err);
+  });
 });
 
 // Whenever a template is chosen, load its content
@@ -804,9 +868,8 @@ watch(selectedTemplate, async () => {
   if (selectedTemplate.value) {
     await loadTemplateContent();
 
-    // Only register custom languages and initialize editor if we're dealing with a text file
+    // Only initialize editor if we're dealing with a text file
     if (isTextType.value) {
-      await registerCustomLanguages();
       setTimeout(initializeEditor, 100);
     }
   }
@@ -814,7 +877,6 @@ watch(selectedTemplate, async () => {
 
 watch(templateType, async () => {
   if (isTextType.value) {
-    await registerCustomLanguages();
     initializeEditor();
   }
 });
@@ -823,9 +885,10 @@ watch(templateType, async () => {
 watch(
   () => $q.dark.isActive,
   async (isDark) => {
-    if (editor && monacoInstance.value) {
-      const monaco = await loadMonaco();
-      monaco.editor.setTheme(isDark ? "customDarkTheme" : "customLightTheme");
+    if (editor && window.monaco) {
+      window.monaco.editor.setTheme(
+        isDark ? "customDarkTheme" : "customLightTheme"
+      );
     }
   }
 );
@@ -902,8 +965,12 @@ const loadTemplateContent = async () => {
 
       if (editor) {
         editor.setValue(data);
-        const monaco = await loadMonaco();
-        monaco.editor.setModelLanguage(editor.getModel(), editorLanguage.value);
+        if (window.monaco) {
+          window.monaco.editor.setModelLanguage(
+            editor.getModel(),
+            editorLanguage.value
+          );
+        }
         editor.updateOptions({ readOnly: isReadOnly.value });
       }
     } else {
