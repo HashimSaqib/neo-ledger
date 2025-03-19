@@ -367,12 +367,18 @@
             </div>
 
             <!-- Row 6: GIFI -->
-            <q-input
+            <s-select
+              :options="gifi"
+              map-options
+              emit-value
+              option-label="label"
+              option-value="accno"
               dense
               outlined
               v-model="selectedAccount.gifi_accno"
               :label="t('GIFI')"
               class="q-mt-xs"
+              account
             />
 
             <!-- Form actions -->
@@ -479,7 +485,18 @@ const fetchData = async () => {
     console.error(error);
   }
 };
-
+const gifi = ref([]);
+const fetchGifi = async () => {
+  try {
+    const response = await api.get("/create_links/chart");
+    gifi.value = response.data.gifi;
+    gifi.value = gifi.value.map((account) => {
+      return { ...account, label: `${account.accno}--${account.description}` };
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
 const editDialog = ref(false);
 const selectedAccount = ref({});
 
@@ -801,6 +818,7 @@ const downloadExcel = () => {
 };
 
 onMounted(() => {
+  fetchGifi();
   fetchData();
 });
 </script>

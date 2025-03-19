@@ -246,6 +246,11 @@ export const menuLinks = [
             link: "/system/chart/addaccount",
             perm: "system.chart.add",
           },
+          {
+            title: "GIFI",
+            link: "/system/chart/gifi",
+            perm: "system.chart.gifi",
+          },
         ],
       },
     ],

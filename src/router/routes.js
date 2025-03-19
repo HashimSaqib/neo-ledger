@@ -20,6 +20,7 @@ import SysCurrencies from "src/pages/system/Currencies.vue";
 import SysDefaults from "src/pages/system/Defaults.vue";
 import ListAccounts from "src/pages/system/chart/ListAccounts.vue";
 import AddAccount from "src/pages/system/chart/AddAccount.vue";
+import GIFI from "src/pages/system/chart/Gifi.vue";
 import ListDepartments from "src/pages/system/department/ListDepartments.vue";
 import ListProjects from "src/pages/projectsjobs/ListProjects.vue";
 import LoginPage from "src/pages/LoginPage.vue";
@@ -205,6 +206,11 @@ const routes = [
         path: "/system/chart/addaccount",
         component: AddAccount,
         meta: { permission: "system.chart.add" },
+      },
+      {
+        path: "/system/chart/gifi",
+        component: GIFI,
+        meta: { permission: "system.chart.gifi" },
       },
       {
         path: "/system/departments",
