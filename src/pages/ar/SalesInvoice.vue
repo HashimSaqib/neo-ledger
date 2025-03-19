@@ -21,21 +21,24 @@
               bg-color="input"
             />
             <div class="q-ml-sm" style="display: flex; align-items: center">
-              <a
-                href="#"
+              <q-btn
                 @click.prevent="openEditCustomer"
                 class="text-primary q-mr-xs"
                 style="text-decoration: none"
                 v-if="selectedCustomer"
-                >?</a
-              >
-              <a
-                href="#"
+                icon="edit"
+                flat
+                dense
+              />
+
+              <q-btn
                 @click.prevent="openAddCustomer"
                 class="text-primary"
                 style="margin-right: 0.5em; text-decoration: none"
-                >+</a
-              >
+                icon="add"
+                flat
+                dense
+              />
             </div>
             <div class="col-sm-4 q-md-ml-md content-center" v-if="customer">
               <p class="q-px-sm maintext q-ma-none">
@@ -353,9 +356,9 @@
               <q-btn
                 flat
                 dense
-                icon="question_mark"
-                size="0.4rem"
+                icon="edit"
                 href="#"
+                size="0.8rem"
                 @click.prevent="openEditPart(line)"
                 class="text-primary items-center"
                 v-if="line.partnumber"
