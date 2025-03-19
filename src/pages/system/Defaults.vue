@@ -258,6 +258,29 @@
 
       <!-- Heading: Last Numbers -->
       <div class="text-h6 q-mt-md">{{ t("Last Numbers") }}</div>
+      <div class="maintext q-my-none">
+        {{
+          t(
+            "Next numbers combine fixed patterns with variables and auto-incrementing digits. Use variables like <%date%> or <%yy%><%mm%> together with numbers (e.g., 0001) to create custom numbering sequences that increment automatically."
+          )
+        }}
+      </div>
+      <!-- Variable Chips for Defaults -->
+      <div class="row q-my-xs q-gutter-sm">
+        <template v-if="activeLastNumberField">
+          <q-chip
+            color="primary"
+            v-for="item in filteredTokens"
+            :key="item.token"
+            clickable
+            class="cursor-pointer"
+            @click="insertToken(item.token)"
+          >
+            {{ item.token }}
+            <q-tooltip>{{ item.tooltip }}</q-tooltip>
+          </q-chip>
+        </template>
+      </div>
 
       <!-- GL Reference Number + Lock -->
       <div class="row q-mb-sm items-center">
@@ -269,6 +292,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('glnumber')"
           />
         </div>
         <div class="col-auto">
@@ -290,6 +314,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('sinumber')"
           />
         </div>
         <div class="col-auto">
@@ -311,6 +336,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('sonumber')"
           />
         </div>
         <div class="col-auto">
@@ -332,6 +358,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('vinumber')"
           />
         </div>
       </div>
@@ -346,6 +373,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('batchnumber')"
           />
         </div>
       </div>
@@ -360,6 +388,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('vouchernumber')"
           />
         </div>
       </div>
@@ -374,6 +403,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('ponumber')"
           />
         </div>
         <div class="col-auto">
@@ -395,6 +425,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('sqnumber')"
           />
         </div>
         <div class="col-auto">
@@ -416,6 +447,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('rfqnumber')"
           />
         </div>
         <div class="col-auto">
@@ -437,6 +469,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('partnumber')"
           />
         </div>
       </div>
@@ -451,6 +484,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('projectnumber')"
           />
         </div>
       </div>
@@ -465,6 +499,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('employeenumber')"
           />
         </div>
         <div class="col-auto">
@@ -486,6 +521,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('customernumber')"
           />
         </div>
         <div class="col-auto">
@@ -507,6 +543,7 @@
             outlined
             dense
             class="lightbg input-box"
+            @focus="setActiveLastNumberField('vendornumber')"
           />
         </div>
         <div class="col-auto">
@@ -527,12 +564,12 @@
     </q-form>
   </q-page>
 </template>
-
 <script setup>
-import { ref, onMounted, inject } from "vue";
+import { ref, onMounted, inject, computed } from "vue";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
+
 const updateTitle = inject("updateTitle");
 updateTitle("Company Defaults");
 const { t } = useI18n();
@@ -636,6 +673,131 @@ function findAccountById(arr, id) {
 }
 
 const locklinetax = ref(false);
+
+// New reactive variable to track which last number field is active
+const activeLastNumberField = ref(null);
+
+// Define token categories and their corresponding field applicability
+const allTokens = [
+  {
+    token: "<%date%>",
+    tooltip: t("Inserts the current date based on system date format."),
+    categories: ["all"],
+  },
+  {
+    token: "<%yy%>",
+    tooltip: t("Inserts the two-digit year (or full year if using yyyy)."),
+    categories: ["all"],
+  },
+  {
+    token: "<%mm%>",
+    tooltip: t("Inserts the month (two-digit)."),
+    categories: ["all"],
+  },
+  {
+    token: "<%dd%>",
+    tooltip: t("Inserts the day (two-digit)."),
+    categories: ["all"],
+  },
+  {
+    token: "<%fdm%>",
+    tooltip: t("Inserts the first day of the month."),
+    categories: ["all"],
+  },
+  {
+    token: "<%ldm%>",
+    tooltip: t("Inserts the last day of the month."),
+    categories: ["all"],
+  },
+  {
+    token: "<%curr%>",
+    tooltip: t("Inserts the current currency symbol/code."),
+    categories: ["all"],
+  },
+  {
+    token: "<%name%>",
+    tooltip: t("Inserts the name from the corresponding field."),
+    categories: ["customer", "vendor", "employee"],
+  },
+  {
+    token: "<%business%>",
+    tooltip: t("Inserts the business name."),
+    categories: ["customer", "vendor", "transaction"],
+  },
+  {
+    token: "<%description%>",
+    tooltip: t("Inserts a description text."),
+    categories: ["part", "transaction"],
+  },
+  {
+    token: "<%item%>",
+    tooltip: t("Inserts an item text."),
+    categories: ["part"],
+  },
+  {
+    token: "<%partsgroup%>",
+    tooltip: t("Inserts a parts group text."),
+    categories: ["part"],
+  },
+  {
+    token: "<%phone%>",
+    tooltip: t("Inserts the phone number (digits only)."),
+    categories: ["customer", "vendor"],
+  },
+];
+
+// Map each field to its relevant categories
+const fieldCategoryMap = {
+  glnumber: ["all", "transaction"],
+  sinumber: ["all", "transaction", "customer"],
+  sonumber: ["all", "transaction", "customer"],
+  vinumber: ["all", "transaction", "vendor"],
+  batchnumber: ["all", "transaction"],
+  vouchernumber: ["all", "transaction"],
+  ponumber: ["all", "transaction", "vendor"],
+  sqnumber: ["all", "transaction", "customer"],
+  rfqnumber: ["all", "transaction", "vendor"],
+  partnumber: ["all", "part"],
+  projectnumber: ["all", "project"],
+  employeenumber: ["all", "employee"],
+  customernumber: ["all", "customer"],
+  vendornumber: ["all", "vendor"],
+};
+
+// Computed property to filter tokens based on active field
+const filteredTokens = computed(() => {
+  if (!activeLastNumberField.value) {
+    return [];
+  }
+
+  const relevantCategories = fieldCategoryMap[activeLastNumberField.value] || [
+    "all",
+  ];
+
+  return allTokens.filter(
+    (token) =>
+      token.categories.includes("all") ||
+      token.categories.some((category) => relevantCategories.includes(category))
+  );
+});
+
+function setActiveLastNumberField(fieldName) {
+  activeLastNumberField.value = fieldName;
+}
+
+function insertToken(token) {
+  if (activeLastNumberField.value) {
+    form.value[activeLastNumberField.value] =
+      form.value[activeLastNumberField.value] + token;
+  } else {
+    Notify.create({
+      message: t(
+        "Please select a Last Number field before inserting a variable."
+      ),
+      type: "warning",
+    });
+  }
+}
 
 async function loadDefaults() {
   try {
