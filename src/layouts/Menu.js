@@ -228,6 +228,11 @@ export const menuLinks = [
         perm: "system.user.employees",
       },
       {
+        title: "Templates",
+        link: "/system/templates",
+        perm: "system.templates",
+      },
+      {
         title: "Chart Of Accounts",
         perm: "system.chart",
         sublinks: [
