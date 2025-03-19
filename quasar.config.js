@@ -4,7 +4,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 import { configure } from "quasar/wrappers";
-
+import monacoEditorPlugin from "vite-plugin-monaco-editor";
 export default configure((/* ctx */) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -39,6 +39,22 @@ export default configure((/* ctx */) => {
         node: "node20",
       },
 
+      vitePlugins: [
+        [
+          monacoEditorPlugin.default || monacoEditorPlugin,
+          {
+            customWorkers: [
+              {
+                label: "html",
+                entry: "monaco-editor/esm/vs/language/html/html.worker",
+              },
+              // latex doesn't have a built-in worker
+            ],
+            // for custom definitions
+            featuredWorkers: ["editorWorkerService"],
+          },
+        ],
+      ],
       vueRouterMode: "hash", // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,

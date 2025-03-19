@@ -259,7 +259,6 @@
     </q-dialog>
   </div>
 </template>
-
 <script setup>
 import {
   ref,
@@ -271,7 +270,6 @@ import {
 } from "vue";
 import { api } from "src/boot/axios";
 import { useQuasar } from "quasar";
-import * as monaco from "monaco-editor";
 
 /** Quasar + Refs **/
 const $q = useQuasar();
@@ -289,6 +287,7 @@ const saving = ref(false);
 const fileLoading = ref(true);
 const editorLoading = ref(true);
 const client = ref(null); // Add client ref to handle client parameter
+const monacoInstance = ref(null);
 
 // Upload Functionality
 const newTemplateFile = ref(null);
@@ -374,8 +373,25 @@ const templateIncludes = computed(() => {
   });
 });
 
+// Dynamically load Monaco editor
+// Replace the loadMonaco function with this version
+const loadMonaco = async () => {
+  if (monacoInstance.value) return monacoInstance.value;
+
+  // First, import the core editor API
+  const monaco = await import("monaco-editor/esm/vs/editor/editor.api");
+
+  // Explicitly load the HTML language contribution to ensure it's available
+  await import("monaco-editor/esm/vs/basic-languages/html/html.contribution");
+
+  monacoInstance.value = monaco;
+  return monaco;
+};
+
 // Register custom language definitions with Monaco
-const registerCustomLanguages = () => {
+const registerCustomLanguages = async () => {
+  const monaco = await loadMonaco();
+
   // Create custom themes first
   monaco.editor.defineTheme("customLightTheme", {
     base: "vs",
@@ -747,12 +763,15 @@ const registerCustomLanguages = () => {
 };
 
 // Initialize the Monaco editor (only for text files)
-const initializeEditor = () => {
+const initializeEditor = async () => {
   // Only init if it's a text type file
   if (!editorContainer.value || !isTextType.value) return;
 
   // Dispose any existing instance
   if (editor) editor.dispose();
+
+  // Load Monaco if not already loaded
+  const monaco = await loadMonaco();
 
   editor = monaco.editor.create(editorContainer.value, {
     value: templateContent.value,
@@ -772,9 +791,8 @@ const initializeEditor = () => {
 };
 
 /** Lifecycle and watchers **/
-onMounted(() => {
-  // Register our custom language definitions first
-  registerCustomLanguages();
+onMounted(async () => {
+  // Get templates first
   getTemplates();
 
   // Try to get client info if needed for your app
@@ -782,21 +800,31 @@ onMounted(() => {
 });
 
 // Whenever a template is chosen, load its content
-watch(selectedTemplate, () => {
+watch(selectedTemplate, async () => {
   if (selectedTemplate.value) {
-    loadTemplateContent();
-    // Re‐init the editor if needed
-    setTimeout(initializeEditor, 100);
+    await loadTemplateContent();
+
+    // Only register custom languages and initialize editor if we're dealing with a text file
+    if (isTextType.value) {
+      await registerCustomLanguages();
+      setTimeout(initializeEditor, 100);
+    }
   }
 });
 
-watch(templateType, initializeEditor);
+watch(templateType, async () => {
+  if (isTextType.value) {
+    await registerCustomLanguages();
+    initializeEditor();
+  }
+});
 
 // Watch for theme changes and update Monaco editor accordingly
 watch(
   () => $q.dark.isActive,
-  (isDark) => {
-    if (editor) {
+  async (isDark) => {
+    if (editor && monacoInstance.value) {
+      const monaco = await loadMonaco();
       monaco.editor.setTheme(isDark ? "customDarkTheme" : "customLightTheme");
     }
   }
@@ -874,6 +902,7 @@ const loadTemplateContent = async () => {
 
       if (editor) {
         editor.setValue(data);
+        const monaco = await loadMonaco();
         monaco.editor.setModelLanguage(editor.getModel(), editorLanguage.value);
         editor.updateOptions({ readOnly: isReadOnly.value });
       }
