@@ -26,9 +26,11 @@
           <div>
             <q-list>
               <EssentialLink
-                v-for="link in filteredMenu"
+                v-for="(link, index) in filteredMenu"
                 :key="link.title"
                 v-bind="link"
+                :index="index"
+                :depth="0"
               />
             </q-list>
           </div>
@@ -143,5 +145,12 @@ onMounted(async () => {
 
   filteredMenu.value = filterMenu(menuLinks);
   console.log(filteredMenu.value);
+});
+
+// active dropdown
+const activeDropdownIndex = ref(null);
+provide("activeDropdownIndex", activeDropdownIndex);
+provide("setActiveDropdownIndex", (index) => {
+  activeDropdownIndex.value = index;
 });
 </script>

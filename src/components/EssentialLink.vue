@@ -24,8 +24,9 @@
     <!-- For links with sublinks -->
     <q-expansion-item
       v-if="hasDropdown"
+      v-model="isExpanded"
       expand-separator
-      header-class="maintext "
+      header-class="maintext"
       :icon="props.icon"
       :label="t(props.title)"
     >
@@ -87,7 +88,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
@@ -116,8 +117,33 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  index: {
+    type: Number,
+    default: -1,
+  },
 });
+// Inject from MainLayout
+const activeDropdownIndex = inject("activeDropdownIndex");
+const setActiveDropdownIndex = inject("setActiveDropdownIndex");
 
+// State management
+const isTopLevel = computed(() => props.depth === 0);
+const localExpanded = ref(false);
+
+const isExpanded = computed({
+  get() {
+    return isTopLevel.value
+      ? activeDropdownIndex.value === props.index
+      : localExpanded.value;
+  },
+  set(value) {
+    if (isTopLevel.value) {
+      setActiveDropdownIndex(value ? props.index : null);
+    } else {
+      localExpanded.value = value;
+    }
+  },
+});
 // Check if this link has sublinks (dropdown)
 const hasDropdown = computed(() => props.sublinks && props.sublinks.length > 0);
 const hasSubDropdown = (sublink) =>
