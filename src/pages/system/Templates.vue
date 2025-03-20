@@ -30,6 +30,20 @@
       </div>
     </div>
 
+    <!-- Navigation History (Back Button) -->
+    <div v-if="navigationHistory.length > 0" class="q-mb-md">
+      <q-btn
+        color="grey-7"
+        icon="arrow_back"
+        :label="`Back to ${getTemplateLabel(
+          navigationHistory[navigationHistory.length - 1]
+        )}`"
+        dense
+        outline
+        @click="navigateBack"
+      />
+    </div>
+
     <!-- Main Card -->
     <q-card v-if="selectedTemplate" class="q-mt-md shadow-3">
       <q-card-section class="lightbg q-pa-sm">
@@ -290,6 +304,9 @@ const client = ref(null); // Add client ref to handle client parameter
 const monacoLoaded = ref(false);
 const monacoLoading = ref(false);
 
+// Navigation history for included files
+const navigationHistory = ref([]);
+
 // Upload Functionality
 const newTemplateFile = ref(null);
 const newTemplateName = ref("");
@@ -339,6 +356,22 @@ const editorLanguage = computed(() => {
       return "html";
   }
 });
+
+// Get template label for navigation history display
+const getTemplateLabel = (templateId) => {
+  // Find template in the list to get its friendly name
+  const template = templates.value.find((t) => {
+    if (typeof t === "object" && t.value) {
+      return t.value === templateId;
+    }
+    return t === templateId;
+  });
+
+  if (template) {
+    return typeof template === "object" ? template.label : template;
+  }
+  return templateId;
+};
 
 // Extract includes from template content using regex
 const extractIncludes = (content) => {
@@ -424,12 +457,11 @@ const loadMonaco = () => {
     document.head.appendChild(script);
   });
 };
-
 // Register custom language definitions with Monaco
 const registerCustomLanguages = (monaco) => {
   if (!monaco) return;
 
-  // Create custom themes first
+  // Create custom themes first - use the same color for control/loop for consistency
   monaco.editor.defineTheme("customLightTheme", {
     base: "vs",
     inherit: true,
@@ -437,6 +469,7 @@ const registerCustomLanguages = (monaco) => {
       { token: "template-tag", foreground: "0000AA", fontStyle: "bold" },
       { token: "template-variable", foreground: "AA0000" },
       { token: "template-control", foreground: "AA00AA", fontStyle: "bold" },
+      { token: "template-end", foreground: "AA00AA", fontStyle: "bold" },
       { token: "template-loop", foreground: "00AA00", fontStyle: "bold" },
     ],
     colors: {},
@@ -449,6 +482,7 @@ const registerCustomLanguages = (monaco) => {
       { token: "template-tag", foreground: "6699FF", fontStyle: "bold" },
       { token: "template-variable", foreground: "FF9999" },
       { token: "template-control", foreground: "FF99FF", fontStyle: "bold" },
+      { token: "template-end", foreground: "FF99FF", fontStyle: "bold" },
       { token: "template-loop", foreground: "99FF99", fontStyle: "bold" },
     ],
     colors: {},
@@ -461,9 +495,9 @@ const registerCustomLanguages = (monaco) => {
       root: [
         // Template syntax rules first
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
         // Standard LaTeX syntax
@@ -488,7 +522,6 @@ const registerCustomLanguages = (monaco) => {
   });
 
   // Create custom HTML language definition with template syntax highlighting
-  // This approach works by creating a new tokenizer that extends the default HTML tokenizer
   const htmlWithTemplateTokenizer = {
     defaultToken: "",
     tokenPostfix: ".html",
@@ -497,12 +530,12 @@ const registerCustomLanguages = (monaco) => {
       root: [
         // Custom template syntax patterns
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
-        // HTML standard syntax (copied from default Monaco HTML tokenizer)
+        // HTML standard syntax
         [/<!DOCTYPE/, "metatag", "@doctype"],
         [/<!--/, "comment", "@comment"],
         [
@@ -535,9 +568,9 @@ const registerCustomLanguages = (monaco) => {
       otherTag: [
         // Add template highlighting even inside tags
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
         [/\/?>/, "delimiter", "@pop"],
@@ -550,9 +583,9 @@ const registerCustomLanguages = (monaco) => {
       script: [
         // Make sure to highlight templates in script blocks
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
         [/type/, "attribute.name", "@scriptAfterType"],
@@ -632,9 +665,9 @@ const registerCustomLanguages = (monaco) => {
       scriptEmbedded: [
         // Template highlighting in script content
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
         [
@@ -646,9 +679,9 @@ const registerCustomLanguages = (monaco) => {
       style: [
         // Template highlighting in style blocks
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
         [/type/, "attribute.name", "@styleAfterType"],
@@ -728,9 +761,9 @@ const registerCustomLanguages = (monaco) => {
       styleEmbedded: [
         // Template highlighting in style content
         [/<%include\s+[^%>]+%>/, "template-tag"],
-        [/<%if\s+[^%>]+%>/, "template-control"],
-        [/<%end\s+[^%>]+%>/, "template-control"],
-        [/<%foreach\s+[^%>]+%>/, "template-loop"],
+        [/<%if\s+([^%>]+)%>/, "template-control"],
+        [/<%foreach\s+([^%>]+)%>/, "template-loop"],
+        [/<%end\s+[^%>]+%>/, "template-end"],
         [/<%[^%>]+%>/, "template-variable"],
 
         [/<\/style/, { token: "@rematch", next: "@pop", nextEmbedded: "@pop" }],
@@ -906,6 +939,16 @@ onBeforeUnmount(() => {
 
 /** Methods **/
 
+// Navigate back to previous template
+const navigateBack = () => {
+  if (navigationHistory.value.length > 0) {
+    // Get the last template from history
+    const previousTemplate = navigationHistory.value.pop();
+    // Load it without adding to history (we're going back)
+    selectedTemplate.value = previousTemplate;
+  }
+};
+
 // Load an included file when clicked in the includes list
 const loadIncludeFile = (filename) => {
   // Find the template in the templates list
@@ -917,6 +960,12 @@ const loadIncludeFile = (filename) => {
   });
 
   if (templateItem) {
+    // Store current template in history before navigating
+    if (selectedTemplate.value) {
+      navigationHistory.value.push(selectedTemplate.value);
+    }
+
+    // Navigate to the included template
     selectedTemplate.value =
       typeof templateItem === "object" ? templateItem.value : templateItem;
   } else {
@@ -1037,6 +1086,15 @@ const saveTemplateContent = async () => {
 
     await api.post("/system/template", { content }, { params });
 
+    // Store current selection
+    const currentTemplate = selectedTemplate.value;
+
+    // Refresh the templates list
+    await getTemplates();
+
+    // Restore the selection
+    selectedTemplate.value = currentTemplate;
+
     $q.notify({
       message: "Template saved successfully",
       color: "positive",
@@ -1117,6 +1175,9 @@ const uploadNewTemplate = async () => {
       },
     });
 
+    // Store the name of the newly uploaded template
+    const newTemplateName = newTemplateName.value || newTemplateFile.value.name;
+
     $q.notify({
       message: `Template ${
         fileExistsWarning.value ? "replaced" : "uploaded"
@@ -1125,12 +1186,29 @@ const uploadNewTemplate = async () => {
       position: "center",
     });
 
-    // Reset form and refresh templates
+    // Reset form
     newTemplateFile.value = null;
     newTemplateName.value = "";
     fileExistsWarning.value = false;
     showUploadDialog.value = false;
-    getTemplates();
+
+    // Refresh templates and select the new one
+    await getTemplates();
+
+    // Find and select the newly uploaded template
+    const newlyUploadedTemplate = templates.value.find((t) => {
+      if (typeof t === "object" && t.value) {
+        return t.value === newTemplateName;
+      }
+      return t === newTemplateName;
+    });
+
+    if (newlyUploadedTemplate) {
+      selectedTemplate.value =
+        typeof newlyUploadedTemplate === "object"
+          ? newlyUploadedTemplate.value
+          : newlyUploadedTemplate;
+    }
   } catch (error) {
     handleError("Failed to upload template", error);
   } finally {
@@ -1214,6 +1292,15 @@ const uploadReplacementFile = async (event) => {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      // Store current selection
+      const currentTemplate = selectedTemplate.value;
+
+      // Refresh templates list
+      await getTemplates();
+
+      // Restore selection
+      selectedTemplate.value = currentTemplate;
 
       $q.notify({
         message: "File replaced successfully",
