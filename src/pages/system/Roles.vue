@@ -1,76 +1,117 @@
 <template>
-  <q-page class="lightbg q-pa-sm">
-    <q-table
-      :rows="roles"
-      :columns="columns"
-      row-key="id"
-      flat
-      bordered
-      separator="horizontal"
-      hide-bottom
-    >
-      <!-- Custom cell for Access Controls -->
-      <template v-slot:body-cell-acs="props">
-        <q-td :props="props">
-          <div class="row items-center no-wrap">
-            <div
-              v-for="group in groupRowAcs(props.row.acs)"
-              :key="group.group"
-              class="q-mr-sm"
-            >
-              <q-chip dense flat>
-                <!-- Display raw permission group (or you may enhance this lookup if needed) -->
-                {{ t(group.group) }}
-                <q-tooltip v-if="group.subs.length">
-                  <div v-for="sub in group.subs" :key="sub" class="q-pa-xs">
-                    {{ t(sub.split(".").slice(1).join(".")) }}
-                  </div>
-                </q-tooltip>
-              </q-chip>
+  <div class="container">
+    <h1>Datasets</h1>
+
+    <!-- Loading Spinner -->
+    <div v-if="loading" class="spinner">Loading...</div>
+
+    <!-- Error Message -->
+    <div v-if="error" class="error">
+      Error fetching datasets. Please try again later.
+    </div>
+
+    <!-- Datasets Grid -->
+    <div v-if="!loading && !error" class="datasets-grid">
+      <div
+        v-for="dataset in datasets"
+        :key="dataset.db_name"
+        class="dataset-card"
+      >
+        <div class="dataset-header">
+          <!-- Logo Image -->
+          <img
+            v-if="dataset.logo"
+            :src="'data:image/png;base64,' + dataset.logo"
+            alt="Logo"
+            class="dataset-logo"
+          />
+          <h2 class="dataset-title">{{ dataset.db_name }}</h2>
+        </div>
+        <p class="dataset-description">{{ dataset.description }}</p>
+        <p class="dataset-access">
+          <strong>Access:</strong> <em>{{ dataset.access_level }}</em>
+        </p>
+
+        <!-- Additional details for owner/admin -->
+        <div
+          v-if="
+            dataset.access_level === 'owner' || dataset.access_level === 'admin'
+          "
+          class="admin-details"
+        >
+          <div class="users" v-if="dataset.users && dataset.users.length">
+            <h3>Users</h3>
+            <ul>
+              <li v-for="user in dataset.users" :key="user.email">
+                {{ user.email }} - {{ user.access_level }}
+              </li>
+            </ul>
+          </div>
+          <!-- Improved Roles Display -->
+          <div class="roles" v-if="dataset.roles && dataset.roles.length">
+            <h3>Roles</h3>
+            <div class="roles-list">
+              <div
+                v-for="role in dataset.roles"
+                :key="role.id"
+                class="role-item"
+              >
+                <!-- Using q-chip to display role description and grouped permissions -->
+                <q-chip dense flat class="q-mr-sm">
+                  {{ role.description || role.name }}
+                  <q-tooltip v-if="role.acs && role.acs.length">
+                    <div
+                      v-for="group in groupRowAcs(role.acs)"
+                      :key="group.group"
+                      class="q-pa-xs"
+                    >
+                      <strong>{{ t(group.group) }}</strong>
+                      <span v-if="group.subs.length">
+                        : {{ group.subs.map(formatSub).join(", ") }}
+                      </span>
+                    </div>
+                  </q-tooltip>
+                </q-chip>
+                <!-- Edit button for each role -->
+                <q-btn
+                  label="Edit"
+                  color="primary"
+                  flat
+                  size="sm"
+                  @click="openEditRolePopup(dataset, role)"
+                />
+              </div>
             </div>
           </div>
-        </q-td>
-      </template>
-
-      <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
+          <!-- Button to add a new role -->
           <q-btn
-            :label="t('Edit')"
+            label="Add Role"
             color="primary"
-            @click="openEditPopup(props.row)"
-            flat
             size="sm"
+            @click="openAddRolePopup(dataset)"
           />
-        </q-td>
-      </template>
-    </q-table>
+        </div>
+      </div>
+    </div>
 
-    <q-btn
-      :label="t('Add Role')"
-      color="primary"
-      @click="openAddPopup"
-      size="sm"
-      class="q-my-md"
-    />
-
-    <!-- Dialog for adding or editing role -->
-    <q-dialog v-model="editDialog">
+    <!-- Global Dialog for Adding/Editing a Role -->
+    <q-dialog v-model="roleDialog">
       <q-card>
         <q-card-section>
           <div class="text-h6">
             {{ t(isEditMode ? "Edit Role" : "Add Role") }}
           </div>
+          <!-- Now using description (you can adjust field names as needed) -->
           <q-input
             v-model="selectedRole.description"
-            :label="t('Description')"
+            label="Description"
             outlined
             dense
             class="q-my-md"
           />
-
           <div class="q-my-md">
-            <div class="text-subtitle2">{{ t("Access Controls") }}</div>
-            <!-- Hierarchical checkboxes for access controls -->
+            <div class="text-subtitle2">Access Controls</div>
+            <!-- Render hierarchical checkboxes based on groupedAcs -->
             <div
               v-for="group in groupedAcs"
               :key="group.group"
@@ -78,58 +119,64 @@
             >
               <q-checkbox
                 :label="t(group.label)"
-                :model-value="isGroupChecked(group)"
-                @update:model-value="(val) => toggleGroup(group, val)"
+                :model-value="isGroupChecked(group, selectedRole)"
+                @update:model-value="
+                  (val) => toggleGroup(group, val, selectedRole)
+                "
               />
               <div class="q-ml-lg">
                 <q-checkbox
                   v-for="subObj in group.subs"
                   :key="subObj.perm"
                   :label="t(subObj.label)"
-                  :model-value="isChecked(subObj.perm)"
+                  :model-value="isChecked(subObj.perm, selectedRole)"
                   @update:model-value="
-                    (val) => togglePermission(subObj.perm, val)
+                    (val) => togglePermission(subObj.perm, val, selectedRole)
                   "
                 />
               </div>
             </div>
           </div>
         </q-card-section>
-
         <q-card-actions align="right" class="q-mt-none q-pt-none">
-          <q-btn flat :label="t('Cancel')" color="negative" v-close-popup />
-          <q-btn flat :label="t('Save')" color="positive" @click="saveRole" />
+          <q-btn
+            flat
+            label="Cancel"
+            color="negative"
+            v-close-popup
+            @click="cancelRole"
+          />
+          <q-btn flat label="Save" color="positive" @click="saveRole" />
         </q-card-actions>
       </q-card>
     </q-dialog>
-  </q-page>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, inject } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
-// Import the menu links from menu.js
-import { menuLinks } from "src/layouts/Menu.js";
 import { useI18n } from "vue-i18n";
+import { menuLinks } from "src/layouts/Menu.js";
 const { t } = useI18n();
 
-// Set page title using injected updateTitle
-const updateTitle = inject("updateTitle");
-updateTitle("User Roles");
+const datasets = ref([]);
+const loading = ref(true);
+const error = ref(false);
 
-const roles = ref([]);
-const editDialog = ref(false);
+// Global state for role creation/editing
+const roleDialog = ref(false);
 const isEditMode = ref(false);
+const selectedDataset = ref(null);
+// Now using a description field instead of just a name
 const selectedRole = ref({ id: null, description: "", acs: [] });
 
-// Build grouped access controls from menuLinks
+// Build grouped access controls from menuLinks (recursive flattening for sublinks)
 const groupedAcs = computed(() => {
-  // Helper function to recursively flatten sublinks
   const flattenSublinks = (links) => {
     return links.flatMap((link) => {
       let items = [];
-      // Use either "perm" or fallback to "perl" (if present)
       if (link.perm || link.perl) {
         items.push({ perm: link.perm || link.perl, label: link.title });
       }
@@ -141,7 +188,6 @@ const groupedAcs = computed(() => {
   };
 
   return menuLinks.map((link) => {
-    // Top-level permission (handle possible key typo: perm vs. perl)
     const groupPerm = link.perm || link.perl;
     const groupLabel = link.title;
     const subs = link.sublinks ? flattenSublinks(link.sublinks) : [];
@@ -154,20 +200,7 @@ const groupedAcs = computed(() => {
   });
 });
 
-// Define table columns (the acs column now uses a custom slot)
-const columns = [
-  { name: "id", label: t("ID"), field: "id", align: "left" },
-  {
-    name: "description",
-    label: t("Description"),
-    field: "description",
-    align: "left",
-  },
-  { name: "acs", label: t("Access Controls"), field: "acs", align: "left" },
-  { name: "actions", label: t("Actions"), align: "right" },
-];
-
-// Helper function to group a role's acs for table display (unchanged)
+// Group an array of access controls for display (chips with tooltips)
 const groupRowAcs = (acsArray) => {
   const groups = {};
   acsArray.forEach((perm) => {
@@ -183,50 +216,69 @@ const groupRowAcs = (acsArray) => {
   return Object.values(groups);
 };
 
-// Fetch roles from API and parse the acs field into an array
-const getRoles = async () => {
+// Optional formatter for subpermissions (remove group prefix if desired)
+const formatSub = (perm) => {
+  const parts = perm.split(".");
+  return parts.slice(1).join(".");
+};
+
+// Fetch datasets from the central API
+const getDatasets = async () => {
   try {
-    const response = await api.get("/system/roles");
-    roles.value = response.data.map((role) => {
-      return {
-        ...role,
-        acs: typeof role.acs === "string" ? JSON.parse(role.acs) : role.acs,
-      };
-    });
-  } catch (error) {
-    Notify.create({
-      message: error.response?.data?.message || t("Can't fetch roles"),
-      type: "negative",
-      position: "center",
-    });
+    const response = await api.get("/central/db_list");
+    datasets.value = response.data.map((ds) => ({
+      ...ds,
+      roles: ds.roles || [],
+      users: ds.users || [],
+    }));
+  } catch (err) {
+    console.error("Error fetching datasets:", err);
+    error.value = true;
+  } finally {
+    loading.value = false;
   }
 };
 
-const openAddPopup = () => {
+onMounted(() => {
+  getDatasets();
+});
+
+// Open the role creation dialog for a given dataset
+const openAddRolePopup = (dataset) => {
+  selectedDataset.value = dataset;
   selectedRole.value = { id: null, description: "", acs: [] };
   isEditMode.value = false;
-  editDialog.value = true;
+  roleDialog.value = true;
 };
 
-const openEditPopup = (role) => {
-  // Clone the role to avoid modifying the table data directly
+// Open the role edit dialog for an existing role
+const openEditRolePopup = (dataset, role) => {
+  selectedDataset.value = dataset;
+  // Clone the role to avoid directly modifying dataset data
   selectedRole.value = { ...role };
-  // Ensure acs is an array (it should already be if parsed)
   if (typeof selectedRole.value.acs === "string") {
     selectedRole.value.acs = JSON.parse(selectedRole.value.acs);
   }
   isEditMode.value = true;
-  editDialog.value = true;
+  roleDialog.value = true;
 };
 
+// Cancel role creation/editing
+const cancelRole = () => {
+  roleDialog.value = false;
+  selectedRole.value = { id: null, description: "", acs: [] };
+};
+
+// Save the role via API call
 const saveRole = async () => {
   try {
-    // Convert the selected acs array back to a JSON string for the API
     const payload = {
+      // Using "description" now; adjust if you need both name/description
       description: selectedRole.value.description,
       acs: JSON.stringify(selectedRole.value.acs),
     };
     if (isEditMode.value) {
+      // For editing, use the role id endpoint
       await api.post(`/system/roles/${selectedRole.value.id}`, payload);
       Notify.create({
         message:
@@ -239,15 +291,20 @@ const saveRole = async () => {
         position: "center",
       });
     } else {
-      await api.post("/system/roles", payload);
+      // For creation, send client info as before
+      await api.post(
+        `/system/roles?client=${selectedDataset.value.db_name}`,
+        payload
+      );
       Notify.create({
         message: t("Role added successfully!"),
         type: "positive",
         position: "center",
       });
     }
-    editDialog.value = false;
-    getRoles(); // Refresh the table data after saving
+    roleDialog.value = false;
+    // Refresh the datasets to update roles
+    getDatasets();
   } catch (error) {
     Notify.create({
       message: error.response?.data?.message || t("An error occurred"),
@@ -257,78 +314,170 @@ const saveRole = async () => {
   }
 };
 
-onMounted(() => {
-  getRoles();
-});
-
-// Utility functions for permission toggling
-
-// Checks if a single permission is selected
-const isChecked = (permission) => {
-  return selectedRole.value.acs.includes(permission);
+// Utility functions for toggling permissions in the role's acs array
+const isChecked = (permission, role) => {
+  return role.acs.includes(permission);
 };
 
-// Toggle a sub permission; if checked, ensure the parent is also checked.
-// If unchecked and no other sub is selected, the parent is unchecked.
-const togglePermission = (permission, value) => {
+const togglePermission = (permission, value, role) => {
   if (value) {
-    if (!selectedRole.value.acs.includes(permission)) {
-      selectedRole.value.acs.push(permission);
+    if (!role.acs.includes(permission)) {
+      role.acs.push(permission);
     }
-    // Ensure parent is checked if available
+    // Ensure the parent permission is also added
     const parent = permission.split(".")[0];
-    if (!selectedRole.value.acs.includes(parent)) {
-      selectedRole.value.acs.push(parent);
+    if (!role.acs.includes(parent)) {
+      role.acs.push(parent);
     }
   } else {
-    selectedRole.value.acs = selectedRole.value.acs.filter(
-      (p) => p !== permission
-    );
-    // If a sub permission is unchecked and no others remain, uncheck parent
+    role.acs = role.acs.filter((p) => p !== permission);
     const parent = permission.split(".")[0];
-    // Find related group by parent and check if any sub permissions remain checked
+    // If no subpermissions remain checked for the group, remove the parent
     const group = groupedAcs.value.find((g) => g.group === parent);
     if (
       group &&
-      group.subs.every(
-        (permObj) => !selectedRole.value.acs.includes(permObj.perm)
-      )
+      group.subs.every((permObj) => !role.acs.includes(permObj.perm))
     ) {
-      selectedRole.value.acs = selectedRole.value.acs.filter(
-        (p) => p !== parent
-      );
+      role.acs = role.acs.filter((p) => p !== parent);
     }
   }
 };
 
-// For a given group, return true if its top permission (if available) or any sub permission is selected
-const isGroupChecked = (group) => {
-  const acs = selectedRole.value.acs;
+const isGroupChecked = (group, role) => {
+  const acs = role.acs;
   const hasTop = group.top ? acs.includes(group.group) : false;
   const hasSub = group.subs.some((permObj) => acs.includes(permObj.perm));
   return hasTop || hasSub;
 };
 
-// Toggle an entire group of permissions (both parent and sub items)
-const toggleGroup = (group, value) => {
+const toggleGroup = (group, value, role) => {
   if (value) {
-    if (group.top && !selectedRole.value.acs.includes(group.group)) {
-      selectedRole.value.acs.push(group.group);
+    if (group.top && !role.acs.includes(group.group)) {
+      role.acs.push(group.group);
     }
     group.subs.forEach((permObj) => {
-      if (!selectedRole.value.acs.includes(permObj.perm)) {
-        selectedRole.value.acs.push(permObj.perm);
+      if (!role.acs.includes(permObj.perm)) {
+        role.acs.push(permObj.perm);
       }
     });
   } else {
-    selectedRole.value.acs = selectedRole.value.acs.filter(
-      (p) => p !== group.group
-    );
+    role.acs = role.acs.filter((p) => p !== group.group);
     group.subs.forEach((permObj) => {
-      selectedRole.value.acs = selectedRole.value.acs.filter(
-        (p) => p !== permObj.perm
-      );
+      role.acs = role.acs.filter((p) => p !== permObj.perm);
     });
   }
 };
 </script>
+
+<style scoped>
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.spinner {
+  text-align: center;
+  font-size: 1.2em;
+  color: #555;
+}
+
+.error {
+  text-align: center;
+  color: #b00020;
+  background: #fddede;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.datasets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.dataset-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dataset-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dataset-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.dataset-logo {
+  max-width: 50px;
+  margin-right: 10px;
+}
+
+.dataset-title {
+  margin: 0;
+  font-size: 1.25em;
+  color: #333;
+}
+
+.dataset-description {
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.dataset-access {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.admin-details {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.admin-details h3 {
+  margin: 0 0 5px;
+  font-size: 1em;
+  color: #333;
+}
+
+.admin-details ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.admin-details li {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 3px;
+}
+
+/* Roles list styling */
+.roles-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+</style>

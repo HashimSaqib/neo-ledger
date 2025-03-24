@@ -24,13 +24,19 @@ import GIFI from "src/pages/system/chart/Gifi.vue";
 import ListDepartments from "src/pages/system/department/ListDepartments.vue";
 import ListProjects from "src/pages/projectsjobs/ListProjects.vue";
 import LoginPage from "src/pages/LoginPage.vue";
+import SignUp from "src/pages/Signup.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 import Roles from "src/pages/system/Roles.vue";
 import Employees from "src/pages/system/Employees.vue";
 import LedgerTemplates from "src/pages/system/Templates.vue";
+import CentralIndex from "src/pages/central/IndexPage.vue";
 const routes = [
   {
     path: "/",
+    component: CentralIndex,
+  },
+  {
+    path: "/client/:client",
     component: MainLayout,
     children: [
       {
@@ -39,19 +45,19 @@ const routes = [
       },
       // General Ledger
       {
-        path: "/gl/add-gl",
+        path: "gl/add-gl",
         component: GeneralLedger,
         props: (route) => ({ id: route.query.id }),
         meta: { permission: "gl.add" },
       },
       {
-        path: "/gl/reports",
+        path: "gl/reports",
         component: GlTransactions,
         meta: { permission: "gl.transactions" },
       },
       // ARAP
       {
-        path: "/arap/transaction/:type",
+        path: "arap/transaction/:type",
         component: ArApTransaction,
         props: (route) => ({ id: route.query.id }),
         meta: {
@@ -63,7 +69,7 @@ const routes = [
         },
       },
       {
-        path: "/arap/transactions/:type",
+        path: "arap/transactions/:type",
         component: ArApTransactions,
         meta: {
           permission: (route) => {
@@ -74,7 +80,7 @@ const routes = [
         },
       },
       {
-        path: "/history/:type",
+        path: "history/:type",
         component: VcHistory,
         meta: {
           permission: (route) => {
@@ -85,7 +91,7 @@ const routes = [
         },
       },
       {
-        path: "/arap/:type",
+        path: "arap/:type",
         component: AddVC,
         props: (route) => ({ id: route.query.id }),
         meta: {
@@ -97,7 +103,7 @@ const routes = [
         },
       },
       {
-        path: "/arap/search/:type",
+        path: "arap/search/:type",
         component: SearchVC,
         meta: {
           permission: (route) => {
@@ -108,7 +114,7 @@ const routes = [
         },
       },
       {
-        path: "/ar/sales-invoice",
+        path: "ar/sales-invoice",
         component: SalesInvoice,
         props: (route) => ({ id: route.query.id }),
         meta: {
@@ -120,20 +126,20 @@ const routes = [
         },
       },
       {
-        path: "/pos/sale",
+        path: "pos/sale",
         component: PointOfSale,
         props: (route) => ({ id: route.query.id }),
         meta: { permission: "pos.sale" },
       },
       {
-        path: "/ap/vendor-invoice",
+        path: "ap/vendor-invoice",
         component: VendorInvoice,
         props: (route) => ({ id: route.query.id }),
         meta: { permission: "vendor.invoice" },
       },
       // Reports
       {
-        path: "/reports/trial_balance",
+        path: "reports/trial_balance",
         component: TrialBalance,
         props: (route) => ({
           from: route.query.fromdate,
@@ -142,7 +148,7 @@ const routes = [
         meta: { permission: "reports.trial" },
       },
       {
-        path: "/reports/trial_transactions",
+        path: "reports/trial_transactions",
         component: TrialTransactions,
         props: (route) => ({
           accno: route.query.accno,
@@ -156,13 +162,13 @@ const routes = [
         },
       },
       {
-        path: "/reports/income_statement",
+        path: "reports/income_statement",
         component: IncomeStatement,
         meta: { permission: "reports.income" },
       },
       // Goods & Services
       {
-        path: "/ic/add/:type",
+        path: "ic/add/:type",
         component: AddPart,
         meta: {
           permission: (route) => {
@@ -173,7 +179,7 @@ const routes = [
         },
       },
       {
-        path: "/ic/search/:type",
+        path: "ic/search/:type",
         component: SearchPart,
         meta: {
           permission: (route) => {
@@ -188,65 +194,73 @@ const routes = [
       },
       // System Settings
       {
-        path: "/system/currencies",
+        path: "system/currencies",
         component: SysCurrencies,
         meta: { permission: "system.currencies" },
       },
       {
-        path: "/system/defaults",
+        path: "system/defaults",
         component: SysDefaults,
         meta: { permission: "system.defaults" },
       },
       {
-        path: "/system/chart/list",
+        path: "system/chart/list",
         component: ListAccounts,
         meta: { permission: "system.chart.list" },
       },
       {
-        path: "/system/chart/addaccount",
+        path: "system/chart/addaccount",
         component: AddAccount,
         meta: { permission: "system.chart.add" },
       },
       {
-        path: "/system/chart/gifi",
+        path: "system/chart/gifi",
         component: GIFI,
         meta: { permission: "system.chart.gifi" },
       },
       {
-        path: "/system/departments",
+        path: "system/departments",
         component: ListDepartments,
         meta: { permission: "system.departments" },
       },
       {
-        path: "/system/projects",
+        path: "system/projects",
         component: ListProjects,
         meta: { permission: "system.projects" },
       },
       {
-        path: "/reconciliation",
+        path: "reconciliation",
         component: Reconciliation,
         meta: { permission: "cash.recon" },
       },
       {
-        path: "/system/roles",
+        path: "system/roles",
         component: Roles,
         meta: { permission: "system.user.roles" },
       },
       {
-        path: "/system/employees",
+        path: "system/employees",
         component: Employees,
         meta: { permission: "system.user.employees" },
       },
       {
-        path: "/system/templates",
+        path: "system/templates",
         component: LedgerTemplates,
         meta: { permission: "system.user.templates" },
       },
     ],
   },
   {
+    path: "/client/:client/login",
+    component: LoginPage,
+  },
+  {
     path: "/login",
     component: LoginPage,
+  },
+  {
+    path: "/signup",
+    component: SignUp,
   },
   // Catch-all for undefined routes
   {

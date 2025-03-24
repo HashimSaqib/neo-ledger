@@ -12,8 +12,8 @@
           <q-img :src="logo" class="q-mb-lg" />
           <form @submit.prevent="login" class="flex column" style="width: 100%">
             <q-input
-              v-model="loginData.username"
-              :label="t('Username')"
+              v-model="loginData.email"
+              :label="t('Email')"
               class="lightbg"
               input-class="maintext"
               label-color="secondary"
@@ -41,8 +41,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { Notify, useQuasar } from "quasar";
-import { useRouter } from "vue-router";
+import { Notify, useQuasar, LocalStorage } from "quasar";
+import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import axios from "axios";
 import logo from "assets/images/logo.png";
@@ -51,36 +51,41 @@ import LanguageSwitcher from "src/components/LanguageSwitcher.vue";
 const { t } = useI18n();
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 const loading = ref(false);
 const loginData = ref({
-  username: "",
+  email: "",
   password: "",
+  client: route.params.client || "",
 });
 
 onMounted(() => {
-  $q.cookies.remove("client");
   $q.cookies.remove("sessionkey");
-  $q.cookies.remove("company");
-  $q.cookies.remove("acs");
-});
 
+  // Iterate over local storage keys and remove those that match the "acs_" prefix
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith("acs_")) {
+      localStorage.removeItem(key);
+    }
+  });
+});
 const login = async () => {
   loading.value = true;
   try {
     const response = await axios.post(
-      "https://api.neo-ledger.com/client/neoledger/auth/login",
+      "https://api.neo-ledger.com/login",
       loginData.value
     );
-    const { client, sessionkey, company, acs } = response.data;
-    $q.cookies.set("client", client, { path: "/" });
+    const { sessionkey } = response.data;
     $q.cookies.set("sessionkey", sessionkey, { path: "/" });
-    $q.cookies.set("company", company, { path: "/" });
-    $q.cookies.set("acs", acs, { path: "/" });
     loading.value = false;
-    router.push("/");
+    if (loginData.value.client) {
+      return router.push(`/client/${loginData.value.client}`);
+    }
+    return router.push("/");
   } catch (error) {
     Notify.create({
-      message: t("login.error") || "Login failed",
+      message: t(`${error.response.data.message}`),
       type: "negative",
       position: "center",
     });

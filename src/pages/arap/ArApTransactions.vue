@@ -383,6 +383,7 @@ import { Cookies, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount, downloadReport, createPDF } from "src/helpers/utils";
+const createLink = inject("createLink");
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
@@ -887,22 +888,22 @@ const clearForm = () => {
 const getPath = (row) => {
   let path = "";
   if (row.till) {
-    path = "/pos/sale";
+    path = createLink("ar.till");
   } else if (row.invoice) {
     path =
-      type.value === "customer" ? "/ar/sales-invoice" : "/ap/vendor-invoice";
+      type.value === "customer"
+        ? createLink("customer.invoice")
+        : createLink("vendor.invoice");
   } else {
-    path = `/arap/transaction/${type.value}`;
+    path = createLink(`transaction.${type.value}`);
   }
-
-  // Use flattenParams to flatten formData before spreading into query
   const flatParams = flattenParams(formData.value);
   return {
     path,
     query: {
       id: row.id,
       ...flatParams,
-      callback: `/arap/transactions/${type.value}/`,
+      callback: createLink("base") + `/arap/transactions/${type.value}/`,
     },
   };
 };

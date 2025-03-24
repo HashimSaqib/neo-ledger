@@ -1,0 +1,1977 @@
+<template>
+  <q-layout view="hHh lpR fFf">
+    <!-- Fixed header with title, theme toggle, language selector and logout -->
+    <q-header elevated>
+      <q-toolbar>
+        <q-toolbar-title>Datasets</q-toolbar-title>
+
+        <q-space />
+
+        <!-- Refresh Button -->
+        <q-btn
+          flat
+          round
+          icon="refresh"
+          @click="getDatasets"
+          aria-label="Refresh Datasets"
+        >
+          <q-tooltip>Refresh</q-tooltip>
+        </q-btn>
+
+        <!-- Logout Button -->
+        <q-btn-dropdown flat dense icon="settings" auto-close>
+          <q-list>
+            <!-- Dark Mode Toggle -->
+            <q-item>
+              <q-item-section avatar>
+                <q-icon :name="$q.dark.isActive ? 'dark_mode' : 'light_mode'" />
+              </q-item-section>
+              <q-item-section>
+                <q-toggle
+                  v-model="$q.dark.isActive"
+                  @update:model-value="setTheme"
+                  :label="$t($q.dark.isActive ? 'Dark Mode' : 'Light Mode')"
+                  dense
+                />
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section avatar>
+                <q-icon name="language" />
+              </q-item-section>
+              <q-item-section>
+                <q-select
+                  v-model="selectedLanguage"
+                  :options="languages"
+                  dense
+                  options-dense
+                  @update:model-value="switchLanguage"
+                  outlined
+                  :label="$t('Language')"
+                  class="q-px-none"
+                >
+                  <template v-slot:option="{ itemProps, opt }">
+                    <q-item
+                      v-bind="itemProps"
+                      clickable
+                      @click="switchLanguage(opt)"
+                    >
+                      <q-item-section>{{ opt.label }}</q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </q-item-section>
+            </q-item>
+
+            <!-- Logout Button -->
+            <q-separator spaced />
+            <q-item
+              clickable
+              v-ripple
+              @click="handleLogout"
+              class="text-negative"
+            >
+              <q-item-section avatar>
+                <q-icon name="logout" color="negative" />
+              </q-item-section>
+              <q-item-section>{{ $t("Logout") }}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </q-toolbar>
+    </q-header>
+
+    <q-page-container>
+      <q-page class="q-pa-md">
+        <!-- Loading state -->
+        <div v-if="loading" class="flex flex-center q-pa-lg">
+          <q-spinner-dots size="50px" color="primary" />
+        </div>
+
+        <!-- Dismissible error banner -->
+        <q-banner
+          v-if="error"
+          class="q-mb-md"
+          color="negative"
+          text-color="white"
+          dismissible
+          @dismiss="error = false"
+        >
+          Error fetching datasets. Please try again later.
+        </q-banner>
+
+        <!-- Search and View Control Bar -->
+        <div v-if="!loading && !error" class="row q-mb-md items-center">
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model="searchQuery"
+              dense
+              outlined
+              placeholder="Search datasets..."
+              class="q-mr-sm"
+              clearable
+            >
+              <template v-slot:prepend>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+          <div
+            class="col-12 col-md-6 text-right q-mt-sm-none q-mt-md-none q-mt-xs"
+          >
+            <q-toggle
+              v-model="isGridView"
+              :label="isGridView ? 'Grid View' : 'List View'"
+              left-label
+              color="primary"
+              keep-color
+            >
+              <template v-slot:checked-icon>
+                <q-icon name="grid_view" />
+              </template>
+              <template v-slot:unchecked-icon>
+                <q-icon name="view_list" />
+              </template>
+            </q-toggle>
+          </div>
+        </div>
+
+        <!-- Pending Invites section (only shown when there are invites) -->
+        <q-card
+          v-if="!loading && !error && receivedInvites.length > 0"
+          class="q-mb-md"
+        >
+          <q-card-section class="q-pb-none">
+            <div class="text-h6 flex items-center">
+              <q-icon name="move_to_inbox" class="q-mr-sm" />
+              Pending Invites ({{ receivedInvites.length }})
+            </div>
+          </q-card-section>
+
+          <q-separator class="q-my-md" />
+
+          <q-card-section>
+            <div v-if="loadingInvites" class="flex flex-center q-pa-md">
+              <q-spinner color="primary" size="md" />
+            </div>
+            <div v-else>
+              <q-list separator>
+                <q-item
+                  v-for="invite in receivedInvites"
+                  :key="invite.id"
+                  class="q-py-sm"
+                >
+                  <q-item-section avatar>
+                    <q-avatar v-if="invite.logo">
+                      <img :src="invite.logo" />
+                    </q-avatar>
+
+                    <q-avatar
+                      v-else
+                      color="primary"
+                      text-color="white"
+                      icon="database"
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>
+                      <span class="text-weight-medium">{{
+                        invite.db_name
+                      }}</span>
+                    </q-item-label>
+                    <q-item-label caption class="q-mt-xs">
+                      <q-badge color="blue-grey" class="q-mr-sm">
+                        {{ invite.access_level }}
+                      </q-badge>
+                      <template v-if="invite.role">
+                        <q-badge color="teal">
+                          {{ invite.role }}
+                        </q-badge>
+                      </template>
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <div class="row q-gutter-sm">
+                      <q-btn
+                        color="positive"
+                        flat
+                        label="Accept"
+                        @click="acceptInvite(invite.id)"
+                        :loading="processingInvite === invite.id"
+                      />
+                      <q-btn
+                        color="negative"
+                        flat
+                        label="Decline"
+                        @click="declineInvite(invite.id)"
+                        :loading="processingInvite === invite.id"
+                      />
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </div>
+          </q-card-section>
+        </q-card>
+
+        <!-- No results message -->
+        <div
+          v-if="!loading && !error && filteredDatasets.length === 0"
+          class="flex flex-center column q-py-xl text-grey text-center"
+        >
+          <q-icon name="search_off" size="64px" />
+          <div class="text-h6 q-mt-md">No datasets found</div>
+          <div class="text-body2">Try adjusting your search query</div>
+        </div>
+
+        <!-- GRID VIEW MODE -->
+        <div
+          v-if="!loading && !error && filteredDatasets.length > 0 && isGridView"
+          class="row q-col-gutter-md"
+        >
+          <div
+            v-for="dataset in filteredDatasets"
+            :key="dataset.db_name"
+            class="col-12 col-md-6 col-lg-4"
+          >
+            <!-- Admin view of dataset -->
+            <q-card v-if="dataset.admin === 1" class="dataset-card">
+              <q-card-section class="dataset-header">
+                <!-- Dataset Info -->
+                <div class="row justify-between no-wrap">
+                  <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
+                    <q-img :src="`${dataset.logo}`" alt="Logo" />
+                  </q-avatar>
+                  <q-avatar
+                    v-else
+                    color="primary"
+                    text-color="white"
+                    size="56px"
+                    class="q-mr-md"
+                  >
+                    <q-icon name="database" size="32px" />
+                  </q-avatar>
+
+                  <div class="column flex-grow-1">
+                    <div class="text-h6 ellipsis text-primary text-center">
+                      {{ dataset.db_name }}
+                    </div>
+                    <div class="row items-center q-mt-xs">
+                      <q-badge color="primary" class="q-mr-sm">
+                        {{ dataset.users ? dataset.users.length : 0 }} Users
+                      </q-badge>
+                      <q-badge>
+                        {{ dataset.roles ? dataset.roles.length : 0 }} Roles
+                      </q-badge>
+                    </div>
+                  </div>
+
+                  <div class="row q-gutter-sm">
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      color="primary"
+                      icon="person_add"
+                      @click.stop="openInviteDialog(dataset)"
+                      :aria-label="`Invite to ${dataset.db_name}`"
+                    >
+                      <q-tooltip>Invite User</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      color="primary"
+                      icon="open_in_new"
+                      @click.stop="navigateToDataset(dataset)"
+                      :aria-label="`Open ${dataset.db_name}`"
+                    >
+                      <q-tooltip>Open Dataset</q-tooltip>
+                    </q-btn>
+                  </div>
+                </div>
+              </q-card-section>
+
+              <q-separator />
+
+              <!-- Dataset Tabs Section -->
+              <q-tabs
+                v-model="dataset.activeTab"
+                dense
+                class="text-grey q-py-sm"
+                active-color="primary"
+                indicator-color="primary"
+                align="justify"
+                narrow-indicator
+              >
+                <q-tab name="users" icon="group" label="Users" />
+                <q-tab name="roles" icon="security" label="Roles" />
+                <q-tab
+                  name="invites"
+                  icon="mail"
+                  label="Invites"
+                  :alert="getDatasetInvites(dataset.id).length > 0"
+                />
+              </q-tabs>
+
+              <q-separator />
+
+              <q-tab-panels v-model="dataset.activeTab" animated>
+                <!-- Users Panel -->
+                <q-tab-panel name="users" class="q-pa-sm">
+                  <div v-if="dataset.users && dataset.users.length">
+                    <q-table
+                      :rows="dataset.users"
+                      :columns="userColumns"
+                      row-key="email"
+                      flat
+                      bordered
+                      dense
+                      hide-pagination
+                      hide-bottom
+                    >
+                      <!-- User Actions column -->
+                      <template v-slot:body-cell-actions="props">
+                        <q-td :props="props">
+                          <q-btn
+                            flat
+                            round
+                            dense
+                            color="primary"
+                            icon="edit"
+                            @click.stop="openEditUserDialog(dataset, props.row)"
+                          >
+                            <q-tooltip>
+                              {{
+                                props.row.access_level === "owner"
+                                  ? "Owner access cannot be modified"
+                                  : "Edit Access"
+                              }}
+                            </q-tooltip>
+                          </q-btn>
+                          <q-btn
+                            flat
+                            round
+                            dense
+                            color="negative"
+                            icon="delete"
+                            @click.stop="
+                              confirmRemoveAccess(dataset, props.row)
+                            "
+                            :disabled="props.row.access_level === 'owner'"
+                          >
+                            <q-tooltip>
+                              {{
+                                props.row.access_level === "owner"
+                                  ? "Owner access cannot be removed"
+                                  : "Remove Access"
+                              }}
+                            </q-tooltip>
+                          </q-btn>
+                        </q-td>
+                      </template>
+                    </q-table>
+                  </div>
+                  <div v-else class="text-center q-pa-md text-grey-7">
+                    <q-icon name="people_alt" size="48px" />
+                    <div class="q-mt-sm">No users available</div>
+                  </div>
+                </q-tab-panel>
+
+                <!-- Roles Panel -->
+                <q-tab-panel name="roles" class="q-pa-sm">
+                  <div v-if="dataset.roles && dataset.roles.length">
+                    <q-table
+                      :rows="dataset.roles"
+                      :columns="roleColumns"
+                      row-key="id"
+                      flat
+                      bordered
+                      dense
+                      hide-pagination
+                      hide-bottom
+                    >
+                      <!-- Display role permissions as chips -->
+                      <template v-slot:body-cell-acs="props">
+                        <q-td :props="props">
+                          <div class="row items-center flex-wrap q-gutter-xs">
+                            <q-chip
+                              v-for="group in groupRowAcs(props.row.acs)"
+                              :key="group.group"
+                              dense
+                              size="sm"
+                              color="primary"
+                              text-color="white"
+                            >
+                              {{ t(group.group) }}
+                              <q-tooltip v-if="group.subs.length">
+                                <div
+                                  v-for="sub in group.subs"
+                                  :key="sub"
+                                  class="q-pa-xs"
+                                >
+                                  {{ sub.split(".").slice(1).join(".") }}
+                                </div>
+                              </q-tooltip>
+                            </q-chip>
+                          </div>
+                        </q-td>
+                      </template>
+                      <!-- Edit action -->
+                      <template v-slot:body-cell-actions="props">
+                        <q-td :props="props" class="q-gutter-xs">
+                          <q-btn
+                            icon="edit"
+                            color="primary"
+                            flat
+                            dense
+                            @click.stop="openEditRolePopup(dataset, props.row)"
+                          >
+                            <q-tooltip>Edit</q-tooltip>
+                          </q-btn>
+                        </q-td>
+                      </template>
+                    </q-table>
+
+                    <div class="q-mt-md text-right">
+                      <q-btn
+                        label="Add Role"
+                        color="primary"
+                        size="sm"
+                        icon="add"
+                        @click.stop="openAddRolePopup(dataset)"
+                      />
+                    </div>
+                  </div>
+                  <div v-else class="text-center q-pa-md text-grey-7">
+                    <q-icon name="security" size="48px" />
+                    <div class="q-mt-sm">No roles available</div>
+                    <q-btn
+                      class="q-mt-md"
+                      label="Add First Role"
+                      color="primary"
+                      size="sm"
+                      icon="add"
+                      @click.stop="openAddRolePopup(dataset)"
+                    />
+                  </div>
+                </q-tab-panel>
+
+                <!-- Invites Panel -->
+                <q-tab-panel name="invites" class="q-pa-sm">
+                  <div v-if="loadingInvites" class="flex flex-center q-pa-md">
+                    <q-spinner color="primary" size="md" />
+                  </div>
+
+                  <div
+                    v-else-if="getDatasetInvites(dataset.id).length === 0"
+                    class="text-center q-pa-md text-grey-7"
+                  >
+                    <q-icon name="mail" size="48px" />
+                    <div class="q-mt-sm">No pending invites</div>
+                    <q-btn
+                      class="q-mt-md"
+                      label="Invite User"
+                      color="primary"
+                      size="sm"
+                      icon="person_add"
+                      @click.stop="openInviteDialog(dataset)"
+                    />
+                  </div>
+
+                  <div v-else>
+                    <q-list separator>
+                      <q-item
+                        v-for="invite in getDatasetInvites(dataset.id)"
+                        :key="invite.id"
+                        class="q-py-sm"
+                      >
+                        <q-item-section>
+                          <q-item-label>
+                            <q-icon name="email" class="q-mr-xs" />
+                            {{ invite.recipient_email }}
+                          </q-item-label>
+                          <q-item-label caption class="q-mt-xs">
+                            <q-badge color="blue-grey" class="q-mr-sm">
+                              {{ invite.access_level }}
+                            </q-badge>
+                            <template v-if="invite.role_id">
+                              <q-badge color="teal">
+                                {{ invite.role }}
+                              </q-badge>
+                            </template>
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-btn
+                            color="negative"
+                            flat
+                            round
+                            dense
+                            icon="cancel"
+                            @click="cancelInvite(invite.id)"
+                            :loading="processingInvite === invite.id"
+                          >
+                            <q-tooltip>Cancel Invite</q-tooltip>
+                          </q-btn>
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+
+                    <div class="q-mt-md text-right">
+                      <q-btn
+                        label="Invite Another User"
+                        color="primary"
+                        size="sm"
+                        icon="person_add"
+                        @click.stop="openInviteDialog(dataset)"
+                      />
+                    </div>
+                  </div>
+                </q-tab-panel>
+              </q-tab-panels>
+            </q-card>
+
+            <!-- Non-admin simplified view -->
+            <q-card v-else class="dataset-card">
+              <q-card-section class="dataset-header">
+                <div class="row justify-between items-center">
+                  <div class="row items-center">
+                    <q-avatar v-if="dataset.logo">
+                      <img :src="dataset.logo" />
+                    </q-avatar>
+
+                    <q-avatar
+                      v-else
+                      color="primary"
+                      text-color="white"
+                      icon="database"
+                    />
+
+                    <div class="text-h6 ellipsis text-primary">
+                      {{ dataset.db_name }}
+                    </div>
+                  </div>
+
+                  <q-btn
+                    color="primary"
+                    icon="open_in_new"
+                    @click.stop="navigateToDataset(dataset)"
+                    :aria-label="`Open ${dataset.db_name}`"
+                    label="Open"
+                  />
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+
+        <!-- LIST VIEW MODE -->
+        <div
+          v-if="
+            !loading && !error && filteredDatasets.length > 0 && !isGridView
+          "
+        >
+          <q-list separator>
+            <q-expansion-item
+              v-for="dataset in filteredDatasets"
+              :key="dataset.db_name"
+              v-model="dataset.expanded"
+              :expand-icon-toggle="false"
+              :expandable="dataset.admin === 1"
+              class="dataset-list-item q-my-sm"
+              dense-toggle
+              :header-class="dataset.admin === 1 ? 'cursor-pointer' : ''"
+            >
+              <template v-slot:header>
+                <q-item-section avatar>
+                  <q-avatar v-if="dataset.logo">
+                    <img :src="dataset.logo" />
+                  </q-avatar>
+
+                  <q-avatar
+                    v-else
+                    color="primary"
+                    text-color="white"
+                    icon="database"
+                  />
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="text-primary text-weight-medium text-h6">
+                    {{ dataset.db_name }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    <div class="row q-gutter-x-md q-mt-xs">
+                      <span v-if="dataset.admin === 1">
+                        <q-icon name="group" size="16px" class="q-mr-xs" />
+                        {{ dataset.users ? dataset.users.length : 0 }} Users
+                      </span>
+                      <span v-if="dataset.admin === 1">
+                        <q-icon name="security" size="16px" class="q-mr-xs" />
+                        {{ dataset.roles ? dataset.roles.length : 0 }} Roles
+                      </span>
+                      <span v-if="dataset.admin === 1">
+                        <q-badge color="primary">Admin</q-badge>
+                      </span>
+                      <span v-else>
+                        <q-badge color="blue-grey">User</q-badge>
+                      </span>
+                    </div>
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section side>
+                  <div class="row q-gutter-sm">
+                    <q-btn
+                      v-if="dataset.admin === 1"
+                      flat
+                      round
+                      color="primary"
+                      icon="person_add"
+                      @click.stop="openInviteDialog(dataset)"
+                      size="sm"
+                    >
+                      <q-tooltip>Invite User</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      flat
+                      round
+                      color="primary"
+                      icon="open_in_new"
+                      @click.stop="navigateToDataset(dataset)"
+                      size="sm"
+                    >
+                      <q-tooltip>Open Dataset</q-tooltip>
+                    </q-btn>
+                  </div>
+                </q-item-section>
+              </template>
+
+              <!-- Expandable section for admin users -->
+              <q-card v-if="dataset.admin === 1" bordered flat class="q-mt-md">
+                <q-tabs
+                  v-model="dataset.activeTab"
+                  dense
+                  class="text-grey"
+                  active-color="primary"
+                  indicator-color="primary"
+                  align="left"
+                  narrow-indicator
+                >
+                  <q-tab name="users" icon="group" label="Users" />
+                  <q-tab name="roles" icon="security" label="Roles" />
+                  <q-tab
+                    name="invites"
+                    icon="mail"
+                    label="Invites"
+                    :alert="getDatasetInvites(dataset.id).length > 0"
+                  />
+                </q-tabs>
+
+                <q-separator />
+
+                <q-tab-panels v-model="dataset.activeTab" animated>
+                  <!-- Users Panel -->
+                  <q-tab-panel name="users" class="q-pa-sm">
+                    <div v-if="dataset.users && dataset.users.length">
+                      <q-table
+                        :rows="dataset.users"
+                        :columns="userColumns"
+                        row-key="email"
+                        flat
+                        bordered
+                        dense
+                        hide-pagination
+                        hide-bottom
+                      >
+                        <!-- User Actions column -->
+                        <template v-slot:body-cell-actions="props">
+                          <q-td :props="props">
+                            <q-btn
+                              flat
+                              round
+                              dense
+                              color="primary"
+                              icon="edit"
+                              @click.stop="
+                                openEditUserDialog(dataset, props.row)
+                              "
+                            >
+                              <q-tooltip>
+                                {{
+                                  props.row.access_level === "owner"
+                                    ? "Owner access cannot be modified"
+                                    : "Edit Access"
+                                }}
+                              </q-tooltip>
+                            </q-btn>
+                            <q-btn
+                              flat
+                              round
+                              dense
+                              color="negative"
+                              icon="delete"
+                              @click.stop="
+                                confirmRemoveAccess(dataset, props.row)
+                              "
+                              :disabled="props.row.access_level === 'owner'"
+                            >
+                              <q-tooltip>
+                                {{
+                                  props.row.access_level === "owner"
+                                    ? "Owner access cannot be removed"
+                                    : "Remove Access"
+                                }}
+                              </q-tooltip>
+                            </q-btn>
+                          </q-td>
+                        </template>
+                      </q-table>
+                    </div>
+                    <div v-else class="text-center q-pa-md text-grey-7">
+                      <q-icon name="people_alt" size="48px" />
+                      <div class="q-mt-sm">No users available</div>
+                    </div>
+                  </q-tab-panel>
+
+                  <!-- Roles Panel -->
+                  <q-tab-panel name="roles" class="q-pa-sm">
+                    <div v-if="dataset.roles && dataset.roles.length">
+                      <q-table
+                        :rows="dataset.roles"
+                        :columns="roleColumns"
+                        row-key="id"
+                        flat
+                        bordered
+                        dense
+                        hide-pagination
+                        hide-bottom
+                      >
+                        <!-- Display role permissions as chips -->
+                        <template v-slot:body-cell-acs="props">
+                          <q-td :props="props">
+                            <div class="row items-center flex-wrap q-gutter-xs">
+                              <q-chip
+                                v-for="group in groupRowAcs(props.row.acs)"
+                                :key="group.group"
+                                dense
+                                size="sm"
+                                color="primary"
+                                text-color="white"
+                              >
+                                {{ t(group.group) }}
+                                <q-tooltip v-if="group.subs.length">
+                                  <div
+                                    v-for="sub in group.subs"
+                                    :key="sub"
+                                    class="q-pa-xs"
+                                  >
+                                    {{ sub.split(".").slice(1).join(".") }}
+                                  </div>
+                                </q-tooltip>
+                              </q-chip>
+                            </div>
+                          </q-td>
+                        </template>
+                        <!-- Edit action -->
+                        <template v-slot:body-cell-actions="props">
+                          <q-td :props="props" class="q-gutter-xs">
+                            <q-btn
+                              icon="edit"
+                              color="primary"
+                              flat
+                              dense
+                              @click.stop="
+                                openEditRolePopup(dataset, props.row)
+                              "
+                            >
+                              <q-tooltip>Edit</q-tooltip>
+                            </q-btn>
+                          </q-td>
+                        </template>
+                      </q-table>
+
+                      <div class="q-mt-md text-right">
+                        <q-btn
+                          label="Add Role"
+                          color="primary"
+                          size="sm"
+                          icon="add"
+                          @click.stop="openAddRolePopup(dataset)"
+                        />
+                      </div>
+                    </div>
+                    <div v-else class="text-center q-pa-md text-grey-7">
+                      <q-icon name="security" size="48px" />
+                      <div class="q-mt-sm">No roles available</div>
+                      <q-btn
+                        class="q-mt-md"
+                        label="Add First Role"
+                        color="primary"
+                        size="sm"
+                        icon="add"
+                        @click.stop="openAddRolePopup(dataset)"
+                      />
+                    </div>
+                  </q-tab-panel>
+
+                  <!-- Invites Panel -->
+                  <q-tab-panel name="invites" class="q-pa-sm">
+                    <div v-if="loadingInvites" class="flex flex-center q-pa-md">
+                      <q-spinner color="primary" size="md" />
+                    </div>
+
+                    <div
+                      v-else-if="getDatasetInvites(dataset.id).length === 0"
+                      class="text-center q-pa-md text-grey-7"
+                    >
+                      <q-icon name="mail" size="48px" />
+                      <div class="q-mt-sm">No pending invites</div>
+                      <q-btn
+                        class="q-mt-md"
+                        label="Invite User"
+                        color="primary"
+                        size="sm"
+                        icon="person_add"
+                        @click.stop="openInviteDialog(dataset)"
+                      />
+                    </div>
+
+                    <div v-else>
+                      <q-list separator>
+                        <q-item
+                          v-for="invite in getDatasetInvites(dataset.id)"
+                          :key="invite.id"
+                          class="q-py-sm"
+                        >
+                          <q-item-section>
+                            <q-item-label>
+                              <q-icon name="email" class="q-mr-xs" />
+                              {{ invite.recipient_email }}
+                            </q-item-label>
+                            <q-item-label caption class="q-mt-xs">
+                              <q-badge color="blue-grey" class="q-mr-sm">
+                                {{ invite.access_level }}
+                              </q-badge>
+                              <template v-if="invite.role_id">
+                                <q-badge color="teal">
+                                  {{ getRoleName(invite.role_id) }}
+                                </q-badge>
+                              </template>
+                            </q-item-label>
+                          </q-item-section>
+                          <q-item-section side>
+                            <q-btn
+                              color="negative"
+                              flat
+                              round
+                              dense
+                              icon="cancel"
+                              @click="cancelInvite(invite.id)"
+                              :loading="processingInvite === invite.id"
+                            >
+                              <q-tooltip>Cancel Invite</q-tooltip>
+                            </q-btn>
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+
+                      <div class="q-mt-md text-right">
+                        <q-btn
+                          label="Invite Another User"
+                          color="primary"
+                          size="sm"
+                          icon="person_add"
+                          @click.stop="openInviteDialog(dataset)"
+                        />
+                      </div>
+                    </div>
+                  </q-tab-panel>
+                </q-tab-panels>
+              </q-card>
+            </q-expansion-item>
+          </q-list>
+        </div>
+
+        <!-- Dialog for Adding/Editing a Role -->
+        <q-dialog v-model="roleDialog">
+          <q-card>
+            <q-card-section
+              class="row items-center justify-between bg-primary text-white"
+            >
+              <div class="text-h6">
+                {{ isEditMode ? "Edit Role" : "Add Role" }}
+              </div>
+              <q-btn
+                flat
+                round
+                dense
+                icon="close"
+                v-close-popup
+                text-color="white"
+              />
+            </q-card-section>
+
+            <q-card-section class="scroll" style="max-height: 80vh">
+              <q-input
+                v-model="selectedRole.name"
+                label="Role Name"
+                outlined
+                dense
+                class="q-mb-md"
+                :rules="[(val) => !!val || 'Role name is required']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="badge" />
+                </template>
+              </q-input>
+
+              <div class="q-my-md">
+                <div class="text-subtitle1 q-mb-sm text-primary">
+                  Access Controls
+                </div>
+                <q-separator class="q-mb-sm" />
+
+                <div v-for="group in groupedAcs" :key="group.group">
+                  <q-checkbox
+                    :label="t(group.label)"
+                    :model-value="isGroupChecked(group, selectedRole)"
+                    @update:model-value="
+                      (val) => toggleGroup(group, val, selectedRole)
+                    "
+                    color="primary"
+                    class="lighttext q-mt-sm"
+                  />
+                  <div class="q-ml-lg">
+                    <q-checkbox
+                      v-for="subObj in group.subs"
+                      :key="subObj.perm"
+                      :label="t(subObj.label)"
+                      :model-value="isChecked(subObj.perm, selectedRole)"
+                      @update:model-value="
+                        (val) =>
+                          togglePermission(subObj.perm, val, selectedRole)
+                      "
+                      class="maintext q-ma-xs"
+                      dense
+                    />
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+
+            <q-card-actions align="right" class="q-pa-md">
+              <q-btn
+                flat
+                label="Cancel"
+                color="grey"
+                v-close-popup
+                @click="cancelRole"
+              />
+              <q-btn
+                label="Save"
+                color="primary"
+                @click="saveRole"
+                :loading="saving"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+        <!-- Dialog for Inviting a User -->
+        <q-dialog v-model="inviteDialog">
+          <q-card style="width: 500px; max-width: 90vw">
+            <q-card-section
+              class="row items-center justify-between bg-primary text-white"
+            >
+              <div class="text-h6">
+                <q-icon name="person_add" class="q-mr-sm" />
+                Invite User
+              </div>
+              <q-btn
+                flat
+                round
+                dense
+                icon="close"
+                v-close-popup
+                text-color="white"
+              />
+            </q-card-section>
+
+            <q-card-section class="q-pt-md">
+              <p class="text-subtitle2 q-mb-sm">
+                Inviting user to
+                <strong>{{ selectedDatasetForInvite?.db_name }}</strong>
+              </p>
+
+              <q-input
+                v-model="inviteData.recipient_email"
+                label="Email Address"
+                type="email"
+                outlined
+                dense
+                hide-bottom-space
+                class="q-my-md"
+                lazy-rules
+                :rules="[
+                  (val) => !!val || 'Email is required',
+                  (val) =>
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ||
+                    'Invalid email format',
+                ]"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="email" />
+                </template>
+              </q-input>
+
+              <q-select
+                v-model="inviteData.access_level"
+                :options="[
+                  { label: 'Admin', value: 'admin' },
+                  { label: 'User', value: 'user' },
+                ]"
+                label="Access Level"
+                outlined
+                dense
+                class="q-my-md"
+                emit-value
+                map-options
+              >
+                <template v-slot:prepend>
+                  <q-icon name="security" />
+                </template>
+              </q-select>
+
+              <q-select
+                v-if="
+                  selectedDatasetForInvite && selectedDatasetForInvite.roles
+                "
+                v-model="inviteData.role_id"
+                :options="roleOptions"
+                label="Role"
+                outlined
+                dense
+                class="q-my-md"
+                emit-value
+                map-options
+                clearable
+              >
+                <template v-slot:prepend>
+                  <q-icon name="assignment_ind" />
+                </template>
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No roles available
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </q-card-section>
+
+            <q-card-actions align="right" class="q-pa-md">
+              <q-btn
+                flat
+                label="Cancel"
+                color="grey"
+                v-close-popup
+                @click="cancelInviteDialog"
+              />
+              <q-btn
+                label="Send Invite"
+                color="primary"
+                icon="send"
+                @click="sendInvite"
+                :loading="sendingInvite"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+        <!-- Dialog for Editing User Access -->
+        <q-dialog v-model="editUserDialog">
+          <q-card style="width: 500px; max-width: 90vw">
+            <q-card-section
+              class="row items-center justify-between bg-primary text-white"
+            >
+              <div class="text-h6">
+                <q-icon name="edit" class="q-mr-sm" />
+                Edit User Access
+              </div>
+              <q-btn
+                flat
+                round
+                dense
+                icon="close"
+                v-close-popup
+                text-color="white"
+              />
+            </q-card-section>
+
+            <q-card-section class="q-pt-md">
+              <p class="text-subtitle2 q-mb-sm">
+                User: <strong>{{ selectedUser?.email }}</strong>
+              </p>
+              <p class="text-subtitle2 q-mb-md">
+                Dataset:
+                <strong>{{ selectedDatasetForUserEdit?.db_name }}</strong>
+              </p>
+
+              <q-select
+                v-model="userEditData.access_level"
+                :options="[
+                  { label: 'Admin', value: 'admin' },
+                  { label: 'User', value: 'user' },
+                ]"
+                label="Access Level"
+                outlined
+                dense
+                class="q-my-md"
+                emit-value
+                map-options
+                :disable="selectedUser?.access_level === 'owner'"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="security" />
+                </template>
+              </q-select>
+
+              <q-select
+                v-if="
+                  selectedDatasetForUserEdit && selectedDatasetForUserEdit.roles
+                "
+                v-model="userEditData.role_id"
+                :options="roleOptionsForEdit"
+                label="Role"
+                outlined
+                dense
+                class="q-my-md"
+                emit-value
+                map-options
+                clearable
+              >
+                <template v-slot:prepend>
+                  <q-icon name="assignment_ind" />
+                </template>
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No roles available
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </q-card-section>
+
+            <q-card-actions align="right" class="q-pa-md">
+              <q-btn
+                flat
+                label="Cancel"
+                color="grey"
+                v-close-popup
+                @click="cancelEditUserDialog"
+              />
+              <q-btn
+                label="Save Changes"
+                color="primary"
+                icon="save"
+                @click="saveUserAccess"
+                :loading="savingUserAccess"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+        <!-- Confirmation Dialog for Removing Access -->
+        <q-dialog v-model="removeAccessDialog">
+          <q-card>
+            <q-card-section class="bg-negative text-white">
+              <div class="text-h6">
+                <q-icon name="warning" class="q-mr-sm" />
+                Remove User Access
+              </div>
+            </q-card-section>
+
+            <q-card-section class="q-pt-md">
+              <p>
+                Are you sure you want to remove access for
+                <strong>{{ selectedUser?.email }}</strong> from
+                <strong>{{ selectedDatasetForUserEdit?.db_name }}</strong
+                >?
+              </p>
+              <p class="text-caption text-negative">
+                This action cannot be undone.
+              </p>
+            </q-card-section>
+
+            <q-card-actions align="right" class="q-pa-md">
+              <q-btn flat label="Cancel" color="primary" v-close-popup />
+              <q-btn
+                label="Remove Access"
+                color="negative"
+                @click="removeUserAccess"
+                :loading="removingAccess"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+      </q-page>
+    </q-page-container>
+  </q-layout>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import { api } from "src/boot/axios";
+import { Notify, Cookies, useQuasar } from "quasar";
+import { useI18n } from "vue-i18n";
+import { menuLinks } from "src/layouts/Menu.js";
+import { useRouter } from "vue-router";
+import { setTheme } from "src/boot/theme";
+import { i18n, loadLanguagePack } from "src/boot/i18n";
+
+const { t } = useI18n();
+const $q = useQuasar();
+const router = useRouter();
+
+// View and search state
+const isGridView = ref(true);
+const searchQuery = ref("");
+
+// Datasets state
+const datasets = ref([]);
+const loading = ref(true);
+const error = ref(false);
+const saving = ref(false);
+
+// Role management state
+const roleDialog = ref(false);
+const isEditMode = ref(false);
+const selectedDataset = ref(null);
+const selectedRole = ref({ id: null, name: "", acs: [] });
+
+// Invite management state
+const inviteDialog = ref(false);
+const selectedDatasetForInvite = ref(null);
+const inviteData = ref({
+  recipient_email: "",
+  access_level: "user",
+  role_id: null,
+});
+const sentInvites = ref([]);
+const receivedInvites = ref([]);
+const loadingInvites = ref(false);
+const sendingInvite = ref(false);
+const processingInvite = ref(null);
+
+// User access edit state
+const editUserDialog = ref(false);
+const removeAccessDialog = ref(false);
+const selectedDatasetForUserEdit = ref(null);
+const selectedUser = ref(null);
+const userEditData = ref({
+  access_level: "",
+  role_id: null,
+});
+const savingUserAccess = ref(false);
+const removingAccess = ref(false);
+
+// Theme and language settings
+const languages = [
+  { value: "en", label: "English" },
+  { value: "de", label: "Deutsch" },
+];
+
+const selectedLanguage = ref(
+  languages.find((lang) => lang.value === i18n.global.locale.value) ||
+    languages[0]
+);
+
+// Columns for Roles table
+const roleColumns = [
+  { name: "name", label: "Name", field: "name", align: "left" },
+  { name: "acs", label: "Permissions", field: "acs", align: "left" },
+  { name: "actions", label: "", field: "actions", align: "right" },
+];
+
+// Columns for Users table
+const userColumns = [
+  { name: "email", label: "Email", field: "email", align: "left" },
+  {
+    name: "access_level",
+    label: "Access Level",
+    field: "access_level",
+    align: "left",
+  },
+  { name: "role", label: "Role", field: "role", align: "left" },
+  {
+    name: "actions",
+    label: "Actions",
+    field: "actions",
+    align: "right",
+  },
+];
+
+// Filtered datasets based on search query
+const filteredDatasets = computed(() => {
+  if (!searchQuery.value) {
+    return datasets.value;
+  }
+
+  const query = searchQuery.value.toLowerCase();
+  return datasets.value.filter((dataset) =>
+    dataset.db_name.toLowerCase().includes(query)
+  );
+});
+
+// Computed properties for dropdown options
+const roleOptions = computed(() => {
+  if (
+    !selectedDatasetForInvite.value ||
+    !selectedDatasetForInvite.value.roles
+  ) {
+    return [];
+  }
+  return selectedDatasetForInvite.value.roles.map((role) => ({
+    label: role.name,
+    value: role.id,
+  }));
+});
+
+const roleOptionsForEdit = computed(() => {
+  if (
+    !selectedDatasetForUserEdit.value ||
+    !selectedDatasetForUserEdit.value.roles
+  ) {
+    return [];
+  }
+  return selectedDatasetForUserEdit.value.roles.map((role) => ({
+    label: role.name,
+    value: role.id,
+  }));
+});
+
+// Compute grouped access controls from menuLinks
+const groupedAcs = computed(() => {
+  const flattenSublinks = (links) => {
+    return links.flatMap((link) => {
+      let items = [];
+      if (link.perm || link.perl) {
+        items.push({ perm: link.perm || link.perl, label: link.title });
+      }
+      if (link.sublinks) {
+        items = items.concat(flattenSublinks(link.sublinks));
+      }
+      return items;
+    });
+  };
+
+  return menuLinks.map((link) => {
+    const groupPerm = link.perm || link.perl;
+    const groupLabel = link.title;
+    const subs = link.sublinks ? flattenSublinks(link.sublinks) : [];
+    return {
+      group: groupPerm,
+      label: groupLabel,
+      top: !!groupPerm,
+      subs: subs,
+    };
+  });
+});
+
+// Get invites for a specific dataset
+const getDatasetInvites = (datasetId) => {
+  return sentInvites.value.filter((invite) => invite.dataset_id === datasetId);
+};
+
+// Process role access controls into groups for display
+const groupRowAcs = (acsArray) => {
+  const parsedAcs =
+    typeof acsArray === "string" ? JSON.parse(acsArray) : acsArray;
+  const groups = {};
+  parsedAcs.forEach((perm) => {
+    const parts = perm.split(".");
+    const group = parts[0];
+    if (!groups[group]) {
+      groups[group] = { group: group, subs: [] };
+    }
+    if (parts.length > 1) {
+      groups[group].subs.push(perm);
+    }
+  });
+  return Object.values(groups);
+};
+
+// Toggle dark/light mode
+const toggleDarkMode = () => {
+  $q.dark.toggle();
+  setTheme($q.dark.isActive ? "dark" : "light");
+};
+
+// Switch language
+function switchLanguage(lang) {
+  if (i18n.global.locale.value !== lang.value) {
+    loadLanguagePack(lang.value);
+    selectedLanguage.value = lang;
+  }
+}
+
+// Logout handler
+async function handleLogout() {
+  Cookies.remove("client");
+  Cookies.remove("sessionkey");
+  await router.push("/login");
+}
+
+// Fetch datasets from the API and process roles/users data
+const getDatasets = async () => {
+  try {
+    const response = await api.get("/db_list");
+    datasets.value = response.data.map((ds) => ({
+      ...ds,
+      activeTab: "users", // Add active tab state for each dataset
+      expanded: false, // For list view expansion
+      roles:
+        ds.roles?.map((role) => ({
+          ...role,
+          acs:
+            typeof role.acs === "string"
+              ? JSON.parse(role.acs)
+              : role.acs || [],
+        })) || [],
+      users: ds.users || [],
+    }));
+
+    // Load invites after datasets are loaded
+    getInvites();
+  } catch (err) {
+    console.error("Error fetching datasets:", err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Helper to get role name from ID
+const getRoleName = (roleId) => {
+  for (const dataset of datasets.value) {
+    if (dataset.roles) {
+      const role = dataset.roles.find((r) => r.id === roleId);
+      if (role) return role.name;
+    }
+  }
+  return `Role #${roleId}`;
+};
+
+// Fetch both sent and received invites
+const getInvites = async () => {
+  loadingInvites.value = true;
+  try {
+    // Fetch sent invites
+    const sentResponse = await api.get("/invites/sent");
+    sentInvites.value = sentResponse.data.invites || [];
+
+    // Fetch received invites
+    const receivedResponse = await api.get("/invites/received");
+    receivedInvites.value = receivedResponse.data.invites || [];
+  } catch (err) {
+    console.error("Error fetching invites:", err);
+    Notify.create({
+      message: "Failed to load invites",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    loadingInvites.value = false;
+  }
+};
+
+// Accept an invite
+const acceptInvite = async (inviteId) => {
+  processingInvite.value = inviteId;
+  try {
+    await api.post(`/invite/${inviteId}/accept`);
+
+    // Remove from received invites
+    receivedInvites.value = receivedInvites.value.filter(
+      (invite) => invite.id !== inviteId
+    );
+
+    Notify.create({
+      message: "Invite accepted successfully",
+      type: "positive",
+      position: "center",
+    });
+
+    // Refresh datasets to show new access
+    getDatasets();
+  } catch (err) {
+    console.error("Error accepting invite:", err);
+    Notify.create({
+      message: err.response?.data?.message || "Failed to accept invite",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    processingInvite.value = null;
+  }
+};
+
+// Decline an invite
+const declineInvite = async (inviteId) => {
+  processingInvite.value = inviteId;
+  try {
+    await api.post(`/invite/${inviteId}/decline`);
+
+    // Remove from received invites
+    receivedInvites.value = receivedInvites.value.filter(
+      (invite) => invite.id !== inviteId
+    );
+
+    Notify.create({
+      message: "Invite declined",
+      type: "positive",
+      position: "center",
+    });
+  } catch (err) {
+    console.error("Error declining invite:", err);
+    Notify.create({
+      message: err.response?.data?.message || "Failed to decline invite",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    processingInvite.value = null;
+  }
+};
+
+// Cancel an invite
+const cancelInvite = async (inviteId) => {
+  processingInvite.value = inviteId;
+  try {
+    await api.delete(`/invite/${inviteId}`);
+
+    // Remove from sent invites list
+    sentInvites.value = sentInvites.value.filter(
+      (invite) => invite.id !== inviteId
+    );
+
+    Notify.create({
+      message: "Invite canceled",
+      type: "positive",
+      position: "center",
+    });
+  } catch (err) {
+    console.error("Error canceling invite:", err);
+    Notify.create({
+      message: err.response?.data?.message || "Failed to cancel invite",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    processingInvite.value = null;
+  }
+};
+
+// Open dialog to send an invite
+const openInviteDialog = (dataset) => {
+  selectedDatasetForInvite.value = dataset;
+  inviteData.value = {
+    recipient_email: "",
+    access_level: "user",
+    role_id: null,
+  };
+  inviteDialog.value = true;
+};
+
+// Cancel invite dialog
+const cancelInviteDialog = () => {
+  inviteDialog.value = false;
+};
+
+// Send an invite
+const sendInvite = async () => {
+  // Validate email format
+  if (
+    !inviteData.value.recipient_email ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteData.value.recipient_email)
+  ) {
+    Notify.create({
+      message: "Please enter a valid email address",
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  sendingInvite.value = true;
+  try {
+    const payload = {
+      recipient_email: inviteData.value.recipient_email,
+      dataset_id: selectedDatasetForInvite.value.id,
+      access_level: inviteData.value.access_level,
+      role_id: inviteData.value.role_id || null,
+    };
+
+    await api.post(
+      `/client/${selectedDatasetForInvite.value.db_name}/invite`,
+      payload
+    );
+
+    Notify.create({
+      message: "Invite sent successfully",
+      type: "positive",
+      position: "center",
+    });
+
+    inviteDialog.value = false;
+
+    // Refresh sent invites
+    getInvites();
+  } catch (err) {
+    console.error("Error sending invite:", err);
+    Notify.create({
+      message: err.response?.data?.message || "Failed to send invite",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    sendingInvite.value = false;
+  }
+};
+
+// Open dialog to edit user access
+const openEditUserDialog = (dataset, user) => {
+  selectedDatasetForUserEdit.value = dataset;
+  selectedUser.value = user;
+  userEditData.value = {
+    access_level: user.access_level,
+    role_id: user.role_id,
+  };
+  editUserDialog.value = true;
+};
+
+// Cancel user edit dialog
+const cancelEditUserDialog = () => {
+  editUserDialog.value = false;
+  selectedUser.value = null;
+  userEditData.value = {
+    access_level: "",
+    role_id: null,
+  };
+};
+
+// Open confirmation dialog to remove user access
+const confirmRemoveAccess = (dataset, user) => {
+  if (user.access_level === "owner") {
+    Notify.create({
+      message: "Cannot remove owner access",
+      type: "warning",
+      position: "center",
+    });
+    return;
+  }
+
+  selectedDatasetForUserEdit.value = dataset;
+  selectedUser.value = user;
+  removeAccessDialog.value = true;
+};
+
+// Save user access changes
+const saveUserAccess = async () => {
+  if (!selectedUser.value || !selectedDatasetForUserEdit.value) {
+    return;
+  }
+
+  savingUserAccess.value = true;
+
+  try {
+    const payload = {
+      access_level: userEditData.value.access_level,
+      role_id: userEditData.value.role_id,
+    };
+
+    await api.post(
+      `/client/${selectedDatasetForUserEdit.value.db_name}/access/${selectedUser.value.profile_id}`,
+      payload
+    );
+
+    Notify.create({
+      message: "User access updated successfully",
+      type: "positive",
+      position: "center",
+    });
+
+    editUserDialog.value = false;
+
+    // Update the user data in the local state
+    if (
+      selectedDatasetForUserEdit.value &&
+      selectedDatasetForUserEdit.value.users
+    ) {
+      const userIndex = selectedDatasetForUserEdit.value.users.findIndex(
+        (u) => u.profile_id === selectedUser.value.profile_id
+      );
+
+      if (userIndex !== -1) {
+        selectedDatasetForUserEdit.value.users[userIndex].access_level =
+          userEditData.value.access_level;
+        selectedDatasetForUserEdit.value.users[userIndex].role_id =
+          userEditData.value.role_id;
+        selectedDatasetForUserEdit.value.users[userIndex].role = userEditData
+          .value.role_id
+          ? getRoleName(userEditData.value.role_id)
+          : null;
+      }
+    }
+  } catch (err) {
+    console.error("Error updating user access:", err);
+    Notify.create({
+      message: err.response?.data?.message || "Failed to update user access",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    savingUserAccess.value = false;
+  }
+};
+
+// Remove user access
+const removeUserAccess = async () => {
+  if (
+    !selectedUser.value ||
+    !selectedDatasetForUserEdit.value ||
+    selectedUser.value.access_level === "owner"
+  ) {
+    removeAccessDialog.value = false;
+    return;
+  }
+
+  removingAccess.value = true;
+
+  try {
+    await api.post(
+      `/client/${selectedDatasetForUserEdit.value.db_name}/access/${selectedUser.value.profile_id}`,
+      { delete: true }
+    );
+
+    Notify.create({
+      message: "User access removed successfully",
+      type: "positive",
+      position: "center",
+    });
+
+    // Remove the user from the dataset's users array
+    if (
+      selectedDatasetForUserEdit.value &&
+      selectedDatasetForUserEdit.value.users
+    ) {
+      selectedDatasetForUserEdit.value.users =
+        selectedDatasetForUserEdit.value.users.filter(
+          (u) => u.profile_id !== selectedUser.value.profile_id
+        );
+    }
+
+    removeAccessDialog.value = false;
+  } catch (err) {
+    console.error("Error removing user access:", err);
+    Notify.create({
+      message: err.response?.data?.message || "Failed to remove user access",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    removingAccess.value = false;
+  }
+};
+
+onMounted(() => {
+  // Fetch datasets and invites on component mount
+  getDatasets();
+});
+
+// Open dialog to add a new role
+const openAddRolePopup = (dataset) => {
+  selectedDataset.value = dataset;
+  selectedRole.value = { id: null, name: "", acs: [] };
+  isEditMode.value = false;
+  roleDialog.value = true;
+};
+
+// Open dialog to edit an existing role
+const openEditRolePopup = (dataset, role) => {
+  selectedDataset.value = dataset;
+  selectedRole.value = {
+    id: role.id,
+    name: role.name,
+    acs: typeof role.acs === "string" ? JSON.parse(role.acs) : [...role.acs],
+  };
+  isEditMode.value = true;
+  roleDialog.value = true;
+};
+
+// Cancel role editing/creation
+const cancelRole = () => {
+  roleDialog.value = false;
+  selectedRole.value = { id: null, name: "", acs: [] };
+};
+
+// Save role changes (create/update) via API
+const saveRole = async () => {
+  if (!selectedRole.value.name.trim()) {
+    Notify.create({
+      message: "Role name is required",
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  saving.value = true;
+  try {
+    const payload = {
+      name: selectedRole.value.name,
+      acs: JSON.stringify(selectedRole.value.acs),
+    };
+    const clientParam = `?client=${selectedDataset.value.db_name}`;
+
+    if (isEditMode.value) {
+      await api.post(
+        `/client/${selectedDataset.value.db_name}/system/roles/${selectedRole.value.id}`,
+        payload
+      );
+      Notify.create({
+        message: "Role updated successfully",
+        type: "positive",
+        position: "center",
+      });
+    } else {
+      await api.post(
+        `/client/${selectedDataset.value.db_name}/system/roles${clientParam}`,
+        payload
+      );
+      Notify.create({
+        message: "Role added successfully",
+        type: "positive",
+        position: "center",
+      });
+    }
+
+    roleDialog.value = false;
+    getDatasets();
+  } catch (error) {
+    Notify.create({
+      message: error.response?.data?.message || "An error occurred",
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    saving.value = false;
+  }
+};
+
+// Check if a specific permission is active
+const isChecked = (permission, role) => {
+  return role.acs.includes(permission);
+};
+
+// Toggle a specific permission on/off
+const togglePermission = (permission, value, role) => {
+  if (value) {
+    if (!role.acs.includes(permission)) {
+      role.acs.push(permission);
+    }
+    const parent = permission.split(".")[0];
+    if (!role.acs.includes(parent)) {
+      role.acs.push(parent);
+    }
+  } else {
+    role.acs = role.acs.filter((p) => p !== permission);
+    const parent = permission.split(".")[0];
+    const group = groupedAcs.value.find((g) => g.group === parent);
+    if (
+      group &&
+      group.subs.every((permObj) => !role.acs.includes(permObj.perm))
+    ) {
+      role.acs = role.acs.filter((p) => p !== parent);
+    }
+  }
+};
+
+// Determine if any permission within a group is active
+const isGroupChecked = (group, role) => {
+  const acs = role.acs;
+  const hasTop = group.top ? acs.includes(group.group) : false;
+  const hasSub = group.subs.some((permObj) => acs.includes(permObj.perm));
+  return hasTop || hasSub;
+};
+
+// Toggle all permissions within a group on/off
+const toggleGroup = (group, value, role) => {
+  if (value) {
+    if (group.top && !role.acs.includes(group.group)) {
+      role.acs.push(group.group);
+    }
+    group.subs.forEach((permObj) => {
+      if (!role.acs.includes(permObj.perm)) {
+        role.acs.push(permObj.perm);
+      }
+    });
+  } else {
+    role.acs = role.acs.filter((p) => p !== group.group);
+    group.subs.forEach((permObj) => {
+      role.acs = role.acs.filter((p) => p !== permObj.perm);
+    });
+  }
+};
+
+// Navigate to the dataset details in a new tab
+const navigateToDataset = (dataset) => {
+  window.open(`/client/${dataset.db_name}`, "_blank");
+};
+</script>
+
+<style scoped>
+.dataset-card {
+  transition: box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dataset-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.dataset-header {
+  padding: 16px;
+}
+
+.q-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dataset-list-item {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.dataset-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.q-dark .dataset-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+</style>

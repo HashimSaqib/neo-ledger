@@ -686,25 +686,25 @@ function clearForm() {
   formData.value.summary = "detail";
 }
 
-// Generate a router-link path for a result row.
+const createLink = inject("createLink");
 function getPath(row) {
   if (itemType.value === "services") {
-    return { path: "/ic/add/service", query: { id: row.id } };
+    return { path: createLink("service.add"), query: { id: row.id } };
   }
-  return { path: "/ic/add/part", query: { id: row.id } };
+  return { path: createLink("part.add"), query: { id: row.id } };
 }
 function getinvPath(row) {
   const base =
     row.module === "ir"
-      ? "/ap/vendor-invoice/"
+      ? createLink("vendor.invoice")
       : row.module === "is"
-      ? "/ar/sales-invoice/"
+      ? createLink("customer.invoice")
       : "";
 
   return { path: base, query: { id: row.trans_id } };
 }
 function getVcPath(row) {
-  const base = `/arap/${row.vc}/`;
+  const base = createLink($vc);
 
   return { path: base, query: { id: row.vc_id } };
 }

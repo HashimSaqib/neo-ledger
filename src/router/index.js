@@ -6,15 +6,8 @@ import {
   createWebHashHistory,
 } from "vue-router";
 import routes from "./routes";
-import { Cookies, Notify } from "quasar";
-
+import { Cookies, LocalStorage, Notify } from "quasar";
 export default route(function () {
-  const createHistory = process.env.SERVER
-    ? createMemoryHistory
-    : process.env.VUE_ROUTER_MODE === "history"
-    ? createWebHistory
-    : createWebHashHistory;
-
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
@@ -22,20 +15,24 @@ export default route(function () {
   });
 
   Router.beforeEach((to, from, next) => {
-    // Retrieve user permissions from cookies.
-    let acs = Cookies.get("acs");
+    if (!to.params.client) {
+      next();
+      return;
+    }
+
+    const client = to.params.client;
+
+    let acs = LocalStorage.getItem(`${client}_acs`);
     try {
-      acs = acs ? (typeof acs === "string" ? JSON.parse(acs) : acs) : [];
+      acs = acs ? acs : [];
     } catch (e) {
       acs = [];
     }
 
     let requiredPerm = to.meta && to.meta.permission;
-    // If the permission is defined as a function, call it with the current route.
     if (typeof requiredPerm === "function") {
       requiredPerm = requiredPerm(to);
     }
-    // If the permission is an array, allow if at least one permission is present.
     if (Array.isArray(requiredPerm)) {
       const hasPermission = requiredPerm.some((perm) => acs.includes(perm));
       if (hasPermission) {
@@ -60,9 +57,7 @@ export default route(function () {
         });
         next(false);
       }
-    }
-    // If no permission is defined, simply allow navigation.
-    else {
+    } else {
       next();
     }
   });

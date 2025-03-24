@@ -1,40 +1,40 @@
 // src/utils.js
 import { utils, writeFile } from "xlsx";
 import { inject } from "vue";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Dialog } from "quasar";
+// Format a number as a string with commas and two decimals
 export const formatAmount = (amount) => {
-  if (isNaN(amount) || amount === null || amount === undefined) return ""; // return empty string for invalid values
-
-  // Convert amount to string and format it
+  if (isNaN(amount) || amount === null || amount === undefined) return "";
   return parseFloat(amount)
-    .toFixed(2) // Ensure it's a two-decimal float (optional)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas every three digits
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
+
+// Round the given amount to two decimals
 export const roundAmount = (amount) => {
   const parsed = parseFloat(amount);
-  if (isNaN(parsed)) return NaN; // or you could choose another fallback value
-
+  if (isNaN(parsed)) return NaN;
   return Math.round(parsed * 100) / 100;
 };
 
+// Format a date string from "yyyy-mm-dd" to "dd-mm-yyyy"
 export const displayDate = (datestring) => {
-  // Split the input date by hyphen
   const [year, month, day] = datestring.split("-");
-
-  // Return the date in the desired format dd-mm-yyyy
   return `${day}-${month}-${year}`;
 };
 
+// Filter an array of options based on a search value
 export const filter = (val, options) => {
   if (val === "") return options;
   const needle = val.toLowerCase();
   return options.filter((v) => v.toLowerCase().includes(needle));
 };
-export const downloadReport = (filteredResults, columns, totals = null) => {
-  // Build the header row from the computed columns (ensuring the order is correct)
-  const headerRow = columns.map((col) => col.label);
 
-  // Map filteredResults into rows where cell order matches the header order,
-  // applying roundAmount for totals columns if a value is present
+// Download a report as an Excel file
+export const downloadReport = (filteredResults, columns, totals = null) => {
+  const headerRow = columns.map((col) => col.label);
   const dataRows = filteredResults.map((row) =>
     columns.map((col) => {
       let value = row[col.field] || "";
@@ -49,8 +49,6 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
       return value;
     })
   );
-
-  // Prepare the totals row if totals are provided
   const totalsRow = totals
     ? columns.map((col) => {
         if (
@@ -65,15 +63,9 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
         return "";
       })
     : null;
-
-  // Combine header, data rows, and totals row (if available)
   const exportData = [headerRow, ...dataRows];
   if (totalsRow) exportData.push(totalsRow);
-
-  // Create worksheet from the 2D array
   const worksheet = utils.aoa_to_sheet(exportData);
-
-  // Auto-adjust column widths
   worksheet["!cols"] = headerRow.map((header, index) => {
     let maxLength = header.length;
     dataRows.forEach((row) => {
@@ -82,17 +74,12 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
     });
     return { wch: maxLength + 2 };
   });
-
-  // Create a new workbook and append the worksheet
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, worksheet, "AR Transactions");
-
-  // Export the workbook to a file with compression enabled
   writeFile(workbook, "ARreport.xlsx", { compression: true });
 };
 
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+// Create a PDF report from the provided data
 export const createPDF = (
   filteredResults,
   columns,
@@ -101,35 +88,26 @@ export const createPDF = (
   params = {}
 ) => {
   const doc = new jsPDF({ orientation: "landscape" });
-
-  let yPosition = 10; // Track vertical position
-  const leftPadding = 15; // Align params with the table start
-
-  // Add Title if provided
+  let yPosition = 10;
+  const leftPadding = 15;
   if (title) {
     doc.setFontSize(18);
     doc.text(title, doc.internal.pageSize.width / 2, yPosition, {
       align: "center",
     });
-    yPosition += 8; // Slightly reduced spacing
+    yPosition += 8;
   }
-
-  // Add Params if provided
   if (params && Object.keys(params).length > 0) {
-    doc.setFontSize(12); // Reduce font size
+    doc.setFontSize(12);
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
         doc.text(`${key}: ${value}`, leftPadding, yPosition);
-        yPosition += 6; // Reduce line spacing
+        yPosition += 6;
       }
     });
-    yPosition += 4; // Small gap before the table
+    yPosition += 4;
   }
-
-  // Define table headers
   const headerRow = columns.map((col) => col.label);
-
-  // Identify number columns for right alignment
   const numberColumns = [
     "amount",
     "netamount",
@@ -140,8 +118,6 @@ export const createPDF = (
     "credit",
     "balance",
   ];
-
-  // Map filteredResults into rows where cell order matches the header order
   const dataRows = filteredResults.map((row) =>
     columns.map((col) => {
       let value = row[col.field] || "";
@@ -151,11 +127,7 @@ export const createPDF = (
       return value;
     })
   );
-
-  // Check if any total column has a value
   let hasTotals = totals && numberColumns.some((col) => totals[col]);
-
-  // Prepare totals row only if there's a valid total value
   let totalsRow = null;
   if (hasTotals) {
     totalsRow = columns.map((col) => {
@@ -167,19 +139,15 @@ export const createPDF = (
       return "";
     });
   }
-
-  // Construct table data
   const tableData = [...dataRows];
   if (totalsRow) tableData.push(totalsRow);
-
-  // Add table to PDF
   autoTable(doc, {
     startY: yPosition,
     head: [headerRow],
     body: tableData,
     styles: { fontSize: 10 },
     theme: "striped",
-    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] }, // Light grey header with black text
+    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
     columnStyles: Object.fromEntries(
       columns.map((col, index) => [
         index,
@@ -187,20 +155,17 @@ export const createPDF = (
       ])
     ),
   });
-
-  // Save the PDF
   doc.save(`${title}.pdf`);
 };
 
-// Delete Confirmation
-import { Dialog } from "quasar";
+// Display a delete confirmation dialog using Quasar's Dialog component
 export const confirmDelete = ({
   title,
   message,
   cancel = true,
   persistent = true,
-}) => {
-  return new Promise((resolve, reject) => {
+}) =>
+  new Promise((resolve) => {
     Dialog.create({
       title,
       message,
@@ -210,4 +175,3 @@ export const confirmDelete = ({
       .onOk(() => resolve(true))
       .onCancel(() => resolve(false));
   });
-};

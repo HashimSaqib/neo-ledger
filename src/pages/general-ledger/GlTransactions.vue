@@ -834,26 +834,23 @@ const clearAccnoFilter = () => {
   formData.value.accnoto = "";
   search();
 };
+const createLink = inject("createLink");
 
 // Return router path based on row type
 const getPath = (row) => {
   let path = "";
   if (row.type === "gl") {
-    path = "/gl/add-gl";
+    path = createLink("gl.transaction");
   } else if (row.type === "ar") {
-    if (row.till) {
-      path = "/pos/sale";
-    } else if (row.invoice) {
-      path = "/ar/sales-invoice";
-    } else {
-      path = "/arap/transaction/customer";
-    }
+    path = row.till
+      ? createLink("customer.pos")
+      : row.invoice
+      ? createLink("customer.invoice")
+      : createLink("transaction.customer");
   } else if (row.type === "ap") {
-    if (row.invoice) {
-      path = "/ap/vendor-invoice";
-    } else {
-      path = "/arap/transaction/vendor";
-    }
+    path = row.invoice
+      ? createLink("vendor.invoice")
+      : createLink("vendor.transaction");
   }
   const flatParams = flattenParams(formData.value);
   return {
@@ -861,7 +858,7 @@ const getPath = (row) => {
     query: {
       id: row.id,
       ...flatParams,
-      callback: `/gl/reports`,
+      callback: createLink("base") + `/gl/reports`,
     },
   };
 };

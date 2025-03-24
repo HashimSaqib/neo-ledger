@@ -1,5 +1,11 @@
 export const menuLinks = [
   {
+    title: "Dashboard",
+    icon: "dashboard",
+    perm: "dashboard",
+    link: "/",
+  },
+  {
     title: "Customers",
     icon: "people",
     perm: "customer",
@@ -18,12 +24,12 @@ export const menuLinks = [
       {
         title: "Credit Invoice",
         link: "/ar/sales-invoice?credit_invoice=1",
-        perm: "customer.creditinvoice",
+        perm: "customer.invoice.return",
       },
       {
         title: "Add Customer",
         link: "/arap/customer",
-        perm: "customer.addcustomer",
+        perm: "customer.add",
       },
 
       {
@@ -67,12 +73,12 @@ export const menuLinks = [
       {
         title: "Debit Invoice",
         link: "/ap/vendor-invoice?debit_invoice=1",
-        perm: "vendor.debitinvoice",
+        perm: "vendor.invoice.return",
       },
       {
         title: "Add Vendor",
         link: "/arap/Vendor",
-        perm: "vendor.addvendor",
+        perm: "vendor.add",
       },
       // Combined Reports submenu for AP & Vendors
       {

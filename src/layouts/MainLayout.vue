@@ -49,6 +49,7 @@
     </q-page-container>
   </q-layout>
 </template>
+
 <script setup>
 import { ref, provide, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -56,16 +57,17 @@ import { useI18n } from "vue-i18n";
 import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
 import { menuLinks } from "src/layouts/Menu.js";
-import { Cookies, Dark } from "quasar"; // import Dark plugin
+import { Cookies, Dark, LocalStorage } from "quasar";
 
 const miniState = ref(false);
 const { t } = useI18n();
 const route = useRoute();
 const leftDrawerOpen = ref(false);
 const company = Cookies.get("company");
-const dbname = Cookies.get("client");
 
-const getDefaultTitle = () => company || dbname || t("Neo Ledger");
+// Extract client from the route instead of from Cookies
+const client = route.params.client;
+const getDefaultTitle = () => company || client || t("Neo Ledger");
 const title = ref(getDefaultTitle());
 
 // Provide title and update function to child components
@@ -85,6 +87,40 @@ let wasDarkMode = Dark.isActive;
 const togglePrintMode = () => {
   printMode.value = !printMode.value;
 };
+
+const createLink = (link) => {
+  const base = `/client/${client}`;
+  let path;
+
+  if (link === "gl.transaction") {
+    path = `${base}/gl/add-gl`;
+  } else if (link === "customer.pos") {
+    path = `${base}/pos/sale`;
+  } else if (link === "customer.invoice") {
+    path = `${base}/ar/sales-invoice`;
+  } else if (link === "customer.transaction") {
+    path = `${base}/arap/transaction/customer`;
+  } else if (link === "vendor.invoice") {
+    path = `${base}/ap/vendor-invoice`;
+  } else if (link === "customer.transaction") {
+    path = `${base}/arap/transaction/vendor`;
+  } else if (link === "base") {
+    path = `${base}`;
+  } else if (link === "trial.transactions") {
+    path = `${base}/reports/trial_transactions`;
+  } else if (link === "vendor") {
+    path = `${base}/arap/vendor`;
+  } else if (link === "customer") {
+    path = `${base}/arap/customer`;
+  } else if (link === "part.add") {
+    path = `${base}/ic/add/part`;
+  } else if (link === "service.add") {
+    path = `${base}/ic/add/service`;
+  }
+
+  return path;
+};
+provide("createLink", createLink);
 
 const printPDF = async () => {
   // Save current dark mode state
@@ -116,35 +152,46 @@ window.addEventListener("afterprint", () => {
     togglePrintMode();
   }
 });
-const filteredMenu = ref();
-onMounted(async () => {
-  let acs = Cookies.get("acs");
 
+const filteredMenu = ref();
+
+// Create a filtering function to process menu links based on permissions.
+
+// Define the filterMenu function without parameters.
+const filterMenu = () => {
+  let acs = LocalStorage.getItem(`${client}_acs`);
   try {
     acs = acs ? acs : [];
-    if (!Array.isArray(acs)) throw new Error("Invalid permissions format");
   } catch (error) {
     console.error("Error parsing permissions:", error);
-    acs = []; // Fallback to an empty array
+    acs = [];
   }
 
-  const filterMenu = (menu) => {
+  // A helper function for recursive filtering.
+  const recursiveFilter = (menu) => {
     return menu
       .map((item) => {
-        // Recursively filter sublinks if they exist
-        const sublinks = item.sublinks ? filterMenu(item.sublinks) : [];
-
-        // Include the item if it has a valid permission OR has valid sublinks
+        const sublinks = item.sublinks ? recursiveFilter(item.sublinks) : [];
         if (acs.includes(item.perm) || sublinks.length) {
-          return { ...item, sublinks };
+          const updatedItem = { ...item, sublinks };
+          if (updatedItem.link) {
+            const normalizedLink = updatedItem.link.replace(/^\/+/, "");
+            updatedItem.link = `/client/${client}/${normalizedLink}`;
+          }
+          return updatedItem;
         }
         return null;
       })
       .filter(Boolean);
   };
 
-  filteredMenu.value = filterMenu(menuLinks);
-  console.log(filteredMenu.value);
+  filteredMenu.value = recursiveFilter(menuLinks);
+};
+
+provide("filterMenu", filterMenu);
+
+onMounted(() => {
+  filterMenu();
 });
 
 // active dropdown

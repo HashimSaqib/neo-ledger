@@ -724,19 +724,22 @@ const filteredResults = computed(() => {
 // ----------------------------------------------------
 //  getPath
 // ----------------------------------------------------
+const createLink = inject("createLink");
+
 function getPath(row) {
-  const base = vcType.value === "vendor" ? "/arap/vendor/" : "/arap/customer/";
+  const base = createLink(vcType.value);
   return { path: base, query: { id: row.id } };
 }
+
 function getinvPath(row) {
   const base =
     vcType.value === "vendor"
       ? row.module === "ir"
-        ? "/ap/vendor-invoice/"
-        : "/arap/transaction/vendor"
+        ? createLink("vendor.invoice")
+        : createLink("vendor.transaction")
       : row.module === "is"
-      ? "/ar/sales-invoice/"
-      : "/arap/transaction/customer";
+      ? createLink("customer.invoice")
+      : createLink("customer.transaction");
   return { path: base, query: { id: row.invid } };
 }
 

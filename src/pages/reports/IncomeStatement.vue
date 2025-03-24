@@ -12,9 +12,8 @@
         <q-form @submit.prevent="search" class="q-gutter-y-sm">
           <!-- Filters Section -->
           <div class="row q-gutter-sm q-mt-none">
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-3" v-if="departments.length > 0">
               <s-select
-                v-if="departments.length > 0"
                 v-model="formData.department"
                 :options="departments"
                 :label="t('Department')"
@@ -28,7 +27,7 @@
                 search="description"
               />
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-3" v-if="projects.length > 0">
               <s-select
                 v-model="formData.projectnumber"
                 :options="projects"
@@ -43,7 +42,7 @@
                 search="description"
               />
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-3" v-if="currencies.length > 0">
               <s-select
                 v-model="formData.currency"
                 :options="currencies"
@@ -920,6 +919,8 @@ const getPDF = async () => {
  * Accepts an account number and a specific period.
  * Formats the fromdate and todate from the period and includes other query parameters.
  */
+const createLink = inject("createLink");
+
 const getPath = (accno, period) => {
   // Helper to format "YYYYMMDD" to "YYYY-MM-DD"
   const formatDateStr = (dateStr) =>
@@ -937,7 +938,7 @@ const getPath = (accno, period) => {
     project,
     department,
   });
-  return `/reports/trial_transactions?${params.toString()}`;
+  return createLink("trial.transactions") + `?${params.toString()}`;
 };
 
 /**

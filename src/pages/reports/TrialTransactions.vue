@@ -239,43 +239,38 @@ const filteredResults = computed(() => {
   });
   return processedResults;
 });
+const createLink = inject("createLink");
 
 /* Helper: Get Navigation Path for a Transaction Row */
 const getPath = (row) => {
-  console.log(row);
   if (!row || !row.module) return null;
 
   let path = "";
 
   if (row.module === "gl") {
-    path = "/gl/add-gl";
+    path = createLink("gl.transaction");
   } else if (row.module === "ar" || row.module === "is") {
-    if (!!row.till) {
-      // Ensures falsy values are treated correctly
-      path = "/pos/sale";
-    } else if (!!row.invoice) {
-      path = "/ar/sales-invoice";
-    } else {
-      path = "/arap/transaction/customer";
-    }
+    path = row.till
+      ? createLink("ar.till")
+      : row.invoice
+      ? createLink("invoice.customer")
+      : createLink("transaction.customer");
   } else if (row.module === "ir") {
-    if (!!row.invoice) {
-      path = "/ap/vendor-invoice";
-    } else {
-      path = "/arap/transaction/vendor";
-    }
+    path = row.invoice
+      ? createLink("invoice.vendor")
+      : createLink("transaction.vendor");
   }
 
   if (!path) return null;
 
   return {
+    path,
     query: {
       id: row.id,
       ...formData.value,
       search: 1,
-      callback: "/reports/trial_transactions",
+      callback: createLink("base") + `/gl/reports`,
     },
-    path,
   };
 };
 

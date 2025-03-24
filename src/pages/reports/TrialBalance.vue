@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { formatAmount } from "src/helpers/utils";
 import { useRoute } from "vue-router";
@@ -339,10 +339,11 @@ function formatRow(result) {
   return formatted;
 }
 
+const createLink = inject("createLink");
 const getPath = (row) => {
   let path = "";
 
-  path = "/reports/trial_transactions";
+  path = createLink("trail.transactions");
 
   return {
     path,

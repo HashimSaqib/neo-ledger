@@ -10,7 +10,7 @@
     >
       <!-- Inner wrapper applies left padding without shifting on hover -->
       <div :style="innerStyle" class="row items-center">
-        <q-item-section avatar v-if="props.icon" :style="iconStyle">
+        <q-item-section avatar v-if="props.icon" class="maintext">
           <q-icon :name="props.icon" />
         </q-item-section>
         <q-item-section>
