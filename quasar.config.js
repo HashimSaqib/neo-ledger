@@ -4,7 +4,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 import { configure } from "quasar/wrappers";
-
+import { visualizer } from "rollup-plugin-visualizer";
 export default configure((/* ctx */) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -58,6 +58,16 @@ export default configure((/* ctx */) => {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
+      vitePlugins: [
+        [
+          visualizer({
+            open: true, // Automatically opens the report in your browser after build
+            filename: "stats.html", // Output file name for the report
+            gzipSize: true, // Display gzip size in report
+            brotliSize: true, // Display brotli size in report
+          }),
+        ],
+      ],
       // vitePlugins: [
       //   [ 'package-name', { ..pluginOptions.. }, { server: true, client: true } ]
       // ]

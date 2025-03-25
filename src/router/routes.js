@@ -1,5 +1,4 @@
 import MainLayout from "layouts/MainLayout.vue";
-import IndexPage from "src/pages/IndexPage.vue";
 import GeneralLedger from "src/pages/general-ledger/GeneralLedger.vue";
 import GlTransactions from "src/pages/general-ledger/GlTransactions.vue";
 import ArApTransaction from "src/pages/arap/ArApTransaction.vue";
@@ -29,11 +28,10 @@ import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 import Roles from "src/pages/system/Roles.vue";
 import Employees from "src/pages/system/Employees.vue";
 import LedgerTemplates from "src/pages/system/Templates.vue";
-import CentralIndex from "src/pages/central/IndexPage.vue";
 const routes = [
   {
     path: "/",
-    component: CentralIndex,
+    component: () => import("src/pages/central/IndexPage.vue"),
   },
   {
     path: "/client/:client",
@@ -41,7 +39,7 @@ const routes = [
     children: [
       {
         path: "",
-        component: IndexPage,
+        component: () => import("src/pages/IndexPage.vue"),
       },
       // General Ledger
       {
