@@ -27,7 +27,6 @@ import SignUp from "src/pages/Signup.vue";
 import ErrorNotFound from "src/pages/ErrorNotFound.vue";
 import Roles from "src/pages/system/Roles.vue";
 import Employees from "src/pages/system/Employees.vue";
-import LedgerTemplates from "src/pages/system/Templates.vue";
 const routes = [
   {
     path: "/",
@@ -243,7 +242,7 @@ const routes = [
       },
       {
         path: "system/templates",
-        component: LedgerTemplates,
+        component: () => import("src/pages/system/Templates.vue"),
         meta: { permission: "system.user.templates" },
       },
     ],
