@@ -209,16 +209,13 @@ const signupOtp = async () => {
 const confirmSignup = async () => {
   loading.value = true;
   try {
-    await axios.post("https://api.neo-ledger.com/signup", {
+    const response = await axios.post("https://api.neo-ledger.com/signup", {
       email: signupData.value.email,
       password: signupData.value.password,
       otp: signupData.value.otp,
     });
-    Notify.create({
-      message: t("Signup successful!"),
-      type: "positive",
-      position: "center",
-    });
+    const { sessionkey } = response.data;
+    $q.cookies.set("sessionkey", sessionkey, { path: "/" });
     router.push("/");
   } catch (error) {
     Notify.create({
