@@ -1,32 +1,37 @@
-import MainLayout from "layouts/MainLayout.vue";
-import GeneralLedger from "src/pages/general-ledger/GeneralLedger.vue";
-import GlTransactions from "src/pages/general-ledger/GlTransactions.vue";
-import ArApTransaction from "src/pages/arap/ArApTransaction.vue";
-import ArApTransactions from "src/pages/arap/ArApTransactions.vue";
-import SalesInvoice from "src/pages/ar/SalesInvoice.vue";
-import AddVC from "src/pages/arap/AddVC.vue";
-import VcHistory from "src/pages/arap/VcHistory.vue";
-import SearchVC from "src/pages/arap/SearchVC.vue";
-import AddPart from "src/pages/goodservices/AddPart.vue";
-import SearchPart from "src/pages/goodservices/SearchPart.vue";
-import PointOfSale from "src/pages/pos/PointOfSale.vue";
-import VendorInvoice from "src/pages/ap/VendorInvoice.vue";
-import TrialBalance from "src/pages/reports/TrialBalance.vue";
-import TrialTransactions from "src/pages/reports/TrialTransactions.vue";
-import IncomeStatement from "src/pages/reports/IncomeStatement.vue";
-import Reconciliation from "src/pages/cash/Reconciliation.vue";
-import SysCurrencies from "src/pages/system/Currencies.vue";
-import SysDefaults from "src/pages/system/Defaults.vue";
-import ListAccounts from "src/pages/system/chart/ListAccounts.vue";
-import AddAccount from "src/pages/system/chart/AddAccount.vue";
-import GIFI from "src/pages/system/chart/Gifi.vue";
-import ListDepartments from "src/pages/system/department/ListDepartments.vue";
-import ListProjects from "src/pages/projectsjobs/ListProjects.vue";
-import LoginPage from "src/pages/LoginPage.vue";
-import SignUp from "src/pages/Signup.vue";
-import ErrorNotFound from "src/pages/ErrorNotFound.vue";
-import Roles from "src/pages/system/Roles.vue";
-import Employees from "src/pages/system/Employees.vue";
+const MainLayout = () => import("layouts/MainLayout.vue");
+const GeneralLedger = () =>
+  import("src/pages/general-ledger/GeneralLedger.vue");
+const GlTransactions = () =>
+  import("src/pages/general-ledger/GlTransactions.vue");
+const ArApTransaction = () => import("src/pages/arap/ArApTransaction.vue");
+const ArApTransactions = () => import("src/pages/arap/ArApTransactions.vue");
+const SalesInvoice = () => import("src/pages/ar/SalesInvoice.vue");
+const AddVC = () => import("src/pages/arap/AddVC.vue");
+const VcHistory = () => import("src/pages/arap/VcHistory.vue");
+const SearchVC = () => import("src/pages/arap/SearchVC.vue");
+const AddPart = () => import("src/pages/goodservices/AddPart.vue");
+const SearchPart = () => import("src/pages/goodservices/SearchPart.vue");
+const PointOfSale = () => import("src/pages/pos/PointOfSale.vue");
+const VendorInvoice = () => import("src/pages/ap/VendorInvoice.vue");
+const TrialBalance = () => import("src/pages/reports/TrialBalance.vue");
+const TrialTransactions = () =>
+  import("src/pages/reports/TrialTransactions.vue");
+const IncomeStatement = () => import("src/pages/reports/IncomeStatement.vue");
+const Reconciliation = () => import("src/pages/cash/Reconciliation.vue");
+const SysCurrencies = () => import("src/pages/system/Currencies.vue");
+const SysDefaults = () => import("src/pages/system/Defaults.vue");
+const ListAccounts = () => import("src/pages/system/chart/ListAccounts.vue");
+const AddAccount = () => import("src/pages/system/chart/AddAccount.vue");
+const GIFI = () => import("src/pages/system/chart/Gifi.vue");
+const ListDepartments = () =>
+  import("src/pages/system/department/ListDepartments.vue");
+const ListProjects = () => import("src/pages/projectsjobs/ListProjects.vue");
+const LoginPage = () => import("src/pages/LoginPage.vue");
+const SignUp = () => import("src/pages/Signup.vue");
+const ErrorNotFound = () => import("src/pages/ErrorNotFound.vue");
+const Roles = () => import("src/pages/system/Roles.vue");
+const Employees = () => import("src/pages/system/Employees.vue");
+
 const routes = [
   {
     path: "/",
