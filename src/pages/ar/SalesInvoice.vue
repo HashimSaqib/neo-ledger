@@ -1529,7 +1529,7 @@ const postInvoice = async () => {
       source: payment.source,
       memo: payment.memo,
       amount: payment.amount,
-      account: payment.account.label,
+      account: payment.account ? payment.account.label : "",
       exchangerate: payment.exchangerate,
     })),
   };

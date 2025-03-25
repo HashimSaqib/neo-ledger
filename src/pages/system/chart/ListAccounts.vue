@@ -368,6 +368,7 @@
 
             <!-- Row 6: GIFI -->
             <s-select
+              v-if="gifi && gifi.length > 0"
               :options="gifi"
               map-options
               emit-value

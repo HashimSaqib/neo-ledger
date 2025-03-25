@@ -858,7 +858,7 @@ const loadData = async () => {
   }
 };
 const submitForm = async (isNew = false) => {
-  if (!form.value.partnumber || !form.value.description) {
+  if (!form.value.description) {
     Notify.create({
       message: "Please fill in the required fields",
       type: "negative",
@@ -973,7 +973,6 @@ const submitForm = async (isNew = false) => {
     });
     const fetchId = response.data.id;
     if (fetchId) {
-      console.log("hello");
       componentId.value = fetchId;
       await loadData();
       emit("saved");

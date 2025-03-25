@@ -3,44 +3,63 @@
     <q-page-container>
       <q-page class="flex flex-center lightbg">
         <div
-          class="q-pa-xl flex column mainbg relative-position"
+          class="q-pa-xl flex column mainbg card-style relative-position"
           style="min-width: 40vw"
         >
           <q-img :src="logo" class="q-mb-lg" />
 
+          <!-- Message for when signups are not allowed -->
+          <div
+            v-if="!otpStage && !signupAllowed"
+            class="flex column text-center message-box"
+          >
+            <p>
+              {{ t("Signup is not allowed") }}
+            </p>
+          </div>
+
           <!-- Signup Form -->
-          <transition name="fade">
-            <form
-              v-if="!otpStage"
-              @submit.prevent="signupOtp"
-              class="flex column"
-              style="width: 100%"
-            >
-              <q-input
-                v-model="signupData.email"
-                :label="t('Email')"
-                class="lightbg"
-                input-class="maintext"
-                label-color="secondary"
-                outlined
-              />
-              <q-input
-                v-model="signupData.password"
-                :label="t('Password')"
-                type="password"
-                class="lightbg maintext q-my-lg"
-                input-class="maintext"
-                label-color="secondary"
-                outlined
-              />
-              <q-btn
-                type="submit"
-                :label="t('Sign Up')"
-                spread
-                color="primary"
-              />
-            </form>
-          </transition>
+          <form
+            v-if="!otpStage && signupAllowed"
+            @submit.prevent="signupOtp"
+            class="flex column"
+            style="width: 100%"
+          >
+            <q-input
+              v-model="signupData.email"
+              :label="t('Email')"
+              class="lightbg"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+            />
+            <q-input
+              v-model="signupData.password"
+              :label="t('Password')"
+              type="password"
+              class="lightbg maintext q-mt-sm"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+            />
+            <q-input
+              v-if="signupData.invite"
+              v-model="signupData.invite"
+              :label="t('Invite Code')"
+              class="lightbg q-my-sm"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              readonly
+            />
+            <q-btn
+              type="submit"
+              :label="signupData.invite ? t('Sign Up') : t('Sign Up & Get OTP')"
+              spread
+              class="q-my-sm"
+              color="primary"
+            />
+          </form>
 
           <!-- OTP Input Form -->
           <transition name="fade">
@@ -78,43 +97,107 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { Notify, useQuasar } from "quasar";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import axios from "axios";
 import logo from "assets/images/logo.png";
-import LanguageSwitcher from "src/components/LanguageSwitcher.vue";
 
 const { t } = useI18n();
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 
 const loading = ref(false);
 const otpStage = ref(false);
+const signupAllowed = ref(false);
 const signupData = ref({
   email: "",
   password: "",
   otp: "",
+  invite: "",
 });
 
-// First step: request an OTP using email & password
+onMounted(async () => {
+  if (route.query.invite) {
+    signupData.value.invite = route.query.invite;
+  }
+
+  try {
+    const { data } = await axios.get(
+      "https://api.neo-ledger.com/check_signup",
+      { params: { invite: signupData.value.invite } }
+    );
+
+    const pubSignup = data.public_signup;
+    const inviteCode = data.invite_code;
+
+    if (pubSignup === 0) {
+      // Public signup disabled
+      if (inviteCode === 1) {
+        // Valid invite code
+        signupAllowed.value = true;
+      } else {
+        // No valid invite
+        signupAllowed.value = false;
+        Notify.create({
+          message: t("Signup requires a valid invite code"),
+          type: "negative",
+          position: "center",
+        });
+      }
+    } else {
+      // Public signup enabled
+      signupAllowed.value = true;
+      if (inviteCode === 0 && signupData.value.invite) {
+        // Invalid invite with public signup
+        Notify.create({
+          message: t("Invalid invite code - using public signup"),
+          type: "warning",
+          position: "center",
+        });
+        signupData.value.invite = "";
+      }
+    }
+  } catch (error) {
+    signupAllowed.value = false;
+    Notify.create({
+      message: t(error.response?.data?.message || "Signup check failed"),
+      type: "negative",
+      position: "center",
+    });
+  }
+});
+
 const signupOtp = async () => {
   loading.value = true;
   try {
-    await axios.post("https://api.neo-ledger.com/central/signup_otp", {
+    const endpoint = signupData.value.invite ? "signup" : "signup_otp";
+    await axios.post(`https://api.neo-ledger.com/${endpoint}`, {
       email: signupData.value.email,
       password: signupData.value.password,
+      ...(signupData.value.invite && { invite: signupData.value.invite }),
     });
-    otpStage.value = true;
-    Notify.create({
-      message: t("OTP sent to your email"),
-      type: "positive",
-      position: "center",
-    });
+
+    if (signupData.value.invite) {
+      Notify.create({
+        message: t("Signup successful!"),
+        type: "positive",
+        position: "center",
+      });
+      router.push("/");
+    } else {
+      otpStage.value = true;
+      Notify.create({
+        message: t("OTP sent to your email"),
+        type: "positive",
+        position: "center",
+      });
+    }
   } catch (error) {
     Notify.create({
-      message: t(`${error.response.data.message}`),
+      message: t(error.response?.data?.message || "Signup failed"),
       type: "negative",
       position: "center",
     });
@@ -123,11 +206,10 @@ const signupOtp = async () => {
   }
 };
 
-// Second step: confirm signup with the OTP
 const confirmSignup = async () => {
   loading.value = true;
   try {
-    await axios.post("https://api.neo-ledger.com/central/signup", {
+    await axios.post("https://api.neo-ledger.com/signup", {
       email: signupData.value.email,
       password: signupData.value.password,
       otp: signupData.value.otp,
@@ -140,7 +222,7 @@ const confirmSignup = async () => {
     router.push("/");
   } catch (error) {
     Notify.create({
-      message: t(`${error.response.data.message}`),
+      message: t(error.response?.data?.message || "Confirmation failed"),
       type: "negative",
       position: "center",
     });
@@ -150,14 +232,4 @@ const confirmSignup = async () => {
 };
 </script>
 
-<style scoped>
-/* Simple fade transition for smooth UI */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
+<!-- Keep existing styles unchanged -->

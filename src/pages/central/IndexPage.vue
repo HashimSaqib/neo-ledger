@@ -6,7 +6,6 @@
         <q-toolbar-title>Datasets</q-toolbar-title>
 
         <q-space />
-
         <!-- Refresh Button -->
         <q-btn
           flat
@@ -116,8 +115,14 @@
               </template>
             </q-input>
           </div>
+          <q-btn
+            label="Create New Dataset"
+            @click="showDatasetDialog = true"
+            color="primary"
+            class="col-2"
+          />
           <div
-            class="col-12 col-md-6 text-right q-mt-sm-none q-mt-md-none q-mt-xs"
+            class="col-12 col-md-4 text-right q-mt-sm-none q-mt-md-none q-mt-xs"
           >
             <q-toggle
               v-model="isGridView"
@@ -223,7 +228,13 @@
           <div class="text-h6 q-mt-md">No datasets found</div>
           <div class="text-body2">Try adjusting your search query</div>
         </div>
-
+        <div>
+          <!-- Use v-model for two-way binding of dialog visibility -->
+          <CreateDataset
+            v-model="showDatasetDialog"
+            @create-dataset="handleCreateDataset"
+          />
+        </div>
         <!-- GRID VIEW MODE -->
         <div
           v-if="!loading && !error && filteredDatasets.length > 0 && isGridView"
@@ -312,6 +323,12 @@
                   icon="mail"
                   label="Invites"
                   :alert="getDatasetInvites(dataset.id).length > 0"
+                />
+                <q-tab
+                  name="delete"
+                  icon="delete"
+                  label="delete"
+                  v-if="dataset.access_level == 'owner'"
                 />
               </q-tabs>
 
@@ -529,6 +546,33 @@
                       />
                     </div>
                   </div>
+                </q-tab-panel>
+                <q-tab-panel name="delete" class="q-pa-md">
+                  <div class="text-h6 text-negative q-mb-sm">
+                    Delete Dataset
+                  </div>
+                  <p class="q-mb-sm">
+                    This action will permanently delete the dataset and
+                    templates and
+                    <strong>cannot</strong> be undone. Only the owner can
+                    perform this operation. Please enter your password to
+                    confirm.
+                  </p>
+
+                  <q-input
+                    v-model="deletePw"
+                    type="password"
+                    dense
+                    input-class="maintext"
+                    label-color="secondary"
+                    label="Password"
+                    class="q-mb-md text-center"
+                  />
+                  <q-btn
+                    color="negative"
+                    label="DELETE DATASET"
+                    @click="handleDelete(dataset)"
+                  />
                 </q-tab-panel>
               </q-tab-panels>
             </q-card>
@@ -1232,6 +1276,32 @@ import { menuLinks } from "src/layouts/Menu.js";
 import { useRouter } from "vue-router";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
+import CreateDataset from "./CreateDataset.vue";
+
+const showDatasetDialog = ref(false);
+
+// Handle the dataset creation event emitted from the dialog component
+const handleCreateDataset = async (datasetDetails) => {
+  try {
+    const response = api.post("create_dataset", datasetDetails);
+    getDatasets();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// handle Deletion
+const deletePw = ref();
+const handleDelete = async (dataset) => {
+  try {
+    const response = api.delete(
+      `dataset?id=${dataset.id}&owner_pw=${deletePw.value}`
+    );
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const { t } = useI18n();
 const $q = useQuasar();
