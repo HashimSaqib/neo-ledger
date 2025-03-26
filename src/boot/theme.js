@@ -1,16 +1,16 @@
 // src/boot/theme.js
-import { setCssVar, Cookies, Dark } from "quasar";
+import { setCssVar, Cookies, LocalStorage, Dark } from "quasar";
 import { boot } from "quasar/wrappers";
 import { themes } from "src/css/themes";
 import { watch } from "vue";
 
 const THEME_COOKIE = "preferred-theme";
 
-export const isDark = () => Cookies.get(THEME_COOKIE) === "dark";
+export const isDark = () => LocalStorage.getItem(THEME_COOKIE) === "dark";
 
 export const setTheme = (isDark) => {
   // Set cookie with 365 days expiry
-  Cookies.set(THEME_COOKIE, isDark ? "dark" : "light", {
+  LocalStorage.set(THEME_COOKIE, isDark ? "dark" : "light", {
     expires: 365,
     path: "/",
   });
@@ -32,7 +32,7 @@ export const setTheme = (isDark) => {
 
 export default boot(() => {
   // If no theme cookie exists, create one with default 'light' theme
-  if (!Cookies.has(THEME_COOKIE)) {
+  if (!LocalStorage.has(THEME_COOKIE)) {
     setTheme(false);
   } else {
     setTheme(isDark());

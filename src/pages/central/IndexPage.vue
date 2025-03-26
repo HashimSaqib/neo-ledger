@@ -250,18 +250,38 @@
               <q-card-section class="dataset-header">
                 <!-- Dataset Info -->
                 <div class="row justify-between no-wrap">
-                  <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
-                    <q-img :src="`${dataset.logo}`" alt="Logo" />
-                  </q-avatar>
-                  <q-avatar
-                    v-else
-                    color="primary"
-                    text-color="white"
-                    size="56px"
-                    class="q-mr-md"
-                  >
-                    <q-icon name="database" size="32px" />
-                  </q-avatar>
+                  <div>
+                    <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
+                      <q-img :src="`${dataset.logo}`" alt="Logo" />
+                    </q-avatar>
+                    <q-avatar
+                      v-else
+                      color="primary"
+                      text-color="white"
+                      size="56px"
+                      class="q-mr-md"
+                    >
+                      <q-icon name="database" size="32px" />
+                    </q-avatar>
+                    <q-btn
+                      round
+                      dense
+                      flat
+                      icon="edit"
+                      class="download-icon"
+                      @click="triggerLogoUpload(dataset.id)"
+                      size="sm"
+                      color="primary"
+                      v-if="dataset.admin === 1"
+                    />
+
+                    <input
+                      type="file"
+                      :ref="(el) => (logoInputRefs[dataset.id] = el)"
+                      @change="handleLogoUpload($event, dataset.id)"
+                      style="display: none"
+                    />
+                  </div>
 
                   <div class="column flex-grow-1">
                     <div class="text-h6 ellipsis text-primary text-center">
@@ -323,6 +343,12 @@
                   icon="mail"
                   label="Invites"
                   :alert="getDatasetInvites(dataset.id).length > 0"
+                />
+                <q-tab
+                  name="backup"
+                  icon="cloud_download"
+                  label="backup"
+                  v-if="dataset.access_level == 'owner'"
                 />
                 <q-tab
                   name="delete"
@@ -574,6 +600,19 @@
                     @click="handleDelete(dataset)"
                   />
                 </q-tab-panel>
+                <q-tab-panel name="backup" class="q-pa-md text-center">
+                  <q-btn
+                    color="primary"
+                    label="Download Database"
+                    class="q-mr-sm"
+                    @click="downloadDb(dataset)"
+                  />
+                  <q-btn
+                    color="accent"
+                    label="Download Templates"
+                    @click="downloadTemplates(dataset)"
+                  />
+                </q-tab-panel>
               </q-tab-panels>
             </q-card>
 
@@ -630,16 +669,38 @@
             >
               <template v-slot:header>
                 <q-item-section avatar>
-                  <q-avatar v-if="dataset.logo">
-                    <img :src="dataset.logo" />
-                  </q-avatar>
+                  <div>
+                    <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
+                      <q-img :src="`${dataset.logo}`" alt="Logo" />
+                    </q-avatar>
+                    <q-avatar
+                      v-else
+                      color="primary"
+                      text-color="white"
+                      size="56px"
+                      class="q-mr-md"
+                    >
+                      <q-icon name="database" size="32px" />
+                    </q-avatar>
+                    <q-btn
+                      round
+                      dense
+                      flat
+                      icon="edit"
+                      class="download-icon"
+                      @click="triggerLogoUpload(dataset.id)"
+                      size="sm"
+                      color="primary"
+                      v-if="dataset.admin === 1"
+                    />
 
-                  <q-avatar
-                    v-else
-                    color="primary"
-                    text-color="white"
-                    icon="database"
-                  />
+                    <input
+                      type="file"
+                      :ref="(el) => (logoInputRefs[dataset.id] = el)"
+                      @change="handleLogoUpload($event, dataset.id)"
+                      style="display: none"
+                    />
+                  </div>
                 </q-item-section>
 
                 <q-item-section>
@@ -694,15 +755,20 @@
               </template>
 
               <!-- Expandable section for admin users -->
-              <q-card v-if="dataset.admin === 1" bordered flat class="q-mt-md">
+              <q-card
+                v-if="dataset.admin === 1"
+                bordered
+                flat
+                enclass="q-mt-md"
+              >
                 <q-tabs
                   v-model="dataset.activeTab"
                   dense
-                  class="text-grey"
+                  class="text-grey q-pa-sm"
                   active-color="primary"
                   indicator-color="primary"
                   align="left"
-                  narrow-indicator
+                  narrow-
                 >
                   <q-tab name="users" icon="group" label="Users" />
                   <q-tab name="roles" icon="security" label="Roles" />
@@ -711,6 +777,18 @@
                     icon="mail"
                     label="Invites"
                     :alert="getDatasetInvites(dataset.id).length > 0"
+                  />
+                  <q-tab
+                    name="backup"
+                    icon="backup"
+                    label="backup"
+                    v-if="dataset.access_level == 'owner'"
+                  />
+                  <q-tab
+                    name="delete"
+                    icon="delete"
+                    label="delete"
+                    v-if="dataset.access_level == 'owner'"
                   />
                 </q-tabs>
 
@@ -932,6 +1010,73 @@
                         />
                       </div>
                     </div>
+                  </q-tab-panel>
+                  <q-tab-panel name="delete" class="q-pa-md">
+                    <div class="text-h6 text-negative q-mb-sm">
+                      Delete Dataset
+                    </div>
+                    <p class="q-mb-sm">
+                      This action will permanently delete the dataset and
+                      templates and
+                      <strong>cannot</strong> be undone. Only the owner can
+                      perform this operation. Please enter your password to
+                      confirm.
+                    </p>
+
+                    <q-input
+                      v-model="deletePw"
+                      type="password"
+                      dense
+                      input-class="maintext"
+                      label-color="secondary"
+                      label="Password"
+                      class="q-mb-md text-center"
+                    />
+                    <q-btn
+                      color="negative"
+                      label="DELETE DATASET"
+                      @click="handleDelete(dataset)"
+                    />
+                  </q-tab-panel>
+                  <q-tab-panel name="delete" class="q-pa-md">
+                    <div class="text-h6 text-negative q-mb-sm">
+                      Delete Dataset
+                    </div>
+                    <p class="q-mb-sm">
+                      This action will permanently delete the dataset and
+                      templates and
+                      <strong>cannot</strong> be undone. Only the owner can
+                      perform this operation. Please enter your password to
+                      confirm.
+                    </p>
+
+                    <q-input
+                      v-model="deletePw"
+                      type="password"
+                      dense
+                      input-class="maintext"
+                      label-color="secondary"
+                      label="Password"
+                      class="q-mb-md text-center"
+                    />
+                    <q-btn
+                      color="negative"
+                      label="DELETE DATASET"
+                      @click="handleDelete(dataset)"
+                    />
+                  </q-tab-panel>
+                  <q-tab-panel name="backup" class="q-pa-md text-center">
+                    <q-btn
+                      color="primary"
+                      label="Download Database"
+                      class="q-mr-sm"
+                      @click="downloadDb(dataset)"
+                    />
+                    <q-btn
+                      color="accent"
+                      label="Download Templates"
+                      @click="downloadTemplates(dataset)"
+                    />
                   </q-tab-panel>
                 </q-tab-panels>
               </q-card>
@@ -1268,7 +1413,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, useTemplateRef } from "vue";
 import { api } from "src/boot/axios";
 import { Notify, Cookies, useQuasar } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -1283,7 +1428,7 @@ const showDatasetDialog = ref(false);
 // Handle the dataset creation event emitted from the dialog component
 const handleCreateDataset = async (datasetDetails) => {
   try {
-    const response = api.post("create_dataset", datasetDetails);
+    const response = await api.post("create_dataset", datasetDetails);
     getDatasets();
   } catch (error) {
     console.log(error);
@@ -1294,12 +1439,95 @@ const handleCreateDataset = async (datasetDetails) => {
 const deletePw = ref();
 const handleDelete = async (dataset) => {
   try {
-    const response = api.delete(
+    const response = await api.delete(
       `dataset?id=${dataset.id}&owner_pw=${deletePw.value}`
     );
-    console.log(response);
+    deletePw.value = "";
+    Notify.create({
+      message: "Dataset succesfully deleted.",
+      position: "center",
+      color: "positive",
+    });
+    getDatasets();
   } catch (error) {
     console.log(error);
+    deletePw.value = "";
+  }
+};
+const downloadDb = async (dataset) => {
+  try {
+    const response = await api.get(`download_db?id=${dataset.id}`, {
+      responseType: "blob", // Ensure the response is treated as binary data
+    });
+    // Create a blob URL for the response data
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    // Use dataset.dbName if available, otherwise fallback to dataset.id
+    link.setAttribute("download", `${dataset.dbName || dataset.id}.sql`);
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    // Cleanup: remove the link after initiating the download
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Error downloading SQL dump:", error);
+  }
+};
+
+// Function to download the templates folder as a zip archive
+const downloadTemplates = async (dataset) => {
+  try {
+    const response = await api.get(`download_templates?id=${dataset.id}`, {
+      responseType: "blob", // Ensure the response is treated as binary data
+    });
+    // Create a blob URL for the response data
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    // Use dataset.dbName if available, otherwise fallback to dataset.id
+    link.setAttribute(
+      "download",
+      `${dataset.dbName || dataset.id}_templates.zip`
+    );
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    // Cleanup: remove the link after initiating the download
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Error downloading templates zip:", error);
+  }
+};
+const logoInputRefs = ref({});
+const triggerLogoUpload = (id) => {
+  logoInputRefs.value[id].click();
+};
+const handleLogoUpload = async (event, id) => {
+  // Get the selected file from the file input
+  const file = event.target.files[0];
+  if (!file) {
+    console.error("No file selected");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    // Post the file to the backend route '/upload_logo'
+    const response = await api.post(`/upload_logo?id=${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    Notify.create({
+      message: "Logo Uploaded sucessfully.",
+      position: "center",
+      color: "positive",
+    });
+    getDatasets();
+  } catch (error) {
+    console.error("Error uploading logo:", error);
   }
 };
 
@@ -1491,7 +1719,6 @@ function switchLanguage(lang) {
 
 // Logout handler
 async function handleLogout() {
-  Cookies.remove("client");
   Cookies.remove("sessionkey");
   await router.push("/login");
 }
@@ -1513,6 +1740,9 @@ const getDatasets = async () => {
               : role.acs || [],
         })) || [],
       users: ds.users || [],
+      logo: ds.logo
+        ? `${ds.logo}?rand=${Math.random().toString(36).slice(2)}`
+        : ds.logo,
     }));
 
     // Load invites after datasets are loaded
@@ -1565,7 +1795,6 @@ const acceptInvite = async (inviteId) => {
   try {
     await api.post(`/invite/${inviteId}/accept`);
 
-    // Remove from received invites
     receivedInvites.value = receivedInvites.value.filter(
       (invite) => invite.id !== inviteId
     );
@@ -1576,7 +1805,6 @@ const acceptInvite = async (inviteId) => {
       position: "center",
     });
 
-    // Refresh datasets to show new access
     getDatasets();
   } catch (err) {
     console.error("Error accepting invite:", err);

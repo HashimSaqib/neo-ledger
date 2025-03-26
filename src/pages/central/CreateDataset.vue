@@ -6,36 +6,43 @@
       </q-card-section>
 
       <q-card-section class="q-gutter-sm">
-        <q-input
-          v-model="datasetName"
-          dense
-          label="Dataset Name"
-          outlined
-          bg-color="input"
-          label-color="secondary"
-        />
+        <!-- Wrap inputs and buttons inside the q-form -->
+        <q-form ref="datasetForm" @submit.prevent="createDataset">
+          <q-input
+            v-model="datasetName"
+            dense
+            label="Dataset Name"
+            outlined
+            bg-color="input"
+            label-color="secondary"
+            :rules="[(val) => !!val || 'Dataset Name is required']"
+          />
 
-        <!-- Template Language select using the "charts" array -->
-        <s-select
-          v-model="selectedChart"
-          :options="chartsOptions"
-          label="Chart of Accounts"
-          outlined
-        />
+          <!-- Template Language select using the "charts" array -->
+          <s-select
+            v-model="selectedChart"
+            :options="chartsOptions"
+            label="Chart of Accounts"
+            outlined
+            :rules="[(val) => !!val || 'Chart of Accounts is required']"
+          />
 
-        <!-- Template select using the "templates" array -->
-        <s-select
-          v-model="selectedTemplate"
-          :options="templateOptions"
-          label="Template"
-          outlined
-        />
+          <!-- Template select using the "templates" array -->
+          <s-select
+            v-model="selectedTemplate"
+            :options="templateOptions"
+            label="Template"
+            outlined
+            :rules="[(val) => !!val || 'Template is required']"
+          />
+
+          <!-- Moved submit button inside the form -->
+          <q-card-actions align="right">
+            <q-btn flat label="Cancel" @click="cancel" />
+            <q-btn flat label="Create" color="primary" type="submit" />
+          </q-card-actions>
+        </q-form>
       </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="cancel" />
-        <q-btn flat label="Create" color="primary" @click="createDataset" />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -75,11 +82,13 @@ const templateOptions = ref([]);
 const selectedChart = ref(null);
 const selectedTemplate = ref(null);
 
+// Reference to the q-form component for validation
+const datasetForm = ref(null);
+
 // Fetch options for charts (template languages) and templates
 const fetchOptions = async () => {
   try {
     const { data } = await api.get("/create_dataset");
-
     chartsOptions.value = data.charts;
     templateOptions.value = data.templates;
   } catch (error) {
@@ -94,9 +103,10 @@ onMounted(() => {
   fetchOptions();
 });
 
-// Emit an event when dataset creation is confirmed
+// Called when the form is submitted
 const createDataset = () => {
-  if (!datasetName.value || !selectedChart.value || !selectedTemplate.value) {
+  // Check form validity
+  if (datasetForm.value && !datasetForm.value.validate()) {
     Notify.create({
       message: "Please fill in all fields.",
       color: "warning",

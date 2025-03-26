@@ -379,7 +379,7 @@
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
-import { Cookies, Notify } from "quasar";
+import { LocalStorage, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount, downloadReport, createPDF } from "src/helpers/utils";
@@ -641,7 +641,9 @@ const selectedColumns = ref(
 
 // Process filters from cookies (unchanged)
 function processFilters() {
-  const savedFilters = Cookies.get(`${type.value}_transactions_filters`);
+  const savedFilters = LocalStorage.getItem(
+    `${type.value}_transactions_filters`
+  );
 
   if (savedFilters) {
     try {
@@ -664,7 +666,7 @@ function processFilters() {
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove(`${type.value}_transactions_filters`);
+      LocalStorage.remove(`${type.value}_transactions_filters`);
     }
   } else {
     const defaultFilters = {
@@ -675,7 +677,7 @@ function processFilters() {
       order: baseColumns.value.map((col) => col.name),
     };
 
-    Cookies.set(`${type.value}_transactions_filters`, defaultFilters, {
+    LocalStorage.set(`${type.value}_transactions_filters`, defaultFilters, {
       expires: 30,
     });
     selectedColumns.value = defaultFilters.columns;
@@ -693,7 +695,7 @@ watch(
       order: baseColumns.value.map((col) => col.name),
     };
     try {
-      Cookies.set(`${type.value}_transactions_filters`, filters, {
+      LocalStorage.set(`${type.value}_transactions_filters`, filters, {
         expires: 30,
       });
     } catch (error) {

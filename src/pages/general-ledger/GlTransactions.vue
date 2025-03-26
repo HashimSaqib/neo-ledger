@@ -354,7 +354,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { api } from "src/boot/axios";
-import { Cookies, Notify } from "quasar";
+import { Notify, LocalStorage } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount, roundAmount } from "src/helpers/utils";
@@ -538,7 +538,7 @@ const selectedColumns = ref(
 );
 
 function processFilters() {
-  const savedFilters = Cookies.get("gl_list_filters");
+  const savedFilters = LocalStorage.getItem("gl_list_filters");
   if (savedFilters) {
     try {
       const parsedFilters =
@@ -560,7 +560,7 @@ function processFilters() {
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove("ar_transactions_filters");
+      LocalStorage.remove("gl_list_filters");
     }
   } else {
     const defaultFilters = {
@@ -570,7 +570,7 @@ function processFilters() {
       }, {}),
       order: baseColumns.value.map((col) => col.name),
     };
-    Cookies.set("gl_list_filters", defaultFilters, { expires: 30 });
+    LocalStorage.set("gl_list_filters", defaultFilters, { expires: 30 });
     selectedColumns.value = defaultFilters.columns;
     baseColumns.value = defaultFilters.order
       .map((name) => baseColumns.value.find((col) => col.name === name))
@@ -592,7 +592,7 @@ watch(
       order: baseColumns.value.map((col) => col.name),
     };
     try {
-      Cookies.set("gl_list_filters", filters, { expires: 30 });
+      LocalStorage.set("gl_list_filters", filters, { expires: 30 });
       tableKey.value++;
     } catch (error) {
       console.error("Error saving filters to cookies:", error);

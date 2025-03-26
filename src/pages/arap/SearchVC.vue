@@ -266,7 +266,7 @@
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
-import { Cookies, Notify } from "quasar";
+import { LocalStorage, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount } from "src/helpers/utils";
@@ -556,7 +556,7 @@ watch(
       order: baseColumns.value.map((c) => c.name),
     };
     try {
-      Cookies.set(filterCookieName.value, filters, { expires: 30 });
+      LocalStorage.set(filterCookieName.value, filters, { expires: 30 });
     } catch (error) {
       console.error("Error saving filters to cookies:", error);
     }
@@ -632,7 +632,7 @@ function clearForm() {
 //  processFilters - loads cookie & merges with default
 // ----------------------------------------------------
 function processFilters() {
-  const saved = Cookies.get(filterCookieName.value);
+  const saved = LocalStorage.getItem(filterCookieName.value);
   if (saved) {
     try {
       const parsed = typeof saved === "string" ? JSON.parse(saved) : saved;
@@ -658,7 +658,7 @@ function processFilters() {
       }
     } catch (error) {
       console.error("Error parsing saved filters:", error);
-      Cookies.remove(filterCookieName.value);
+      LocalStorage.remove(filterCookieName.value);
     }
   } else {
     // No cookie => create defaults
@@ -670,7 +670,7 @@ function processFilters() {
       columns: defaults,
       order: baseColumns.value.map((c) => c.name),
     };
-    Cookies.set(filterCookieName.value, filterObj, { expires: 30 });
+    LocalStorage.set(filterCookieName.value, filterObj, { expires: 30 });
     selectedColumns.value = defaults;
   }
 }
