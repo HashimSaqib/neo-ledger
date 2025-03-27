@@ -120,6 +120,7 @@ const signupData = ref({
 });
 
 onMounted(async () => {
+  $q.cookies.remove("sessionkey");
   if (route.query.invite) {
     signupData.value.invite = route.query.invite;
   }
@@ -174,11 +175,14 @@ const signupOtp = async () => {
   loading.value = true;
   try {
     const endpoint = signupData.value.invite ? "signup" : "signup_otp";
-    await axios.post(`https://api.neo-ledger.com/${endpoint}`, {
-      email: signupData.value.email,
-      password: signupData.value.password,
-      ...(signupData.value.invite && { invite: signupData.value.invite }),
-    });
+    const response = await axios.post(
+      `https://api.neo-ledger.com/${endpoint}`,
+      {
+        email: signupData.value.email,
+        password: signupData.value.password,
+        ...(signupData.value.invite && { invite: signupData.value.invite }),
+      }
+    );
 
     if (signupData.value.invite) {
       Notify.create({
@@ -186,6 +190,8 @@ const signupOtp = async () => {
         type: "positive",
         position: "center",
       });
+      const { sessionkey } = response.data;
+      $q.cookies.set("sessionkey", sessionkey, { path: "/" });
       router.push("/");
     } else {
       otpStage.value = true;
