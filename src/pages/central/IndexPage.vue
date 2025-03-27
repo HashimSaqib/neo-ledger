@@ -1446,7 +1446,7 @@ const handleAllowCreation = (newVal) => {
   allowDbCreation.value = newVal;
 };
 // handle Deletion
-const deletePw = ref();
+const deletePw = ref("");
 const handleDelete = async (dataset) => {
   try {
     const response = await api.delete(
@@ -1460,7 +1460,11 @@ const handleDelete = async (dataset) => {
     });
     getDatasets();
   } catch (error) {
-    console.log(error);
+    Notify.create({
+      message: error.response.data.message,
+      color: "negative",
+      position: "center",
+    });
     deletePw.value = "";
   }
 };
