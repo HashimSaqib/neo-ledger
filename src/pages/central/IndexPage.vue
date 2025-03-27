@@ -116,6 +116,7 @@
             </q-input>
           </div>
           <q-btn
+            v-if="allowDbCreation"
             label="Create New Dataset"
             @click="showDatasetDialog = true"
             color="primary"
@@ -233,6 +234,7 @@
           <CreateDataset
             v-model="showDatasetDialog"
             @create-dataset="handleCreateDataset"
+            @update:allowCreation="handleAllowCreation"
           />
         </div>
         <!-- GRID VIEW MODE -->
@@ -1432,9 +1434,17 @@ const handleCreateDataset = async (datasetDetails) => {
     getDatasets();
   } catch (error) {
     console.log(error);
+    Notify.create({
+      message: error.response.data.error,
+      color: "negative",
+      position: "center",
+    });
   }
 };
-
+const allowDbCreation = ref();
+const handleAllowCreation = (newVal) => {
+  allowDbCreation.value = newVal;
+};
 // handle Deletion
 const deletePw = ref();
 const handleDelete = async (dataset) => {

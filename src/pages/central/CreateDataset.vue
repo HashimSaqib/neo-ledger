@@ -1,5 +1,10 @@
 <template>
-  <q-dialog v-model="localDialog" persistent>
+  <q-dialog
+    v-model="localDialog"
+    v-if="
+      allowCreation && chartsOptions.length > 0 && templateOptions.length > 0
+    "
+  >
     <q-card style="min-width: 60vw">
       <q-card-section class="q-pb-none">
         <div class="text-h6 q-mt-none">Create Dataset</div>
@@ -15,9 +20,15 @@
             outlined
             bg-color="input"
             label-color="secondary"
-            :rules="[(val) => !!val || 'Dataset Name is required']"
+            :rules="[
+              (val) => !!val || 'Dataset Name is required',
+              (val) =>
+                /^[a-z0-9]+$/.test(val) ||
+                'Only lowercase alphabets and numbers allowed',
+            ]"
+            class="q-mb-sm"
+            hide-bottom-space
           />
-
           <!-- Template Language select using the "charts" array -->
           <s-select
             v-model="selectedChart"
@@ -25,6 +36,8 @@
             label="Chart of Accounts"
             outlined
             :rules="[(val) => !!val || 'Chart of Accounts is required']"
+            class="q-mb-sm"
+            hide-bottom-space
           />
 
           <!-- Template select using the "templates" array -->
@@ -34,6 +47,8 @@
             label="Template"
             outlined
             :rules="[(val) => !!val || 'Template is required']"
+            class="q-mb-sm"
+            hide-bottom-space
           />
 
           <!-- Moved submit button inside the form -->
@@ -85,16 +100,21 @@ const selectedTemplate = ref(null);
 // Reference to the q-form component for validation
 const datasetForm = ref(null);
 
+const allowCreation = ref(false);
 // Fetch options for charts (template languages) and templates
 const fetchOptions = async () => {
   try {
     const { data } = await api.get("/create_dataset");
-    chartsOptions.value = data.charts;
-    templateOptions.value = data.templates;
+    allowCreation.value = data.db_creation;
+    if (allowCreation.value) {
+      chartsOptions.value = data.charts;
+      templateOptions.value = data.templates;
+    }
   } catch (error) {
     Notify.create({
-      message: "Failed to load dataset options.",
+      message: response.data.error,
       color: "negative",
+      position: "center",
     });
   }
 };
@@ -129,4 +149,7 @@ const createDataset = () => {
 const cancel = () => {
   localDialog.value = false;
 };
+watch(allowCreation, (newVal) => {
+  emit("update:allowCreation", newVal);
+});
 </script>

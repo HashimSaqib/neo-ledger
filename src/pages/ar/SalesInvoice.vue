@@ -683,7 +683,7 @@
         outlined
       />
       <q-select
-        :options="['PDF']"
+        :options="['tex', 'html']"
         v-model="printOptions.format"
         class="mainbg"
         dense
@@ -821,7 +821,7 @@ const partSaved = async () => {
 // =====================
 const printOptions = ref({
   type: "Invoice",
-  format: "PDF",
+  format: "TEX",
   location: "Download",
 });
 updateTitle("Customer Invoice");
@@ -1049,11 +1049,13 @@ const handleLineItemChange = (newValue, index) => {
   if (dragging.value) return;
   if (newValue && newValue.partnumber) {
     if (!newValue.noupdate) {
+      console.log(newValue);
       const line = lines.value[index];
       line.description = newValue.partnumber.description || "";
       line.oh = newValue.partnumber.oh || 0;
       line.unit = newValue.partnumber.unit || "";
       line.price = newValue.partnumber.sellprice || 0;
+      line.itemnotes = newValue.partnumber.notes || "";
       line.extended = calculateExtended(
         line.qty || 1,
         line.price,
@@ -1422,7 +1424,7 @@ const printInvoice = async () => {
   }
   try {
     const response = await api.get(
-      `/print_invoice?id=${invId.value}&vc=customer`,
+      `/print_invoice?id=${invId.value}&vc=customer&type=${printOptions.value.format}`,
       {
         responseType: "blob",
       }

@@ -248,7 +248,7 @@ const routes = [
       {
         path: "system/templates",
         component: () => import("src/pages/system/Templates.vue"),
-        meta: { permission: "system.user.templates" },
+        meta: { permission: "system.templates" },
       },
     ],
   },
