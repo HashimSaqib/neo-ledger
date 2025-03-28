@@ -675,12 +675,15 @@
 
     <!-- Print Options Section (shown if invoice exists) -->
     <div class="row q-gutter-x-md" v-if="invId">
-      <q-select
-        :options="['Invoice']"
-        v-model="printOptions.type"
-        class="mainbg"
-        dense
-        outlined
+      <s-select
+        :options="templates"
+        option-label="label"
+        option-value="value"
+        map-options
+        emit-value
+        v-model="printOptions.template"
+        search="label"
+        label="Template"
       />
       <q-select
         :options="['tex', 'html']"
@@ -819,17 +822,23 @@ const partSaved = async () => {
 // =====================
 // Title & Invoice Type Setup
 // =====================
-const printOptions = ref({
-  type: "Invoice",
-  format: "TEX",
-  location: "Download",
-});
+
 updateTitle("Customer Invoice");
 if (route.query.credit_invoice) {
   updateTitle("Credit Invoice");
 }
 const invType = ref(route.query.credit_invoice ? "credit_invoice" : "invoice");
 
+const templates = [
+  { label: t("Invoice"), value: "invoice" },
+  { label: t("Pick List"), value: "pick_list" },
+  { label: t("Packing List"), value: "packing_list" },
+];
+const printOptions = ref({
+  template: "invoice",
+  format: "tex",
+  location: "download",
+});
 // =====================
 // Counters & Refs for Dynamic Elements
 // =====================
@@ -1424,7 +1433,7 @@ const printInvoice = async () => {
   }
   try {
     const response = await api.get(
-      `/print_invoice?id=${invId.value}&vc=customer&type=${printOptions.value.format}`,
+      `/print_invoice?id=${invId.value}&vc=customer&template=${printOptions.value.template}&format=${printOptions.value.format}`,
       {
         responseType: "blob",
       }
@@ -1433,7 +1442,7 @@ const printInvoice = async () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "invoice.pdf";
+    a.download = `${printOptions.value.template}_${invId.value}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

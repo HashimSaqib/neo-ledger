@@ -599,11 +599,11 @@ const form = ref({
   forcewarehouse: false,
   hideaccounts: false,
   linetax: false,
-  IC: {},
-  IC_income: {},
-  IC_expense: {},
-  fxgainloss: {},
-  cashovershort: {},
+  IC: null,
+  IC_income: null,
+  IC_expense: null,
+  fxgainloss: null,
+  cashovershort: null,
   glnumber: "",
   lock_glnumber: false,
   sinumber: "",
@@ -795,6 +795,7 @@ function insertToken(token) {
         "Please select a Last Number field before inserting a variable."
       ),
       type: "warning",
+      position: "center",
     });
   }
 }
@@ -925,12 +926,14 @@ async function submitForm() {
     Notify.create({
       message: t("Defaults saved successfully"),
       type: "positive",
+      position: "center",
     });
   } catch (err) {
     console.error("Error saving defaults", err);
     Notify.create({
       message: t("Error saving defaults"),
       type: "negative",
+      position: "center",
     });
   }
 }

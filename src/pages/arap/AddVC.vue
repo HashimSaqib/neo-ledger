@@ -214,6 +214,8 @@
                   v-model="form[`tax_${tax.id}`]"
                   :name="`tax_${tax.id}`"
                   :label="tax.description"
+                  :false-value="0"
+                  :true-value="1"
                 />
               </div>
               <q-checkbox
@@ -284,8 +286,11 @@
             <q-select
               v-model="form.curr"
               name="curr"
-              :options="['PKR', 'USD']"
+              :options="currencies"
               :label="t('Currency')"
+              option-value="curr"
+              option-label="curr"
+              emit-value
               outlined
               dense
               class="lightbg q-mb-sm"
@@ -531,7 +536,7 @@ const form = ref({
   creditlimit: 0,
   threshold: "",
   terms: "",
-  curr: "PKR",
+  curr: "",
   startdate: new Date().toISOString().split("T")[0],
   enddate: "",
   discount: "",
@@ -585,8 +590,7 @@ const formatAccountOption = (account) => ({
 const updateVCSettings = async () => {
   const isCustomer = componentType.value === "customer";
 
-  // Only update the page title if we are NOT using the component via props
-  if (!haveProps.value && updateTitle) {
+  if (!haveProps.value) {
     updateTitle(
       isEditMode.value ? `Edit ${vcType.value}` : `Add ${vcType.value}`
     );
@@ -605,41 +609,19 @@ const updateVCSettings = async () => {
       .filter((account) => account.link === linkType)
       .map(formatAccountOption);
 
-    taxAccounts.value = accounts.value
-      .filter((account) => account.link.split(":").includes(taxLink))
-      .map((account) => ({
-        id: account.accno,
-        description: `${account.description} `,
-      }));
-
     paymentAccounts.value = accounts.value
       .filter((account) => account.link.split(":").includes(paymentLink))
       .map(formatAccountOption);
 
     // Initialize tax checkboxes in form
     taxAccounts.value.forEach((tax) => {
-      form.value[`tax_${tax.id}`] = false;
-    });
-  }
-};
-
-// Fetch accounts from API
-const fetchAccounts = async () => {
-  try {
-    const response = await api.get("/charts");
-    accounts.value = response.data;
-    await updateVCSettings();
-  } catch (error) {
-    console.error("Failed to fetch accounts:", error);
-    Notify.create({
-      message: t("Failed to fetch accounts"),
-      type: "negative",
-      position: "center",
+      form.value[`tax_${tax.ac}`] = false;
     });
   }
 };
 const fetchVc = async (id) => {
   try {
+    await fetchLinks();
     const response = await api.get(`/arap/${componentType.value}/${id}`);
     const data = response.data;
 
@@ -648,9 +630,9 @@ const fetchVc = async (id) => {
     const taxIds = taxAccountsString ? taxAccountsString.split(" ") : [];
     taxIds.forEach((taxId) => {
       // Set checkbox to true if data[`tax_${taxId}`] equals "1"
-      form.value[`tax_${taxId}`] = data[`tax_${taxId}`] === "1";
+      form.value[`tax_${taxId}`] = data[`tax_${taxId}`] === "1" ? 1 : 0;
     });
-
+    console.log(form.value);
     // Handle all_contact array
     if (data.all_contact && data.all_contact.length > 0) {
       const contact = data.all_contact[0]; // Take the first contact
@@ -683,6 +665,7 @@ const fetchVc = async (id) => {
         form.value[key] = data[key];
       }
     });
+    await updateVCSettings();
   } catch (error) {
     console.error("Failed to fetch vc:", error);
     Notify.create({
@@ -759,15 +742,35 @@ const submitForm = async () => {
   }
 };
 
-// Watch for changes in the route params (if no prop is passed)
 watch(
   () => route.params.type,
   () => updateVCSettings()
 );
 
+const currencies = ref();
+const fetchLinks = async () => {
+  try {
+    const response = await api.get(
+      `/create_links/${vcType.value.toLowerCase()}`
+    );
+    accounts.value = response.data.accounts.all;
+    currencies.value = response.data.currencies;
+    taxAccounts.value = response.data.tax_accounts;
+    taxAccounts.value = taxAccounts.value.map((tax) => ({
+      id: tax.accno,
+      description: `${tax.description} `,
+    }));
+    taxAccounts.value.forEach((tax) => {
+      form.value[`tax_${tax.id}`] = 0;
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
 // Initialize component
 onMounted(async () => {
-  await fetchAccounts();
+  await fetchLinks();
+  await updateVCSettings();
   // Only attempt to fetch VC data if there is a valid id
   if (componentId.value) {
     await fetchVc(componentId.value);

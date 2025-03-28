@@ -581,7 +581,7 @@ const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
 const formData = ref({
   department: route.query.department || "",
   projectnumber: route.query.projectnumber || "",
-  currency: "PKR",
+  currency: "",
   decimalplaces: "2",
   usetemplate: false,
   method: "accrual",
