@@ -1,13 +1,13 @@
 <template>
   <q-page class="q-pa-sm relative-position">
-    <q-form @submit.prevent="submitForm" ref="formRef" class="q-pa-sm">
-      <!-- Basic Information & Other Fields remain unchanged -->
+    <q-form ref="formRef" class="q-pa-sm" @submit.prevent="submitForm">
+      <!-- Basic Information & Other Fields -->
       <div class="row q-mb-sm mainbg q-gutter-sm">
         <div class="col-12 col-md-5 q-mr-xl">
           <q-input
             v-model="form.partnumber"
             name="partnumber"
-            label="Number"
+            :label="t('Number')"
             outlined
             dense
             class="q-mb-sm"
@@ -17,7 +17,7 @@
           <q-input
             v-model="form.description"
             name="description"
-            label="Description"
+            :label="t('Description')"
             type="textarea"
             outlined
             dense
@@ -25,6 +25,8 @@
             class="q-mb-sm"
             bg-color="input"
             label-color="secondary"
+            :rules="[requiredRule]"
+            hide-bottom-space
           />
 
           <!-- Accounts Section -->
@@ -33,7 +35,7 @@
             v-model="form.inventory"
             :options="inventoryAccounts"
             name="IC_inventory"
-            label="Inventory"
+            :label="t('Inventory')"
             outlined
             dense
             class="q-mb-sm"
@@ -41,13 +43,15 @@
             label-color="secondary"
             search="label"
             account
+            :rules="[requiredRule]"
+            hide-bottom-space
           />
           <s-select
             v-if="type == 'part'"
             v-model="form.income"
             :options="incomeAccounts"
             name="IC_income"
-            label="Income"
+            :label="t('Income')"
             outlined
             dense
             class="q-mb-sm"
@@ -55,13 +59,15 @@
             label-color="secondary"
             search="label"
             account
+            :rules="[requiredRule]"
+            hide-bottom-space
           />
           <s-select
             v-if="type == 'part'"
             v-model="form.cogs"
             :options="cogsAccounts"
             name="IC_expense"
-            label="COGS"
+            :label="t('COGS')"
             outlined
             dense
             class="q-mb-sm"
@@ -69,13 +75,15 @@
             label-color="secondary"
             search="label"
             account
+            :rules="[requiredRule]"
+            hide-bottom-space
           />
           <s-select
             v-if="type == 'service'"
             v-model="form.income"
             :options="serviceIncomeAccounts"
             name="IC_income"
-            label="Income"
+            :label="t('Income')"
             outlined
             dense
             class="q-mb-sm"
@@ -83,13 +91,15 @@
             label-color="secondary"
             search="label"
             account
+            :rules="[requiredRule]"
+            hide-bottom-space
           />
           <s-select
             v-if="type == 'service'"
             v-model="form.expense"
             :options="expenseAccounts"
             name="IC_expense"
-            label="Expense"
+            :label="t('Expense')"
             outlined
             dense
             class="q-mb-sm"
@@ -97,6 +107,8 @@
             label-color="secondary"
             search="label"
             account
+            :rules="[requiredRule]"
+            hide-bottom-space
           />
 
           <!-- Tax Accounts -->
@@ -105,18 +117,18 @@
               <q-checkbox
                 v-model="form.taxes[tax.accno]"
                 :name="`IC_tax_${tax.accno}`"
-                :label="tax.description"
+                :label="t(tax.description)"
               />
             </div>
           </div>
 
           <!-- Reference Documents -->
           <div class="q-mb-sm">
-            <div class="text-weight-bold">Reference Documents</div>
+            <div class="text-weight-bold">{{ t("Reference Documents") }}</div>
             <q-input
               v-model="form.referenceDescription"
               name="referencedescription_1"
-              label="Reference Description"
+              :label="t('Reference Description')"
               outlined
               dense
               class="q-mb-sm"
@@ -126,7 +138,7 @@
             <q-checkbox
               v-model="form.referenceConfidential"
               name="referenceconfidential_1"
-              label="Confidential"
+              :label="t('Confidential')"
               class="q-mb-sm"
               bg-color="input"
               label-color="secondary"
@@ -137,7 +149,7 @@
           <q-input
             v-model="form.notes"
             name="notes"
-            label="Notes"
+            :label="t('Notes')"
             type="textarea"
             outlined
             dense
@@ -151,7 +163,7 @@
           <q-input
             v-model="form.image"
             name="image"
-            label="Image"
+            :label="t('Image')"
             outlined
             dense
             class="q-mb-sm"
@@ -161,7 +173,7 @@
           <q-input
             v-model="form.drawing"
             name="drawing"
-            label="Drawing"
+            :label="t('Drawing')"
             outlined
             dense
             class="q-mb-sm"
@@ -171,7 +183,7 @@
           <q-input
             v-model="form.microfiche"
             name="microfiche"
-            label="Microfiche"
+            :label="t('Microfiche')"
             outlined
             dense
             class="q-mb-sm"
@@ -181,7 +193,7 @@
           <q-input
             v-model="form.toolnumber"
             name="toolnumber"
-            label="Tool Number"
+            :label="t('Tool Number')"
             outlined
             dense
             class="q-mb-sm"
@@ -195,7 +207,7 @@
           <q-input
             v-model="form.priceupdate"
             name="priceupdate"
-            label="Updated"
+            :label="t('Updated')"
             type="date"
             outlined
             dense
@@ -206,7 +218,7 @@
           <q-input
             v-model="form.lot"
             name="lot"
-            label="Lot"
+            :label="t('Lot')"
             outlined
             dense
             class="q-mb-sm"
@@ -216,7 +228,7 @@
           <q-input
             v-model="form.expires"
             name="expires"
-            label="Expires"
+            :label="t('Expires')"
             type="date"
             outlined
             dense
@@ -227,7 +239,7 @@
           <q-input
             v-model="form.sellprice"
             name="sellprice"
-            label="Sell Price"
+            :label="t('Sell Price')"
             outlined
             dense
             class="q-mb-sm"
@@ -237,7 +249,7 @@
           <q-input
             v-model="form.listprice"
             name="listprice"
-            label="List Price"
+            :label="t('List Price')"
             outlined
             dense
             class="q-mb-sm"
@@ -247,7 +259,7 @@
           <q-input
             v-model="form.lastcost"
             name="lastcost"
-            label="Last Cost"
+            :label="t('Last Cost')"
             outlined
             dense
             class="q-mb-sm"
@@ -259,7 +271,7 @@
             v-if="type !== 'service'"
             v-model="form.averageCost"
             name="averageCost"
-            label="Average Cost"
+            :label="t('Average Cost')"
             outlined
             dense
             class="q-mb-sm"
@@ -270,7 +282,7 @@
             v-if="type !== 'service'"
             v-model="form.unit"
             name="unit"
-            label="Unit"
+            :label="t('Unit')"
             outlined
             dense
             class="q-mb-sm"
@@ -281,7 +293,7 @@
             v-if="type !== 'service'"
             v-model="form.weight"
             name="weight"
-            label="Weight (kg)"
+            :label="t('Weight (kg)')"
             outlined
             dense
             class="q-mb-sm"
@@ -292,7 +304,7 @@
             v-if="type !== 'service'"
             v-model="form.onhand"
             name="onhand"
-            label="On Hand"
+            :label="t('On Hand')"
             outlined
             dense
             class="q-mb-sm"
@@ -303,14 +315,14 @@
             v-if="type !== 'service'"
             v-model="form.checkinventory"
             name="checkinventory"
-            label="Check Inventory"
+            :label="t('Check Inventory')"
             class="q-mb-sm"
           />
           <q-input
             v-if="type !== 'service'"
             v-model="form.rop"
             name="rop"
-            label="ROP"
+            :label="t('ROP')"
             outlined
             dense
             class="q-mb-sm"
@@ -321,7 +333,7 @@
             v-if="type !== 'service'"
             v-model="form.bin"
             name="bin"
-            label="Bin"
+            :label="t('Bin')"
             outlined
             dense
             class="q-mb-sm"
@@ -336,7 +348,7 @@
           <q-input
             v-model="form.countryorigin"
             name="countryorigin"
-            label="Country of Origin"
+            :label="t('Country of Origin')"
             outlined
             dense
             class="q-mb-sm"
@@ -348,7 +360,7 @@
           <q-input
             v-model="form.tariff_hscode"
             name="tariff_hscode"
-            label="HS Code"
+            :label="t('HS Code')"
             outlined
             dense
             class="q-mb-sm"
@@ -360,7 +372,7 @@
           <q-input
             v-model="form.barcode"
             name="barcode"
-            label="Barcode"
+            :label="t('Barcode')"
             outlined
             dense
             class="q-mb-sm"
@@ -370,9 +382,9 @@
         </div>
       </div>
 
-      <!-- Group: Make and Model (Now an Array) - Hide entirely for service -->
+      <!-- Group: Make and Model (Not for service) -->
       <div v-if="type !== 'service'" class="q-mb-sm">
-        <div class="text-weight-bold q-mb-xs">Make and Model</div>
+        <div class="text-weight-bold q-mb-xs">{{ t("Make and Model") }}</div>
         <div
           v-for="(line, index) in form.makeModelLines"
           :key="'mm-' + index"
@@ -382,7 +394,7 @@
             <q-input
               v-model="line.make"
               :name="`make_${index}`"
-              label="Make"
+              :label="t('Make')"
               outlined
               dense
               class="q-mb-sm"
@@ -396,7 +408,7 @@
             <q-input
               v-model="line.model"
               :name="`model_${index}`"
-              label="Model"
+              :label="t('Model')"
               outlined
               dense
               class="q-mb-sm"
@@ -417,9 +429,11 @@
         </div>
       </div>
 
-      <!-- Group: Vendor Information (Now an Array) -->
+      <!-- Group: Vendor Information -->
       <div class="q-mb-md">
-        <div class="text-weight-bold q-mb-xs">Vendor Information</div>
+        <div class="text-weight-bold q-mb-xs">
+          {{ t("Vendor Information") }}
+        </div>
         <div
           v-for="(line, index) in form.vendorLines"
           :key="'vendor-' + index"
@@ -432,7 +446,7 @@
               option-label="name"
               :option-value="(option) => `${option.name}--${option.value}`"
               :name="`vendor_${index}`"
-              label="Vendor"
+              :label="t('Vendor')"
               outlined
               dense
               class="q-mb-sm"
@@ -446,7 +460,7 @@
             <q-input
               v-model="line.vendorPartNumber"
               :name="`partnumber_${index}`"
-              label="Number"
+              :label="t('Number')"
               outlined
               dense
               class="q-mb-sm"
@@ -459,7 +473,7 @@
             <q-input
               v-model="line.vendorCost"
               :name="`lastcost_${index}`"
-              label="Cost"
+              :label="t('Cost')"
               outlined
               dense
               class="q-mb-sm"
@@ -473,7 +487,7 @@
               v-model="line.vendorCurrency"
               :options="currencies"
               :name="`vendorcurr_${index}`"
-              label="Curr"
+              :label="t('Curr')"
               option-value="curr"
               option-label="curr"
               outlined
@@ -488,7 +502,7 @@
             <q-input
               v-model="line.vendorLeadtime"
               :name="`leadtime_${index}`"
-              label="Leadtime (days)"
+              :label="t('Leadtime (days)')"
               outlined
               dense
               class="q-mb-sm"
@@ -509,9 +523,11 @@
         </div>
       </div>
 
-      <!-- Group: Customer Information (Now an Array) -->
+      <!-- Group: Customer Information -->
       <div class="q-mb-md">
-        <div class="text-weight-bold q-mb-xs">Customer Information</div>
+        <div class="text-weight-bold q-mb-xs">
+          {{ t("Customer Information") }}
+        </div>
         <div
           v-for="(line, index) in form.customerLines"
           :key="'customer-' + index"
@@ -524,7 +540,7 @@
               option-label="name"
               :option-value="(option) => `${option.name}--${option.id}`"
               :name="`customer_${index}`"
-              label="Customer"
+              :label="t('Customer')"
               outlined
               dense
               class="q-mb-sm"
@@ -538,7 +554,7 @@
             <q-input
               v-model="line.priceBreak"
               :name="`pricebreak_${index}`"
-              label="Break"
+              :label="t('Break')"
               outlined
               dense
               class="q-mb-sm"
@@ -551,7 +567,7 @@
             <q-input
               v-model="line.customerPrice"
               :name="`customerprice_${index}`"
-              label="Sell Price"
+              :label="t('Sell Price')"
               outlined
               dense
               class="q-mb-sm"
@@ -565,7 +581,7 @@
               v-model="line.customerCurrency"
               :options="currencies"
               :name="`customercurr_${index}`"
-              label="Curr"
+              :label="t('Curr')"
               option-value="curr"
               option-label="curr"
               outlined
@@ -580,7 +596,7 @@
             <q-input
               v-model="line.validFrom"
               :name="`validfrom_${index}`"
-              label="From"
+              :label="t('From')"
               type="date"
               outlined
               dense
@@ -594,7 +610,7 @@
             <q-input
               v-model="line.validTo"
               :name="`validto_${index}`"
-              label="To"
+              :label="t('To')"
               type="date"
               outlined
               dense
@@ -617,11 +633,11 @@
       </div>
 
       <div class="row justify-start q-mt-md">
-        <!-- Changed click event to submitForm -->
-        <q-btn :label="t('Save')" @click="submitForm(false)" color="primary" />
+        <!-- Using type="submit" on buttons so that the q-form's validation is triggered -->
+        <q-btn @click="submitForm(false)" :label="t('Save')" color="primary" />
         <q-btn
-          :label="t('Save As New')"
           @click="submitForm(true)"
+          :label="t('Save As New')"
           class="q-mx-sm"
         />
       </div>
@@ -635,8 +651,10 @@ import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+
 const { t } = useI18n();
 const route = useRoute();
+
 // -------------------------
 // Transaction Type & Page Title
 // -------------------------
@@ -647,19 +665,21 @@ const props = defineProps({
   type: { type: String, default: null },
 });
 const emit = defineEmits(["saved"]);
-const haveProps = computed(() => props.id !== null || props.type !== null);
-const componentId = computed(() => {
-  return props.id ?? route.params.id ?? route.query.id;
-});
-const componentType = computed(() => {
-  return props.type ?? route.params.type;
-});
+const componentId = computed(
+  () => props.id ?? route.params.id ?? route.query.id
+);
+const componentType = computed(() => props.type ?? route.params.type);
 const type = ref(componentType.value || "part");
+
 if (type.value === "part") {
-  updateTitle("Add Part");
+  updateTitle(t("Add Part"));
 } else if (type.value === "service") {
-  updateTitle("Add Service");
+  updateTitle(t("Add Service"));
 }
+
+const formRef = ref(null);
+const saveAsNew = ref(false);
+
 const form = ref({
   // Basic Information
   partnumber: "",
@@ -687,7 +707,6 @@ const form = ref({
   checkinventory: false,
   rop: "",
   bin: "",
-  // Additional Descriptive Info
   image: "",
   countryorigin: "",
   drawing: "",
@@ -695,7 +714,7 @@ const form = ref({
   microfiche: "",
   barcode: "",
   toolnumber: "",
-  // Make & Model Lines as Array (removed for service)
+  // Make & Model Lines as Array (not used for service)
   makeModelLines: [{ make: "", model: "" }],
   // Vendor Lines as Array
   vendorLines: [
@@ -735,6 +754,9 @@ const makeInputRefs = [];
 const vendorInputRefs = [];
 const customerInputRefs = [];
 
+// Validation rule for required fields
+const requiredRule = (v) => !!v || t("This field is required");
+
 // Fetch static links and accounts data
 const getLinks = async () => {
   try {
@@ -749,12 +771,45 @@ const getLinks = async () => {
     cogsAccounts.value = links.accounts.cogs;
     expenseAccounts.value = links.accounts.expense;
     serviceIncomeAccounts.value = links.accounts.service_income;
+    // Helper function: returns account with matching id, or the first account if none match (if array isn't empty)
+    const getAccount = (accounts, id) => {
+      if (!accounts || accounts.length === 0) {
+        return undefined;
+      }
+      return accounts.find((acc) => acc.id == id) || accounts[0];
+    };
+
+    form.value.inventory = getAccount(
+      inventoryAccounts.value,
+      links.defaults.inventory_accno_id
+    );
+    form.value.income = getAccount(
+      incomeAccounts.value,
+      links.defaults.income_accno_id
+    );
+
+    if (type.value === "service") {
+      form.value.income = getAccount(
+        serviceIncomeAccounts.value,
+        links.defaults.income_accno_id
+      );
+    }
+
+    form.value.cogs = getAccount(
+      cogsAccounts.value,
+      links.defaults.expense_accno_id
+    );
+    form.value.expense = getAccount(
+      expenseAccounts.value,
+      links.defaults.expense_accno_id
+    );
+
     currencies.value = links.currencies;
     vendors.value = links.vendors;
     customers.value = links.customers;
   } catch (error) {
     Notify.create({
-      message: "Failed to fetch links",
+      message: t("Failed to fetch links"),
       type: "negative",
       position: "center",
     });
@@ -769,7 +824,7 @@ const loadData = async () => {
     const response = await api.get(`/ic/items/${id}`);
     const data = response.data;
     type.value = data.item;
-    updateTitle(`Edit ${type.value}`);
+    updateTitle(`${t("Edit")} ${t(type.value)}`);
 
     // Basic fields
     form.value.partnumber = data.partnumber;
@@ -851,22 +906,29 @@ const loadData = async () => {
     }
   } catch (error) {
     Notify.create({
-      message: "Failed to load item data",
+      message: t("Failed to load item data"),
       type: "negative",
       position: "center",
     });
   }
 };
-const submitForm = async (isNew = false) => {
-  if (!form.value.description) {
+
+const submitForm = async () => {
+  const valid = await formRef.value.validate();
+
+  // If the form is not valid, handle errors
+  if (!valid) {
+    const firstError = formRef.value.$el.querySelector(".q-field--error");
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
     Notify.create({
-      message: "Please fill in the required fields",
+      message: t("Please fill in the required fields"),
       type: "negative",
       position: "center",
     });
     return;
   }
-
   // Create a shallow copy of form data
   const postData = { ...form.value };
 
@@ -958,7 +1020,7 @@ const submitForm = async (isNew = false) => {
 
   let response;
   try {
-    if (id && !isNew) {
+    if (id && !saveAsNew.value) {
       // Update existing item
       response = await api.post(`/ic/items/${id}`, postData);
     } else {
@@ -967,7 +1029,7 @@ const submitForm = async (isNew = false) => {
     }
 
     Notify.create({
-      message: "Part/Service saved successfully",
+      message: t("Part/Service saved successfully"),
       type: "positive",
       position: "center",
     });
@@ -981,10 +1043,10 @@ const submitForm = async (isNew = false) => {
     const errorMessage =
       error?.response?.data?.error ||
       error.message ||
-      "An unexpected error occurred";
+      t("An unexpected error occurred");
 
     Notify.create({
-      message: `Error saving Part/Service: ${errorMessage}`,
+      message: `${t("Error saving Part/Service")}: ${errorMessage}`,
       type: "negative",
       position: "center",
     });
