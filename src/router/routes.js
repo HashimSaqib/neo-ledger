@@ -99,8 +99,8 @@ const routes = [
         meta: {
           permission: (route) => {
             return route.params.type === "customer"
-              ? "customer.addcustomer"
-              : "vendor.addvendor";
+              ? "customer.add"
+              : "vendor.add";
           },
         },
       },
