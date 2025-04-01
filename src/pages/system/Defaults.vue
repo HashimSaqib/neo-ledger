@@ -165,7 +165,11 @@
             v-model="form.namesbynumber"
             name="namesbynumber"
             :label="t('Sort Names by Number')"
-            class="col-12 col-md-5"
+          />
+          <q-checkbox
+            v-model="form.xelatex"
+            name="xelatex"
+            :label="t('XeLatex')"
           />
         </div>
       </div>
@@ -594,6 +598,7 @@ const form = ref({
   roundchange: "",
   weightunit: "",
   namesbynumber: false,
+  xelatex: false,
   typeofcontact: "",
   checkinventory: false,
   forcewarehouse: false,
@@ -822,6 +827,7 @@ async function loadDefaults() {
     form.value.roundchange = data.roundchange || "";
     form.value.weightunit = data.weightunit || "";
     form.value.namesbynumber = isChecked(data.namesbynumber);
+    form.value.xelatex = isChecked(data.xelatex);
     form.value.typeofcontact = data.typeofcontact || "";
     form.value.checkinventory = isChecked(data.checkinventory);
     form.value.forcewarehouse = isChecked(data.forcewarehouse);
@@ -851,7 +857,6 @@ async function loadDefaults() {
     form.value.lock_customernumber = isChecked(data.lock_customernumber);
     form.value.vendornumber = data.vendornumber || "";
     form.value.lock_vendornumber = isChecked(data.lock_vendornumber);
-
     if (data.locklinetax) {
       locklinetax.value = true;
     }
