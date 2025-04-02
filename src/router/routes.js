@@ -5,6 +5,7 @@ const GlTransactions = () =>
   import("src/pages/general-ledger/GlTransactions.vue");
 const ArApTransaction = () => import("src/pages/arap/ArApTransaction.vue");
 const ArApTransactions = () => import("src/pages/arap/ArApTransactions.vue");
+const ArReminder = () => import("src/pages/arap/ArReminder.vue");
 const SalesInvoice = () => import("src/pages/ar/SalesInvoice.vue");
 const AddVC = () => import("src/pages/arap/AddVC.vue");
 const VcHistory = () => import("src/pages/arap/VcHistory.vue");
@@ -17,6 +18,7 @@ const TrialBalance = () => import("src/pages/reports/TrialBalance.vue");
 const TrialTransactions = () =>
   import("src/pages/reports/TrialTransactions.vue");
 const IncomeStatement = () => import("src/pages/reports/IncomeStatement.vue");
+const BalanceSheet = () => import("src/pages/reports/BalanceSheet.vue");
 const Reconciliation = () => import("src/pages/cash/Reconciliation.vue");
 const SysCurrencies = () => import("src/pages/system/Currencies.vue");
 const SysDefaults = () => import("src/pages/system/Defaults.vue");
@@ -81,6 +83,7 @@ const routes = [
           },
         },
       },
+
       {
         path: "history/:type",
         component: VcHistory,
@@ -128,6 +131,11 @@ const routes = [
         },
       },
       {
+        path: "ar/reminder",
+        component: ArReminder,
+        meta: { permission: "customer.reminder" },
+      },
+      {
         path: "pos/sale",
         component: PointOfSale,
         props: (route) => ({ id: route.query.id }),
@@ -167,6 +175,11 @@ const routes = [
         path: "reports/income_statement",
         component: IncomeStatement,
         meta: { permission: "reports.income" },
+      },
+      {
+        path: "reports/balance_sheet",
+        component: BalanceSheet,
+        meta: { permission: "reports.balance" },
       },
       // Goods & Services
       {

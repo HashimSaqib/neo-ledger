@@ -41,6 +41,11 @@ export const menuLinks = [
             perm: "customer.transactions",
           },
           {
+            title: "Reminder",
+            link: "/ar/reminder",
+            perm: "customer.reminder",
+          },
+          {
             title: "Customer Search",
             link: "/arap/search/customer",
             perm: "customer.search",
@@ -195,6 +200,11 @@ export const menuLinks = [
         title: "Income Statement",
         link: "/reports/income_statement",
         perm: "reports.income",
+      },
+      {
+        title: "Balance Sheet",
+        link: "/reports/balance_sheet",
+        perm: "reports.balance",
       },
     ],
   },

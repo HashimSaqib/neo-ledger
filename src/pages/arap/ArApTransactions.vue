@@ -291,7 +291,6 @@
         bordered
         dense
         :rows-per-page-options="[0]"
-        :virtual-scroll="!printMode"
         virtual-scroll-sticky-end
         hide-bottom
       >
@@ -897,7 +896,7 @@ const getPath = (row) => {
         ? createLink("customer.invoice")
         : createLink("vendor.invoice");
   } else {
-    path = createLink(`transaction.${type.value}`);
+    path = createLink(`${type.value}.transaction`);
   }
   const flatParams = flattenParams(formData.value);
   return {
@@ -926,8 +925,6 @@ const downloadPDF = () => {
     params
   );
 };
-
-const printMode = inject("printToggle");
 onMounted(async () => {
   processFilters();
   await fetchAccounts();
