@@ -96,6 +96,19 @@
                 />
               </div>
               <div class="row q-mb-sm">
+                <q-input
+                  outlined
+                  :label="t('Description')"
+                  v-model="description"
+                  bg-color="input"
+                  label-color="secondary"
+                  class="col-sm-11 col-12"
+                  dense
+                  type="input"
+                  autogrow
+                />
+              </div>
+              <div class="row q-mb-sm">
                 <q-select
                   v-if="departments.length > 0"
                   outlined
@@ -181,19 +194,6 @@
                   outlined
                   dense
                   type="date"
-                />
-              </div>
-              <div class="row q-gutter-sm">
-                <q-input
-                  outlined
-                  :label="t('Description')"
-                  v-model="description"
-                  bg-color="input"
-                  label-color="secondary"
-                  class="col-sm-11 col-12"
-                  dense
-                  type="textarea"
-                  rows="2"
                 />
               </div>
             </div>
