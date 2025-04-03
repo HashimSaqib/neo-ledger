@@ -39,7 +39,7 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
     columns.map((col) => {
       let value = row[col.field] || "";
       if (
-        ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(
+        ["amount", "netamount", "paid", "tax", "paymentdiff", "due"].includes(
           col.name
         ) &&
         value !== ""
@@ -52,7 +52,7 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
   const totalsRow = totals
     ? columns.map((col) => {
         if (
-          ["amount", "netamount", "paid", "tax", "paymentdiff"].includes(
+          ["amount", "netamount", "paid", "tax", "paymentdiff", "due"].includes(
             col.name
           )
         ) {
