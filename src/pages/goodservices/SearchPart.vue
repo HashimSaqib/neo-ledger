@@ -229,7 +229,7 @@
             <q-checkbox v-model="formData.l_id" label="ID" />
             <q-checkbox v-model="formData.l_partnumber" label="Number" />
             <q-checkbox v-model="formData.l_description" label="Description" />
-            <q-checkbox v-model="formData.l_qty" label="Qty" />
+            <q-checkbox v-model="formData.l_onhand" label="Qty" />
             <q-checkbox v-model="formData.l_unit" label="Unit" />
             <q-checkbox v-model="formData.l_priceupdate" label="Updated" />
             <q-checkbox v-model="formData.l_lot" label="Lot" />
@@ -305,7 +305,7 @@
           <q-td :props="props">
             <span
               v-if="
-                ['sellprice', 'lastcost', 'listprice', 'qty'].includes(
+                ['sellprice', 'lastcost', 'listprice', 'onhand'].includes(
                   props.col.name
                 )
               "
@@ -394,7 +394,7 @@ const formData = ref({
   l_id: false,
   l_partnumber: true,
   l_description: true,
-  l_qty: true,
+  l_onhand: true,
   l_unit: false,
   l_priceupdate: false,
   l_lot: false,
@@ -403,14 +403,14 @@ const formData = ref({
   l_cost: false,
   l_sellprice: true,
   l_listprice: false,
-  l_lastcost: true,
+  l_lastcost: false,
   l_avgcost: false,
   l_linetotal: false,
   l_markup: false,
   l_bin: false,
   l_rop: false,
   l_weight: false,
-  l_notes: false,
+  l_notes: true,
   l_image: false,
   l_drawing: false,
   l_toolnumber: false,
@@ -490,7 +490,14 @@ const baseColumns = [
     field: "description",
     align: "let",
   },
-  { name: "qty", label: "Qty", field: "qty", align: "right" },
+  { name: "notes", label: "Notes", field: "notes", align: "left" },
+  {
+    name: "onhand",
+    label: "Qty",
+    field: "onhand",
+    align: "right",
+    sortable: "true",
+  },
   { name: "unit", label: "Unit", field: "unit", align: "left" },
   {
     name: "priceupdate",
@@ -526,7 +533,7 @@ const baseColumns = [
   { name: "bin", label: "Bin", field: "bin", align: "left" },
   { name: "rop", label: "ROP", field: "rop", align: "left" },
   { name: "weight", label: "Weight", field: "weight", align: "left" },
-  { name: "notes", label: "Notes", field: "notes", align: "left" },
+
   { name: "image", label: "Image", field: "image", align: "left" },
   { name: "drawing", label: "Drawing", field: "drawing", align: "left" },
   {
