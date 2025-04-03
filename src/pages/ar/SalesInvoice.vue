@@ -301,14 +301,15 @@
               />
               <q-input
                 outlined
-                :value="line.oh"
+                v-model="line.onhand"
                 :label="t('OH')"
-                class="col-1"
+                class="col-1 maintext"
                 bg-color="input"
                 label-color="secondary"
                 dense
-                readonly
+                type="input"
                 @keyup.enter="handleLineEnter(index, $event)"
+                disable
               />
               <q-input
                 outlined
@@ -992,7 +993,7 @@ const lines = ref([
     number: "",
     description: "",
     qty: 1,
-    oh: 0,
+    onhand: "",
     unit: "",
     price: 0,
     discount: 0,
@@ -1016,7 +1017,7 @@ const addLineAt = (index) => {
     number: "",
     description: "",
     qty: 1,
-    oh: 0,
+    onhand: "",
     unit: "",
     price: 0,
     discount: 0,
@@ -1061,7 +1062,7 @@ const handleLineItemChange = (newValue, index) => {
       console.log(newValue);
       const line = lines.value[index];
       line.description = newValue.partnumber.description || "";
-      line.oh = newValue.partnumber.oh || 0;
+      line.onhand = newValue.partnumber.onhand || "";
       line.unit = newValue.partnumber.unit || "";
       line.price = newValue.partnumber.sellprice || 0;
       line.itemnotes = newValue.partnumber.notes || "";
@@ -1362,7 +1363,7 @@ const loadInvoice = async (invoice) => {
       partnumber: line,
       description: line.description,
       qty: line.qty,
-      oh: line.oh,
+      oh: line.onhand,
       unit: line.unit,
       price: line.price,
       discount: line.discount,
@@ -1517,7 +1518,6 @@ const postInvoice = async () => {
         number: line.partnumber.id,
         description: line.description,
         qty: line.qty,
-        oh: line.oh,
         unit: line.unit,
         price: line.price,
         discount: line.discount,
@@ -1610,7 +1610,7 @@ const resetForm = () => {
       partnumber: null,
       description: "",
       qty: 0,
-      oh: "",
+      onhand: "",
       unit: "",
       price: 0,
       discount: 0,
