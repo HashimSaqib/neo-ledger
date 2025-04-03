@@ -1417,7 +1417,7 @@
 <script setup>
 import { ref, onMounted, computed, useTemplateRef } from "vue";
 import { api } from "src/boot/axios";
-import { Notify, Cookies, useQuasar } from "quasar";
+import { Notify, Cookies, useQuasar, LocalStorage } from "quasar";
 import { useI18n } from "vue-i18n";
 import { menuLinks } from "src/layouts/Menu.js";
 import { useRouter } from "vue-router";
@@ -1758,6 +1758,19 @@ const getDatasets = async () => {
         ? `${ds.logo}?rand=${Math.random().toString(36).slice(2)}`
         : ds.logo,
     }));
+    if (response.data && Array.isArray(response.data)) {
+      // 1. Extract all db_name values
+      const dbNames = response.data.map((ds) => ds.db_name);
+      // 2. Join them into a comma-separated string
+      const availableDbString = dbNames.join(",");
+      // 3. Store in LocalStorage using the key 'available_db'
+      LocalStorage.set("available_db", availableDbString);
+
+      // Optional: Log the stored value for verification
+      console.log("Stored available_db:", availableDbString);
+    } else {
+      console.warn("API response data is not an array:", response.data);
+    }
 
     // Load invites after datasets are loaded
     getInvites();

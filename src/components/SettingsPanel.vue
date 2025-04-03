@@ -48,6 +48,24 @@
         </q-item-section>
       </q-item>
 
+      <div>
+        <s-select
+          v-model="selectedDb"
+          :options="dbOptions"
+          dense
+          options-dense
+          @update:model-value="switchDatabase"
+          outlined
+          :label="$t('Switch Database')"
+          class="q-px-none"
+        >
+          <!-- No emit-value/map-options needed if options are just strings -->
+          <template v-slot:prepend>
+            <q-icon name="open_in_new" size="xs" class="q-mr-xs" />
+            <!-- Hint that it opens a new tab -->
+          </template>
+        </s-select>
+      </div>
       <!-- Logout Button -->
       <q-separator spaced />
       <q-item clickable v-ripple @click="handleLogout" class="text-negative">
@@ -61,9 +79,9 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { Cookies } from "quasar";
+import { Cookies, LocalStorage } from "quasar";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 
@@ -87,6 +105,28 @@ function switchLanguage(lang) {
     loadLanguagePack(lang.value);
   }
 }
+
+const dbOptions = ref([]);
+const selectedDb = ref(null);
+const loadDbOptions = () => {
+  const availableDbString = LocalStorage.getItem("available_db");
+  if (availableDbString) {
+    dbOptions.value = availableDbString.split(",");
+  } else {
+    dbOptions.value = []; // Ensure it's empty if nothing in storage
+  }
+};
+function switchDatabase(dbName) {
+  if (!dbName) return; // Avoid issues if null is somehow selected
+
+  const url = `/client/${dbName}`;
+  window.open(url, "_blank"); // Open in new tab
+
+  selectedDb.value = null;
+}
+onMounted(() => {
+  loadDbOptions();
+});
 
 async function handleLogout() {
   Cookies.remove("client");

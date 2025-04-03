@@ -60,6 +60,7 @@ const loginData = ref({
 });
 
 onMounted(() => {
+  LocalStorage.remove("available_db");
   $q.cookies.remove("sessionkey");
 
   // Iterate over local storage keys and remove those that match the "acs_" prefix
