@@ -495,7 +495,7 @@ const baseColumns = [
     name: "description",
     label: "Description",
     field: "description",
-    align: "let",
+    align: "left",
     sortable: true,
   },
   {

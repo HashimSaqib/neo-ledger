@@ -30,7 +30,6 @@
                 flat
                 dense
               />
-
               <q-btn
                 @click.prevent="openAddCustomer"
                 class="text-primary"
@@ -53,10 +52,65 @@
               </p>
             </div>
           </div>
+
           <div v-if="customer">
             <p class="q-mb-sm q-px-sm maintext">
               <strong>{{ t("Address") }}</strong> {{ customer.full_address }}
             </p>
+          </div>
+
+          <div class="row">
+            <!-- Shipto Expansion Item -->
+            <q-expansion-item
+              label="Shipto"
+              dense
+              class="q-mt-none q-mb-sm col-7"
+            >
+              <div class="q-px-none q-my-sm">
+                <q-input
+                  v-model="shipto.name"
+                  label="Name"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <q-input
+                  v-model="shipto.address1"
+                  label="Address 1"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <q-input
+                  v-model="shipto.address2"
+                  label="Address 2"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <q-input
+                  v-model="shipto.city"
+                  label="City"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <q-input
+                  v-model="shipto.state"
+                  label="State"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <q-input
+                  v-model="shipto.zip"
+                  label="Zip"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+            </q-expansion-item>
           </div>
 
           <!-- Record Account & Currency Selection -->
@@ -994,6 +1048,7 @@ const intnotes = ref("");
 const invNumber = ref("");
 const ordNumber = ref("");
 const poNumber = ref("");
+const shipto = ref({});
 const invId = ref(route.query.id ? `${route.query.id}` : "");
 
 const { formatDate, addToDate } = date;
