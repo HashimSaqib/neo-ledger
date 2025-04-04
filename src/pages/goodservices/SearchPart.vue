@@ -483,20 +483,34 @@ const baseColumns = [
     align: "left",
   },
   { name: "id", label: "ID", field: "id", align: "left" },
-  { name: "partnumber", label: "Number", field: "partnumber", align: "left" },
+  {
+    name: "partnumber",
+    label: "Number",
+    field: "partnumber",
+    align: "left",
+    sortable: true,
+  },
+
   {
     name: "description",
     label: "Description",
     field: "description",
     align: "let",
+    sortable: true,
   },
-  { name: "notes", label: "Notes", field: "notes", align: "left" },
+  {
+    name: "notes",
+    label: "Notes",
+    field: "notes",
+    align: "left",
+    sortable: true,
+  },
   {
     name: "onhand",
     label: "Qty",
     field: "onhand",
     align: "right",
-    sortable: "true",
+    sortable: true,
   },
   { name: "unit", label: "Unit", field: "unit", align: "left" },
   {
@@ -513,18 +527,26 @@ const baseColumns = [
     field: "checkinventory",
     align: "left",
   },
-  { name: "cost", label: "Cost", field: "cost", align: "right" },
+  {
+    name: "cost",
+    label: "Cost",
+    field: "cost",
+    align: "right",
+    sortable: true,
+  },
   {
     name: "sellprice",
     label: "Sell Price",
     field: "sellprice",
     align: "right",
+    sortable: true,
   },
   {
     name: "listprice",
     label: "List Price",
     field: "listprice",
     align: "right",
+    sortable: true,
   },
   { name: "lastcost", label: "Last Cost", field: "lastcost", align: "right" },
   { name: "avgcost", label: "Average Cost", field: "avgcost", align: "right" },
@@ -606,13 +628,14 @@ const finalColumns = computed(() => {
 
   // 3. If `sold` or `bought` is 1, insert 'invnumber' after 'lastcost'.
   if (formData.value.sold === 1 || formData.value.bought === 1) {
-    const lastCostIndex = cols.findIndex((col) => col.name === "lastcost");
+    const lastCostIndex = cols.findIndex((col) => col.name === "description");
     if (lastCostIndex !== -1) {
       cols.splice(lastCostIndex + 1, 0, {
         name: "invnumber",
         label: "Invoice",
         field: "invnumber",
-        align: "right",
+        align: "left",
+        sortable: true,
       });
     }
   }
