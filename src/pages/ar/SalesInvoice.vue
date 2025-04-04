@@ -682,6 +682,18 @@
       @click="postInvoice"
       class="relative-position q-mr-md"
     />
+    <q-btn
+      :label="t('Save')"
+      color="primary"
+      @click="postInvoice(true)"
+      class="relative-position q-mr-md"
+    />
+    <q-btn
+      :label="t('Delete')"
+      color="warning"
+      @click="deleteInvoice"
+      v-if="invId"
+    />
     <q-separator class="q-my-sm" size="2px" v-if="invId" />
 
     <div class="row q-gutter-x-md" v-if="invId">
@@ -772,7 +784,7 @@ import {
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, confirmDelete } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
@@ -1476,7 +1488,47 @@ const printInvoice = async () => {
   }
 };
 
-const postInvoice = async () => {
+const deleteInvoice = async () => {
+  try {
+    const confirmed = await confirmDelete({
+      title: t("Confirm Deletion"),
+      message: t(
+        "Are you sure you want to delete this invoice? This action cannot be undone."
+      ),
+    });
+
+    if (confirmed) {
+      await api.delete(`/arap/invoice/customer/${invId.value}`);
+
+      Notify.create({
+        message: t("Invoice deleted successfully"),
+        color: "positive",
+        position: "center",
+      });
+
+      if (route.query.callback) {
+        const query = { ...route.query, search: 1 };
+        router.push({ path: route.query.callback, query: query });
+      } else {
+        resetForm();
+      }
+    } else {
+      Notify.create({
+        message: t("Invoice Delete canceled"),
+        color: "warning",
+        position: "center",
+      });
+    }
+  } catch (error) {
+    Notify.create({
+      message: t("Unable to delete Invoice") + error,
+      color: "negative",
+      position: "center",
+    });
+    console.error(error);
+  }
+};
+const postInvoice = async (save = false) => {
   if (!selectedCustomer.value) {
     Notify.create({
       message: t("Customer is required."),
@@ -1586,7 +1638,10 @@ const postInvoice = async () => {
       type: "positive",
       position: "center",
     });
-    if (route.query.callback) {
+    const id = response.data.id;
+    if (save) {
+      fetchInvoice(id);
+    } else if (route.query.callback) {
       const query = { ...route.query, search: 1 };
       router.push({ path: route.query.callback, query: query });
     } else {
