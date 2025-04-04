@@ -48,7 +48,14 @@
                       {{ formatAmount(vc.creditlimit) }}
                     </span>
                     <strong>{{ t("Remaining") }}</strong>
-                    <span class="text-negative q-ml-sm">
+                    <span
+                      class="q-ml-sm"
+                      :class="
+                        vc.creditremaining > 0
+                          ? 'text-positive'
+                          : 'text-negative'
+                      "
+                    >
                       {{ formatAmount(vc.creditremaining) }}
                     </span>
                   </p>
@@ -591,10 +598,22 @@ const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 // Transaction Type & Page Title
 // -------------------------
 const type = ref(route.params.type || route.query.type || "vendor");
+const reverse = ref(route.params.reverse || route.query.reverse || 0);
+const transactionType = ref("transaction");
 if (type.value === "customer") {
-  updateTitle("AR Transaction");
+  if (reverse.value == 1) {
+    updateTitle("Credit Note");
+    transactionType.value = "credit_note";
+  } else {
+    updateTitle("AR Transaction");
+  }
 } else {
-  updateTitle("AP Transaction");
+  if (reverse.value == 1) {
+    updateTitle("Debit Note");
+    transactionType.value = "debit_note";
+  } else {
+    updateTitle("AP Transaction");
+  }
 }
 
 // -------------------------
@@ -1059,6 +1078,7 @@ const postInvoice = async () => {
     recordAccount: recordAccount.value,
     selectedCurrency: selectedCurrency.value,
     curr: selectedCurrency.value.curr,
+    type: transactionType.value,
     lines: lines.value.map((line) => ({
       amount: line.amount,
       account: line.account ? line.account.accno : null,
@@ -1228,6 +1248,13 @@ const loadInvoice = async (invoice) => {
   }
   initialLoad.value = true;
   try {
+    transactionType.value = invoice.type;
+    if (transactionType.value === "credit_note") {
+      updateTitle("Credit Note");
+    }
+    if (transactionType.value === "debit_note") {
+      updateTitle("Debit Note");
+    }
     const vcId = invoice[`${type.value}_id`];
     let vcToSelect = vcList.value.find((vc) => vc.id === vcId);
     // Update the minimal vendor selection used by the s-select.

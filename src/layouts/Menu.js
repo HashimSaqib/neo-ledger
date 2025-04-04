@@ -27,6 +27,11 @@ export const menuLinks = [
         perm: "customer.invoice.return",
       },
       {
+        title: "Credit Note",
+        link: "/arap/transaction/customer?reverse=1",
+        perm: "customer.transaction.return",
+      },
+      {
         title: "Add Customer",
         link: "/arap/customer",
         perm: "customer.add",

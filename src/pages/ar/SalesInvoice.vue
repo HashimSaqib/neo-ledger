@@ -675,6 +675,15 @@
     </div>
 
     <!-- Print Options Section (shown if invoice exists) -->
+
+    <q-btn
+      :label="t('Post')"
+      color="primary"
+      @click="postInvoice"
+      class="relative-position q-mr-md"
+    />
+    <q-separator class="q-my-sm" size="2px" v-if="invId" />
+
     <div class="row q-gutter-x-md" v-if="invId">
       <s-select
         :options="templates"
@@ -694,26 +703,21 @@
         outlined
       />
       <q-select
-        :options="['Download']"
+        :options="printLocations"
         v-model="printOptions.location"
         class="mainbg"
         dense
         outlined
+        map-options
+        emit-value
+      />
+      <q-btn
+        color="accent"
+        :label="t('Print')"
+        @click="printInvoice"
+        v-if="invId"
       />
     </div>
-    <q-separator class="q-my-sm" size="2px" v-if="invId" />
-    <q-btn
-      :label="t('Post')"
-      color="primary"
-      @click="postInvoice"
-      class="relative-position q-mr-md"
-    />
-    <q-btn
-      color="accent"
-      :label="t('Print')"
-      @click="printInvoice"
-      v-if="invId"
-    />
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
@@ -835,10 +839,14 @@ const templates = [
   { label: t("Pick List"), value: "pick_list" },
   { label: t("Packing List"), value: "packing_list" },
 ];
+const printLocations = [
+  { label: t("Screen"), value: "screen" },
+  { label: t("Download"), value: "download" },
+];
 const printOptions = ref({
   template: "invoice",
   format: "tex",
-  location: "download",
+  location: "screen",
 });
 // =====================
 // Counters & Refs for Dynamic Elements
@@ -1441,13 +1449,21 @@ const printInvoice = async () => {
     );
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${printOptions.value.template}_${invId.value}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+
+    if (printOptions.value.location === "screen") {
+      // Open PDF in a new tab or window
+      window.open(url, "_blank");
+    } else {
+      // Download PDF
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${printOptions.value.template}_${invId.value}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    // Clean up the object URL after a short delay
+    setTimeout(() => window.URL.revokeObjectURL(url), 100);
     loading.value = false;
   } catch (error) {
     Notify.create({

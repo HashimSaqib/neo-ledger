@@ -390,8 +390,6 @@ const route = useRoute();
 
 // Initialize the type based on route param ("customer" or "vendor")
 const type = ref(route.params.type || "customer");
-// linkType: if type is vendor, plain "ar" strings become "ap"
-const linkType = computed(() => (type.value === "customer" ? "ar" : "ap"));
 
 // Computed labels for party selection and number
 const partyListLabel = computed(() =>
@@ -933,7 +931,6 @@ onMounted(async () => {
     type.value === "customer" ? "Customer Transactions" : "Vendor Transactions"
   );
 
-  // Load any query parameters into the form
   loadParams();
 });
 </script>
