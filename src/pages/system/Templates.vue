@@ -1176,7 +1176,7 @@ const uploadNewTemplate = async () => {
     });
 
     // Store the name of the newly uploaded template
-    const newTemplateName = newTemplateName.value || newTemplateFile.value.name;
+    newTemplateName.value = newTemplateName.value || newTemplateFile.value.name;
 
     $q.notify({
       message: `Template ${

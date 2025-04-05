@@ -1438,7 +1438,7 @@ const loadInvoice = async (invoice) => {
       partnumber: line,
       description: line.description,
       qty: line.qty,
-      oh: line.onhand,
+      onhand: line.onhand,
       unit: line.unit,
       price: line.price,
       discount: line.discount,
