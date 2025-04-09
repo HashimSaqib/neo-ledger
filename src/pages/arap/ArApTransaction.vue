@@ -1051,12 +1051,27 @@ const postInvoice = async () => {
     });
     return;
   }
-  if (
-    lines.value.length === 0 ||
-    !lines.value.some((line) => line.amount && line.account)
-  ) {
+  const validLineExists =
+    lines.value.length > 0 &&
+    lines.value.some((line) => line.amount && line.account);
+
+  const validPaymentExists =
+    payments.value.length > 0 &&
+    payments.value.some(
+      (payment) =>
+        payment.amount &&
+        payment.account &&
+        (typeof payment.account === "object"
+          ? payment.account.label
+          : payment.account)
+    );
+
+  // If neither a valid line nor a valid payment exists, notify and exit.
+  if (!validLineExists && !validPaymentExists) {
     Notify.create({
-      message: t("At least one line item with amount and account is required"),
+      message: t(
+        "At least one line item or payment with amount and account is required"
+      ),
       type: "negative",
       position: "center",
     });

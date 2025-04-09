@@ -26,6 +26,41 @@
           outlined
           dense
         />
+
+        <s-select
+          v-if="customers.length > 0"
+          :options="customers"
+          option-label="label"
+          search="label"
+          option-value="name"
+          v-model="formData.customer"
+          class="lightbg q-my-md"
+          :label="t('Customer')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+          clearable
+          emit-value
+          map-options
+        />
+        <s-select
+          v-if="vendors.length > 0"
+          :options="vendors"
+          option-label="label"
+          search="label"
+          option-value="name"
+          v-model="formData.vendor"
+          class="lightbg q-my-md"
+          :label="t('Vendor')"
+          input-class="maintext"
+          label-color="secondary"
+          outlined
+          dense
+          clearable
+          emit-value
+          map-options
+        />
         <q-input
           v-model="formData.name"
           class="lightbg q-my-md"
@@ -663,12 +698,16 @@ function groupData(data) {
 const accounts = ref([]);
 const departments = ref([]);
 const projects = ref([]);
+const customers = ref([]);
+const vendors = ref([]);
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl_report");
     departments.value = response.data.departments;
     accounts.value = response.data.accounts.all;
     projects.value = response.data.projects;
+    customers.value = response.data.customers;
+    vendors.value = response.data.vendors;
   } catch (error) {
     console.log(error);
   }
@@ -777,6 +816,12 @@ const tableKey = ref(0); // needed to fix virtual scroll by forcing rerender on 
 const search = async () => {
   try {
     loading.value = true;
+    if (formData.value.customer) {
+      formData.value.name = formData.value.customer;
+    }
+    if (formData.value.vendor) {
+      formData.value.name = formData.value.vendor;
+    }
     // Flatten formData using the arrow function.
     const params = flattenParams(formData.value);
 

@@ -122,24 +122,6 @@
             color="primary"
             class="col-2"
           />
-          <div
-            class="col-12 col-md-4 text-right q-mt-sm-none q-mt-md-none q-mt-xs"
-          >
-            <q-toggle
-              v-model="isGridView"
-              :label="isGridView ? 'Grid View' : 'List View'"
-              left-label
-              color="primary"
-              keep-color
-            >
-              <template v-slot:checked-icon>
-                <q-icon name="grid_view" />
-              </template>
-              <template v-slot:unchecked-icon>
-                <q-icon name="view_list" />
-              </template>
-            </q-toggle>
-          </div>
         </div>
 
         <!-- Pending Invites section (only shown when there are invites) -->
@@ -347,11 +329,18 @@
                   :alert="getDatasetInvites(dataset.id).length > 0"
                 />
                 <q-tab
+                  name="connections"
+                  icon="cloud_upload"
+                  label="Connections"
+                  v-if="dataset.access_level == 'owner'"
+                />
+                <q-tab
                   name="backup"
                   icon="cloud_download"
                   label="backup"
                   v-if="dataset.access_level == 'owner'"
                 />
+
                 <q-tab
                   name="delete"
                   icon="delete"
@@ -602,6 +591,14 @@
                     @click="handleDelete(dataset)"
                   />
                 </q-tab-panel>
+                <q-tab-panel name="connections" class="q-pa-md text-center">
+                  <q-btn
+                    color="primary"
+                    label="Link Dropbox"
+                    class="q-mr-sm"
+                    href=""
+                  />
+                </q-tab-panel>
                 <q-tab-panel name="backup" class="q-pa-md text-center">
                   <q-btn
                     color="primary"
@@ -650,440 +647,6 @@
               </q-card-section>
             </q-card>
           </div>
-        </div>
-
-        <!-- LIST VIEW MODE -->
-        <div
-          v-if="
-            !loading && !error && filteredDatasets.length > 0 && !isGridView
-          "
-        >
-          <q-list separator>
-            <q-expansion-item
-              v-for="dataset in filteredDatasets"
-              :key="dataset.db_name"
-              v-model="dataset.expanded"
-              :expand-icon-toggle="false"
-              :expandable="dataset.admin === 1"
-              class="dataset-list-item q-my-sm"
-              dense-toggle
-              :header-class="dataset.admin === 1 ? 'cursor-pointer' : ''"
-            >
-              <template v-slot:header>
-                <q-item-section avatar>
-                  <div>
-                    <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
-                      <q-img :src="`${dataset.logo}`" alt="Logo" />
-                    </q-avatar>
-                    <q-avatar
-                      v-else
-                      color="primary"
-                      text-color="white"
-                      size="56px"
-                      class="q-mr-md"
-                    >
-                      <q-icon name="database" size="32px" />
-                    </q-avatar>
-                    <q-btn
-                      round
-                      dense
-                      flat
-                      icon="edit"
-                      class="download-icon"
-                      @click="triggerLogoUpload(dataset.id)"
-                      size="sm"
-                      color="primary"
-                      v-if="dataset.admin === 1"
-                    />
-
-                    <input
-                      type="file"
-                      :ref="(el) => (logoInputRefs[dataset.id] = el)"
-                      @change="handleLogoUpload($event, dataset.id)"
-                      style="display: none"
-                    />
-                  </div>
-                </q-item-section>
-
-                <q-item-section>
-                  <q-item-label class="text-primary text-weight-medium text-h6">
-                    {{ dataset.db_name }}
-                  </q-item-label>
-                  <q-item-label caption>
-                    <div class="row q-gutter-x-md q-mt-xs">
-                      <span v-if="dataset.admin === 1">
-                        <q-icon name="group" size="16px" class="q-mr-xs" />
-                        {{ dataset.users ? dataset.users.length : 0 }} Users
-                      </span>
-                      <span v-if="dataset.admin === 1">
-                        <q-icon name="security" size="16px" class="q-mr-xs" />
-                        {{ dataset.roles ? dataset.roles.length : 0 }} Roles
-                      </span>
-                      <span v-if="dataset.admin === 1">
-                        <q-badge color="primary">Admin</q-badge>
-                      </span>
-                      <span v-else>
-                        <q-badge color="blue-grey">User</q-badge>
-                      </span>
-                    </div>
-                  </q-item-label>
-                </q-item-section>
-
-                <q-item-section side>
-                  <div class="row q-gutter-sm">
-                    <q-btn
-                      v-if="dataset.admin === 1"
-                      flat
-                      round
-                      color="primary"
-                      icon="person_add"
-                      @click.stop="openInviteDialog(dataset)"
-                      size="sm"
-                    >
-                      <q-tooltip>Invite User</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      flat
-                      round
-                      color="primary"
-                      icon="open_in_new"
-                      @click.stop="navigateToDataset(dataset)"
-                      size="sm"
-                    >
-                      <q-tooltip>Open Dataset</q-tooltip>
-                    </q-btn>
-                  </div>
-                </q-item-section>
-              </template>
-
-              <!-- Expandable section for admin users -->
-              <q-card
-                v-if="dataset.admin === 1"
-                bordered
-                flat
-                enclass="q-mt-md"
-              >
-                <q-tabs
-                  v-model="dataset.activeTab"
-                  dense
-                  class="text-grey q-pa-sm"
-                  active-color="primary"
-                  indicator-color="primary"
-                  align="left"
-                  narrow-
-                >
-                  <q-tab name="users" icon="group" label="Users" />
-                  <q-tab name="roles" icon="security" label="Roles" />
-                  <q-tab
-                    name="invites"
-                    icon="mail"
-                    label="Invites"
-                    :alert="getDatasetInvites(dataset.id).length > 0"
-                  />
-                  <q-tab
-                    name="backup"
-                    icon="backup"
-                    label="backup"
-                    v-if="dataset.access_level == 'owner'"
-                  />
-                  <q-tab
-                    name="delete"
-                    icon="delete"
-                    label="delete"
-                    v-if="dataset.access_level == 'owner'"
-                  />
-                </q-tabs>
-
-                <q-separator />
-
-                <q-tab-panels v-model="dataset.activeTab" animated>
-                  <!-- Users Panel -->
-                  <q-tab-panel name="users" class="q-pa-sm">
-                    <div v-if="dataset.users && dataset.users.length">
-                      <q-table
-                        :rows="dataset.users"
-                        :columns="userColumns"
-                        row-key="email"
-                        flat
-                        bordered
-                        dense
-                        hide-pagination
-                        hide-bottom
-                      >
-                        <!-- User Actions column -->
-                        <template v-slot:body-cell-actions="props">
-                          <q-td :props="props">
-                            <q-btn
-                              flat
-                              round
-                              dense
-                              color="primary"
-                              icon="edit"
-                              @click.stop="
-                                openEditUserDialog(dataset, props.row)
-                              "
-                            >
-                              <q-tooltip>
-                                {{
-                                  props.row.access_level === "owner"
-                                    ? "Owner access cannot be modified"
-                                    : "Edit Access"
-                                }}
-                              </q-tooltip>
-                            </q-btn>
-                            <q-btn
-                              flat
-                              round
-                              dense
-                              color="negative"
-                              icon="delete"
-                              @click.stop="
-                                confirmRemoveAccess(dataset, props.row)
-                              "
-                              :disabled="props.row.access_level === 'owner'"
-                            >
-                              <q-tooltip>
-                                {{
-                                  props.row.access_level === "owner"
-                                    ? "Owner access cannot be removed"
-                                    : "Remove Access"
-                                }}
-                              </q-tooltip>
-                            </q-btn>
-                          </q-td>
-                        </template>
-                      </q-table>
-                    </div>
-                    <div v-else class="text-center q-pa-md text-grey-7">
-                      <q-icon name="people_alt" size="48px" />
-                      <div class="q-mt-sm">No users available</div>
-                    </div>
-                  </q-tab-panel>
-
-                  <!-- Roles Panel -->
-                  <q-tab-panel name="roles" class="q-pa-sm">
-                    <div v-if="dataset.roles && dataset.roles.length">
-                      <q-table
-                        :rows="dataset.roles"
-                        :columns="roleColumns"
-                        row-key="id"
-                        flat
-                        bordered
-                        dense
-                        hide-pagination
-                        hide-bottom
-                      >
-                        <!-- Display role permissions as chips -->
-                        <template v-slot:body-cell-acs="props">
-                          <q-td :props="props">
-                            <div class="row items-center flex-wrap q-gutter-xs">
-                              <q-chip
-                                v-for="group in groupRowAcs(props.row.acs)"
-                                :key="group.group"
-                                dense
-                                size="sm"
-                                color="primary"
-                                text-color="white"
-                              >
-                                {{ t(group.group) }}
-                                <q-tooltip v-if="group.subs.length">
-                                  <div
-                                    v-for="sub in group.subs"
-                                    :key="sub"
-                                    class="q-pa-xs"
-                                  >
-                                    {{ sub.split(".").slice(1).join(".") }}
-                                  </div>
-                                </q-tooltip>
-                              </q-chip>
-                            </div>
-                          </q-td>
-                        </template>
-                        <!-- Edit action -->
-                        <template v-slot:body-cell-actions="props">
-                          <q-td :props="props" class="q-gutter-xs">
-                            <q-btn
-                              icon="edit"
-                              color="primary"
-                              flat
-                              dense
-                              @click.stop="
-                                openEditRolePopup(dataset, props.row)
-                              "
-                            >
-                              <q-tooltip>Edit</q-tooltip>
-                            </q-btn>
-                          </q-td>
-                        </template>
-                      </q-table>
-
-                      <div class="q-mt-md text-right">
-                        <q-btn
-                          label="Add Role"
-                          color="primary"
-                          size="sm"
-                          icon="add"
-                          @click.stop="openAddRolePopup(dataset)"
-                        />
-                      </div>
-                    </div>
-                    <div v-else class="text-center q-pa-md text-grey-7">
-                      <q-icon name="security" size="48px" />
-                      <div class="q-mt-sm">No roles available</div>
-                      <q-btn
-                        class="q-mt-md"
-                        label="Add First Role"
-                        color="primary"
-                        size="sm"
-                        icon="add"
-                        @click.stop="openAddRolePopup(dataset)"
-                      />
-                    </div>
-                  </q-tab-panel>
-
-                  <!-- Invites Panel -->
-                  <q-tab-panel name="invites" class="q-pa-sm">
-                    <div v-if="loadingInvites" class="flex flex-center q-pa-md">
-                      <q-spinner color="primary" size="md" />
-                    </div>
-
-                    <div
-                      v-else-if="getDatasetInvites(dataset.id).length === 0"
-                      class="text-center q-pa-md text-grey-7"
-                    >
-                      <q-icon name="mail" size="48px" />
-                      <div class="q-mt-sm">No pending invites</div>
-                      <q-btn
-                        class="q-mt-md"
-                        label="Invite User"
-                        color="primary"
-                        size="sm"
-                        icon="person_add"
-                        @click.stop="openInviteDialog(dataset)"
-                      />
-                    </div>
-
-                    <div v-else>
-                      <q-list separator>
-                        <q-item
-                          v-for="invite in getDatasetInvites(dataset.id)"
-                          :key="invite.id"
-                          class="q-py-sm"
-                        >
-                          <q-item-section>
-                            <q-item-label>
-                              <q-icon name="email" class="q-mr-xs" />
-                              {{ invite.recipient_email }}
-                            </q-item-label>
-                            <q-item-label caption class="q-mt-xs">
-                              <q-badge color="blue-grey" class="q-mr-sm">
-                                {{ invite.access_level }}
-                              </q-badge>
-                              <template v-if="invite.role_id">
-                                <q-badge color="teal">
-                                  {{ getRoleName(invite.role_id) }}
-                                </q-badge>
-                              </template>
-                            </q-item-label>
-                          </q-item-section>
-                          <q-item-section side>
-                            <q-btn
-                              color="negative"
-                              flat
-                              round
-                              dense
-                              icon="cancel"
-                              @click="cancelInvite(invite.id)"
-                              :loading="processingInvite === invite.id"
-                            >
-                              <q-tooltip>Cancel Invite</q-tooltip>
-                            </q-btn>
-                          </q-item-section>
-                        </q-item>
-                      </q-list>
-
-                      <div class="q-mt-md text-right">
-                        <q-btn
-                          label="Invite Another User"
-                          color="primary"
-                          size="sm"
-                          icon="person_add"
-                          @click.stop="openInviteDialog(dataset)"
-                        />
-                      </div>
-                    </div>
-                  </q-tab-panel>
-                  <q-tab-panel name="delete" class="q-pa-md">
-                    <div class="text-h6 text-negative q-mb-sm">
-                      Delete Dataset
-                    </div>
-                    <p class="q-mb-sm">
-                      This action will permanently delete the dataset and
-                      templates and
-                      <strong>cannot</strong> be undone. Only the owner can
-                      perform this operation. Please enter your password to
-                      confirm.
-                    </p>
-
-                    <q-input
-                      v-model="deletePw"
-                      type="password"
-                      dense
-                      input-class="maintext"
-                      label-color="secondary"
-                      label="Password"
-                      class="q-mb-md text-center"
-                    />
-                    <q-btn
-                      color="negative"
-                      label="DELETE DATASET"
-                      @click="handleDelete(dataset)"
-                    />
-                  </q-tab-panel>
-                  <q-tab-panel name="delete" class="q-pa-md">
-                    <div class="text-h6 text-negative q-mb-sm">
-                      Delete Dataset
-                    </div>
-                    <p class="q-mb-sm">
-                      This action will permanently delete the dataset and
-                      templates and
-                      <strong>cannot</strong> be undone. Only the owner can
-                      perform this operation. Please enter your password to
-                      confirm.
-                    </p>
-
-                    <q-input
-                      v-model="deletePw"
-                      type="password"
-                      dense
-                      input-class="maintext"
-                      label-color="secondary"
-                      label="Password"
-                      class="q-mb-md text-center"
-                    />
-                    <q-btn
-                      color="negative"
-                      label="DELETE DATASET"
-                      @click="handleDelete(dataset)"
-                    />
-                  </q-tab-panel>
-                  <q-tab-panel name="backup" class="q-pa-md text-center">
-                    <q-btn
-                      color="primary"
-                      label="Download Database"
-                      class="q-mr-sm"
-                      @click="downloadDb(dataset)"
-                    />
-                    <q-btn
-                      color="accent"
-                      label="Download Templates"
-                      @click="downloadTemplates(dataset)"
-                    />
-                  </q-tab-panel>
-                </q-tab-panels>
-              </q-card>
-            </q-expansion-item>
-          </q-list>
         </div>
 
         <!-- Dialog for Adding/Editing a Role -->
@@ -1736,6 +1299,8 @@ async function handleLogout() {
   Cookies.remove("sessionkey");
   await router.push("/login");
 }
+
+const dropbox_id = ref();
 
 // Fetch datasets from the API and process roles/users data
 const getDatasets = async () => {
