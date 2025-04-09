@@ -349,7 +349,7 @@
         <!-- Totals Row -->
         <template v-slot:bottom-row>
           <q-tr class="totals-row">
-            <q-td v-for="col in columns" :key="col.name">
+            <q-td v-for="col in columns" align-right :key="col.name">
               <template
                 v-if="
                   [
@@ -992,20 +992,6 @@ onMounted(async () => {
   text-align: left;
   background-color: var(--q-maintext);
   color: var(--q-mainbg);
-}
-
-:deep(.totals-row td[class*="amount"]),
-:deep(.totals-row td[class*="paid"]),
-:deep(.totals-row td[class*="tax"]),
-:deep(.totals-row td[class*="paymentdiff"]) {
-  text-align: right !important;
-}
-
-:deep(.q-table tbody td[class*="amount"]),
-:deep(.q-table tbody td[class*="paid"]),
-:deep(.q-table tbody td[class*="tax"]),
-:deep(.q-table tbody td[class*="paymentdiff"]) {
-  text-align: right;
 }
 
 :deep(.q-virtual-scroll__content) {

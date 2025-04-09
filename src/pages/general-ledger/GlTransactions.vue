@@ -27,7 +27,7 @@
           dense
         />
         <q-input
-          v-model="formData.companyName"
+          v-model="formData.name"
           class="lightbg q-my-md"
           :label="t('Company Name')"
           input-class="maintext"
@@ -233,7 +233,6 @@
         :columns="displayColumns"
         row-key="id"
         :rows-per-page-options="[0]"
-        virtual-scroll-slice-size="500"
       >
         <!-- Custom body slot: group header, subtotal and normal rows -->
         <template v-slot:body="props">
@@ -750,7 +749,7 @@ const loadParams = () => {
   const simpleParams = [
     "reference",
     "description",
-    "companyName",
+    "name",
     "lineitem",
     "source",
     "memo",

@@ -1658,6 +1658,7 @@ const postInvoice = async (save = false) => {
         cost: line.cost,
         project: line.project,
       })),
+    shipto: shipto.value,
     payments: payments.value.map((payment) => ({
       date: payment.date,
       source: payment.source,
