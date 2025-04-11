@@ -33,6 +33,7 @@ const SignUp = () => import("src/pages/Signup.vue");
 const ErrorNotFound = () => import("src/pages/ErrorNotFound.vue");
 const Roles = () => import("src/pages/system/Roles.vue");
 const Employees = () => import("src/pages/system/Employees.vue");
+const Connections = () => import("src/pages/Connections.vue");
 
 const routes = [
   {
@@ -266,6 +267,10 @@ const routes = [
     ],
   },
   {
+    path: "/connection",
+    component: Connections,
+  },
+  {
     path: "/client/:client/login",
     component: LoginPage,
   },
@@ -273,6 +278,7 @@ const routes = [
     path: "/login",
     component: LoginPage,
   },
+
   {
     path: "/signup",
     component: SignUp,

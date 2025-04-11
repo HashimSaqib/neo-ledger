@@ -592,12 +592,62 @@
                   />
                 </q-tab-panel>
                 <q-tab-panel name="connections" class="q-pa-md text-center">
-                  <q-btn
-                    color="primary"
-                    label="Link Dropbox"
-                    class="q-mr-sm"
-                    href=""
-                  />
+                  <!-- Active Dropbox Connection -->
+                  <div
+                    v-if="
+                      dataset.connections.length > 0 &&
+                      dataset.connections[0].connection_status === 'active'
+                    "
+                    class="q-pa-md"
+                  >
+                    <q-icon name="check_circle" color="green" size="3em" />
+                    <div class="text-h5 q-mt-sm">Dropbox Connection Active</div>
+                  </div>
+
+                  <!-- Dropbox Connection with Error -->
+                  <div
+                    v-else-if="
+                      dataset.connections.length > 0 &&
+                      dataset.connections[0].connection_status === 'error'
+                    "
+                    class="q-pa-md"
+                  >
+                    <q-icon name="error_outline" color="red" size="3em" />
+                    <div class="text-h5 q-mt-sm">Connection Disabled</div>
+                    <div class="q-mt-sm text-subtitle2">
+                      Error: {{ dataset.connections[0].error }}
+                    </div>
+                    <q-btn
+                      dense
+                      label="Reconnect Dropbox"
+                      color="primary"
+                      icon="folder"
+                      :href="`https://www.dropbox.com/oauth2/authorize?client_id=${
+                        dataset.DROPBOX_KEY
+                      }&response_type=code&state=${
+                        dataset.db_name
+                      }&token_access_type=offline&redirect_uri=${encodeURIComponent(
+                        redirectUrl
+                      )}/connection`"
+                    />
+                  </div>
+
+                  <!-- No Dropbox Connection Found -->
+                  <div v-else class="q-pa-md">
+                    <q-btn
+                      dense
+                      label="Connect Dropbox"
+                      color="primary"
+                      icon="folder"
+                      :href="`https://www.dropbox.com/oauth2/authorize?client_id=${
+                        dataset.DROPBOX_KEY
+                      }&response_type=code&state=${
+                        dataset.db_name
+                      }&token_access_type=offline&redirect_uri=${encodeURIComponent(
+                        redirectUrl
+                      )}/connection`"
+                    />
+                  </div>
                 </q-tab-panel>
                 <q-tab-panel name="backup" class="q-pa-md text-center">
                   <q-btn
@@ -1300,8 +1350,6 @@ async function handleLogout() {
   await router.push("/login");
 }
 
-const dropbox_id = ref();
-
 // Fetch datasets from the API and process roles/users data
 const getDatasets = async () => {
   try {
@@ -1678,9 +1726,10 @@ const removeUserAccess = async () => {
   }
 };
 
+const redirectUrl = ref();
 onMounted(() => {
-  // Fetch datasets and invites on component mount
   getDatasets();
+  redirectUrl.value = window.location.origin;
 });
 
 // Open dialog to add a new role
