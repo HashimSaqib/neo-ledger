@@ -592,47 +592,63 @@
                   />
                 </q-tab-panel>
                 <q-tab-panel name="connections" class="q-pa-md text-center">
-                  <!-- Active Dropbox Connection -->
-                  <div
-                    v-if="
-                      dataset.connections.length > 0 &&
-                      dataset.connections[0].connection_status === 'active'
-                    "
-                    class="q-pa-md"
-                  >
-                    <q-icon name="check_circle" color="green" size="3em" />
-                    <div class="text-h5 q-mt-sm">Dropbox Connection Active</div>
-                  </div>
-
-                  <!-- Dropbox Connection with Error -->
-                  <div
-                    v-else-if="
-                      dataset.connections.length > 0 &&
-                      dataset.connections[0].connection_status === 'error'
-                    "
-                    class="q-pa-md"
-                  >
-                    <q-icon name="error_outline" color="red" size="3em" />
-                    <div class="text-h5 q-mt-sm">Connection Disabled</div>
-                    <div class="q-mt-sm text-subtitle2">
-                      Error: {{ dataset.connections[0].error }}
+                  <!-- If there is a connection (active or error) -->
+                  <div v-if="dataset.connections.length > 0">
+                    <!-- Display active connection -->
+                    <div
+                      v-if="dataset.connections[0].status === 'active'"
+                      class="q-pa-md"
+                    >
+                      <q-icon name="check_circle" color="green" size="3em" />
+                      <div class="text-h5 q-mt-sm">
+                        {{
+                          dataset.connections[0].type === "dropbox"
+                            ? "Dropbox"
+                            : "Google Drive"
+                        }}
+                        Connection Active
+                      </div>
                     </div>
-                    <q-btn
-                      dense
-                      label="Reconnect Dropbox"
-                      color="primary"
-                      icon="folder"
-                      :href="`https://www.dropbox.com/oauth2/authorize?client_id=${
-                        dataset.DROPBOX_KEY
-                      }&response_type=code&state=${
-                        dataset.db_name
-                      }&token_access_type=offline&redirect_uri=${encodeURIComponent(
-                        redirectUrl
-                      )}/connection`"
-                    />
+
+                    <!-- Display connection with error and reconnect button -->
+                    <div
+                      v-else-if="dataset.connections[0].status === 'error'"
+                      class="q-pa-md"
+                    >
+                      <q-icon name="error_outline" color="red" size="3em" />
+                      <div class="text-h5 q-mt-sm">Connection Disabled</div>
+                      <div class="q-mt-sm text-subtitle2">
+                        Error: {{ dataset.connections[0].error }}
+                      </div>
+                      <q-btn
+                        dense
+                        :label="`Reconnect ${
+                          dataset.connections[0].type === 'dropbox'
+                            ? 'Dropbox'
+                            : 'Google Drive'
+                        }`"
+                        color="primary"
+                        icon="folder"
+                        :href="
+                          dataset.connections[0].type === 'dropbox'
+                            ? `https://www.dropbox.com/oauth2/authorize?client_id=${
+                                dataset.DROPBOX_KEY
+                              }&response_type=code&state=${
+                                dataset.db_name
+                              }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
+                                redirectUrl
+                              )}/connection`
+                            : `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&response_type=code&scope=https://www.googleapis.com/auth/drive.file&state=${
+                                dataset.db_name
+                              }|dropbox&access_type=offline&redirect_uri=${encodeURIComponent(
+                                redirectUrl
+                              )}/connection`
+                        "
+                      />
+                    </div>
                   </div>
 
-                  <!-- No Dropbox Connection Found -->
+                  <!-- If no connection exists, provide options for both services -->
                   <div v-else class="q-pa-md">
                     <q-btn
                       dense
@@ -643,12 +659,27 @@
                         dataset.DROPBOX_KEY
                       }&response_type=code&state=${
                         dataset.db_name
-                      }&token_access_type=offline&redirect_uri=${encodeURIComponent(
+                      }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
+                        redirectUrl
+                      )}/connection`"
+                    />
+                    <q-btn
+                      dense
+                      label="Connect Google Drive"
+                      color="primary"
+                      icon="folder"
+                      class="q-ml-md"
+                      :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${
+                        dataset.GOOGLE_CLIENT_ID
+                      }&response_type=code&scope=https://www.googleapis.com/auth/drive.file&state=${
+                        dataset.db_name
+                      }|google_drive&access_type=offline&redirect_uri=${encodeURIComponent(
                         redirectUrl
                       )}/connection`"
                     />
                   </div>
                 </q-tab-panel>
+
                 <q-tab-panel name="backup" class="q-pa-md text-center">
                   <q-btn
                     color="primary"
