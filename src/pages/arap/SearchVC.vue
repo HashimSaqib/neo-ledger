@@ -9,6 +9,21 @@
       >
         <!-- Basic Info Section -->
         <div class="row q-mt-md q-gutter-md">
+          <s-select
+            class="lightbg col-6 col-md-3"
+            v-model="formData.dropdown"
+            :label="nameLabel"
+            input-class="maintext"
+            label-color="secondary"
+            outlined
+            dense
+            :options="vCList"
+            option-label="label"
+            option-value="name"
+            search="label"
+            map-options
+            emit-value
+          />
           <q-input
             v-model="formData.name"
             class="lightbg col-6 col-md-3"
@@ -504,6 +519,23 @@ const isAnyTransactionTypeSelected = computed(() => {
   );
 });
 
+const vCList = ref([]);
+const fetchLinks = async () => {
+  try {
+    const response = await api.get(`/create_links/${vcType.value}/`);
+    vcType.value === "customer"
+      ? (vCList.value = response.data.customers)
+      : (vCList.value = response.data.vendors);
+  } catch (error) {
+    console.error("Failed to fetch links:", error);
+    Notify.create({
+      message: t("Failed to fetch links"),
+      type: "negative",
+      position: "center",
+    });
+  }
+};
+
 // ----------------------------------------------------
 //  finalColumns
 //    1) Start with baseColumns that survived updateVCSettings() (only relevant columns).
@@ -591,8 +623,18 @@ async function search() {
     const endpoint =
       vcType.value === "vendor" ? "/arap/vendor/" : "/arap/customer/";
     const params = flattenParams(formData.value);
+    params.name = formData.value.dropdown;
     const resp = await api.get(endpoint, { params });
-    results.value = resp.data;
+    if (resp.data) {
+      results.value = resp.data;
+    } else {
+      results.value = [];
+      Notify.create({
+        message: t("No Results Found"),
+        type: "negative",
+        position: "center",
+      });
+    }
     filtersOpen.value = false;
   } catch (err) {
     console.error(err);
@@ -781,13 +823,14 @@ function updateVCSettings() {
 // ----------------------------------------------------
 //  Lifecycle
 // ----------------------------------------------------
-onMounted(() => {
-  updateVCSettings();
+onMounted(async () => {
   if (updateTitle) {
     updateTitle(
       vcType.value === "vendor" ? "Search Vendors" : "Search Customers"
     );
   }
+  await fetchLinks();
+  updateVCSettings(); // Initialize baseColumns and selectedColumns on mount
 });
 
 watch(
