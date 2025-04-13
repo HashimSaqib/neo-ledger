@@ -473,6 +473,13 @@ const baseColumns = ref([
     align: "left",
   },
   {
+    name: "status",
+    label: "Status",
+    field: "status",
+    default: true,
+    align: "left",
+  },
+  {
     name: "name",
     label: partyListLabel.value.slice(0, -1), // singular version e.g. "Customer" or "Vendor"
     field: "name",

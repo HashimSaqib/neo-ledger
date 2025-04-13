@@ -343,7 +343,7 @@
             </template>
           </q-list>
           <!-- Assets Subtotal Row -->
-          <q-item class="q-pa-sm items-center">
+          <q-item class="q-pa-xs items-center">
             <q-item-section>{{ t("Total Assets") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
@@ -356,8 +356,8 @@
         </div>
 
         <!-- Liabilities Section -->
-        <div class="q-mt-md">
-          <div class="text-h5 text-primary q-mb-md">{{ t("Liabilities") }}</div>
+        <div class="q-mt-sm">
+          <div class="text-h5 text-primary q-mb-sm">{{ t("Liabilities") }}</div>
           <q-separator />
           <q-list bordered separator>
             <!-- Iterate over liability accounts (hidden accounts already excluded) -->
@@ -405,7 +405,7 @@
             </template>
           </q-list>
           <!-- Liabilities Subtotal Row -->
-          <q-item class="q-pa-sm items-center">
+          <q-item class="q-pa-xs items-center">
             <q-item-section>{{ t("Total Liabilities") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
@@ -466,7 +466,7 @@
             </template>
           </q-list>
           <!-- Current Earnings Row -->
-          <q-item class="q-pa-sm items-center">
+          <q-item class="q-pa-xs items-center">
             <q-item-section>{{ t("Current Earnings") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
@@ -483,7 +483,7 @@
             </q-item-section>
           </q-item>
           <!-- Updated Total Equity Row -->
-          <q-item class="q-pa-sm items-center">
+          <q-item class="q-pa-xs items-center">
             <q-item-section>{{ t("Total Equity") }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
@@ -498,8 +498,26 @@
               }}
             </q-item-section>
           </q-item>
+          <!-- New: Total Liabilities + Equity Row -->
+          <q-item class="q-pa-xs items-center">
+            <q-item-section>{{
+              t("Total Liabilities + Equity")
+            }}</q-item-section>
+            <q-item-section
+              v-for="period in results.periods"
+              :key="period.label"
+              class="col text-right text-bold"
+            >
+              {{
+                formatAmountCustom(
+                  sumAccounts(liabilityAccounts, period.label) +
+                    sumAccounts(equityAccounts, period.label)
+                )
+              }}
+            </q-item-section>
+          </q-item>
         </div>
-        <!-- Note: The "Total Liabilities and Equity" row has been removed -->
+        <!-- (Removed the previous note about "Total Liabilities and Equity" being removed.) -->
       </q-card-section>
     </q-card>
   </q-page>
@@ -584,8 +602,6 @@ const formattedDateRange = computed(() => {
 
 /* ============================================================================
    Computed properties for each account group.
-   • For assets we “flip” the sign by multiplying by –1.
-   • For all groups, we exclude any account with charttype === "H"
 ============================================================================ */
 const assetAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
@@ -664,21 +680,14 @@ const equityAccounts = computed(() => {
 
 /* ============================================================================
    Helper Functions for Formatting
+   - Negative values now use the default minus sign rather than wrapping with parentheses.
 ============================================================================ */
 const formatAmountCustom = (value) => {
-  const formatted = formatAmount(value);
-  if (value < 0) {
-    return `(${formatted.replace("-", "")})`;
-  }
-  return formatted;
+  return formatAmount(value);
 };
 
 const roundAmountCustom = (value) => {
-  const rounded = roundAmount(value);
-  if (rounded < 0) {
-    return `(${Math.abs(rounded)})`;
-  }
-  return rounded;
+  return roundAmount(value);
 };
 
 /* ============================================================================
@@ -692,7 +701,7 @@ const sumAccounts = (accountsArray, periodLabel) => {
 };
 
 /* ============================================================================
-   Period-related functions and report generation remain unchanged
+   Period-related functions and report generation.
 ============================================================================ */
 const updatePeriod = (period) => {
   if (formData.value.periodMode === "current") {
@@ -747,7 +756,7 @@ const addPeriod = () => {
   const allowedYears = yearOptions.map((y) => parseInt(y.value, 10));
   const minYear = Math.min(...allowedYears);
 
-  // Helper function to format date (e.g., YYYY-MM-DD). Adjust if your format differs.
+  // Helper function to format date (e.g., YYYY-MM-DD)
   const formatDate = (date) => {
     if (typeof date === "string") {
       if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
@@ -801,51 +810,43 @@ const addPeriod = () => {
       const newDateStr = formatDate(lastDate);
       newPeriod = { ...lastPeriod, todate: newDateStr, label: newDateStr };
     } else if (formData.value.periodMode === "monthly") {
-      // Assume lastPeriod.month is stored like "01", "02", ... "12"
       let year = Number(lastPeriod.year);
-      let month = Number(lastPeriod.month); // Convert "01" -> 1 etc.
-
+      let month = Number(lastPeriod.month);
       month -= 1;
       if (month === 0) {
         month = 12;
         year -= 1;
       }
-
       if (year < minYear) {
         console.warn(
           `Cannot add period before minimum allowed year (${minYear}).`
         );
         return;
       }
-
       newPeriod = {
         ...lastPeriod,
-        month: String(month).padStart(2, "0"), // Format back to "01", "12" etc.
+        month: String(month).padStart(2, "0"),
         year: year.toString(),
         todate: "",
         label: "",
       };
     } else if (formData.value.periodMode === "quarterly") {
-      // Assume lastPeriod.quarter is "Q1", "Q2", etc.
       let year = Number(lastPeriod.year);
-      let quarter = parseInt(lastPeriod.quarter.substring(1), 10); // Get 1, 2, 3, 4
-
+      let quarter = parseInt(lastPeriod.quarter.substring(1), 10);
       quarter -= 1;
       if (quarter === 0) {
         quarter = 4;
         year -= 1;
       }
-
       if (year < minYear) {
         console.warn(
           `Cannot add period before minimum allowed year (${minYear}).`
         );
         return;
       }
-
       newPeriod = {
         ...lastPeriod,
-        quarter: "Q" + quarter, // Format back to "Q1", "Q4" etc.
+        quarter: "Q" + quarter,
         year: year.toString(),
         todate: "",
         label: "",
@@ -853,40 +854,33 @@ const addPeriod = () => {
     } else if (formData.value.periodMode === "yearly") {
       let year = Number(lastPeriod.year);
       year = year - 1;
-
       if (year < minYear) {
         console.warn(
           `Cannot add period before minimum allowed year (${minYear}).`
         );
         return;
       }
-      // Ensure year is string, copy other potential fields from lastPeriod
       newPeriod = { ...lastPeriod, year: year.toString() };
     } else if (formData.value.periodMode === "custom") {
       newPeriod = { ...lastPeriod };
     }
   } else {
-    // --- Logic for adding the *first* period ---
-    // Use consistent formatting based on options/helpers
-    const today = formatDate(now); // e.g., '2024-07-17'
-    const currentYear = now.getFullYear().toString(); // e.g., '2024'
-    // Use padStart to match monthOptions.value format ("01", "07", etc.)
+    const today = formatDate(now);
+    const currentYear = now.getFullYear().toString();
     const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
-    // Format matches quarterOptions.value format ("Q1", "Q3", etc.)
     const currentQuarter = "Q" + (Math.floor(now.getMonth() / 3) + 1);
-
     if (formData.value.periodMode === "current") {
       newPeriod = { todate: today, label: today };
     } else if (formData.value.periodMode === "monthly") {
       newPeriod = {
-        month: currentMonth, // Use consistently formatted month
+        month: currentMonth,
         year: currentYear,
         todate: "",
         label: "",
       };
     } else if (formData.value.periodMode === "quarterly") {
       newPeriod = {
-        quarter: currentQuarter, // Use consistently formatted quarter
+        quarter: currentQuarter,
         year: currentYear,
         todate: "",
         label: "",
@@ -973,10 +967,8 @@ const getPath = (accno, period) => {
       "0"
     )}`;
   }
-
   const project = formData.value.projectnumber || "";
   const department = formData.value.department || "";
-
   const params = new URLSearchParams({
     accno,
     todate,
@@ -1091,7 +1083,16 @@ const downloadExcel = () => {
   });
   exportData.push(equityTotalRow);
 
-  // Note: The "Total Liabilities and Equity" row has been removed.
+  // New row: Total Liabilities + Equity
+  let liabEquityTotalRow = ["Total Liabilities + Equity"];
+  periods.forEach((period) => {
+    const totalLiabEquity =
+      sumAccounts(liabilityAccounts.value, period.label) +
+      sumAccounts(equityAccounts.value, period.label);
+    liabEquityTotalRow.push(roundAmountCustom(totalLiabEquity));
+  });
+  exportData.push(liabEquityTotalRow);
+
   const worksheet = utils.aoa_to_sheet(exportData);
   worksheet["!merges"] = worksheet["!merges"] || [];
   groupHeaderIndices.forEach((rowIdx) => {
