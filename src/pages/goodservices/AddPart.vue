@@ -671,12 +671,13 @@ const componentId = computed(
 const componentType = computed(() => props.type ?? route.params.type);
 const type = ref(componentType.value || "part");
 
-if (type.value === "part") {
-  updateTitle(t("Add Part"));
-} else if (type.value === "service") {
-  updateTitle(t("Add Service"));
+if (!props.type) {
+  if (type.value === "part") {
+    updateTitle(t("Add Part"));
+  } else if (type.value === "service") {
+    updateTitle(t("Add Service"));
+  }
 }
-
 const formRef = ref(null);
 const saveAsNew = ref(false);
 
@@ -824,8 +825,9 @@ const loadData = async () => {
     const response = await api.get(`/ic/items/${id}`);
     const data = response.data;
     type.value = data.item;
-    updateTitle(`${t("Edit")} ${t(type.value)}`);
-
+    if (!props.type) {
+      updateTitle(`${t("Edit")} ${t(type.value)}`);
+    }
     // Basic fields
     form.value.partnumber = data.partnumber;
     form.value.description = data.description;

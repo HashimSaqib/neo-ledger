@@ -280,6 +280,24 @@
           @click="addLine"
           class="q-ml-md"
         />
+        <q-btn
+          color="secondary"
+          icon="add"
+          dense
+          flat
+          :label="t('Add Part')"
+          @click="openAddPart('part')"
+          class="q-ml-md"
+        />
+        <q-btn
+          color="secondary"
+          icon="add"
+          dense
+          flat
+          :label="t('Add Service')"
+          @click="openAddPart('service')"
+          class="q-ml-md"
+        />
       </div>
       <draggable
         v-model="lines"
@@ -310,7 +328,6 @@
                 search="label"
                 :ref="(el) => (lineSelects[index] = el)"
               />
-              <!-- Edit Product Button -->
 
               <s-select
                 v-if="!line.partnumber"
@@ -879,6 +896,11 @@ const openEditPart = (line) => {
   // Determine type based on inventory_accno_id property
   selectedPartType.value =
     line.partnumber && line.partnumber.inventory_accno_id ? "part" : "service";
+  partDialog.value = true;
+};
+const openAddPart = (type) => {
+  // Determine type based on inventory_accno_id property
+  selectedPartType.value = type;
   partDialog.value = true;
 };
 const closePartDialog = () => {
