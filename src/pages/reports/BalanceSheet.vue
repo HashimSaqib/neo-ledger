@@ -226,6 +226,14 @@
               color="primary"
               dense
             />
+            <q-checkbox
+              v-model="formData.accounttype"
+              :label="t('GIFI')"
+              color="primary"
+              dense
+              true-value="gifi"
+              false-value="standard"
+            />
           </div>
 
           <!-- Submit Button -->

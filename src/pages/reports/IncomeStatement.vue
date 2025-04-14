@@ -278,6 +278,14 @@
               color="primary"
               dense
             />
+            <q-checkbox
+              v-model="formData.accounttype"
+              :label="t('GIFI')"
+              color="primary"
+              dense
+              true-value="gifi"
+              false-value="standard"
+            />
           </div>
 
           <!-- Submit Button -->
@@ -332,7 +340,7 @@
           <q-item class="q-pa-xs q-my-none">
             <!-- Display static header text instead of account.accno -->
             <q-item-section v-if="formData.l_accno" avatar>
-              <q-badge color="primary">{{ t("Acc No") }}</q-badge>
+              {{ t("Acc No") }}
             </q-item-section>
             <q-item-section>{{ t("Description") }}</q-item-section>
             <q-item-section
@@ -355,7 +363,7 @@
               >
                 <!-- Show account number as plain text -->
                 <q-item-section v-if="formData.l_accno" avatar>
-                  <q-badge color="primary">{{ account.accno }}</q-badge>
+                  {{ account.accno }}
                 </q-item-section>
                 <q-item-section>{{ account.description }}</q-item-section>
                 <!-- For each period, render the amount as a clickable link if applicable -->
@@ -432,7 +440,7 @@
               >
                 <!-- Show account number as plain text -->
                 <q-item-section v-if="formData.l_accno" avatar>
-                  <q-badge color="primary">{{ account.accno }}</q-badge>
+                  {{ account.accno }}
                 </q-item-section>
                 <q-item-section>{{ account.description }}</q-item-section>
                 <!-- For each period, render the expense amount as a clickable link if applicable -->
