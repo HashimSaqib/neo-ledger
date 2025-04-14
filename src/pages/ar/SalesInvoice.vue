@@ -73,6 +73,8 @@
                   outlined
                   dense
                   class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
                 />
                 <q-input
                   v-model="shipto.address1"
@@ -80,6 +82,8 @@
                   outlined
                   dense
                   class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
                 />
                 <q-input
                   v-model="shipto.address2"
@@ -87,6 +91,8 @@
                   outlined
                   dense
                   class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
                 />
                 <q-input
                   v-model="shipto.city"
@@ -94,6 +100,8 @@
                   outlined
                   dense
                   class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
                 />
                 <q-input
                   v-model="shipto.state"
@@ -101,6 +109,8 @@
                   outlined
                   dense
                   class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
                 />
                 <q-input
                   v-model="shipto.zip"
@@ -108,6 +118,8 @@
                   outlined
                   dense
                   class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
                 />
               </div>
             </q-expansion-item>
@@ -750,13 +762,19 @@
     <q-btn
       :label="t('Post')"
       color="primary"
-      @click="postInvoice"
+      @click="postInvoice((save = false), (isNew = false))"
       class="relative-position q-mr-md"
     />
     <q-btn
       :label="t('Save')"
       color="primary"
-      @click="postInvoice(true)"
+      @click="postInvoice((save = true), (isNew = false))"
+      class="relative-position q-mr-md"
+    />
+    <q-btn
+      :label="t('Save As New')"
+      color="primary"
+      @click="postInvoice((save = true), (isNew = true))"
       class="relative-position q-mr-md"
     />
     <q-btn
@@ -1511,6 +1529,22 @@ const loadInvoice = async (invoice) => {
       exchangerate: payment.exchangerate,
     };
   });
+  const shiptoFields = [
+    "name",
+    "address1",
+    "address2",
+    "city",
+    "state",
+    "zipcode",
+    "country",
+    "contact",
+    "phone",
+    "fax",
+    "email",
+  ];
+  shiptoFields.forEach((field) => {
+    shipto.value[field] = invoice.shipto[`${field}`];
+  });
   if (payments.value.length === 0) {
     addPayment();
   }
@@ -1605,7 +1639,7 @@ const deleteInvoice = async () => {
     console.error(error);
   }
 };
-const postInvoice = async (save = false) => {
+const postInvoice = async (save = false, isNew = false) => {
   if (!selectedCustomer.value) {
     Notify.create({
       message: t("Customer is required."),
@@ -1704,11 +1738,14 @@ const postInvoice = async (save = false) => {
     }));
     invoiceData.taxincluded = taxIncluded.value;
   }
-  console.log("Invoice Data:", invoiceData);
+  const idParam = ref(invId.value);
+  if (isNew) {
+    idParam.value = "";
+  }
   try {
     loading.value = true;
     const response = await api.post(
-      `/arap/invoice/customer/${invId.value}`,
+      `/arap/invoice/customer/${idParam.value}`,
       invoiceData
     );
     Notify.create({

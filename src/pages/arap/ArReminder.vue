@@ -42,7 +42,23 @@
       </q-expansion-item>
     </q-form>
 
-    <!-- Export buttons -->
+    <!-- Bulk Update Buttons (visible when one or more rows are selected) -->
+    <div class="row q-mb-sm hide-print" v-if="selected.length">
+      <q-btn
+        :label="t('One Level Up')"
+        @click="bulkUpdate('up')"
+        class="q-mr-sm"
+        color="accent"
+      />
+      <q-btn
+        :label="t('One Level Down')"
+        @click="bulkUpdate('down')"
+        class="q-mr-sm"
+        color="info"
+      />
+    </div>
+
+    <!-- Export Buttons -->
     <div class="row q-mb-sm hide-print" v-if="results.length > 0">
       <q-btn
         :label="t('Export')"
@@ -58,7 +74,7 @@
       />
     </div>
 
-    <!-- Transactions Table -->
+    <!-- Transactions Table with Selection -->
     <q-table
       :rows="results"
       :columns="columns"
@@ -70,7 +86,10 @@
       :rows-per-page-options="[0]"
       virtual-scroll-sticky-end
       hide-bottom
+      selection="multiple"
+      v-model:selected="selected"
     >
+      <!-- Level Column with Inline QSelect -->
       <template v-slot:body-cell-level="props">
         <q-td :props="props">
           <q-select
@@ -83,7 +102,7 @@
           />
         </q-td>
       </template>
-      <!-- Customer column: rendered as a clickable link using getVcPath -->
+      <!-- Customer Column (with clickable link) -->
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
           <router-link :to="getVcPath(props.row)" class="text-primary">
@@ -91,6 +110,7 @@
           </router-link>
         </q-td>
       </template>
+      <!-- Invoice Column (with clickable link) -->
       <template v-slot:body-cell-invoice="props">
         <q-td :props="props">
           <router-link :to="getPath(props.row)" class="text-primary">
@@ -98,10 +118,11 @@
           </router-link>
         </q-td>
       </template>
+      <!-- Due Amount Column -->
       <template v-slot:body-cell-due="props">
         <q-td :props="props">{{ formatAmount(props.row.due) }}</q-td>
       </template>
-      <!-- Add actions column with print button -->
+      <!-- Actions Column (Print Button) -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn
@@ -126,26 +147,28 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 import { formatAmount, downloadReport, createPDF } from "src/helpers/utils";
+
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle("Reminder");
+
 const route = useRoute();
 const router = useRouter();
 
 const customers = ref([]);
 const departments = ref([]);
 const results = ref([]);
+const selected = ref([]); // for selected rows in the table
 const formData = ref({});
 const loading = ref(false);
 const filtersOpen = ref(true);
 
+// Search function to fetch transactions based on search criteria
 const search = async () => {
   loading.value = true;
   try {
     const params = formData.value;
-    const response = await api.get(`/arap/reminder/customer`, {
-      params,
-    });
+    const response = await api.get(`/arap/reminder/customer`, { params });
     filtersOpen.value = false;
     if (!response.data.transactions) {
       Notify.create({
@@ -164,6 +187,7 @@ const search = async () => {
   }
 };
 
+// Fetch customer and department links for the search params
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/reminder`);
@@ -174,21 +198,26 @@ const fetchLinks = async () => {
   }
 };
 
-onMounted(() => {
-  fetchLinks();
+// On mounted, fetch the links and if the query parameter "search" equals "1",
+// map the remaining query parameters back to the form data and trigger a search.
+onMounted(async () => {
+  await fetchLinks();
+  if (route.query.search === "1") {
+    // Create a copy of the query parameters excluding the "search" key.
+    const queryParams = { ...route.query };
+    delete queryParams.search;
+    formData.value = queryParams;
+    search();
+  }
 });
 
-// Updated function to handle level updates using the new POST route
+// Function to update a single row's level using the new API which expects an items array
 const updateLevel = async (row, newLevel) => {
-  console.log("Updated level for row:", row, "New level:", newLevel);
   try {
-    // Send a POST request with the required parameters to update the level.
     await api.post(`/arap/reminder/customer`, {
-      client: formData.value.customer, // pass client if needed
-      id: row.id,
-      level: newLevel,
+      client: formData.value.customer,
+      items: [{ id: row.id, level: newLevel }],
     });
-    // Optionally, update the row locally
     row.level = newLevel;
     Notify.create({
       message: t("Level Updated"),
@@ -200,6 +229,45 @@ const updateLevel = async (row, newLevel) => {
   }
 };
 
+// Bulk update function for selected rows to either increase or decrease their levels
+const bulkUpdate = async (direction) => {
+  if (!selected.value.length) return;
+
+  // Map each selected row to a new level that is clamped between 1 and 3.
+  const items = selected.value.map((row) => {
+    const newLevel =
+      direction === "up"
+        ? Math.min(row.level + 1, 3)
+        : Math.max(row.level - 1, 1);
+    return { id: row.id, level: newLevel };
+  });
+
+  try {
+    await api.post(`/arap/reminder/customer`, {
+      client: formData.value.customer,
+      items,
+    });
+    // Update the local levels for the selected items, ensuring the level stays within 1-3.
+    selected.value.forEach((row) => {
+      if (direction === "up" && row.level < 3) {
+        row.level = Math.min(row.level + 1, 3);
+      } else if (direction === "down" && row.level > 1) {
+        row.level = Math.max(row.level - 1, 1);
+      }
+    });
+    Notify.create({
+      message: t(
+        `Levels Updated (${direction === "up" ? "Increased" : "Decreased"})`
+      ),
+      position: "center",
+      color: "positive",
+    });
+  } catch (error) {
+    console.error("Error bulk updating levels:", error);
+  }
+};
+
+// Function to print reminder for a given row
 const printReminder = async (row) => {
   row.printing = true;
   try {
@@ -224,6 +292,7 @@ const printReminder = async (row) => {
   }
 };
 
+// Table columns configuration
 const columns = [
   {
     name: "name",
@@ -279,6 +348,7 @@ const columns = [
 ];
 
 const exportColumns = columns.filter((col) => col.name !== "actions");
+
 const downloadExcel = () => {
   downloadReport(results.value, exportColumns);
 };
@@ -290,6 +360,8 @@ const downloadPDF = () => {
 };
 
 const createLink = inject("createLink");
+
+// Build a router link for the invoice depending on the row attributes
 const getPath = (row) => {
   let path = "";
   if (row.till) {
@@ -297,7 +369,7 @@ const getPath = (row) => {
   } else if (row.invoice) {
     path = createLink("customer.invoice");
   } else {
-    path = createLink("customer.tranaction");
+    path = createLink("customer.transaction");
   }
   const flatParams = formData.value;
   return {
@@ -305,100 +377,15 @@ const getPath = (row) => {
     query: {
       id: row.id,
       ...flatParams,
-      callback: createLink("base") + `/ar/reminder/`,
+      // Append callback link with search flag set to 1.
+      callback: createLink("base") + `/ar/reminder/?search=1`,
     },
   };
 };
 
+// Build a link for the customer view page
 function getVcPath(row) {
   const base = createLink("customer");
   return { path: base, query: { id: row.customer_id } };
 }
 </script>
-
-<style scoped>
-/* Condensed/dense layout adjustments */
-.drag-area {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-:deep(.q-table__container) {
-  height: calc(100vh - 180px);
-  position: relative;
-}
-
-:deep(.q-table thead) {
-  position: sticky;
-  z-index: 2;
-  top: 0;
-  background-color: var(--q-maintext);
-  color: var(--q-main g);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-}
-
-:deep(.q-table thead tr) {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-:deep(.q-table thead tr th) {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  font-weight: var(--q-font-weight-bolder);
-  background-color: var(--q-maintext);
-  color: var(--q-mainbg);
-}
-
-.q-table--loading {
-  opacity: 0.7;
-  transition: opacity 0.3s ease-in-out;
-}
-
-:deep(.totals-row) {
-  position: sticky !important;
-  bottom: 0 !important;
-  z-index: 2;
-  background-color: var(--q-maintext);
-  color: var(--q-mainbg);
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.12);
-}
-
-:deep(.totals-row td) {
-  position: sticky !important;
-  bottom: 0 !important;
-  font-weight: var(--q-font-weight-bolder);
-  text-align: left;
-  background-color: var(--q-maintext);
-  color: var(--q-mainbg);
-}
-
-:deep(.totals-row td[class*="amount"]),
-:deep(.totals-row td[class*="paid"]),
-:deep(.totals-row td[class*="tax"]),
-:deep(.totals-row td[class*="paymentdiff"]) {
-  text-align: right !important;
-}
-
-:deep(.q-table tbody td[class*="amount"]),
-:deep(.q-table tbody td[class*="paid"]),
-:deep(.q-table tbody td[class*="tax"]),
-:deep(.q-table tbody td[class*="paymentdiff"]) {
-  text-align: right;
-}
-
-:deep(.q-virtual-scroll__content) {
-  margin-bottom: 0 !important;
-}
-
-:deep(.q-table td) {
-  padding: 4px 8px;
-}
-
-.wrapped-description {
-  white-space: pre-wrap;
-  min-width: 10vw;
-}
-</style>
