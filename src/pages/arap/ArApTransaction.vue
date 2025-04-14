@@ -135,22 +135,27 @@
               </div>
               <div class="row">
                 <q-file
-                  v-model="selectedFile"
-                  :label="t('Choose File')"
+                  bg-color="input"
+                  label-color="secondary"
                   filled
                   dense
                   outlined
-                  input-class="maintext"
-                  class="lightbg q-mb-sm col-sm-7 col-12"
-                  :multiple="false"
-                  name="files"
-                />
-                <q-btn
-                  :label="t('Load Invoice')"
-                  color="primary"
-                  class="q-mb-sm q-ml-md-sm"
-                  @click="uploadInvoice"
-                  :disable="!selectedFile"
+                  v-model="files"
+                  label="Reference Documents"
+                  multiple
+                  append
+                  use-chips
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="attachment" />
+                  </template>
+                </q-file>
+              </div>
+              <div class="row q-mt-sm">
+                <FileList
+                  :files="existingFiles"
+                  module="gl"
+                  @file-deleted="handleFileDeletion"
                 />
               </div>
               <div class="row" v-if="link">
@@ -583,7 +588,8 @@ import { formatAmount, confirmDelete } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
-
+import FileList from "src/components/FileList.vue";
+import { jsonToFormData } from "src/helpers/formDataHelper.js";
 // -------------------------
 // Internationalization and Routing
 // -------------------------
@@ -1079,8 +1085,15 @@ const postInvoice = async () => {
   }
 
   const invoiceData = {
-    [type.value === "vendor" ? "selectedVendor" : "selectedCustomer"]:
-      selectedVc.value,
+    ...(type.value === "vendor"
+      ? {
+          vendor_id: selectedVc.value.id,
+          vendor: selectedVc.value.name,
+        }
+      : {
+          customer_id: selectedVc.value.id,
+          customer: selectedVc.value.name,
+        }),
     description: description.value,
     notes: notes.value,
     intnotes: intnotes.value,
@@ -1090,7 +1103,7 @@ const postInvoice = async () => {
     invDate: invDate.value,
     dueDate: dueDate.value,
     poNumber: poNumber.value,
-    recordAccount: recordAccount.value,
+    recordAccount: recordAccount.value.accno,
     selectedCurrency: selectedCurrency.value,
     curr: selectedCurrency.value.curr,
     type: transactionType.value,
@@ -1132,13 +1145,22 @@ const postInvoice = async () => {
     }));
     invoiceData.taxincluded = taxIncluded.value;
   }
+  if (files.value.length > 0) {
+    invoiceData.files = files.value;
+  }
 
   try {
     loading.value = true;
+    const formDataObj = jsonToFormData(invoiceData);
     const idParam = invId.value ? `/${invId.value}` : "";
     const response = await api.post(
       `/arap/transaction/${type.value}${idParam}`,
-      invoiceData
+      formDataObj,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     Notify.create({
       message: t("Transaction posted successfully"),
@@ -1211,7 +1233,6 @@ async function deleteTransaction(id) {
 const uploadInvoice = async () => {
   loading.value = true;
   const formData = new FormData();
-  formData.append("files", selectedFile.value);
   try {
     const response = await api.post("/upload_invoice", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -1247,7 +1268,8 @@ const fetchInvoice = async (id) => {
     }
   }
 };
-
+const files = ref([]);
+const existingFiles = ref([]);
 const loadInvoice = async (invoice) => {
   if (
     !vcList.value.length ||
@@ -1338,7 +1360,7 @@ const loadInvoice = async (invoice) => {
     invId.value = invoice.id;
     ordNumber.value = "";
     poNumber.value = "";
-
+    existingFiles.value = invoice.files;
     if (invoice.payments && invoice.payments.length > 0) {
       payments.value = invoice.payments.map((payment) => ({
         date: payment.date || getTodayDate(),
@@ -1373,6 +1395,9 @@ const loadInvoice = async (invoice) => {
   } finally {
     initialLoad.value = false;
   }
+};
+const handleFileDeletion = (index) => {
+  existingFiles.value.splice(index, 1);
 };
 
 // -------------------------

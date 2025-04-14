@@ -108,26 +108,11 @@
         </q-file>
       </div>
       <div class="row q-mt-sm">
-        <q-list bordered separator>
-          <q-item v-for="(file, index) in existingFiles" :key="index">
-            <q-item-section>
-              <a :href="file.link" target="_blank">
-                {{ file.name }}
-              </a>
-            </q-item-section>
-            <!-- Trash icon button next to each file -->
-            <q-item-section side>
-              <q-btn
-                dense
-                flat
-                icon="delete"
-                @click="deleteFile(file, index)"
-                color="negative"
-                round
-              />
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <FileList
+          :files="existingFiles"
+          module="gl"
+          @file-deleted="handleFileDeletion"
+        />
       </div>
     </div>
 
@@ -149,7 +134,6 @@
             account
             :ref="(el) => setAccountRef(el, index)"
           />
-
           <!-- Debit input -->
           <fn-input
             v-model="line.debit"
@@ -161,7 +145,6 @@
             dense
             @keydown.enter="handleEnter($event, index)"
           />
-
           <!-- Credit input -->
           <fn-input
             v-model="line.credit"
@@ -173,7 +156,6 @@
             dense
             @keydown.enter="handleEnter($event, index)"
           />
-
           <!-- Tax fields if Linetax is enabled -->
           <template v-if="lineTax">
             <s-select
@@ -203,7 +185,6 @@
               @keydown.enter="handleEnter($event, index)"
             />
           </template>
-
           <!-- Toggle Extra Fields Button -->
           <q-btn
             flat
@@ -212,7 +193,6 @@
             :class="line.showExtra ? 'rotate-180' : ''"
             @click="toggleExtra(index)"
           />
-
           <!-- Delete Line Button -->
           <q-btn
             color="negative"
@@ -241,7 +221,6 @@
               dense
               search="description"
             />
-
             <q-input
               v-model="line.source"
               :label="t('Source')"
@@ -325,6 +304,8 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
+import FileList from "src/components/FileList.vue";
+import { jsonToFormData } from "src/helpers/formDataHelper.js";
 
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
@@ -359,7 +340,6 @@ const initialLine = {
 };
 
 const formData = ref({ ...initialFormData });
-
 // -- Lines state includes showExtra to control visibility of source & memo --
 const lines = ref([{ ...initialLine }, { ...initialLine }]);
 
@@ -438,7 +418,6 @@ const toggleExtra = (index) => {
 const totalDebit = computed(() =>
   lines.value.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0)
 );
-
 const totalCredit = computed(() =>
   lines.value.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0)
 );
@@ -466,6 +445,8 @@ const filterProjects = () => {
   });
 };
 
+const currencies = ref([]);
+
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl");
@@ -485,6 +466,7 @@ const fetchLinks = async () => {
 };
 
 const loading = ref(false);
+
 /**
  * submitTransaction handles both saving and posting.
  * @param {boolean} clearAfter - When true, clear the form after posting.
@@ -512,27 +494,6 @@ const submitTransaction = async (clearAfter = false) => {
 
   loading.value = true;
 
-  // Create a FormData object for file handling
-  const formDataObj = new FormData();
-
-  // Add basic transaction data
-  formDataObj.append(
-    "curr",
-    typeof formData.value.currency === "object"
-      ? formData.value.currency.curr
-      : formData.value.currency
-  );
-
-  if (formData.value.exchangeRate) {
-    formDataObj.append("exchangeRate", parseFloat(formData.value.exchangeRate));
-  }
-
-  formDataObj.append("description", formData.value.description || "");
-  formDataObj.append("notes", formData.value.notes || "");
-  formDataObj.append("reference", formData.value.reference || "");
-  formDataObj.append("transdate", formData.value.transdate);
-
-  // Convert lines array to JSON and append
   const linesData = lines.value.map((line) => {
     let lineObj = {
       accno:
@@ -564,26 +525,29 @@ const submitTransaction = async (clearAfter = false) => {
     return lineObj;
   });
 
-  formDataObj.append("lines", JSON.stringify(linesData));
+  // Prepare payload for multipart conversion
+  const payload = {
+    curr:
+      typeof formData.value.currency === "object"
+        ? formData.value.currency.curr
+        : formData.value.currency,
+    exchangeRate: formData.value.exchangeRate
+      ? parseFloat(formData.value.exchangeRate)
+      : undefined,
+    description: formData.value.description || "",
+    notes: formData.value.notes || "",
+    reference: formData.value.reference || "",
+    transdate: formData.value.transdate,
+    lines: JSON.stringify(linesData),
+    department: formData.value.selectedDepartment
+      ? typeof formData.value.selectedDepartment === "object"
+        ? `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`
+        : formData.value.selectedDepartment
+      : undefined,
+    files: formData.value.files,
+  };
 
-  // Add department if selected
-  const { selectedDepartment } = formData.value;
-  if (selectedDepartment) {
-    formDataObj.append(
-      "department",
-      typeof selectedDepartment === "object"
-        ? `${selectedDepartment.description}--${selectedDepartment.id}`
-        : selectedDepartment
-    );
-  }
-
-  // Handle file attachments if present
-  if (formData.value.files && formData.value.files.length > 0) {
-    for (let i = 0; i < formData.value.files.length; i++) {
-      // Changed from "attachments" to "files" to match backend
-      formDataObj.append("files", formData.value.files[i]);
-    }
-  }
+  const formDataObj = jsonToFormData(payload);
 
   try {
     let response;
@@ -692,55 +656,9 @@ const loadTransaction = async (id) => {
   }
 };
 
-/**
- * Delete the provided file by sending a DELETE request.
- * @param {Object} file - The file object containing at least an id property.
- * @param {number} index - The index of the file in existingFiles.
- */
-const deleteFile = async (file, index) => {
-  try {
-    await api.delete(`files/gl/${file.id}`);
-
-    // Remove the file from the existingFiles array.
-    existingFiles.value.splice(index, 1);
-
-    Notify.create({
-      message: "File deleted successfully.",
-      type: "positive",
-      position: "center",
-    });
-  } catch (error) {
-    console.error("Failed to delete file:", error);
-    Notify.create({
-      message: "Failed to delete file.",
-      type: "negative",
-      position: "center",
-    });
-  }
-};
-
-const currencies = ref([]);
-
-const updateTaxAmount = (val, index) => {
-  if (!val || !val.accno) {
-    console.warn("Invalid value provided:", val);
-    return;
-  }
-  if (!taxAccounts || !taxAccounts.value) {
-    console.warn("taxAccounts is not available");
-    return;
-  }
-  const taxAcc = taxAccounts.value.find((item) => item.accno === val.accno);
-  if (!taxAcc || !taxAcc.rate) {
-    lines.value[index].linetaxamount = 0;
-    return;
-  }
-  let debit = parseFloat(lines.value[index].debit);
-  let credit = parseFloat(lines.value[index].credit);
-  if (isNaN(debit)) debit = 0;
-  if (isNaN(credit)) credit = 0;
-  let baseAmount = debit > 0 ? debit : credit;
-  lines.value[index].linetaxamount = baseAmount ? baseAmount * taxAcc.rate : 0;
+// Handler for file deletion event from the FileList component.
+const handleFileDeletion = (index) => {
+  existingFiles.value.splice(index, 1);
 };
 
 onMounted(async () => {
