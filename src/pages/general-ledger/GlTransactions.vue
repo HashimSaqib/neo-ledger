@@ -41,8 +41,6 @@
           outlined
           dense
           clearable
-          emit-value
-          map-options
         />
         <s-select
           v-if="vendors.length > 0"
@@ -58,8 +56,6 @@
           outlined
           dense
           clearable
-          emit-value
-          map-options
         />
         <q-input
           v-model="formData.name"
@@ -817,10 +813,12 @@ const search = async () => {
   try {
     loading.value = true;
     if (formData.value.customer) {
-      formData.value.name = formData.value.customer;
+      formData.value.name = formData.value.customer.name;
+      formData.value.vcnumber = formData.value.customer.customernumber;
     }
     if (formData.value.vendor) {
-      formData.value.name = formData.value.vendor;
+      formData.value.name = formData.value.vendor.name;
+      formData.value.vcnumber = formData.value.vendor.vendornumber;
     }
     // Flatten formData using the arrow function.
     const params = flattenParams(formData.value);
