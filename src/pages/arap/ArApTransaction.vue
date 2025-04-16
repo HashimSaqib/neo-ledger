@@ -1031,6 +1031,7 @@ const resetForm = () => {
   invoicePreview.value = null;
   selectedFile.value = null;
   splitterModel.value = 100;
+  existingFiles.value = [];
 };
 const postInvoice = async () => {
   if (!selectedVc.value) {

@@ -228,6 +228,7 @@
               class="col-sm-5 col-12 q-mb-sm"
             />
           </div>
+          <!-- New file upload section -->
         </div>
 
         <!-- Invoice Number and Date Fields -->
@@ -273,6 +274,31 @@
               outlined
               dense
               type="date"
+            />
+          </div>
+          <div class="row q-ml-lg q-mb-sm">
+            <q-file
+              bg-color="input"
+              label-color="secondary"
+              filled
+              dense
+              outlined
+              v-model="files"
+              label="Reference Documents"
+              multiple
+              append
+              use-chips
+            >
+              <template v-slot:prepend>
+                <q-icon name="attachment" />
+              </template>
+            </q-file>
+          </div>
+          <div class="row q-ml-lg q-mt-sm">
+            <FileList
+              :files="existingFiles"
+              module="ar"
+              @file-deleted="handleFileDeletion"
             />
           </div>
         </div>
@@ -878,6 +904,8 @@ import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import AddPart from "src/pages/goodservices/AddPart.vue";
+import { jsonToFormData } from "src/helpers/formDataHelper.js";
+import FileList from "src/components/FileList.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -1090,6 +1118,14 @@ const ordNumber = ref("");
 const poNumber = ref("");
 const shipto = ref({});
 const invId = ref(route.query.id ? `${route.query.id}` : "");
+// Add after the existing refs
+const files = ref(null);
+const existingFiles = ref([]);
+
+// Add after the existing methods
+const handleFileDeletion = (index) => {
+  existingFiles.value.splice(index, 1);
+};
 
 const { formatDate, addToDate } = date;
 const getTodayDate = () => {
@@ -1548,6 +1584,7 @@ const loadInvoice = async (invoice) => {
   if (payments.value.length === 0) {
     addPayment();
   }
+  existingFiles.value = invoice.files || [];
 };
 
 // =====================
@@ -1677,6 +1714,8 @@ const postInvoice = async (save = false, isNew = false) => {
   }
   const invoiceData = {
     selectedCustomer: selectedCustomer.value,
+    customer_id: selectedCustomer.value.id,
+    customer: selectedCustomer.value.name,
     shippingPoint: shippingPoint.value,
     shipVia: shipVia.value,
     wayBill: wayBill.value,
@@ -1688,8 +1727,8 @@ const postInvoice = async (save = false, isNew = false) => {
     invDate: invDate.value,
     dueDate: dueDate.value,
     poNumber: poNumber.value,
-    recordAccount: recordAccount.value,
-    selectedCurrency: selectedCurrency.value,
+    recordAccount: recordAccount.value.accno,
+    currency: selectedCurrency.value.curr,
     type: invType.value,
     lines: lines.value
       .filter((line) => line.partnumber && line.partnumber.id)
@@ -1723,6 +1762,7 @@ const postInvoice = async (save = false, isNew = false) => {
       account: payment.account ? payment.account.label : "",
       exchangerate: payment.exchangerate,
     })),
+    files: files.value,
   };
   if (selectedDepartment.value) {
     invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;
@@ -1744,9 +1784,15 @@ const postInvoice = async (save = false, isNew = false) => {
   }
   try {
     loading.value = true;
+    const formData = jsonToFormData(invoiceData);
     const response = await api.post(
       `/arap/invoice/customer/${idParam.value}`,
-      invoiceData
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     Notify.create({
       message: "Transaction posted successfully",
@@ -1756,6 +1802,7 @@ const postInvoice = async (save = false, isNew = false) => {
     const id = response.data.id;
     if (save) {
       fetchInvoice(id);
+      files.value = null;
     } else if (route.query.callback) {
       const query = { ...route.query, search: 1 };
       router.push({ path: route.query.callback, query: query });
@@ -1815,6 +1862,8 @@ const resetForm = () => {
   exchangeRate.value = 1;
   invoiceTaxes.value = [];
   taxIncluded.value = false;
+  files.value = null;
+  existingFiles.value = [];
 };
 
 // =====================
