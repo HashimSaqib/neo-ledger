@@ -90,8 +90,9 @@
               <q-btn
                 icon="add"
                 :label="t('Add Period')"
-                flat
                 @click="addPeriod"
+                color="primary"
+                class="q-ml-sm"
               />
             </div>
             <!-- Draggable component wraps the period list -->
