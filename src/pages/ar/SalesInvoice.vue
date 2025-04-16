@@ -1762,7 +1762,6 @@ const postInvoice = async (save = false, isNew = false) => {
       account: payment.account ? payment.account.label : "",
       exchangerate: payment.exchangerate,
     })),
-    files: files.value,
   };
   if (selectedDepartment.value) {
     invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;
@@ -1784,13 +1783,12 @@ const postInvoice = async (save = false, isNew = false) => {
   }
   try {
     loading.value = true;
-    const formData = jsonToFormData(invoiceData);
     const response = await api.post(
       `/arap/invoice/customer/${idParam.value}`,
-      formData,
+      invoiceData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       }
     );
