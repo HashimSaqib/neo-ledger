@@ -286,12 +286,24 @@
     </div>
 
     <!-- Two buttons: Save and Post -->
-    <div class="row q-my-sm q-px-sm">
+    <div class="row q-my-sm q-px-sm q-gutter-x-sm">
       <q-btn
         color="primary"
         :label="t('Post')"
         @click="submitTransaction(true)"
         :loading="loading"
+      />
+      <q-btn
+        color="primary"
+        :label="t('Post As New')"
+        @click="submitTransaction(false, true)"
+        :loading="loading"
+      />
+      <q-btn
+        :label="t('Delete')"
+        color="warning"
+        @click="deleteTransaction"
+        v-if="formData.id"
       />
     </div>
   </q-page>
@@ -302,7 +314,7 @@ import { ref, computed, onMounted, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, confirmDelete } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import FileList from "src/components/FileList.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
@@ -470,8 +482,9 @@ const loading = ref(false);
 /**
  * submitTransaction handles both saving and posting.
  * @param {boolean} clearAfter - When true, clear the form after posting.
+ * @param {boolean} isNew - When true, post as a new transaction regardless of existing ID.
  */
-const submitTransaction = async (clearAfter = false) => {
+const submitTransaction = async (clearAfter = false, isNew = false) => {
   // Validate at least two lines exist
   if (lines.value.length < 2) {
     Notify.create({
@@ -551,7 +564,7 @@ const submitTransaction = async (clearAfter = false) => {
 
   try {
     let response;
-    if (formData.value.id) {
+    if (formData.value.id && !isNew) {
       response = await api.put(
         `/gl/transactions/${formData.value.id}`,
         formDataObj,
@@ -583,6 +596,7 @@ const submitTransaction = async (clearAfter = false) => {
       }
       formData.value.selectedDepartment = null;
       lines.value = [{ ...initialLine }, { ...initialLine }];
+      existingFiles.value = [];
     } else {
       // For Save, load the transaction data if an ID is returned
       if (response.data?.id) {
@@ -659,6 +673,57 @@ const loadTransaction = async (id) => {
 // Handler for file deletion event from the FileList component.
 const handleFileDeletion = (index) => {
   existingFiles.value.splice(index, 1);
+};
+
+const deleteTransaction = async () => {
+  try {
+    const confirmed = await confirmDelete({
+      title: t("Confirm Deletion"),
+      message: t(
+        "Are you sure you want to delete this transaction? This action cannot be undone."
+      ),
+    });
+
+    if (confirmed) {
+      await api.delete(`/gl/transactions/${formData.value.id}`);
+
+      Notify.create({
+        message: t("Transaction deleted successfully"),
+        color: "positive",
+        position: "center",
+      });
+
+      if (route.query.callback) {
+        const query = { ...route.query, search: 1 };
+        router.push({ path: route.query.callback, query: query });
+      } else {
+        resetForm();
+      }
+    } else {
+      Notify.create({
+        message: t("Transaction Delete canceled"),
+        color: "warning",
+        position: "center",
+      });
+    }
+  } catch (error) {
+    Notify.create({
+      message: t("Unable to delete Transaction") + error,
+      color: "negative",
+      position: "center",
+    });
+    console.error(error);
+  }
+};
+
+const resetForm = () => {
+  formData.value = { ...initialFormData };
+  if (currencies.value.length > 0) {
+    formData.value.currency = currencies.value[0];
+  }
+  formData.value.selectedDepartment = null;
+  lines.value = [{ ...initialLine }, { ...initialLine }];
+  existingFiles.value = [];
 };
 
 onMounted(async () => {
