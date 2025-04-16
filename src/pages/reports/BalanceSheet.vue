@@ -100,74 +100,39 @@
                   <!-- Monthly Mode: specific month-end -->
                   <template v-else-if="formData.periodMode === 'monthly'">
                     <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.month"
-                        :options="monthOptions"
+                      <q-input
+                        v-model="element.todate"
+                        type="date"
                         outlined
                         dense
-                        :label="t('Month')"
-                        emit-value
-                        map-options
+                        :label="t('Date')"
                         @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
-                        outlined
-                        dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
                       />
                     </div>
                   </template>
                   <!-- Quarterly Mode: quarter-end date -->
                   <template v-else-if="formData.periodMode === 'quarterly'">
                     <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.quarter"
-                        :options="quarterOptions"
+                      <q-input
+                        v-model="element.todate"
+                        type="date"
                         outlined
                         dense
-                        :label="t('Quarter')"
-                        emit-value
-                        map-options
+                        :label="t('Date')"
                         @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
-                        outlined
-                        dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
                       />
                     </div>
                   </template>
                   <!-- Yearly Mode: year-end date -->
                   <template v-else-if="formData.periodMode === 'yearly'">
                     <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
+                      <q-input
+                        v-model="element.todate"
+                        type="date"
                         outlined
                         dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
+                        :label="t('Date')"
                         @update:model-value="() => updatePeriod(element)"
-                        search="label"
                       />
                     </div>
                   </template>
@@ -577,22 +542,10 @@ const accountTypeOptions = [
   { label: t("Manufacturing"), value: "manufacturing" },
 ];
 
-const monthOptions = Array.from({ length: 12 }, (_, i) => ({
-  value: String(i + 1).padStart(2, "0"),
-  label: date.formatDate(new Date(2000, i, 1), "MMMM"),
-}));
-
 const yearOptions = Array.from({ length: 5 }, (_, i) => {
   const yr = String(now.getFullYear() - i);
   return { value: yr, label: yr };
 });
-
-const quarterOptions = [
-  { label: "Q1", value: "Q1" },
-  { label: "Q2", value: "Q2" },
-  { label: "Q3", value: "Q3" },
-  { label: "Q4", value: "Q4" },
-];
 
 const departments = ref([]);
 const projects = ref([]);
@@ -717,38 +670,15 @@ const updatePeriod = (period) => {
       period.label = period.todate;
     }
   } else if (formData.value.periodMode === "monthly") {
-    if (period.month && period.year) {
-      const selectedYear = period.year;
-      const selectedMonth = period.month;
-      const lastDay = new Date(
-        parseInt(selectedYear, 10),
-        parseInt(selectedMonth, 10),
-        0
-      ).getDate();
-      period.todate =
-        period.year +
-        "-" +
-        selectedMonth +
-        "-" +
-        String(lastDay).padStart(2, "0");
+    if (period.todate) {
       period.label = period.todate;
     }
   } else if (formData.value.periodMode === "quarterly") {
-    if (period.quarter && period.year) {
-      if (period.quarter === "Q1") {
-        period.todate = period.year + "-03-31";
-      } else if (period.quarter === "Q2") {
-        period.todate = period.year + "-06-30";
-      } else if (period.quarter === "Q3") {
-        period.todate = period.year + "-09-30";
-      } else if (period.quarter === "Q4") {
-        period.todate = period.year + "-12-31";
-      }
+    if (period.todate) {
       period.label = period.todate;
     }
   } else if (formData.value.periodMode === "yearly") {
-    if (period.year) {
-      period.todate = period.year + "-12-31";
+    if (period.todate) {
       period.label = period.todate;
     }
   } else if (formData.value.periodMode === "custom") {
@@ -804,10 +734,29 @@ const addPeriod = () => {
   if (formData.value.periods.length > 0) {
     const lastPeriod =
       formData.value.periods[formData.value.periods.length - 1];
+    const lastDate = parseDate(lastPeriod.todate);
+    const day = lastDate.getUTCDate();
 
     if (formData.value.periodMode === "current") {
-      const lastDate = parseDate(lastPeriod.todate);
       lastDate.setUTCFullYear(lastDate.getUTCFullYear() - 1);
+      if (lastDate.getUTCFullYear() < minYear) {
+        console.warn(
+          `Cannot add period before minimum allowed year (${minYear}).`
+        );
+        return;
+      }
+      const newDateStr = formatDate(lastDate);
+      newPeriod = { todate: newDateStr, label: newDateStr };
+    } else if (formData.value.periodMode === "monthly") {
+      // Move to previous month while keeping the same day
+      lastDate.setUTCMonth(lastDate.getUTCMonth() - 1);
+      // Ensure we don't exceed the last day of the month
+      const lastDayOfMonth = new Date(
+        lastDate.getUTCFullYear(),
+        lastDate.getUTCMonth() + 1,
+        0
+      ).getDate();
+      lastDate.setUTCDate(Math.min(day, lastDayOfMonth));
 
       if (lastDate.getUTCFullYear() < minYear) {
         console.warn(
@@ -816,85 +765,58 @@ const addPeriod = () => {
         return;
       }
       const newDateStr = formatDate(lastDate);
-      newPeriod = { ...lastPeriod, todate: newDateStr, label: newDateStr };
-    } else if (formData.value.periodMode === "monthly") {
-      let year = Number(lastPeriod.year);
-      let month = Number(lastPeriod.month);
-      month -= 1;
-      if (month === 0) {
-        month = 12;
-        year -= 1;
-      }
-      if (year < minYear) {
-        console.warn(
-          `Cannot add period before minimum allowed year (${minYear}).`
-        );
-        return;
-      }
-      newPeriod = {
-        ...lastPeriod,
-        month: String(month).padStart(2, "0"),
-        year: year.toString(),
-        todate: "",
-        label: "",
-      };
+      newPeriod = { todate: newDateStr, label: newDateStr };
     } else if (formData.value.periodMode === "quarterly") {
-      let year = Number(lastPeriod.year);
-      let quarter = parseInt(lastPeriod.quarter.substring(1), 10);
-      quarter -= 1;
-      if (quarter === 0) {
-        quarter = 4;
-        year -= 1;
-      }
-      if (year < minYear) {
+      // Move to previous quarter while keeping the same day
+      lastDate.setUTCMonth(lastDate.getUTCMonth() - 3);
+      // Ensure we don't exceed the last day of the month
+      const lastDayOfMonth = new Date(
+        lastDate.getUTCFullYear(),
+        lastDate.getUTCMonth() + 1,
+        0
+      ).getDate();
+      lastDate.setUTCDate(Math.min(day, lastDayOfMonth));
+
+      if (lastDate.getUTCFullYear() < minYear) {
         console.warn(
           `Cannot add period before minimum allowed year (${minYear}).`
         );
         return;
       }
-      newPeriod = {
-        ...lastPeriod,
-        quarter: "Q" + quarter,
-        year: year.toString(),
-        todate: "",
-        label: "",
-      };
+      const newDateStr = formatDate(lastDate);
+      newPeriod = { todate: newDateStr, label: newDateStr };
     } else if (formData.value.periodMode === "yearly") {
-      let year = Number(lastPeriod.year);
-      year = year - 1;
-      if (year < minYear) {
+      // Move to previous year while keeping the same day
+      lastDate.setUTCFullYear(lastDate.getUTCFullYear() - 1);
+      // Ensure we don't exceed the last day of the month
+      const lastDayOfMonth = new Date(
+        lastDate.getUTCFullYear(),
+        lastDate.getUTCMonth() + 1,
+        0
+      ).getDate();
+      lastDate.setUTCDate(Math.min(day, lastDayOfMonth));
+
+      if (lastDate.getUTCFullYear() < minYear) {
         console.warn(
           `Cannot add period before minimum allowed year (${minYear}).`
         );
         return;
       }
-      newPeriod = { ...lastPeriod, year: year.toString() };
+      const newDateStr = formatDate(lastDate);
+      newPeriod = { todate: newDateStr, label: newDateStr };
     } else if (formData.value.periodMode === "custom") {
       newPeriod = { ...lastPeriod };
     }
   } else {
     const today = formatDate(now);
-    const currentYear = now.getFullYear().toString();
-    const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
-    const currentQuarter = "Q" + (Math.floor(now.getMonth() / 3) + 1);
     if (formData.value.periodMode === "current") {
       newPeriod = { todate: today, label: today };
     } else if (formData.value.periodMode === "monthly") {
-      newPeriod = {
-        month: currentMonth,
-        year: currentYear,
-        todate: "",
-        label: "",
-      };
+      newPeriod = { todate: today, label: today };
     } else if (formData.value.periodMode === "quarterly") {
-      newPeriod = {
-        quarter: currentQuarter,
-        year: currentYear,
-        todate: "",
-        label: "",
-      };
+      newPeriod = { todate: today, label: today };
     } else if (formData.value.periodMode === "yearly") {
-      newPeriod = { year: currentYear, todate: "", label: "" };
+      newPeriod = { todate: today, label: today };
     } else if (formData.value.periodMode === "custom") {
       newPeriod = { todate: today, label: today };
     }
