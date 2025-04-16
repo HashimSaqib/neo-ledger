@@ -1,10 +1,10 @@
 <template>
-  <q-list bordered separator>
-    <q-item v-for="(file, index) in files" :key="index">
+  <q-list :bordered="!report" :separator="!report">
+    <q-item v-for="(file, index) in files" :key="index" :dense="report">
       <q-item-section>
         <a :href="file.link" target="_blank">{{ file.name }}</a>
       </q-item-section>
-      <q-item-section side>
+      <q-item-section side v-if="!report">
         <q-btn
           dense
           flat
@@ -30,6 +30,10 @@ const props = defineProps({
   module: {
     type: String,
     required: true,
+  },
+  report: {
+    type: Boolean,
+    default: false,
   },
 });
 

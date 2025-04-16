@@ -321,6 +321,9 @@
                   {{ props.row.reference }}
                 </router-link>
               </span>
+              <span v-else-if="col.name === 'files'">
+                <file-list :files="props.row.files" :report="true" />
+              </span>
               <span v-else-if="col.name === 'accno'">
                 <router-link
                   to="#"
@@ -390,7 +393,7 @@ import { useI18n } from "vue-i18n";
 import { formatAmount, roundAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
 import { useRoute } from "vue-router";
-
+import FileList from "src/components/FileList.vue";
 const route = useRoute();
 const updateTitle = inject("updateTitle");
 const triggerPrint = inject("triggerPrint");
@@ -439,6 +442,14 @@ const baseColumns = ref([
     align: "left",
     label: "Description",
     field: "description",
+    sortable: true,
+    default: true,
+  },
+  {
+    name: "files",
+    align: "left",
+    label: "Files",
+    field: "files",
     sortable: true,
     default: true,
   },

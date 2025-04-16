@@ -302,6 +302,11 @@
             </router-link>
           </q-td>
         </template>
+        <template v-slot:body-cell-files="props">
+          <q-td :props="props">
+            <file-list :files="props.row.files" :report="true" />
+          </q-td>
+        </template>
 
         <!-- Description Column -->
         <template v-slot:body-cell-description="props">
@@ -382,6 +387,7 @@ import { LocalStorage, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import { formatAmount, downloadReport, createPDF } from "src/helpers/utils";
+import FileList from "src/components/FileList.vue";
 const createLink = inject("createLink");
 
 const { t } = useI18n();
@@ -454,6 +460,14 @@ const baseColumns = ref([
     name: "description",
     label: "Description",
     field: "description",
+    default: true,
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "files",
+    label: "Files",
+    field: "files",
     default: true,
     sortable: true,
     align: "left",

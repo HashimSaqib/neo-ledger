@@ -64,6 +64,9 @@
                     {{ props.row.reference }}
                   </router-link>
                 </template>
+                <template v-else-if="col.name === 'files'">
+                  <file-list :files="props.row.files" :report="true" />
+                </template>
                 <template v-else>
                   <template
                     v-if="
@@ -95,6 +98,7 @@ import { formatAmount, createPDF } from "src/helpers/utils";
 import { useRoute } from "vue-router";
 import { utils, writeFile } from "xlsx";
 import { useI18n } from "vue-i18n";
+import FileList from "src/components/FileList.vue";
 const { t } = useI18n();
 /* Update Page Title & Inject Print Function */
 const updateTitle = inject("updateTitle");
@@ -138,6 +142,13 @@ const baseColumns = ref([
     align: "left",
     label: "Description",
     field: "description",
+    default: true,
+  },
+  {
+    name: "files",
+    align: "left",
+    label: "Files",
+    field: "files",
     default: true,
   },
   {
