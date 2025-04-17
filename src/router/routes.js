@@ -34,6 +34,7 @@ const ErrorNotFound = () => import("src/pages/ErrorNotFound.vue");
 const Roles = () => import("src/pages/system/Roles.vue");
 const Employees = () => import("src/pages/system/Employees.vue");
 const Connections = () => import("src/pages/Connections.vue");
+const Taxes = () => import("src/pages/system/Taxes.vue");
 
 const routes = [
   {
@@ -263,6 +264,11 @@ const routes = [
         path: "system/templates",
         component: () => import("src/pages/system/Templates.vue"),
         meta: { permission: "system.templates" },
+      },
+      {
+        path: "system/taxes",
+        component: Taxes,
+        meta: { permission: "system.taxes" },
       },
     ],
   },

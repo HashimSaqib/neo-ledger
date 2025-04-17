@@ -254,6 +254,11 @@ export const menuLinks = [
         perm: "system.templates",
       },
       {
+        title: "Taxes",
+        link: "/system/taxes",
+        perm: "system.taxes",
+      },
+      {
         title: "Chart Of Accounts",
         perm: "system.chart",
         sublinks: [

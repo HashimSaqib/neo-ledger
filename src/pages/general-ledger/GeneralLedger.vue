@@ -9,6 +9,7 @@
           outlined
           dense
           v-model="formData.reference"
+          :disable="lockNumber"
         />
         <q-select
           v-if="currencies"
@@ -161,7 +162,7 @@
             <s-select
               outlined
               v-model="line.taxAccount"
-              :options="taxAccounts"
+              :options="filteredTaxAccounts"
               option-value="accno"
               option-label="label"
               :label="t('Tax Accno')"
@@ -310,7 +311,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject, nextTick } from "vue";
+import { ref, computed, onMounted, inject, nextTick, watch } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -327,6 +328,7 @@ const router = useRouter();
 const { formatDate } = date;
 
 const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
+const lockNumber = ref(false);
 
 // Initial form and line data for reset
 const initialFormData = {
@@ -438,6 +440,59 @@ const lineTax = ref(false);
 const taxAccounts = ref([]);
 const departments = ref([]);
 
+// Add new ref for filtered tax accounts
+const filteredTaxAccounts = ref([]);
+
+// Add function to filter taxes based on transaction date
+const filterTaxAccounts = () => {
+  if (!formData.value.transdate) return;
+
+  const transDate = new Date(formData.value.transdate);
+  filteredTaxAccounts.value = taxAccounts.value.filter((tax) => {
+    if (!tax.validto) return true; // Include if no validto date
+    const validToDate = new Date(tax.validto);
+    return transDate <= validToDate;
+  });
+
+  // Check and remove invalid taxes from line items
+  let removedTaxes = false;
+  lines.value.forEach((line) => {
+    if (line.taxAccount) {
+      const taxAccNo =
+        typeof line.taxAccount === "object"
+          ? line.taxAccount.accno
+          : line.taxAccount;
+      const isValidTax = filteredTaxAccounts.value.some(
+        (tax) => tax.accno === taxAccNo
+      );
+
+      if (!isValidTax) {
+        line.taxAccount = null;
+        line.linetaxamount = 0;
+        removedTaxes = true;
+      }
+    }
+  });
+
+  if (removedTaxes) {
+    Notify.create({
+      message: t(
+        "Some line taxes have been removed as they are no longer valid for the selected date."
+      ),
+      type: "warning",
+      position: "center",
+    });
+  }
+};
+
+// Add watch on transaction date
+watch(
+  () => formData.value.transdate,
+  () => {
+    filterTaxAccounts();
+  }
+);
+
 const projects = ref([]);
 const filteredProjects = ref([]);
 
@@ -472,6 +527,9 @@ const fetchLinks = async () => {
     if (currencies.value.length > 0) {
       formData.value.currency = currencies.value[0];
     }
+    lockNumber.value = response.data.locknumber ? true : false;
+    // Initialize filtered tax accounts
+    filterTaxAccounts();
   } catch (error) {
     console.log(error);
   }
@@ -725,7 +783,27 @@ const resetForm = () => {
   lines.value = [{ ...initialLine }, { ...initialLine }];
   existingFiles.value = [];
 };
-
+const updateTaxAmount = (val, index) => {
+  if (!val || !val.accno) {
+    console.warn("Invalid value provided:", val);
+    return;
+  }
+  if (!taxAccounts || !taxAccounts.value) {
+    console.warn("taxAccounts is not available");
+    return;
+  }
+  const taxAcc = taxAccounts.value.find((item) => item.accno === val.accno);
+  if (!taxAcc || !taxAcc.rate) {
+    lines.value[index].linetaxamount = 0;
+    return;
+  }
+  let debit = parseFloat(lines.value[index].debit);
+  let credit = parseFloat(lines.value[index].credit);
+  if (isNaN(debit)) debit = 0;
+  if (isNaN(credit)) credit = 0;
+  let baseAmount = debit > 0 ? debit : credit;
+  lines.value[index].linetaxamount = baseAmount ? baseAmount * taxAcc.rate : 0;
+};
 onMounted(async () => {
   try {
     await Promise.all([fetchLinks()]);
