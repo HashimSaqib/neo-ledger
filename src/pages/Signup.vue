@@ -126,7 +126,7 @@ onMounted(async () => {
   }
 
   try {
-    const { data } = await axios.get(`${config.apiurl}check_signup`, {
+    const { data } = await axios.get(`${config.apiurl}/check_signup`, {
       params: { invite: signupData.value.invite },
     });
 
@@ -174,7 +174,7 @@ const signupOtp = async () => {
   loading.value = true;
   try {
     const endpoint = signupData.value.invite ? "signup" : "signup_otp";
-    const response = await axios.post(`${config.apiurl}${endpoint}`, {
+    const response = await axios.post(`${config.apiurl}/${endpoint}`, {
       email: signupData.value.email,
       password: signupData.value.password,
       ...(signupData.value.invite && { invite: signupData.value.invite }),
@@ -211,7 +211,7 @@ const signupOtp = async () => {
 const confirmSignup = async () => {
   loading.value = true;
   try {
-    const response = await axios.post(`${config.apiurl}signup`, {
+    const response = await axios.post(`${config.apiurl}/signup`, {
       email: signupData.value.email,
       password: signupData.value.password,
       otp: signupData.value.otp,

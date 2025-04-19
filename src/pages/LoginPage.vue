@@ -72,7 +72,10 @@ onMounted(() => {
 const login = async () => {
   loading.value = true;
   try {
-    const response = await axios.post(`${config.apiurl}login`, loginData.value);
+    const response = await axios.post(
+      `${config.apiurl}/login`,
+      loginData.value
+    );
     const { sessionkey } = response.data;
     $q.cookies.set("sessionkey", sessionkey, { path: "/" });
     loading.value = false;
