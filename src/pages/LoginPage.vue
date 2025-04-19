@@ -47,7 +47,7 @@ import { useI18n } from "vue-i18n";
 import axios from "axios";
 import logo from "assets/images/logo.png";
 import LanguageSwitcher from "src/components/LanguageSwitcher.vue";
-
+import config from "../../neoledger.json";
 const { t } = useI18n();
 const $q = useQuasar();
 const router = useRouter();
@@ -63,7 +63,6 @@ onMounted(() => {
   LocalStorage.remove("available_db");
   $q.cookies.remove("sessionkey");
 
-  // Iterate over local storage keys and remove those that match the "acs_" prefix
   Object.keys(localStorage).forEach((key) => {
     if (key.startsWith("acs_")) {
       localStorage.removeItem(key);
@@ -73,10 +72,7 @@ onMounted(() => {
 const login = async () => {
   loading.value = true;
   try {
-    const response = await axios.post(
-      "https://api.neo-ledger.com/login",
-      loginData.value
-    );
+    const response = await axios.post(`${config.apiurl}login`, loginData.value);
     const { sessionkey } = response.data;
     $q.cookies.set("sessionkey", sessionkey, { path: "/" });
     loading.value = false;

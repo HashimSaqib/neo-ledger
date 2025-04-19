@@ -103,7 +103,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import axios from "axios";
 import logo from "assets/images/logo.png";
-
+import config from "../../neoledger.json";
 const { t } = useI18n();
 const $q = useQuasar();
 const router = useRouter();
@@ -126,10 +126,9 @@ onMounted(async () => {
   }
 
   try {
-    const { data } = await axios.get(
-      "https://api.neo-ledger.com/check_signup",
-      { params: { invite: signupData.value.invite } }
-    );
+    const { data } = await axios.get(`${config.apiurl}check_signup`, {
+      params: { invite: signupData.value.invite },
+    });
 
     const pubSignup = data.public_signup;
     const inviteCode = data.invite_code;
@@ -175,14 +174,11 @@ const signupOtp = async () => {
   loading.value = true;
   try {
     const endpoint = signupData.value.invite ? "signup" : "signup_otp";
-    const response = await axios.post(
-      `https://api.neo-ledger.com/${endpoint}`,
-      {
-        email: signupData.value.email,
-        password: signupData.value.password,
-        ...(signupData.value.invite && { invite: signupData.value.invite }),
-      }
-    );
+    const response = await axios.post(`${config.apiurl}${endpoint}`, {
+      email: signupData.value.email,
+      password: signupData.value.password,
+      ...(signupData.value.invite && { invite: signupData.value.invite }),
+    });
 
     if (signupData.value.invite) {
       Notify.create({
@@ -215,7 +211,7 @@ const signupOtp = async () => {
 const confirmSignup = async () => {
   loading.value = true;
   try {
-    const response = await axios.post("https://api.neo-ledger.com/signup", {
+    const response = await axios.post(`${config.apiurl}signup`, {
       email: signupData.value.email,
       password: signupData.value.password,
       otp: signupData.value.otp,
