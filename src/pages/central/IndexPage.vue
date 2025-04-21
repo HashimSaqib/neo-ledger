@@ -275,12 +275,12 @@
                       color="primary"
                       icon="more_horiz"
                     >
-                      <q-menu v-model="showMenu">
+                      <q-menu>
                         <q-list style="min-width: 150px">
                           <q-item
                             clickable
                             v-close-popup
-                            @click="openDeleteDialog()"
+                            @click="openDeleteDialog(dataset)"
                           >
                             <q-item-section avatar>
                               <q-icon name="delete_forever" color="negative" />
@@ -1120,14 +1120,12 @@ const showDatasetDialog = ref(false);
 const deleteDialog = ref(false);
 const datasetToDelete = ref(null);
 const deletingDataset = ref(false);
-const showMenu = ref(false);
 const activeDataset = ref(null);
 
 const openDeleteDialog = (dataset) => {
   datasetToDelete.value = dataset || activeDataset.value;
   deletePw.value = "";
   deleteDialog.value = true;
-  showMenu.value = false;
 };
 
 const cancelDelete = () => {
