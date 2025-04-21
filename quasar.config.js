@@ -60,12 +60,12 @@ export default configure((/* ctx */) => {
 
       vitePlugins: [
         [
-          visualizer({
-            open: true, // Automatically opens the report in your browser after build
-            filename: "stats.html", // Output file name for the report
-            gzipSize: true, // Display gzip size in report
-            brotliSize: true, // Display brotli size in report
-          }),
+          // visualizer({
+          //   open: true, // Automatically opens the report in your browser after build
+          //   filename: "stats.html", // Output file name for the report
+          //   gzipSize: true, // Display gzip size in report
+          //   brotliSize: true, // Display brotli size in report
+          // }),
         ],
       ],
       // vitePlugins: [
