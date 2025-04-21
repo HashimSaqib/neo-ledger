@@ -235,36 +235,63 @@
                 <!-- Dataset Info -->
                 <div class="row justify-between no-wrap">
                   <div>
-                    <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
-                      <q-img :src="`${dataset.logo}`" alt="Logo" />
-                    </q-avatar>
-                    <q-avatar
-                      v-else
-                      color="primary"
-                      text-color="white"
-                      size="56px"
-                      class="q-mr-md"
-                    >
-                      <q-icon name="database" size="32px" />
-                    </q-avatar>
+                    <div>
+                      <q-avatar v-if="dataset.logo" size="56px" class="q-mr-md">
+                        <q-img :src="`${dataset.logo}`" alt="Logo" />
+                      </q-avatar>
+                      <q-avatar
+                        v-else
+                        color="primary"
+                        text-color="white"
+                        size="56px"
+                        class="q-mr-md"
+                      >
+                        <q-icon name="database" size="32px" />
+                      </q-avatar>
+                      <q-btn
+                        round
+                        dense
+                        flat
+                        icon="edit"
+                        class="download-icon"
+                        @click="triggerLogoUpload(dataset.id)"
+                        size="sm"
+                        color="primary"
+                        v-if="dataset.admin === 1"
+                      />
+
+                      <input
+                        type="file"
+                        :ref="(el) => (logoInputRefs[dataset.id] = el)"
+                        @change="handleLogoUpload($event, dataset.id)"
+                        style="display: none"
+                      />
+                    </div>
                     <q-btn
+                      v-if="dataset.access_level == 'owner'"
+                      flat
                       round
                       dense
-                      flat
-                      icon="edit"
-                      class="download-icon"
-                      @click="triggerLogoUpload(dataset.id)"
-                      size="sm"
                       color="primary"
-                      v-if="dataset.admin === 1"
-                    />
-
-                    <input
-                      type="file"
-                      :ref="(el) => (logoInputRefs[dataset.id] = el)"
-                      @change="handleLogoUpload($event, dataset.id)"
-                      style="display: none"
-                    />
+                      icon="more_horiz"
+                    >
+                      <q-menu v-model="showMenu">
+                        <q-list style="min-width: 150px">
+                          <q-item
+                            clickable
+                            v-close-popup
+                            @click="openDeleteDialog()"
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="delete_forever" color="negative" />
+                            </q-item-section>
+                            <q-item-section class="text-negative"
+                              >Delete Dataset</q-item-section
+                            >
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
                   </div>
 
                   <div class="column flex-grow-1">
@@ -338,13 +365,6 @@
                   name="backup"
                   icon="cloud_download"
                   label="backup"
-                  v-if="dataset.access_level == 'owner'"
-                />
-
-                <q-tab
-                  name="delete"
-                  icon="delete"
-                  label="delete"
                   v-if="dataset.access_level == 'owner'"
                 />
               </q-tabs>
@@ -564,33 +584,6 @@
                     </div>
                   </div>
                 </q-tab-panel>
-                <q-tab-panel name="delete" class="q-pa-md">
-                  <div class="text-h6 text-negative q-mb-sm">
-                    Delete Dataset
-                  </div>
-                  <p class="q-mb-sm">
-                    This action will permanently delete the dataset and
-                    templates and
-                    <strong>cannot</strong> be undone. Only the owner can
-                    perform this operation. Please enter your password to
-                    confirm.
-                  </p>
-
-                  <q-input
-                    v-model="deletePw"
-                    type="password"
-                    dense
-                    input-class="maintext"
-                    label-color="secondary"
-                    label="Password"
-                    class="q-mb-md text-center"
-                  />
-                  <q-btn
-                    color="negative"
-                    label="DELETE DATASET"
-                    @click="handleDelete(dataset)"
-                  />
-                </q-tab-panel>
                 <q-tab-panel name="connections" class="q-pa-md text-center">
                   <!-- If there is a connection (active or error) -->
                   <div v-if="dataset.connections.length > 0">
@@ -631,9 +624,7 @@
                         icon="folder"
                         :href="
                           dataset.connections[0].type === 'dropbox'
-                            ? `https://www.dropbox.com/oauth2/authorize?client_id=${
-                                dataset.DROPBOX_KEY
-                              }&response_type=code&state=${
+                            ? `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_KEY}&response_type=code&state=${
                                 dataset.db_name
                               }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
                                 redirectUrl
@@ -655,13 +646,12 @@
                       label="Connect Dropbox"
                       color="primary"
                       icon="folder"
-                      :href="`https://www.dropbox.com/oauth2/authorize?client_id=${
-                        dataset.DROPBOX_KEY
-                      }&response_type=code&state=${
+                      :href="`https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_KEY}&response_type=code&state=${
                         dataset.db_name
                       }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
                         redirectUrl
                       )}/connection`"
+                      v-if="DROPBOX_KEY"
                     />
                     <q-btn
                       dense
@@ -669,13 +659,12 @@
                       color="primary"
                       icon="folder"
                       class="q-ml-md"
-                      :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${
-                        dataset.GOOGLE_CLIENT_ID
-                      }&response_type=code&scope=https://www.googleapis.com/auth/drive.file&state=${
+                      :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&response_type=code&scope=https://www.googleapis.com/auth/drive.file&state=${
                         dataset.db_name
                       }|google_drive&access_type=offline&redirect_uri=${encodeURIComponent(
                         redirectUrl
                       )}/connection`"
+                      v-if="GOOGLE_CLIENT_ID"
                     />
                   </div>
                 </q-tab-panel>
@@ -1053,6 +1042,63 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
+
+        <!-- Dataset deletion dialog -->
+        <q-dialog v-model="deleteDialog" persistent>
+          <q-card style="width: 500px; max-width: 90vw">
+            <q-card-section class="bg-negative text-white">
+              <div class="text-h6">
+                <q-icon name="delete_forever" class="q-mr-sm" />
+                Delete Dataset
+              </div>
+            </q-card-section>
+
+            <q-card-section class="q-pt-md">
+              <p class="text-subtitle2 q-mb-md">
+                Are you sure you want to delete
+                <strong>{{ datasetToDelete?.db_name }}</strong
+                >?
+              </p>
+              <p class="q-mb-sm">
+                This action will permanently delete the dataset and all
+                templates and
+                <strong>cannot</strong> be undone. Only the owner can perform
+                this operation.
+              </p>
+              <p class="text-body2 text-negative q-mb-md">
+                Please enter your password to confirm this irreversible action.
+              </p>
+
+              <q-input
+                v-model="deletePw"
+                type="password"
+                dense
+                input-class="maintext"
+                label-color="negative"
+                label="Password"
+                class="q-mb-md"
+                outlined
+                autocomplete="current-password"
+              />
+            </q-card-section>
+
+            <q-card-actions align="right" class="q-pa-md">
+              <q-btn
+                flat
+                label="Cancel"
+                color="primary"
+                v-close-popup
+                @click="cancelDelete"
+              />
+              <q-btn
+                color="negative"
+                label="DELETE DATASET"
+                @click="confirmDelete"
+                :loading="deletingDataset"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -1068,8 +1114,39 @@ import { useRouter } from "vue-router";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 import CreateDataset from "./CreateDataset.vue";
-
 const showDatasetDialog = ref(false);
+
+// Dataset menu and delete dialog
+const deleteDialog = ref(false);
+const datasetToDelete = ref(null);
+const deletingDataset = ref(false);
+const showMenu = ref(false);
+const activeDataset = ref(null);
+
+const openDeleteDialog = (dataset) => {
+  datasetToDelete.value = dataset || activeDataset.value;
+  deletePw.value = "";
+  deleteDialog.value = true;
+  showMenu.value = false;
+};
+
+const cancelDelete = () => {
+  datasetToDelete.value = null;
+  deletePw.value = "";
+};
+
+const confirmDelete = async () => {
+  if (!datasetToDelete.value) return;
+
+  deletingDataset.value = true;
+  try {
+    await handleDelete(datasetToDelete.value);
+    deleteDialog.value = false;
+    datasetToDelete.value = null;
+  } finally {
+    deletingDataset.value = false;
+  }
+};
 
 // Handle the dataset creation event emitted from the dialog component
 const handleCreateDataset = async (datasetDetails) => {
@@ -1103,6 +1180,7 @@ const handleDelete = async (dataset) => {
       color: "positive",
     });
     getDatasets();
+    return true;
   } catch (error) {
     Notify.create({
       message: error.response.data.message,
@@ -1110,6 +1188,7 @@ const handleDelete = async (dataset) => {
       position: "center",
     });
     deletePw.value = "";
+    return false;
   }
 };
 const downloadDb = async (dataset) => {
@@ -1418,6 +1497,22 @@ const getDatasets = async () => {
 
     // Load invites after datasets are loaded
     getInvites();
+  } catch (err) {
+    console.error("Error fetching datasets:", err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const GOOGLE_CLIENT_ID = ref("");
+const DROPBOX_KEY = ref("");
+const connectionKeys = async () => {
+  try {
+    const response = await api.get("/connection_keys");
+    DROPBOX_KEY.value = response.data.DROPBOX_KEY;
+    GOOGLE_CLIENT_ID.value = response.data.GOOGLE_CLIENT_ID;
+    console.log(response.data);
   } catch (err) {
     console.error("Error fetching datasets:", err);
     error.value = true;
@@ -1760,6 +1855,7 @@ const removeUserAccess = async () => {
 const redirectUrl = ref();
 onMounted(() => {
   getDatasets();
+  connectionKeys();
   redirectUrl.value = window.location.origin;
 });
 
