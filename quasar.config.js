@@ -58,16 +58,16 @@ export default configure((/* ctx */) => {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      vitePlugins: [
-        [
-          // visualizer({
-          //   open: true, // Automatically opens the report in your browser after build
-          //   filename: "stats.html", // Output file name for the report
-          //   gzipSize: true, // Display gzip size in report
-          //   brotliSize: true, // Display brotli size in report
-          // }),
-        ],
-      ],
+      // vitePlugins: [
+      //[
+      // visualizer({
+      //   open: true, // Automatically opens the report in your browser after build
+      //   filename: "stats.html", // Output file name for the report
+      //   gzipSize: true, // Display gzip size in report
+      //   brotliSize: true, // Display brotli size in report
+      // }),
+      //],
+      //],
       // vitePlugins: [
       //   [ 'package-name', { ..pluginOptions.. }, { server: true, client: true } ]
       // ]

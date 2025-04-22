@@ -585,88 +585,13 @@
                   </div>
                 </q-tab-panel>
                 <q-tab-panel name="connections" class="q-pa-md text-center">
-                  <!-- If there is a connection (active or error) -->
-                  <div v-if="dataset.connections.length > 0">
-                    <!-- Display active connection -->
-                    <div
-                      v-if="dataset.connections[0].status === 'active'"
-                      class="q-pa-md"
-                    >
-                      <q-icon name="check_circle" color="green" size="3em" />
-                      <div class="text-h5 q-mt-sm">
-                        {{
-                          dataset.connections[0].type === "dropbox"
-                            ? "Dropbox"
-                            : "Google Drive"
-                        }}
-                        Connection Active
-                      </div>
-                    </div>
-
-                    <!-- Display connection with error and reconnect button -->
-                    <div
-                      v-else-if="dataset.connections[0].status === 'error'"
-                      class="q-pa-md"
-                    >
-                      <q-icon name="error_outline" color="red" size="3em" />
-                      <div class="text-h5 q-mt-sm">Connection Disabled</div>
-                      <div class="q-mt-sm text-subtitle2">
-                        Error: {{ dataset.connections[0].error }}
-                      </div>
-                      <q-btn
-                        dense
-                        :label="`Reconnect ${
-                          dataset.connections[0].type === 'dropbox'
-                            ? 'Dropbox'
-                            : 'Google Drive'
-                        }`"
-                        color="primary"
-                        icon="folder"
-                        :href="
-                          dataset.connections[0].type === 'dropbox'
-                            ? `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_KEY}&response_type=code&state=${
-                                dataset.db_name
-                              }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
-                                redirectUrl
-                              )}/connection`
-                            : `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&response_type=code&scope=https://www.googleapis.com/auth/drive.file&state=${
-                                dataset.db_name
-                              }|dropbox&access_type=offline&redirect_uri=${encodeURIComponent(
-                                redirectUrl
-                              )}/connection`
-                        "
-                      />
-                    </div>
-                  </div>
-
-                  <!-- If no connection exists, provide options for both services -->
-                  <div v-else class="q-pa-md">
-                    <q-btn
-                      dense
-                      label="Connect Dropbox"
-                      color="primary"
-                      icon="folder"
-                      :href="`https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_KEY}&response_type=code&state=${
-                        dataset.db_name
-                      }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
-                        redirectUrl
-                      )}/connection`"
-                      v-if="DROPBOX_KEY"
-                    />
-                    <q-btn
-                      dense
-                      label="Connect Google Drive"
-                      color="primary"
-                      icon="folder"
-                      class="q-ml-md"
-                      :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&response_type=code&scope=https://www.googleapis.com/auth/drive.file&state=${
-                        dataset.db_name
-                      }|google_drive&access_type=offline&redirect_uri=${encodeURIComponent(
-                        redirectUrl
-                      )}/connection`"
-                      v-if="GOOGLE_CLIENT_ID"
-                    />
-                  </div>
+                  <DatasetConnections
+                    :dataset="dataset"
+                    :redirectUrl="redirectUrl"
+                    :dropboxKey="DROPBOX_KEY"
+                    :googleClientId="GOOGLE_CLIENT_ID"
+                    :allDrive="ALL_DRIVE"
+                  />
                 </q-tab-panel>
 
                 <q-tab-panel name="backup" class="q-pa-md text-center">
@@ -1114,6 +1039,7 @@ import { useRouter } from "vue-router";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 import CreateDataset from "./CreateDataset.vue";
+import DatasetConnections from "./DatasetConnections.vue";
 const showDatasetDialog = ref(false);
 
 // Dataset menu and delete dialog
@@ -1505,11 +1431,13 @@ const getDatasets = async () => {
 
 const GOOGLE_CLIENT_ID = ref("");
 const DROPBOX_KEY = ref("");
+const ALL_DRIVE = ref(false);
 const connectionKeys = async () => {
   try {
     const response = await api.get("/connection_keys");
     DROPBOX_KEY.value = response.data.DROPBOX_KEY;
     GOOGLE_CLIENT_ID.value = response.data.GOOGLE_CLIENT_ID;
+    ALL_DRIVE.value = response.data.ALL_DRIVE;
     console.log(response.data);
   } catch (err) {
     console.error("Error fetching datasets:", err);
