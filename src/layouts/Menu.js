@@ -279,6 +279,11 @@ export const menuLinks = [
           },
         ],
       },
+      {
+        title: "Audit",
+        link: "/system/audit",
+        perm: "system.audit",
+      },
     ],
   },
 ];

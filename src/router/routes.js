@@ -35,6 +35,7 @@ const Roles = () => import("src/pages/system/Roles.vue");
 const Employees = () => import("src/pages/system/Employees.vue");
 const Connections = () => import("src/pages/Connections.vue");
 const Taxes = () => import("src/pages/system/Taxes.vue");
+const Audit = () => import("src/pages/system/Audit.vue");
 
 const routes = [
   {
@@ -269,6 +270,11 @@ const routes = [
         path: "system/taxes",
         component: Taxes,
         meta: { permission: "system.taxes" },
+      },
+      {
+        path: "system/audit",
+        component: Audit,
+        meta: { permission: "system.audit" },
       },
     ],
   },
