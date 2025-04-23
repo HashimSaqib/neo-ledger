@@ -113,6 +113,7 @@
           :files="existingFiles"
           module="gl"
           @file-deleted="handleFileDeletion"
+          :report="!canPost"
         />
       </div>
     </div>
@@ -293,18 +294,20 @@
         :label="t('Post')"
         @click="submitTransaction(true)"
         :loading="loading"
+        v-if="canPost"
       />
       <q-btn
         color="primary"
         :label="t('Post As New')"
         @click="submitTransaction(false, true)"
         :loading="loading"
+        v-if="canPostAsNew"
       />
       <q-btn
         :label="t('Delete')"
         color="warning"
         @click="deleteTransaction"
-        v-if="formData.id"
+        v-if="canDelete"
       />
     </div>
   </q-page>
@@ -338,6 +341,7 @@ const initialFormData = {
   description: "",
   notes: "",
   transdate: getTodayDate(),
+  originaldate: null,
   id: null,
   files: [],
 };
@@ -436,9 +440,33 @@ const totalCredit = computed(() =>
   lines.value.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0)
 );
 
+// Computed properties for conditional visibility
+const canPost = computed(
+  () =>
+    (!closedto.value ||
+      !formData.value.originaldate ||
+      formData.value.originaldate > closedto.value) &&
+    (!closedto.value || formData.value.transdate > closedto.value)
+);
+
+const canPostAsNew = computed(
+  () => !closedto.value || formData.value.transdate > closedto.value
+);
+
+const canDelete = computed(
+  () =>
+    formData.value.id &&
+    (!closedto.value ||
+      !formData.value.originaldate ||
+      formData.value.originaldate > closedto.value) &&
+    revtrans.value != 1
+);
+
 const lineTax = ref(false);
 const taxAccounts = ref([]);
 const departments = ref([]);
+const revtrans = ref(null);
+const closedto = ref(null);
 
 // Add new ref for filtered tax accounts
 const filteredTaxAccounts = ref([]);
@@ -522,6 +550,8 @@ const fetchLinks = async () => {
     departments.value = response.data.departments;
     accounts.value = response.data.accounts.all;
     projects.value = response.data.projects;
+    revtrans.value = response.data.revtrans;
+    closedto.value = response.data.closedto;
     filterProjects();
     currencies.value = response.data.currencies;
     if (currencies.value.length > 0) {
@@ -687,6 +717,7 @@ const loadTransaction = async (id) => {
         description: transactionData.description,
         notes: transactionData.notes,
         transdate: transactionData.transdate,
+        originaldate: transactionData.transdate,
         exchangeRate: transactionData.exchangeRate,
       };
       if (departments.value?.length) {
@@ -780,6 +811,7 @@ const resetForm = () => {
     formData.value.currency = currencies.value[0];
   }
   formData.value.selectedDepartment = null;
+  formData.value.originaldate = null;
   lines.value = [{ ...initialLine }, { ...initialLine }];
   existingFiles.value = [];
 };
