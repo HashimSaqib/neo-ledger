@@ -242,6 +242,7 @@
               bg-color="input"
               label-color="secondary"
               dense
+              :disable="lockNumber"
             />
             <q-input
               outlined
@@ -785,30 +786,37 @@
 
     <!-- Print Options Section (shown if invoice exists) -->
 
-    <q-btn
-      :label="t('Post')"
-      color="primary"
-      @click="postInvoice((save = false), (isNew = false))"
-      class="relative-position q-mr-md"
-    />
-    <q-btn
-      :label="t('Save')"
-      color="primary"
-      @click="postInvoice((save = true), (isNew = false))"
-      class="relative-position q-mr-md"
-    />
-    <q-btn
-      :label="t('Save As New')"
-      color="primary"
-      @click="postInvoice((save = true), (isNew = true))"
-      class="relative-position q-mr-md"
-    />
-    <q-btn
-      :label="t('Delete')"
-      color="warning"
-      @click="deleteInvoice"
-      v-if="invId"
-    />
+    <div class="row q-mt-md">
+      <q-btn
+        color="primary"
+        :label="t('Save')"
+        @click="postInvoice(true, false)"
+        class="q-mr-md"
+        v-if="canPost"
+      />
+      <q-btn
+        color="primary"
+        :label="t('Post')"
+        @click="postInvoice(false, false)"
+        class="q-mr-md"
+        v-if="canPost"
+      />
+      <q-btn
+        color="primary"
+        :label="t('Post As New')"
+        @click="postInvoice(false, true)"
+        class="q-mr-md"
+        v-if="canPostAsNew"
+      />
+      <q-btn
+        color="warning"
+        :label="t('Delete Invoice')"
+        @click="deleteInvoice"
+        v-if="canDelete"
+      />
+      <!-- Keep other buttons as needed -->
+    </div>
+
     <q-separator class="q-my-sm" size="2px" v-if="invId" />
 
     <div class="row q-gutter-x-md" v-if="invId">
@@ -1117,11 +1125,17 @@ const filterProjects = () => {
     return invDateObj >= start && invDateObj <= end; // Include if within range
   });
 };
+const lockNumber = ref(null);
+const closedto = ref(null);
+const revtrans = ref(null);
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/customer`);
     departments.value = response.data.departments;
     currencies.value = response.data.currencies;
+    lockNumber.value = response.data.locknumber == 1 ? true : false;
+    closedto.value = response.data.closedto;
+    revtrans.value = response.data.revtrans;
     if (currencies.value) {
       selectedCurrency.value = currencies.value.find(
         (currency) => currency.rn === 1
@@ -1527,6 +1541,8 @@ const loadInvoice = async (invoice) => {
   invType.value = invoice.type;
   ordNumber.value = invoice.ordNumber;
   invDate.value = invoice.invDate;
+  // Store the original invoice date for closed period check
+  originalInvDate.value = invoice.invDate;
   dueDate.value = invoice.dueDate;
   poNumber.value = invoice.poNumber;
   if (invType.value === "credit_invoice") {
@@ -1925,4 +1941,29 @@ const emailDialog = ref(false);
 const toggleEmailDialog = () => {
   emailDialog.value = !emailDialog.value;
 };
+
+// Add computed properties to control button visibility
+const canPost = computed(
+  () =>
+    (!closedto.value ||
+      !originalInvDate.value ||
+      originalInvDate.value > closedto.value) &&
+    (!closedto.value || invDate.value > closedto.value)
+);
+
+const canPostAsNew = computed(
+  () => !closedto.value || invDate.value > closedto.value
+);
+
+const canDelete = computed(
+  () =>
+    invId.value &&
+    (!closedto.value ||
+      !originalInvDate.value ||
+      originalInvDate.value > closedto.value) &&
+    revtrans.value != 1
+);
+
+// Add originalInvDate ref to track the original invoice date for existing invoices
+const originalInvDate = ref(null);
 </script>
