@@ -844,6 +844,13 @@
         @click="printInvoice"
         v-if="invId"
       />
+      <q-btn
+        color="primary"
+        :label="t('Email')"
+        @click="toggleEmailDialog"
+        v-if="invId"
+        class="q-ml-sm"
+      />
     </div>
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
@@ -880,6 +887,22 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- Email Dialog -->
+    <q-dialog v-model="emailDialog">
+      <q-card style="min-width: 500px" class="q-pa-sm">
+        <q-card-section class="q-pa-none"> </q-card-section>
+        <q-card-section>
+          <EmailOptions
+            :selectedCustomer="customer"
+            :invId="invId"
+            :invNumber="invNumber"
+            :type="invType"
+            vc="customer"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -906,6 +929,7 @@ import AddVC from "src/pages/arap/AddVC.vue";
 import AddPart from "src/pages/goodservices/AddPart.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import FileList from "src/components/FileList.vue";
+import EmailOptions from "src/components/EmailOptions.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -981,6 +1005,13 @@ const printOptions = ref({
   template: "invoice",
   format: "tex",
   location: "screen",
+});
+
+const emailOpitons = ref({
+  template: "invoice",
+  format: "tex",
+  inline: 0,
+  attachment: "pdf",
 });
 // =====================
 // Counters & Refs for Dynamic Elements
@@ -1886,4 +1917,12 @@ onMounted(() => {
   fetchCustomers();
   fetchInvoice(route.query.id);
 });
+
+// =====================
+// Email Dialog
+// =====================
+const emailDialog = ref(false);
+const toggleEmailDialog = () => {
+  emailDialog.value = !emailDialog.value;
+};
 </script>
