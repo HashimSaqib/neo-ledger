@@ -174,6 +174,7 @@
                   bg-color="input"
                   label-color="secondary"
                   dense
+                  :disable="lockNumber"
                 />
                 <q-input
                   outlined
@@ -506,6 +507,7 @@
             color="primary"
             @click="postInvoice"
             class="q-mr-md"
+            v-if="canPost"
           />
           <q-btn
             class="q-mr-md"
@@ -518,7 +520,7 @@
             :label="t('Delete')"
             color="warning"
             @click="deleteTransaction"
-            v-if="invId"
+            v-if="canDelete"
           />
         </div>
       </template>
@@ -631,6 +633,10 @@ const loading = ref(false);
 const selectedFile = ref(null);
 const vcDialog = ref(false);
 const dialogMode = ref(null); // "add" or "edit"
+const lockNumber = ref(false);
+const revtrans = ref(null);
+const closedto = ref(null);
+const originaldate = ref(null);
 
 // -------------------------
 // Entity, Account and Currency State
@@ -918,6 +924,9 @@ const fetchLinks = async () => {
     departments.value = response.data.departments;
     projects.value = response.data.projects;
     filterProjects();
+    revtrans.value = response.data.revtrans;
+    closedto.value = response.data.closedto;
+    lockNumber.value = response.data.locknumber ? true : false;
   } catch (error) {
     console.error("Failed to fetch links:", error);
     Notify.create({
@@ -1032,6 +1041,7 @@ const resetForm = () => {
   selectedFile.value = null;
   splitterModel.value = 100;
   existingFiles.value = [];
+  originaldate.value = null;
 };
 const postInvoice = async () => {
   if (!selectedVc.value) {
@@ -1341,6 +1351,7 @@ const loadInvoice = async (invoice) => {
     console.log(projects.value);
     recordAccount.value = recordAccounts.value[0] || null;
     invDate.value = invoice.invDate || "";
+    originaldate.value = invoice.invDate || "";
     dueDate.value = invoice.dueDate || "";
     link.value = invoice.file;
     if (invoice.currency) {
@@ -1518,6 +1529,18 @@ const vcLabel = computed(() =>
 );
 const vcNumberField = computed(() =>
   type.value === "vendor" ? "vendornumber" : "customernumber"
+);
+
+// Computed properties for conditional visibility
+const canPost = computed(
+  () => !closedto.value || invDate.value > closedto.value
+);
+
+const canDelete = computed(
+  () =>
+    invId.value &&
+    (!closedto.value || originaldate.value > closedto.value) &&
+    revtrans.value != 1
 );
 
 watch(
