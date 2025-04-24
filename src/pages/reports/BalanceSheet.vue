@@ -484,7 +484,8 @@
               {{
                 formatAmountCustom(
                   sumAccounts(liabilityAccounts, period.label) +
-                    sumAccounts(equityAccounts, period.label)
+                    (sumAccounts(assetAccounts, period.label) -
+                      sumAccounts(liabilityAccounts, period.label))
                 )
               }}
             </q-item-section>
@@ -1018,7 +1019,8 @@ const downloadExcel = () => {
   periods.forEach((period) => {
     const totalLiabEquity =
       sumAccounts(liabilityAccounts.value, period.label) +
-      sumAccounts(equityAccounts.value, period.label);
+      (sumAccounts(assetAccounts.value, period.label) -
+        sumAccounts(liabilityAccounts.value, period.label));
     liabEquityTotalRow.push(roundAmountCustom(totalLiabEquity));
   });
   exportData.push(liabEquityTotalRow);
