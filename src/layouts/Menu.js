@@ -62,6 +62,11 @@ export const menuLinks = [
           },
         ],
       },
+      {
+        title: "Consolidate Invoices",
+        link: "/ar/consolidate-invoices",
+        perm: "customer.consolidate",
+      },
     ],
   },
   {
