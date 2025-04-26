@@ -56,6 +56,12 @@
         class="q-mr-sm"
         color="info"
       />
+      <q-btn
+        :label="t('Email')"
+        @click="openEmailDialog"
+        class="q-mr-sm"
+        color="primary"
+      />
     </div>
 
     <!-- Export Buttons -->
@@ -88,6 +94,7 @@
       hide-bottom
       selection="multiple"
       v-model:selected="selected"
+      :row-class="(row) => (row.highlightMissingEmail ? 'bg-red-1' : '')"
     >
       <!-- Level Column with Inline QSelect -->
       <template v-slot:body-cell-level="props">
@@ -137,11 +144,68 @@
         </q-td>
       </template>
     </q-table>
+
+    <!-- Email Dialog -->
+    <q-dialog v-model="emailDialog" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">{{ t("Email Reminders") }}</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input
+            v-model="emailData.adminemail"
+            :label="t('Admin Email')"
+            outlined
+            dense
+            class="q-mb-md"
+          />
+          <q-input
+            v-model="emailData.jobtype"
+            :label="t('Batch Name')"
+            outlined
+            dense
+            class="q-mb-md"
+          />
+          <div class="row q-col-gutter-sm q-mb-md">
+            <div class="col-6">
+              <q-select
+                v-model="emailData.attachment"
+                :label="t('Attachment')"
+                :options="attachmentOptions"
+                outlined
+                dense
+                map-options
+                emit-value
+              />
+            </div>
+            <div class="col-6">
+              <q-checkbox v-model="emailData.inline" :label="t('Inline')" />
+            </div>
+          </div>
+          <q-input
+            v-model="emailData.message"
+            :label="t('Message')"
+            type="textarea"
+            outlined
+            autogrow
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat :label="t('Cancel')" color="negative" v-close-popup />
+          <q-btn
+            flat
+            :label="t('Send')"
+            color="primary"
+            @click="sendEmailBatch"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
-import { ref, onMounted, inject } from "vue";
+import { ref, onMounted, inject, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
@@ -162,6 +226,21 @@ const selected = ref([]); // for selected rows in the table
 const formData = ref({});
 const loading = ref(false);
 const filtersOpen = ref(true);
+const emailDialog = ref(false);
+const emailData = ref({
+  adminemail: "",
+  jobtype: "Reminder Batch",
+  attachment: "tex",
+  inline: false,
+  message: "",
+});
+
+// Attachment options for the email dialog
+const attachmentOptions = [
+  { label: t("None"), value: "none" },
+  { label: t("TEX"), value: "tex" },
+  { label: t("HTML"), value: "html" },
+];
 
 // Search function to fetch transactions based on search criteria
 const search = async () => {
@@ -178,7 +257,11 @@ const search = async () => {
       });
       results.value = [];
     } else {
-      results.value = response.data.transactions;
+      // Reset any highlight flags when loading new results
+      results.value = response.data.transactions.map((transaction) => ({
+        ...transaction,
+        highlightMissingEmail: false,
+      }));
     }
   } catch (error) {
     console.error(error);
@@ -307,6 +390,12 @@ const columns = [
     align: "left",
   },
   {
+    name: "email ",
+    label: t("Email"),
+    field: "email",
+    align: "left",
+  },
+  {
     name: "level",
     label: t("Level"),
     field: "level",
@@ -388,4 +477,111 @@ function getVcPath(row) {
   const base = createLink("customer");
   return { path: base, query: { id: row.customer_id } };
 }
+
+// Open email dialog
+const openEmailDialog = () => {
+  if (!selected.value.length) {
+    Notify.create({
+      message: t("Please select at least one transaction"),
+      position: "center",
+      color: "negative",
+    });
+    return;
+  }
+
+  // Check for missing emails in selected transactions
+  const missingEmails = selected.value.filter(
+    (row) => !row.email || row.email.trim() === ""
+  );
+
+  if (missingEmails.length > 0) {
+    // Reset highlight on all rows first
+    results.value.forEach((row) => {
+      row.highlightMissingEmail = false;
+    });
+
+    // Highlight rows with missing emails
+    missingEmails.forEach((row) => {
+      const resultRow = results.value.find((r) => r.id === row.id);
+      if (resultRow) {
+        resultRow.highlightMissingEmail = true;
+      }
+    });
+
+    // Create notification message
+    const invoiceList = missingEmails
+      .map((row) => {
+        const name = row.name || "";
+        const invnumber = row.invnumber || row.id;
+        return `${name}/${invnumber}`;
+      })
+      .join(", ");
+    Notify.create({
+      message: t(`Missing email address for: ${invoiceList}`),
+      position: "center",
+      color: "negative",
+      timeout: 5000,
+    });
+    return;
+  }
+
+  emailDialog.value = true;
+};
+
+// Send email batch
+const sendEmailBatch = async () => {
+  try {
+    // Create emails array from selected transactions
+    const emails = selected.value.map((row) => ({
+      id: row.id,
+      type: `reminder${row.level}`,
+      email: row.email,
+    }));
+
+    // Create the final object
+    const batchData = {
+      attachment: emailData.value.attachment,
+      inline: emailData.value.inline,
+      message: emailData.value.message,
+      jobtype: emailData.value.jobtype,
+      adminemail: emailData.value.adminemail,
+      emails: emails,
+      vc: "customer",
+    };
+
+    // Post to create_email_batch endpoint
+    const response = await api.post("/create_email_batch", batchData);
+
+    // Close the dialog
+    emailDialog.value = false;
+
+    // Show success notification
+    Notify.create({
+      message: t("Email batch created successfully"),
+      position: "center",
+      color: "positive",
+    });
+  } catch (error) {
+    console.error("Error creating email batch:", error);
+    Notify.create({
+      message: t("Error creating email batch"),
+      position: "center",
+      color: "negative",
+    });
+  }
+};
+
+// Watch for changes in selection and reset highlighting when selection is cleared
+watch(
+  selected,
+  (newVal) => {
+    if (newVal.length === 0) {
+      // Reset highlight on all rows when selection is cleared
+      results.value.forEach((row) => {
+        row.highlightMissingEmail = false;
+      });
+    }
+  },
+  { deep: true }
+);
 </script>
