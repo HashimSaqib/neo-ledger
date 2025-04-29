@@ -38,6 +38,7 @@ const Employees = () => import("src/pages/system/Employees.vue");
 const Connections = () => import("src/pages/Connections.vue");
 const Taxes = () => import("src/pages/system/Taxes.vue");
 const Audit = () => import("src/pages/system/Audit.vue");
+const Batch = () => import("src/pages/system/Batch.vue");
 
 const routes = [
   {
@@ -282,6 +283,11 @@ const routes = [
         path: "system/audit",
         component: Audit,
         meta: { permission: "system.audit" },
+      },
+      {
+        path: "system/batch",
+        component: Batch,
+        meta: { permission: "system.batch" },
       },
     ],
   },

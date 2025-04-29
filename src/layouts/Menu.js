@@ -289,6 +289,11 @@ export const menuLinks = [
         link: "/system/audit",
         perm: "system.audit",
       },
+      {
+        title: "Batch Jobs",
+        link: "/system/batch",
+        perm: "system.batch",
+      },
     ],
   },
 ];

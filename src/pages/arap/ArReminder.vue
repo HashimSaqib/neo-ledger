@@ -536,6 +536,8 @@ const sendEmailBatch = async () => {
       id: row.id,
       type: `reminder${row.level}`,
       email: row.email,
+      name: row.name,
+      invnumber: row.invnumber,
     }));
 
     // Create the final object
