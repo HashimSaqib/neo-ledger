@@ -104,6 +104,7 @@
                       :rows-per-page-options="[0]"
                       hide-bottom
                       flat
+                      dense
                     >
                       <template v-slot:body-cell-select="props">
                         <q-td :props="props">

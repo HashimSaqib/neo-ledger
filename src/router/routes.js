@@ -5,6 +5,7 @@ const GlTransactions = () =>
   import("src/pages/general-ledger/GlTransactions.vue");
 const ArApTransaction = () => import("src/pages/arap/ArApTransaction.vue");
 const ArApTransactions = () => import("src/pages/arap/ArApTransactions.vue");
+const ArApBatch = () => import("src/pages/arap/ArApBatch.vue");
 const ArReminder = () => import("src/pages/arap/ArReminder.vue");
 const SalesInvoice = () => import("src/pages/ar/SalesInvoice.vue");
 const ConsolidateInvoices = () =>
@@ -89,7 +90,17 @@ const routes = [
           },
         },
       },
-
+      {
+        path: "arap/batch/:type/invoice",
+        component: ArApBatch,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.batch"
+              : "vendor.batch";
+          },
+        },
+      },
       {
         path: "history/:type",
         component: VcHistory,

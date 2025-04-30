@@ -632,10 +632,10 @@
             outlined
             class="col-sm-11 col-12"
             rows="2"
+            autogrow
             bg-color="input"
             label-color="secondary"
             :label="t('Internal Notes')"
-            type="textarea"
             v-model="intnotes"
           />
         </div>

@@ -83,6 +83,7 @@
     <!-- Transactions Table with Selection -->
     <q-table
       :rows="results"
+      dense
       :columns="columns"
       row-key="id"
       flat

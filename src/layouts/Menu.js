@@ -67,6 +67,11 @@ export const menuLinks = [
         link: "/ar/consolidate-invoices",
         perm: "customer.consolidate",
       },
+      {
+        title: "Batch Email Invoices",
+        link: "/arap/batch/customer/invoice",
+        perm: "customer.batch",
+      },
     ],
   },
   {
