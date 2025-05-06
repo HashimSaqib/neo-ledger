@@ -70,7 +70,6 @@ const repositories = {
   closedto: ref(""),
 };
 
-// Base columns for entity imports (customers/vendors)
 const entityColumns = [
   { title: t("Name"), key: "name" },
   { title: t("Contact"), key: "contact" },
@@ -120,7 +119,6 @@ const entityColumns = [
   { title: t("Gender"), key: "gender" },
 ];
 
-// Base columns for invoice imports
 const invoiceColumns = [
   { title: t("Invoice Number"), key: "invnumber" },
   { title: t("Description"), key: "description" },
@@ -184,7 +182,6 @@ const importConfigs = {
   ap_invoice: {
     columns: [
       { title: t("Vendor Number"), key: "vendornumber" },
-
       ...invoiceColumns,
     ],
   },
@@ -207,6 +204,19 @@ const getColumnIndexes = (type) => {
   });
 
   return indexes;
+};
+
+const rowToObject = (row, type) => {
+  const config = importConfigs[type] || importConfigs.default;
+  const obj = {};
+
+  config.columns.forEach((col, index) => {
+    if (col.key) {
+      obj[col.key] = row[index];
+    }
+  });
+
+  return obj;
 };
 
 const createEmptyRows = (count) => {
@@ -290,6 +300,7 @@ const parseNumber = (value) => {
 
   return 0;
 };
+
 const formatDate = (dateString) => {
   if (!dateString) return "";
 
@@ -315,36 +326,20 @@ const formatDate = (dateString) => {
     for (const format of formatsToTry) {
       parsedDate = date.extractDate(dateString, format);
       if (parsedDate && !isNaN(parsedDate.getTime())) {
-        console.log(
-          `Successfully parsed "${dateString}" with format "${format}"`
-        );
         break;
-      } else {
-        console.log(
-          `Attempted format "${format}" for "${dateString}" - Failed.`
-        );
       }
     }
 
     if (!parsedDate || isNaN(parsedDate.getTime())) {
-      console.warn(
-        `Quasar extractDate failed for: ${dateString}, attempting native Date.`
-      );
       const nativeParsedDate = new Date(dateString);
       if (nativeParsedDate && !isNaN(nativeParsedDate.getTime())) {
         parsedDate = nativeParsedDate;
-        console.log(`Successfully parsed "${dateString}" with native Date.`);
-      } else {
-        console.warn(`Native Date parsing also failed for: ${dateString}`);
       }
     }
 
     if (parsedDate && !isNaN(parsedDate.getTime())) {
       return date.formatDate(parsedDate, "YYYY-MM-DD");
     } else {
-      console.warn(
-        `Could not parse date with any format or native Date: ${dateString}`
-      );
       return "";
     }
   } catch (error) {
@@ -460,7 +455,6 @@ const coreValidationRules = {
   },
 };
 
-// Base validation rules for entities (customers/vendors)
 const entityValidationRules = [
   {
     field: "name",
@@ -501,17 +495,17 @@ const validationConfigs = {
       },
       {
         field: "exchangerate",
-        rule: (value, row, indexes) =>
-          coreValidationRules.validExchangeRate(row[indexes.curr], value),
+        rule: (value, row) =>
+          coreValidationRules.validExchangeRate(row.curr, value),
       },
     ],
     transactionValidations: [
       {
-        validate: (rows, indexes) => {
+        validate: (rows) => {
           const transactionsByRef = {};
 
           rows.forEach((row) => {
-            const reference = row[indexes.reference];
+            const reference = row.reference;
             if (!reference) return;
 
             if (!transactionsByRef[reference]) {
@@ -529,8 +523,8 @@ const validationConfigs = {
               let totalCredit = 0;
 
               transRows.forEach((row) => {
-                const debit = parseNumber(row[indexes.debit]);
-                const credit = parseNumber(row[indexes.credit]);
+                const debit = parseNumber(row.debit);
+                const credit = parseNumber(row.credit);
 
                 totalDebit += debit;
                 totalCredit += credit;
@@ -766,6 +760,7 @@ const validateData = () => {
     clearStyles(sheet);
 
     const data = sheet.getData?.() || [];
+    const indexes = getColumnIndexes(importType.value);
 
     const nonEmptyRows = data.filter(
       (row) => row && row.some((cell) => cell && cell.toString().trim() !== "")
@@ -783,9 +778,8 @@ const validateData = () => {
 
     const errors = [];
     const config = validationConfigs[importType.value];
-    const indexes = getColumnIndexes(importType.value);
 
-    if (!config || !indexes) {
+    if (!config) {
       Notify.create({
         color: "warning",
         message: t("No validation rules defined for this import type"),
@@ -795,27 +789,23 @@ const validateData = () => {
       return false;
     }
 
-    nonEmptyRows.forEach((row) => {
+    nonEmptyRows.forEach((row, idx) => {
       if (!row || !row.some((cell) => cell && cell.toString().trim() !== ""))
         return;
 
       const realRowIndex = data.findIndex((r) => r === row);
+      const rowObj = rowToObject(row, importType.value);
 
       if (config.fieldValidations) {
         config.fieldValidations.forEach((validation) => {
           const fieldIndex = indexes[validation.field];
-          if (fieldIndex === undefined) {
-            console.warn(
-              `Field ${validation.field} not found in column configuration`
-            );
-            return;
-          }
+          if (fieldIndex === undefined) return;
 
-          const value = row[fieldIndex];
+          const value = rowObj[validation.field];
 
           const result =
             typeof validation.rule === "function"
-              ? validation.rule(value, row, indexes)
+              ? validation.rule(value, rowObj)
               : { valid: true, message: "" };
 
           if (!result.valid) {
@@ -827,13 +817,18 @@ const validateData = () => {
     });
 
     if (config.transactionValidations) {
+      const objRows = nonEmptyRows.map((row) =>
+        rowToObject(row, importType.value)
+      );
+
       config.transactionValidations.forEach((validation) => {
-        const result = validation.validate(nonEmptyRows, indexes);
+        const result = validation.validate(objRows);
 
         if (!result.valid && result.unbalancedRefs) {
-          nonEmptyRows.forEach((row) => {
+          nonEmptyRows.forEach((row, idx) => {
             const realRowIndex = data.findIndex((r) => r === row);
-            const reference = row[indexes.reference];
+            const rowObj = rowToObject(row, importType.value);
+            const reference = rowObj.reference;
 
             if (result.unbalancedRefs.includes(reference)) {
               if (result.affectedFields) {
@@ -883,14 +878,13 @@ const validateData = () => {
   }
 };
 
-const formatEntityData = (row, indexes) => {
+const formatEntityData = (row) => {
+  const rowObj = rowToObject(row, importType.value);
   const entity = {};
 
-  // Map all fields from the row to the entity object
-  Object.keys(indexes).forEach((key) => {
-    const value = row[indexes[key]];
+  Object.keys(rowObj).forEach((key) => {
+    const value = rowObj[key];
     if (value !== undefined && value !== null && value !== "") {
-      // Handle special cases
       if (key === "taxincluded" || key === "remittancevoucher") {
         entity[key] =
           value === "1" || value === "true" || value === true ? 1 : 0;
@@ -915,7 +909,6 @@ const formatEntityData = (row, indexes) => {
     }
   });
 
-  // Add customer_id or vendor_id based on the type
   if (importType.value === "customer") {
     const customer = repositories.customers.value.find(
       (c) => c.customernumber === entity.customernumber
@@ -979,7 +972,6 @@ const importData = async () => {
       return;
     }
 
-    const indexes = getColumnIndexes(importType.value);
     let formattedData;
 
     if (
@@ -989,17 +981,12 @@ const importData = async () => {
       const invoicesByNumber = {};
 
       nonEmptyRows.forEach((row) => {
-        const invNumber = row[indexes.invnumber] || "";
-        const entityNumber =
-          row[
-            indexes[
-              importType.value === "ar_invoice"
-                ? "customernumber"
-                : "vendornumber"
-            ]
-          ] || "";
+        const rowObj = rowToObject(row, importType.value);
+        const invNumber = rowObj.invnumber || "";
+        const entityKey =
+          importType.value === "ar_invoice" ? "customernumber" : "vendornumber";
+        const entityNumber = rowObj[entityKey] || "";
 
-        // Find the entity ID
         let entityId = null;
         if (importType.value === "ar_invoice") {
           const customer = repositories.customers.value.find(
@@ -1016,52 +1003,51 @@ const importData = async () => {
         if (!invoicesByNumber[invNumber]) {
           invoicesByNumber[invNumber] = {
             invNumber: invNumber,
-            description: row[indexes.description] || "",
+            description: rowObj.description || "",
             type: "invoice",
-            invDate: formatDate(row[indexes.invdate] || ""),
-            dueDate: formatDate(row[indexes.duedate] || ""),
-            currency: row[indexes.curr] || "",
-            exchangerate: parseNumber(row[indexes.exchangerate]) || 1.0,
-            notes: row[indexes.notes] || "",
-            intnotes: row[indexes.intnotes] || "",
-            till: row[indexes.till] || "",
-            department: row[indexes.department] || "",
-            recordAccount: row[indexes.recordaccount] || "",
+            invDate: formatDate(rowObj.invdate || ""),
+            dueDate: formatDate(rowObj.duedate || ""),
+            currency: rowObj.curr || "",
+            exchangerate: parseNumber(rowObj.exchangerate) || 1.0,
+            notes: rowObj.notes || "",
+            intnotes: rowObj.intnotes || "",
+            till: rowObj.till || "",
+            department: rowObj.department || "",
+            recordAccount: rowObj.recordaccount || "",
             [importType.value === "ar_invoice" ? "customer_id" : "vendor_id"]:
               entityId,
-            ordNumber: row[indexes.ordnumber] || "",
-            poNumber: row[indexes.ponumber] || "",
-            shippingPoint: row[indexes.shippingpoint] || "",
-            shipVia: row[indexes.shipvia] || "",
-            wayBill: row[indexes.waybill] || "",
+            ordNumber: rowObj.ordnumber || "",
+            poNumber: rowObj.ponumber || "",
+            shippingPoint: rowObj.shippingpoint || "",
+            shipVia: rowObj.shipvia || "",
+            wayBill: rowObj.waybill || "",
             shipto: {
-              name: row[indexes.shipto_name] || "",
-              address1: row[indexes.shipto_address1] || "",
-              address2: row[indexes.shipto_address2] || "",
-              city: row[indexes.shipto_city] || "",
-              state: row[indexes.shipto_state] || "",
-              zipcode: row[indexes.shipto_zipcode] || "",
-              country: row[indexes.shipto_country] || "",
-              contact: row[indexes.shipto_contact] || "",
-              phone: row[indexes.shipto_phone] || "",
-              fax: row[indexes.shipto_fax] || "",
-              email: row[indexes.shipto_email] || "",
+              name: rowObj.shipto_name || "",
+              address1: rowObj.shipto_address1 || "",
+              address2: rowObj.shipto_address2 || "",
+              city: rowObj.shipto_city || "",
+              state: rowObj.shipto_state || "",
+              zipcode: rowObj.shipto_zipcode || "",
+              country: rowObj.shipto_country || "",
+              contact: rowObj.shipto_contact || "",
+              phone: rowObj.shipto_phone || "",
+              fax: rowObj.shipto_fax || "",
+              email: rowObj.shipto_email || "",
             },
             lines: [],
           };
         }
 
-        // Add line item
         const part = repositories.parts.value.find(
-          (p) => p.partnumber === row[indexes.line_number]
+          (p) => p.partnumber === rowObj.line_number
         );
         invoicesByNumber[invNumber].lines.push({
           number: part ? part.id : "",
-          description: row[indexes.line_description] || "",
-          qty: parseNumber(row[indexes.qty]) || 0,
-          price: parseNumber(row[indexes.price]) || 0,
-          discount: parseNumber(row[indexes.discount]) || 0,
-          unit: row[indexes.unit] || "",
+          description: rowObj.line_description || "",
+          qty: parseNumber(rowObj.qty) || 0,
+          price: parseNumber(rowObj.price) || 0,
+          discount: parseNumber(rowObj.discount) || 0,
+          unit: rowObj.unit || "",
         });
       });
 
@@ -1070,12 +1056,13 @@ const importData = async () => {
       const transactionsByRef = {};
 
       nonEmptyRows.forEach((row) => {
-        const reference = row[indexes.reference] || "";
+        const rowObj = rowToObject(row, importType.value);
+        const reference = rowObj.reference || "";
 
         if (!transactionsByRef[reference]) {
           transactionsByRef[reference] = [];
         }
-        transactionsByRef[reference].push(row);
+        transactionsByRef[reference].push(rowObj);
       });
 
       formattedData = [];
@@ -1085,23 +1072,23 @@ const importData = async () => {
 
         const transaction = {
           reference: reference,
-          transdate: formatDate(firstRow[indexes.transdate] || ""),
-          department: firstRow[indexes.department] || 0,
-          description: firstRow[indexes.description] || "",
-          notes: firstRow[indexes.notes] || "",
-          curr: firstRow[indexes.curr] || "",
-          exchangeRate: parseNumber(firstRow[indexes.exchangerate]) || 1.0,
+          transdate: formatDate(firstRow.transdate || ""),
+          department: firstRow.department || 0,
+          description: firstRow.description || "",
+          notes: firstRow.notes || "",
+          curr: firstRow.curr || "",
+          exchangeRate: parseNumber(firstRow.exchangerate) || 1.0,
           lines: [],
         };
 
         rows.forEach((row) => {
           transaction.lines.push({
-            accno: row[indexes.accno] || "",
-            debit: parseNumber(row[indexes.debit]) || 0,
-            credit: parseNumber(row[indexes.credit]) || 0,
-            memo: row[indexes.memo] || "",
-            source: row[indexes.source] || "",
-            project: row[indexes.projectnumber] || "",
+            accno: row.accno || "",
+            debit: parseNumber(row.debit) || 0,
+            credit: parseNumber(row.credit) || 0,
+            memo: row.memo || "",
+            source: row.source || "",
+            project: row.projectnumber || "",
           });
         });
 
@@ -1111,11 +1098,8 @@ const importData = async () => {
       importType.value === "customer" ||
       importType.value === "vendor"
     ) {
-      formattedData = nonEmptyRows.map((row) => formatEntityData(row, indexes));
+      formattedData = nonEmptyRows.map((row) => formatEntityData(row));
     }
-
-    // For now, just log the formatted data
-    console.log("Formatted Invoice Data:", formattedData);
 
     try {
       const endpoint =
