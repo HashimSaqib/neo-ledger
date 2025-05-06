@@ -3,20 +3,39 @@
     <q-table
       :rows="taxes"
       :columns="columns"
-      row-key="id"
+      :row-key="(row, index) => `${row.id}-${index}`"
       flat
       bordered
       separator="horizontal"
       hide-bottom
     >
+      <!-- Custom cell for account number -->
+      <template v-slot:body-cell-accno="props">
+        <q-td :props="props">
+          <span v-if="!isDuplicateAccno(props.rowIndex)">
+            {{ props.row.accno }}
+          </span>
+        </q-td>
+      </template>
+
+      <!-- Custom cell for description -->
+      <template v-slot:body-cell-description="props">
+        <q-td :props="props">
+          <span v-if="!isDuplicateAccno(props.rowIndex)">
+            {{ props.row.description }}
+          </span>
+        </q-td>
+      </template>
+
       <!-- Custom cell for closed checkbox -->
       <template v-slot:body-cell-closed="props">
         <q-td :props="props">
           <q-checkbox
+            v-if="!isDuplicateAccno(props.rowIndex)"
             v-model="props.row.closed"
             :true-value="1"
             :false-value="0"
-            @update:model-value="handleFieldUpdate(props.row, 'closed')"
+            @update:model-value="syncAccountChanges(props.row)"
           />
         </q-td>
       </template>
@@ -31,7 +50,6 @@
             bg-color="input"
             outlined
             label-color="secondary"
-            @blur="handleFieldUpdate(props.row, 'rate')"
           />
         </q-td>
       </template>
@@ -45,7 +63,6 @@
             bg-color="input"
             outlined
             label-color="secondary"
-            @blur="handleFieldUpdate(props.row, 'taxnumber')"
           />
         </q-td>
       </template>
@@ -59,16 +76,21 @@
             bg-color="input"
             outlined
             label-color="secondary"
-            @blur="handleFieldUpdate(props.row, 'validto')"
           />
         </q-td>
       </template>
     </q-table>
+    <q-btn
+      color="primary"
+      :label="t('Save')"
+      @click="saveTaxes"
+      class="q-my-md"
+    />
   </q-page>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
@@ -76,6 +98,34 @@ import { Notify } from "quasar";
 const { t } = useI18n();
 
 const taxes = ref([]);
+
+// Watch for changes in validto field
+watch(
+  () => taxes.value,
+  (newTaxes) => {
+    newTaxes.forEach((tax, index) => {
+      if (index < newTaxes.length - 1) {
+        const nextTax = newTaxes[index + 1];
+
+        // Case 1: validto is set and next line has different accno
+        if (tax.validto && tax.accno !== nextTax.accno) {
+          // Create a copy of the current tax without validto
+          const newTax = { ...tax };
+          delete newTax.validto;
+          // Insert the new tax before the next line
+          taxes.value.splice(index + 1, 0, newTax);
+        }
+
+        // Case 2: validto is removed and next line has same accno
+        if (!tax.validto && tax.accno === nextTax.accno) {
+          // Remove the next line
+          taxes.value.splice(index + 1, 1);
+        }
+      }
+    });
+  },
+  { deep: true }
+);
 
 const columns = [
   {
@@ -116,6 +166,12 @@ const columns = [
   },
 ];
 
+// Check if the current row's accno is the same as the previous row
+const isDuplicateAccno = (rowIndex) => {
+  if (rowIndex === 0) return false;
+  return taxes.value[rowIndex]?.accno === taxes.value[rowIndex - 1]?.accno;
+};
+
 // Fetch taxes from API
 const getTaxes = async () => {
   try {
@@ -131,7 +187,7 @@ const getTaxes = async () => {
 };
 
 // Handle field updates
-const handleFieldUpdate = async (row, field) => {
+const saveTaxes = async () => {
   try {
     // Format all taxes for the payload
     const payload = {
@@ -159,6 +215,21 @@ const handleFieldUpdate = async (row, field) => {
     });
     getTaxes();
   }
+};
+
+// Function to sync changes across items with the same ID
+const syncAccountChanges = (changedRow) => {
+  taxes.value = taxes.value.map((row) => {
+    if (row.id === changedRow.id) {
+      return {
+        ...row,
+        accno: changedRow.accno,
+        description: changedRow.description,
+        closed: changedRow.closed,
+      };
+    }
+    return row;
+  });
 };
 
 onMounted(() => {
