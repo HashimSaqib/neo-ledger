@@ -1760,9 +1760,7 @@ const postInvoice = async (save = false, isNew = false) => {
     return;
   }
   const invoiceData = {
-    selectedCustomer: selectedCustomer.value,
     customer_id: selectedCustomer.value.id,
-    customer: selectedCustomer.value.name,
     shippingPoint: shippingPoint.value,
     shipVia: shipVia.value,
     wayBill: wayBill.value,

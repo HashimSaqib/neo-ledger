@@ -12,6 +12,7 @@
     "build": "quasar build"
   },
   "dependencies": {
+    "@jspreadsheet-ce/vue": "^5.0.1",
     "@quasar/extras": "^1.16.4",
     "axios": "^1.2.1",
     "chart.js": "^4.4.7",

@@ -40,6 +40,7 @@ const Connections = () => import("src/pages/Connections.vue");
 const Taxes = () => import("src/pages/system/Taxes.vue");
 const Audit = () => import("src/pages/system/Audit.vue");
 const Batch = () => import("src/pages/system/Batch.vue");
+const Import = () => import("src/pages/Import.vue");
 
 const routes = [
   {
@@ -299,6 +300,15 @@ const routes = [
         path: "system/batch",
         component: Batch,
         meta: { permission: "system.batch" },
+      },
+      {
+        path: "import/:type",
+        component: Import,
+        meta: {
+          permission: () => {
+            return ["import.gl"];
+          },
+        },
       },
     ],
   },

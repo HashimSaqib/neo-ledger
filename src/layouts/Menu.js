@@ -301,4 +301,36 @@ export const menuLinks = [
       },
     ],
   },
+  {
+    title: "Import",
+    perm: "import",
+    icon: "file_present",
+    sublinks: [
+      {
+        title: "General Ledger",
+        link: "/import/gl",
+        perm: "import.gl",
+      },
+      {
+        title: "Customers",
+        link: "/import/customer",
+        perm: "import.customer",
+      },
+      {
+        title: "Sales Invoice",
+        link: "/import/ar_invoice",
+        perm: "import.ar_invoice",
+      },
+      {
+        title: "Vendors",
+        link: "/import/vendor",
+        perm: "import.vendor",
+      },
+      {
+        title: "Vendor Invoice",
+        link: "/import/ap_invoice",
+        perm: "import.ap_invoice",
+      },
+    ],
+  },
 ];
