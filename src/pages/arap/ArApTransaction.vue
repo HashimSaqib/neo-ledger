@@ -646,6 +646,7 @@ const vcList = ref([]);
 const selectedVc = ref(null);
 // The full fetched vendor details
 const vc = ref(null);
+const taxes = ref([]);
 const taxAccounts = ref([]);
 const lineTax = ref(false);
 const taxAccountList = ref([]);
@@ -926,6 +927,7 @@ const fetchLinks = async () => {
     filterProjects();
     revtrans.value = response.data.revtrans;
     closedto.value = response.data.closedto;
+    taxes.value = response.data.tax_accounts;
     lockNumber.value = response.data.locknumber ? true : false;
   } catch (error) {
     console.error("Failed to fetch links:", error);
@@ -1437,6 +1439,56 @@ const vcSaved = async (savedEntity) => {
 // Update Vendor Details (Separate from the minimal selection)
 // -------------------------
 let isUpdatingVc = false;
+const filterValidTaxes = (invoiceDate) => {
+  if (!taxes.value.length || !taxAccounts.value.length) return [];
+
+  // First, filter taxes to only include those in the allowed list
+  const allowedTaxes = taxes.value.filter((tax) =>
+    taxAccounts.value.includes(tax.accno)
+  );
+
+  // Group taxes by chart_id
+  const taxesByChartId = {};
+  allowedTaxes.forEach((tax) => {
+    if (!taxesByChartId[tax.chart_id]) {
+      taxesByChartId[tax.chart_id] = [];
+    }
+    taxesByChartId[tax.chart_id].push(tax);
+  });
+
+  // For each chart_id, select the valid tax
+  const validTaxes = [];
+  const invoiceDateObj = new Date(invoiceDate);
+
+  Object.values(taxesByChartId).forEach((taxGroup) => {
+    // First filter to taxes that are valid for the invoice date
+    const validForDate = taxGroup.filter((tax) => {
+      if (!tax.validto) return true;
+      const validToDate = new Date(tax.validto);
+      return validToDate >= invoiceDateObj;
+    });
+
+    if (validForDate.length > 0) {
+      // If multiple taxes are valid, choose the one with the closest validto date
+      // that is still after the invoice date (or null validto dates last)
+      validForDate.sort((a, b) => {
+        // If neither has validto, they're equivalent
+        if (!a.validto && !b.validto) return 0;
+        // Null validto dates come last (considered forever valid)
+        if (!a.validto) return 1;
+        if (!b.validto) return -1;
+        // Both have validto dates, sort ascending (closest date first)
+        return new Date(a.validto) - new Date(b.validto);
+      });
+
+      // Add the most appropriate tax for this chart_id
+      validTaxes.push(validForDate[0]);
+    }
+  });
+
+  return validTaxes;
+};
+
 const vcUpdate = async (newValue) => {
   if (!newValue) {
     vc.value = {};
@@ -1454,12 +1506,9 @@ const vcUpdate = async (newValue) => {
       taxAccounts.value = fetchedEntity.taxaccounts
         ? fetchedEntity.taxaccounts.split(" ")
         : [];
-      taxAccountList.value = accounts.value
-        .filter((account) => taxAccounts.value.includes(account.accno))
-        .map((acc) => ({
-          ...acc,
-          rate: parseFloat(fetchedEntity[`${acc.accno}_rate`] || 0),
-        }));
+
+      taxAccountList.value = filterValidTaxes(invDate.value);
+      console.log(taxAccountList.value);
       intnotes.value = fetchedEntity.intnotes;
 
       const recordAccountAccno = fetchedEntity?.AR?.split("--")[0] ?? "";
@@ -1520,6 +1569,14 @@ const vcUpdate = async (newValue) => {
     isUpdatingVc = false;
   }
 };
+
+// Add watcher for invDate
+watch(invDate, (newDate) => {
+  if (!initialLoad.value && vc.value) {
+    taxAccountList.value = filterValidTaxes(newDate);
+    calculateTaxes();
+  }
+});
 
 // -------------------------
 // Computed Properties & Watchers

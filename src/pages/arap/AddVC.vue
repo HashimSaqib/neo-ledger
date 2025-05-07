@@ -755,11 +755,26 @@ const fetchLinks = async () => {
     );
     accounts.value = response.data.accounts.all;
     currencies.value = response.data.currencies;
-    taxAccounts.value = response.data.tax_accounts;
-    taxAccounts.value = taxAccounts.value.map((tax) => ({
+
+    // Filter out duplicate tax accounts based on chart_id
+    const uniqueTaxAccounts = response.data.tax_accounts.reduce(
+      (acc, current) => {
+        const existingAccount = acc.find(
+          (item) => item.chart_id === current.chart_id
+        );
+        if (!existingAccount) {
+          acc.push(current);
+        }
+        return acc;
+      },
+      []
+    );
+
+    taxAccounts.value = uniqueTaxAccounts.map((tax) => ({
       id: tax.accno,
       description: `${tax.description} `,
     }));
+
     taxAccounts.value.forEach((tax) => {
       form.value[`tax_${tax.id}`] = 0;
     });
