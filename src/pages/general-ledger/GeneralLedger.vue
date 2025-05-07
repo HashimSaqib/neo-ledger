@@ -476,10 +476,33 @@ const filterTaxAccounts = () => {
   if (!formData.value.transdate) return;
 
   const transDate = new Date(formData.value.transdate);
-  filteredTaxAccounts.value = taxAccounts.value.filter((tax) => {
-    if (!tax.validto) return true; // Include if no validto date
-    const validToDate = new Date(tax.validto);
-    return transDate <= validToDate;
+
+  // Group taxes by chart_id
+  const groupedTaxes = taxAccounts.value.reduce((acc, tax) => {
+    if (!acc[tax.chart_id]) {
+      acc[tax.chart_id] = [];
+    }
+    acc[tax.chart_id].push(tax);
+    return acc;
+  }, {});
+
+  // For each group, find the valid tax for the transaction date
+  filteredTaxAccounts.value = Object.values(groupedTaxes).map((taxes) => {
+    // Sort taxes by validto date (null dates come last)
+    const sortedTaxes = taxes.sort((a, b) => {
+      if (!a.validto) return 1;
+      if (!b.validto) return -1;
+      return new Date(a.validto) - new Date(b.validto);
+    });
+
+    // Find the first tax that is valid for the transaction date
+    return (
+      sortedTaxes.find((tax) => {
+        if (!tax.validto) return true;
+        const validToDate = new Date(tax.validto);
+        return transDate <= validToDate;
+      }) || sortedTaxes[0]
+    ); // Fallback to the first tax if none are valid
   });
 
   // Check and remove invalid taxes from line items
