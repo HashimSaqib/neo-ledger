@@ -1125,6 +1125,7 @@ const filterProjects = () => {
     return invDateObj >= start && invDateObj <= end; // Include if within range
   });
 };
+const taxes = ref([]);
 const lockNumber = ref(null);
 const closedto = ref(null);
 const revtrans = ref(null);
@@ -1136,6 +1137,7 @@ const fetchLinks = async () => {
     lockNumber.value = response.data.locknumber == 1 ? true : false;
     closedto.value = response.data.closedto;
     revtrans.value = response.data.revtrans;
+    taxes.value = response.data.tax_accounts;
     if (currencies.value) {
       selectedCurrency.value = currencies.value.find(
         (currency) => currency.rn === 1
@@ -1296,6 +1298,11 @@ watch(
   { deep: true }
 );
 
+// Add watcher for invoice date changes
+watch(invDate, () => {
+  calculateTaxes();
+});
+
 // =====================
 // Taxes & Totals Calculation
 // =====================
@@ -1321,7 +1328,27 @@ const calculateTaxes = () => {
         ) {
           const name =
             customer.value[`${taxAccount}_description`] || "Tax Name Not Found";
-          const taxRate = customer.value[`${taxAccount}_rate`] || 0;
+
+          // Find the applicable tax rate based on invoice date
+          const applicableTaxes = taxes.value
+            .filter((tax) => tax.accno === taxAccount)
+            .filter((tax) => {
+              // Include if validto is null (currently valid) or greater than invoice date
+              return (
+                !tax.validto || new Date(tax.validto) > new Date(invDate.value)
+              );
+            })
+            .sort((a, b) => {
+              // Sort by validto date, null values last
+              if (!a.validto) return 1;
+              if (!b.validto) return -1;
+              return new Date(a.validto) - new Date(b.validto);
+            });
+
+          // Use the most recent applicable tax rate
+          const taxRate =
+            applicableTaxes.length > 0 ? applicableTaxes[0].rate : 0;
+
           let taxAmount = 0;
           let netAmount = parseFloat(line.extended);
           if (taxIncluded.value) {
