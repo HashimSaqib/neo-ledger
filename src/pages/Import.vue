@@ -167,8 +167,18 @@ const entityColumns = [
   { title: t("Tax Number"), key: "taxnumber", required: false, default: true },
   { title: t("SIC Code"), key: "sic_code", required: false, default: false },
   { title: t("Currency"), key: "curr", required: true, default: true },
-  { title: t("Start Date"), key: "startdate", required: true, default: false },
-  { title: t("End Date"), key: "enddate", required: false, default: false },
+  {
+    title: t("Start Date (yyyy-mm-dd)"),
+    key: "startdate",
+    required: true,
+    default: false,
+  },
+  {
+    title: t("End Date (yyyy-mm-dd)"),
+    key: "enddate",
+    required: false,
+    default: false,
+  },
   {
     title: t("Cash Discount"),
     type: "numeric",
@@ -279,8 +289,18 @@ const invoiceColumns = [
     required: false,
     default: true,
   },
-  { title: t("Invoice Date"), key: "invdate", required: true, default: true },
-  { title: t("Due Date"), key: "duedate", required: true, default: true },
+  {
+    title: t("Invoice Date (yyyy-mm-dd)"),
+    key: "invdate",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Due Date (yyyy-mm-dd)"),
+    key: "duedate",
+    required: true,
+    default: true,
+  },
   { title: t("Currency"), key: "curr", required: true, default: true },
   {
     title: t("Exchange Rate"),
@@ -296,8 +316,13 @@ const invoiceColumns = [
     required: false,
     default: false,
   },
-  { title: t("Department"), key: "department", required: false, default: true },
-  { title: t("Account"), key: "recordaccount", required: false, default: true },
+  {
+    title: t("Department"),
+    key: "department",
+    required: false,
+    default: false,
+  },
+  { title: t("Account"), key: "recordaccount", required: true, default: true },
   {
     title: t("Order Number"),
     key: "ordnumber",
@@ -314,13 +339,13 @@ const invoiceColumns = [
   { title: t("Ship Via"), key: "shipvia", required: false, default: false },
   { title: t("Waybill"), key: "waybill", required: false, default: false },
   {
-    title: t("Line Number"),
+    title: t("Item Number"),
     key: "line_number",
     required: true,
     default: true,
   },
   {
-    title: t("Line Description"),
+    title: t("Item Description"),
     key: "line_description",
     required: true,
     default: true,
@@ -371,7 +396,7 @@ const importConfigs = {
         default: true,
       },
       {
-        title: t("Trans Date"),
+        title: t("Trans Date (yyyy-mm-dd)"),
         key: "transdate",
         required: true,
         default: true,
@@ -653,8 +678,32 @@ const formatDate = (dateString) => {
   if (!dateString) return "";
 
   try {
-    let parsedDate;
+    // Try to validate if it's already in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const parts = dateString.split("-");
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]);
+      const day = parseInt(parts[2]);
 
+      // Basic date validation
+      if (
+        year >= 1000 &&
+        year <= 9999 &&
+        month >= 1 &&
+        month <= 12 &&
+        day >= 1 &&
+        day <= 31
+      ) {
+        // Additional validation for days in month
+        const lastDayOfMonth = new Date(year, month, 0).getDate();
+        if (day <= lastDayOfMonth) {
+          return dateString; // Already in correct format and valid
+        }
+      }
+      return ""; // Invalid date in YYYY-MM-DD format
+    }
+
+    let parsedDate;
     const formatsToTry = [
       "DD.MM.YYYY",
       "DD/MM/YYYY",
@@ -824,6 +873,34 @@ const entityValidationRules = [
     field: "curr",
     rule: coreValidationRules.currencyExists,
   },
+  {
+    field: "startdate",
+    rule: (value) => {
+      if (!value) return { valid: true, message: "" };
+      const formattedDate = formatDate(value);
+      return {
+        valid: formattedDate !== "",
+        message:
+          formattedDate === ""
+            ? "Invalid date format. Use yyyy-mm-dd format."
+            : "",
+      };
+    },
+  },
+  {
+    field: "enddate",
+    rule: (value) => {
+      if (!value) return { valid: true, message: "" };
+      const formattedDate = formatDate(value);
+      return {
+        valid: formattedDate !== "",
+        message:
+          formattedDate === ""
+            ? "Invalid date format. Use yyyy-mm-dd format."
+            : "",
+      };
+    },
+  },
 ];
 
 const validationConfigs = {
@@ -845,6 +922,19 @@ const validationConfigs = {
         field: "exchangerate",
         rule: (value, row) =>
           coreValidationRules.validExchangeRate(row.curr, value),
+      },
+      {
+        field: "transdate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
       },
     ],
     transactionValidations: [
@@ -948,12 +1038,28 @@ const validationConfigs = {
         rule: coreValidationRules.partExists,
       },
       {
+        field: "invdate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
         field: "duedate",
         rule: (value) => {
           const formattedDate = formatDate(value);
           return {
             valid: formattedDate !== "",
-            message: formattedDate === "" ? "Invalid due date format" : "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
           };
         },
       },
@@ -999,12 +1105,28 @@ const validationConfigs = {
         rule: coreValidationRules.partExists,
       },
       {
+        field: "invdate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
         field: "duedate",
         rule: (value) => {
           const formattedDate = formatDate(value);
           return {
             valid: formattedDate !== "",
-            message: formattedDate === "" ? "Invalid due date format" : "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
           };
         },
       },
@@ -1579,6 +1701,7 @@ const columnGroups = computed(() => {
           "mobile",
           "typeofcontact",
           "gender",
+          "notes",
         ].includes(col.key)
       ),
     });
@@ -1639,13 +1762,6 @@ const columnGroups = computed(() => {
           "bankzipcode",
           "bankcountry",
         ].includes(col.key)
-      ),
-    });
-
-    groups.push({
-      title: t("Other"),
-      columns: availableColumns.value.filter((col) =>
-        ["notes"].includes(col.key)
       ),
     });
   } else if (currentType === "ar_invoice" || currentType === "ap_invoice") {
