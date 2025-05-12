@@ -1,6 +1,6 @@
 <template>
-  <q-page class="flex flex-col lightbg q-pa-md">
-    <div class="column q-gutter-y-md">
+  <q-page class="flex flex-col mainbg q-pa-md">
+    <div class="column q-gutter-y-md full-width q-mb-md">
       <div class="row q-gutter-sm q-mt-md">
         <q-btn
           color="primary"
@@ -18,18 +18,75 @@
         />
         <q-btn color="secondary" :label="t('Insert Rows')" @click="addLines" />
       </div>
-      <div v-if="loading" class="full-width flex justify-center">
-        <q-spinner color="primary" size="3em" />
+
+      <div class="column q-gutter-y-md">
+        <q-expansion-item
+          group="columns"
+          icon="tune"
+          :label="t('Select Columns')"
+          header-class="text-h6"
+          :default-opened="true"
+        >
+          <q-card class="q-pa-md">
+            <div class="row justify-between q-mb-md">
+              <q-btn
+                dense
+                color="primary"
+                :label="t('Select All')"
+                @click="selectAllColumns"
+              />
+              <q-btn
+                dense
+                color="primary"
+                :label="t('Default Columns')"
+                @click="resetToDefaultColumns"
+              />
+              <q-btn
+                dense
+                color="primary"
+                :label="t('Required Only')"
+                @click="selectOnlyRequiredColumns"
+              />
+            </div>
+
+            <div
+              v-for="(group, index) in columnGroups"
+              :key="index"
+              class="column q-mb-sm"
+            >
+              <div class="text-subtitle2 q-mb-xs">{{ group.title }}</div>
+              <div class="row q-gutter-x-md wrap q-gutter-y-xs">
+                <q-checkbox
+                  v-for="col in group.columns"
+                  :key="col.key"
+                  v-model="col.checked"
+                  :label="col.title"
+                  :disable="col.required"
+                  dense
+                  class="col-auto"
+                  @update:model-value="handleColumnToggle"
+                />
+              </div>
+              <q-separator
+                class="q-my-sm"
+                v-if="index < columnGroups.length - 1"
+              />
+            </div>
+          </q-card>
+        </q-expansion-item>
       </div>
-      <Spreadsheet ref="spreadsheet" v-else>
-        <Worksheet :data="spreadsheetData" :columns="columns" />
-      </Spreadsheet>
     </div>
+    <div v-if="loading" class="full-width flex justify-center">
+      <q-spinner color="primary" size="3em" />
+    </div>
+    <Spreadsheet ref="spreadsheet" v-else>
+      <Worksheet :data="spreadsheetData" :columns="visibleColumns" />
+    </Spreadsheet>
   </q-page>
 </template>
 
 <script setup>
-import { ref, onMounted, inject, computed } from "vue";
+import { ref, onMounted, inject, computed, watch } from "vue";
 import { Spreadsheet, Worksheet } from "@jspreadsheet-ce/vue";
 import "jsuites/dist/jsuites.css";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
@@ -70,134 +127,374 @@ const repositories = {
   closedto: ref(""),
 };
 
+// Define column configurations first before any function uses them
 const entityColumns = [
-  { title: t("Name"), key: "name" },
-  { title: t("Contact"), key: "contact" },
-  { title: t("Address 1"), key: "address1" },
-  { title: t("Address 2"), key: "address2" },
-  { title: t("City"), key: "city" },
-  { title: t("State"), key: "state" },
-  { title: t("Zipcode"), key: "zipcode" },
-  { title: t("Country"), key: "country" },
-  { title: t("Phone"), key: "phone" },
-  { title: t("Fax"), key: "fax" },
-  { title: t("Email"), key: "email" },
-  { title: t("CC"), key: "cc" },
-  { title: t("BCC"), key: "bcc" },
-  { title: t("Notes"), key: "notes" },
-  { title: t("Terms"), key: "terms" },
-  { title: t("Discount"), type: "numeric", key: "discount" },
-  { title: t("Credit Limit"), type: "numeric", key: "creditlimit" },
-  { title: t("Tax Included"), key: "taxincluded" },
-  { title: t("Tax Number"), key: "taxnumber" },
-  { title: t("SIC Code"), key: "sic_code" },
-  { title: t("Currency"), key: "curr" },
-  { title: t("Start Date"), key: "startdate" },
-  { title: t("End Date"), key: "enddate" },
-  { title: t("Cash Discount"), type: "numeric", key: "cashdiscount" },
-  { title: t("Threshold"), type: "numeric", key: "threshold" },
-  { title: t("Discount Terms"), key: "discountterms" },
-  { title: t("Remittance Voucher"), key: "remittancevoucher" },
-  { title: t("Bank Name"), key: "bankname" },
-  { title: t("IBAN"), key: "iban" },
-  { title: t("BIC"), key: "bic" },
-  { title: t("Member Number"), key: "membernumber" },
-  { title: t("Clearing Number"), key: "clearingnumber" },
-  { title: t("Bank Address 1"), key: "bankaddress1" },
-  { title: t("Bank Address 2"), key: "bankaddress2" },
-  { title: t("Bank City"), key: "bankcity" },
-  { title: t("Bank State"), key: "bankstate" },
-  { title: t("Bank Zipcode"), key: "bankzipcode" },
-  { title: t("Bank Country"), key: "bankcountry" },
-  { title: t("First Name"), key: "firstname" },
-  { title: t("Last Name"), key: "lastname" },
-  { title: t("Salutation"), key: "salutation" },
-  { title: t("Contact Title"), key: "contacttitle" },
-  { title: t("Occupation"), key: "occupation" },
-  { title: t("Mobile"), key: "mobile" },
-  { title: t("Type of Contact"), key: "typeofcontact" },
-  { title: t("Gender"), key: "gender" },
+  { title: t("Name"), key: "name", required: true, default: true },
+  { title: t("Contact"), key: "contact", required: false, default: true },
+  { title: t("Address 1"), key: "address1", required: false, default: true },
+  { title: t("Address 2"), key: "address2", required: false, default: false },
+  { title: t("City"), key: "city", required: false, default: true },
+  { title: t("State"), key: "state", required: false, default: true },
+  { title: t("Zipcode"), key: "zipcode", required: false, default: true },
+  { title: t("Country"), key: "country", required: false, default: true },
+  { title: t("Phone"), key: "phone", required: false, default: true },
+  { title: t("Fax"), key: "fax", required: false, default: false },
+  { title: t("Email"), key: "email", required: false, default: true },
+  { title: t("CC"), key: "cc", required: false, default: false },
+  { title: t("BCC"), key: "bcc", required: false, default: false },
+  { title: t("Notes"), key: "notes", required: false, default: false },
+  { title: t("Terms"), key: "terms", required: false, default: true },
+  {
+    title: t("Discount"),
+    type: "numeric",
+    key: "discount",
+    required: false,
+    default: true,
+  },
+  {
+    title: t("Credit Limit"),
+    type: "numeric",
+    key: "creditlimit",
+    required: false,
+    default: true,
+  },
+  {
+    title: t("Tax Included"),
+    key: "taxincluded",
+    required: false,
+    default: true,
+  },
+  { title: t("Tax Number"), key: "taxnumber", required: false, default: true },
+  { title: t("SIC Code"), key: "sic_code", required: false, default: false },
+  { title: t("Currency"), key: "curr", required: true, default: true },
+  { title: t("Start Date"), key: "startdate", required: true, default: false },
+  { title: t("End Date"), key: "enddate", required: false, default: false },
+  {
+    title: t("Cash Discount"),
+    type: "numeric",
+    key: "cashdiscount",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Threshold"),
+    type: "numeric",
+    key: "threshold",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Discount Terms"),
+    key: "discountterms",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Remittance Voucher"),
+    key: "remittancevoucher",
+    required: false,
+    default: false,
+  },
+  { title: t("Bank Name"), key: "bankname", required: false, default: false },
+  { title: t("IBAN"), key: "iban", required: false, default: false },
+  { title: t("BIC"), key: "bic", required: false, default: false },
+  {
+    title: t("Member Number"),
+    key: "membernumber",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Clearing Number"),
+    key: "clearingnumber",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Bank Address 1"),
+    key: "bankaddress1",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Bank Address 2"),
+    key: "bankaddress2",
+    required: false,
+    default: false,
+  },
+  { title: t("Bank City"), key: "bankcity", required: false, default: false },
+  { title: t("Bank State"), key: "bankstate", required: false, default: false },
+  {
+    title: t("Bank Zipcode"),
+    key: "bankzipcode",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Bank Country"),
+    key: "bankcountry",
+    required: false,
+    default: false,
+  },
+  { title: t("First Name"), key: "firstname", required: false, default: false },
+  { title: t("Last Name"), key: "lastname", required: false, default: false },
+  {
+    title: t("Salutation"),
+    key: "salutation",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Contact Title"),
+    key: "contacttitle",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Occupation"),
+    key: "occupation",
+    required: false,
+    default: false,
+  },
+  { title: t("Mobile"), key: "mobile", required: false, default: false },
+  {
+    title: t("Type of Contact"),
+    key: "typeofcontact",
+    required: false,
+    default: false,
+  },
+  { title: t("Gender"), key: "gender", required: false, default: false },
 ];
 
 const invoiceColumns = [
-  { title: t("Invoice Number"), key: "invnumber" },
-  { title: t("Description"), key: "description" },
-  { title: t("Invoice Date"), key: "invdate" },
-  { title: t("Due Date"), key: "duedate" },
-  { title: t("Currency"), key: "curr" },
-  { title: t("Exchange Rate"), type: "numeric", key: "exchangerate" },
-  { title: t("Notes"), key: "notes" },
-  { title: t("Internal Notes"), key: "intnotes" },
-  { title: t("Department"), key: "department" },
-  { title: t("Account"), key: "recordaccount" },
-  { title: t("Order Number"), key: "ordnumber" },
-  { title: t("PO Number"), key: "ponumber" },
-  { title: t("Shipping Point"), key: "shippingpoint" },
-  { title: t("Ship Via"), key: "shipvia" },
-  { title: t("Waybill"), key: "waybill" },
-  { title: t("Line Number"), key: "line_number" },
-  { title: t("Line Description"), key: "line_description" },
-  { title: t("Quantity"), type: "numeric", key: "qty" },
-  { title: t("Price"), type: "numeric", key: "price" },
-  { title: t("Discount"), type: "numeric", key: "discount" },
-  { title: t("Unit"), key: "unit" },
+  {
+    title: t("Invoice Number"),
+    key: "invnumber",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Description"),
+    key: "description",
+    required: false,
+    default: true,
+  },
+  { title: t("Invoice Date"), key: "invdate", required: true, default: true },
+  { title: t("Due Date"), key: "duedate", required: true, default: true },
+  { title: t("Currency"), key: "curr", required: true, default: true },
+  {
+    title: t("Exchange Rate"),
+    type: "numeric",
+    key: "exchangerate",
+    required: false,
+    default: true,
+  },
+  { title: t("Notes"), key: "notes", required: false, default: false },
+  {
+    title: t("Internal Notes"),
+    key: "intnotes",
+    required: false,
+    default: false,
+  },
+  { title: t("Department"), key: "department", required: false, default: true },
+  { title: t("Account"), key: "recordaccount", required: false, default: true },
+  {
+    title: t("Order Number"),
+    key: "ordnumber",
+    required: false,
+    default: false,
+  },
+  { title: t("PO Number"), key: "ponumber", required: false, default: false },
+  {
+    title: t("Shipping Point"),
+    key: "shippingpoint",
+    required: false,
+    default: false,
+  },
+  { title: t("Ship Via"), key: "shipvia", required: false, default: false },
+  { title: t("Waybill"), key: "waybill", required: false, default: false },
+  {
+    title: t("Line Number"),
+    key: "line_number",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Line Description"),
+    key: "line_description",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Quantity"),
+    type: "numeric",
+    key: "qty",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Price"),
+    type: "numeric",
+    key: "price",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Discount"),
+    type: "numeric",
+    key: "discount",
+    required: false,
+    default: true,
+  },
+  { title: t("Unit"), key: "unit", required: false, default: true },
 ];
 
 const importConfigs = {
   gl: {
     columns: [
-      { title: t("Reference"), key: "reference" },
-      { title: t("Department"), key: "department" },
-      { title: t("Description"), key: "description" },
-      { title: t("Trans Date"), key: "transdate" },
-      { title: t("Notes"), key: "notes" },
-      { title: t("Currency"), key: "curr" },
-      { title: t("Exchange Rate"), type: "numeric", key: "exchangerate" },
-      { title: t("Account No"), key: "accno" },
-      { title: t("Debit"), type: "numeric", key: "debit" },
-      { title: t("Credit"), type: "numeric", key: "credit" },
-      { title: t("Source"), key: "source" },
-      { title: t("Memo"), key: "memo" },
-      { title: t("Project Number"), key: "projectnumber" },
+      {
+        title: t("Reference"),
+        key: "reference",
+        required: true,
+        default: true,
+      },
+      {
+        title: t("Department"),
+        key: "department",
+        required: false,
+        default: true,
+      },
+      {
+        title: t("Description"),
+        key: "description",
+        required: false,
+        default: true,
+      },
+      {
+        title: t("Trans Date"),
+        key: "transdate",
+        required: true,
+        default: true,
+      },
+      { title: t("Notes"), key: "notes", required: false, default: false },
+      { title: t("Currency"), key: "curr", required: true, default: true },
+      {
+        title: t("Exchange Rate"),
+        type: "numeric",
+        key: "exchangerate",
+        required: false,
+        default: true,
+      },
+      { title: t("Account No"), key: "accno", required: true, default: true },
+      {
+        title: t("Debit"),
+        type: "numeric",
+        key: "debit",
+        required: false,
+        default: true,
+      },
+      {
+        title: t("Credit"),
+        type: "numeric",
+        key: "credit",
+        required: false,
+        default: true,
+      },
+      { title: t("Source"), key: "source", required: false, default: false },
+      { title: t("Memo"), key: "memo", required: false, default: true },
+      {
+        title: t("Project Number"),
+        key: "projectnumber",
+        required: false,
+        default: false,
+      },
     ],
   },
   customer: {
     columns: [
-      { title: t("Customer Number"), key: "customernumber" },
+      {
+        title: t("Customer Number"),
+        key: "customernumber",
+        required: true,
+        default: true,
+      },
       ...entityColumns,
     ],
   },
   vendor: {
     columns: [
-      { title: t("Vendor Number"), key: "vendornumber" },
+      {
+        title: t("Vendor Number"),
+        key: "vendornumber",
+        required: true,
+        default: true,
+      },
       ...entityColumns,
     ],
   },
   ar_invoice: {
     columns: [
-      { title: t("Customer Number"), key: "customernumber" },
+      {
+        title: t("Customer Number"),
+        key: "customernumber",
+        required: true,
+        default: true,
+      },
       ...invoiceColumns,
     ],
   },
   ap_invoice: {
     columns: [
-      { title: t("Vendor Number"), key: "vendornumber" },
+      {
+        title: t("Vendor Number"),
+        key: "vendornumber",
+        required: true,
+        default: true,
+      },
       ...invoiceColumns,
     ],
   },
   default: {
     columns: [
-      { title: t("Column 1"), key: "COL1" },
-      { title: t("Column 2"), key: "COL2" },
+      { title: t("Column 1"), key: "COL1", required: true, default: true },
+      { title: t("Column 2"), key: "COL2", required: false, default: true },
     ],
   },
 };
 
-const getColumnIndexes = (type) => {
+// Define column utils
+const getColumnsConfig = (type) => {
   const config = importConfigs[type] || importConfigs.default;
+  return config.columns;
+};
+
+const columns = computed(() => getColumnsConfig(importType.value));
+
+// Define available columns and visible columns
+const availableColumns = ref([]);
+const visibleColumns = computed(() => {
+  return availableColumns.value.filter((col) => col.checked);
+});
+
+// Define createEmptyRows before it's used
+const createEmptyRows = (count, colCount = null) => {
+  const config = importConfigs[importType.value] || importConfigs.default;
+  const columnsToUse =
+    visibleColumns.value?.length > 0 ? visibleColumns.value : config.columns;
+  const colCountToUse = colCount || columnsToUse.length;
+
+  return Array(count)
+    .fill()
+    .map(() => Array(colCountToUse).fill(""));
+};
+
+// Now we can initialize spreadsheetData
+const spreadsheetData = ref(createEmptyRows(50));
+
+const getColumnIndexes = (type) => {
   const indexes = {};
 
-  config.columns.forEach((col, index) => {
+  visibleColumns.value.forEach((col, index) => {
     if (col.key) {
       indexes[col.key] = index;
     }
@@ -207,34 +504,85 @@ const getColumnIndexes = (type) => {
 };
 
 const rowToObject = (row, type) => {
-  const config = importConfigs[type] || importConfigs.default;
   const obj = {};
 
-  config.columns.forEach((col, index) => {
-    if (col.key) {
+  visibleColumns.value.forEach((col, index) => {
+    if (col.key && index < row.length) {
       obj[col.key] = row[index];
+    }
+  });
+
+  // Add missing required columns with null values
+  const allRequiredColumns =
+    importConfigs[type]?.columns.filter((col) => col.required) || [];
+  allRequiredColumns.forEach((reqCol) => {
+    if (obj[reqCol.key] === undefined) {
+      obj[reqCol.key] = null;
     }
   });
 
   return obj;
 };
 
-const createEmptyRows = (count) => {
-  const config = importConfigs[importType.value] || importConfigs.default;
-  const colCount = config.columns.length;
-  return Array(count)
-    .fill()
-    .map(() => Array(colCount).fill(""));
+const updateVisibleColumns = () => {
+  const sheet = spreadsheet.value?.current?.[0];
+  if (!sheet) return;
+
+  // We need to rebuild the spreadsheet data when columns change
+  const data = sheet.getData?.() || [];
+  const oldColumnCount = sheet.colgroup?.length || 0;
+  const newColumnCount = visibleColumns.value.length;
+
+  if (oldColumnCount !== newColumnCount) {
+    const updatedData = data.map((row) => {
+      if (!row) return Array(newColumnCount).fill("");
+
+      const newRow = Array(newColumnCount).fill("");
+      visibleColumns.value.forEach((col, newIndex) => {
+        const oldIndex = availableColumns.value.findIndex(
+          (oldCol) => oldCol.key === col.key
+        );
+        if (oldIndex >= 0 && oldIndex < row.length) {
+          newRow[newIndex] = row[oldIndex];
+        }
+      });
+      return newRow;
+    });
+
+    spreadsheetData.value = updatedData;
+
+    // Force a complete refresh of the spreadsheet component
+    setTimeout(() => {
+      refreshSpreadsheet();
+    }, 10);
+  }
 };
 
-const spreadsheetData = ref(createEmptyRows(50));
-
-const getColumnsConfig = (type) => {
-  const config = importConfigs[type] || importConfigs.default;
-  return config.columns;
+// Add a new handler for checkbox toggle
+const handleColumnToggle = () => {
+  updateVisibleColumns();
 };
 
-const columns = computed(() => getColumnsConfig(importType.value));
+const initializeColumns = () => {
+  const currentConfig = columns.value;
+  availableColumns.value = currentConfig.map((col) => ({
+    ...col,
+    checked: col.required || col.default || false,
+  }));
+
+  // Reset spreadsheet data with the new column count
+  const visibleColCount = visibleColumns.value.length;
+  spreadsheetData.value = createEmptyRows(50, visibleColCount);
+};
+
+// Add watcher for importType
+watch(
+  importType,
+  () => {
+    initializeColumns();
+  },
+  { immediate: true }
+);
 
 const addLines = () => {
   if (spreadsheet.value && linesToAdd.value > 0) {
@@ -1147,12 +1495,247 @@ const importData = async () => {
   }
 };
 
+// Update onMounted to initialize columns
 onMounted(async () => {
   await fetchModules();
+  initializeColumns();
   setTimeout(() => {
     loading.value = false;
   }, 500);
 });
+
+// Update refreshSpreadsheet function to be more robust
+const refreshSpreadsheet = () => {
+  if (!spreadsheet.value) return;
+
+  // Force re-rendering of the spreadsheet with updated data and columns
+  loading.value = true;
+  setTimeout(() => {
+    loading.value = false;
+    // Allow time for the component to re-render before trying to refresh
+    setTimeout(() => {
+      if (spreadsheet.value?.current?.[0]?.refresh) {
+        spreadsheet.value.current[0].refresh();
+      }
+    }, 100);
+  }, 50);
+};
+
+// Add columnGroups computed property and button action methods
+const columnGroups = computed(() => {
+  const currentType = importType.value;
+  const groups = [];
+
+  if (currentType === "gl") {
+    groups.push({
+      title: t("Header "),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "reference",
+          "department",
+          "description",
+          "transdate",
+          "notes",
+          "curr",
+          "exchangerate",
+        ].includes(col.key)
+      ),
+    });
+    groups.push({
+      title: t("Line Items"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "accno",
+          "debit",
+          "credit",
+          "source",
+          "memo",
+          "projectnumber",
+        ].includes(col.key)
+      ),
+    });
+  } else if (currentType === "customer" || currentType === "vendor") {
+    // First column is always customer/vendor number
+    const firstCol = availableColumns.value.find(
+      (col) => col.key === "customernumber" || col.key === "vendornumber"
+    );
+
+    groups.push({
+      title: t("Number"),
+      columns: firstCol ? [firstCol] : [],
+    });
+
+    groups.push({
+      title: t("Basic Information"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "name",
+          "contact",
+          "firstname",
+          "lastname",
+          "salutation",
+          "contacttitle",
+          "occupation",
+          "mobile",
+          "typeofcontact",
+          "gender",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Contact Information"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "address1",
+          "address2",
+          "city",
+          "state",
+          "zipcode",
+          "country",
+          "phone",
+          "fax",
+          "email",
+          "cc",
+          "bcc",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Financial Information"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "terms",
+          "discount",
+          "creditlimit",
+          "taxincluded",
+          "taxnumber",
+          "sic_code",
+          "curr",
+          "startdate",
+          "enddate",
+          "cashdiscount",
+          "threshold",
+          "discountterms",
+          "remittancevoucher",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Banking Information"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "bankname",
+          "iban",
+          "bic",
+          "membernumber",
+          "clearingnumber",
+          "bankaddress1",
+          "bankaddress2",
+          "bankcity",
+          "bankstate",
+          "bankzipcode",
+          "bankcountry",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Other"),
+      columns: availableColumns.value.filter((col) =>
+        ["notes"].includes(col.key)
+      ),
+    });
+  } else if (currentType === "ar_invoice" || currentType === "ap_invoice") {
+    // First column is always customer/vendor number
+    const firstCol = availableColumns.value.find(
+      (col) => col.key === "customernumber" || col.key === "vendornumber"
+    );
+
+    groups.push({
+      title: t("Number"),
+      columns: firstCol ? [firstCol] : [],
+    });
+
+    groups.push({
+      title: t("Invoice Header"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "invnumber",
+          "description",
+          "invdate",
+          "duedate",
+          "curr",
+          "exchangerate",
+          "notes",
+          "intnotes",
+          "department",
+          "recordaccount",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Order Information"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "ordnumber",
+          "ponumber",
+          "shippingpoint",
+          "shipvia",
+          "waybill",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Line Items"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "line_number",
+          "line_description",
+          "qty",
+          "price",
+          "discount",
+          "unit",
+        ].includes(col.key)
+      ),
+    });
+  } else {
+    // Default case - put all columns in one group
+    groups.push({
+      title: t("All Columns"),
+      columns: availableColumns.value,
+    });
+  }
+
+  // Filter out empty groups
+  return groups.filter((group) => group.columns.length > 0);
+});
+
+// Methods to handle column selection
+const selectAllColumns = () => {
+  availableColumns.value.forEach((col) => {
+    col.checked = true;
+  });
+  updateVisibleColumns();
+};
+
+const resetToDefaultColumns = () => {
+  availableColumns.value.forEach((col) => {
+    col.checked = col.required || col.default;
+  });
+  updateVisibleColumns();
+};
+
+const selectOnlyRequiredColumns = () => {
+  availableColumns.value.forEach((col) => {
+    col.checked = col.required;
+  });
+  updateVisibleColumns();
+};
 </script>
 
 <style>
