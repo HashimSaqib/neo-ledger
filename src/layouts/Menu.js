@@ -86,6 +86,11 @@ export const menuLinks = [
         perm: "vendor.transaction",
       },
       {
+        title: "Debit Note",
+        link: "/arap/transaction/vendor?reverse=1",
+        perm: "vendor.transaction.return",
+      },
+      {
         title: "Vendor Invoice",
         link: "/ap/vendor-invoice",
         perm: "vendor.invoice",

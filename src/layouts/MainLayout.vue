@@ -102,7 +102,7 @@ const createLink = (link) => {
     path = `${base}/arap/transaction/customer`;
   } else if (link === "vendor.invoice") {
     path = `${base}/ap/vendor-invoice`;
-  } else if (link === "customer.transaction") {
+  } else if (link === "vendor.transaction") {
     path = `${base}/arap/transaction/vendor`;
   } else if (link === "base") {
     path = `${base}`;

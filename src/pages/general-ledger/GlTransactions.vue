@@ -899,7 +899,7 @@ const getPath = (row) => {
       ? createLink("customer.pos")
       : row.invoice
       ? createLink("customer.invoice")
-      : createLink("transaction.customer");
+      : createLink("customer.transaction");
   } else if (row.type === "ap") {
     path = row.invoice
       ? createLink("vendor.invoice")
