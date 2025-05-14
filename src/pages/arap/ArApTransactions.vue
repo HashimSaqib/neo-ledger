@@ -428,7 +428,7 @@ const formData = ref({
   open: "Y",
   summary: "1",
   outstanding: "",
-  closed: "",
+  closed: "Y",
   paidlate: "",
   paidearly: "",
   onhold: "",

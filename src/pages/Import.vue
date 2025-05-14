@@ -7,7 +7,12 @@
           :label="t('Validate Data')"
           @click="validateData"
         />
-        <q-btn color="primary" :label="t('Import Data')" @click="importData" />
+        <q-btn
+          color="primary"
+          :label="t('Import Data')"
+          @click="importData"
+          :disable="importDisabled"
+        />
         <q-input
           v-model.number="linesToAdd"
           type="number"
@@ -115,6 +120,7 @@ updateTitle(pageTitles[route.params.type] || pageTitles.default);
 const loading = ref(true);
 const importType = ref(route.params.type);
 const linesToAdd = ref(10);
+const importDisabled = ref(false);
 
 const repositories = {
   currencies: ref([]),
@@ -374,6 +380,131 @@ const invoiceColumns = [
   { title: t("Unit"), key: "unit", required: false, default: true },
 ];
 
+const transactionColumns = [
+  {
+    title: t("Invoice Number"),
+    key: "invnumber",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Description"),
+    key: "description",
+    required: false,
+    default: true,
+  },
+  {
+    title: t("Invoice Date (yyyy-mm-dd)"),
+    key: "invdate",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Due Date (yyyy-mm-dd)"),
+    key: "duedate",
+    required: true,
+    default: true,
+  },
+  { title: t("Currency"), key: "curr", required: true, default: true },
+  {
+    title: t("Exchange Rate"),
+    type: "numeric",
+    key: "exchangerate",
+    required: false,
+    default: true,
+  },
+  { title: t("Notes"), key: "notes", required: false, default: false },
+  {
+    title: t("Internal Notes"),
+    key: "intnotes",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Department"),
+    key: "department",
+    required: false,
+    default: false,
+  },
+  { title: t("Account"), key: "recordaccount", required: true, default: true },
+  {
+    title: t("Order Number"),
+    key: "ordnumber",
+    required: false,
+    default: false,
+  },
+  { title: t("PO Number"), key: "ponumber", required: false, default: false },
+  {
+    title: t("Tax Included"),
+    key: "taxincluded",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Line Description"),
+    key: "line_description",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Line Amount"),
+    type: "numeric",
+    key: "line_amount",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Line Account"),
+    key: "line_account",
+    required: true,
+    default: true,
+  },
+  {
+    title: t("Line Project"),
+    key: "line_project",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Payment Date (yyyy-mm-dd)"),
+    key: "payment_date",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Payment Source"),
+    key: "payment_source",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Payment Memo"),
+    key: "payment_memo",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Payment Amount"),
+    type: "numeric",
+    key: "payment_amount",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Payment Exchange Rate"),
+    type: "numeric",
+    key: "payment_exchangerate",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Payment Account"),
+    key: "payment_account",
+    required: false,
+    default: false,
+  },
+];
+
 const importConfigs = {
   gl: {
     columns: [
@@ -477,6 +608,28 @@ const importConfigs = {
         default: true,
       },
       ...invoiceColumns,
+    ],
+  },
+  ar_transaction: {
+    columns: [
+      {
+        title: t("Customer Number"),
+        key: "customernumber",
+        required: true,
+        default: true,
+      },
+      ...transactionColumns,
+    ],
+  },
+  ap_transaction: {
+    columns: [
+      {
+        title: t("Vendor Number"),
+        key: "vendornumber",
+        required: true,
+        default: true,
+      },
+      ...transactionColumns,
     ],
   },
   default: {
@@ -1156,6 +1309,192 @@ const validationConfigs = {
       },
     ],
   },
+  ar_transaction: {
+    fieldValidations: [
+      {
+        field: "customernumber",
+        rule: coreValidationRules.customerExists,
+      },
+      {
+        field: "invnumber",
+        rule: (value) =>
+          coreValidationRules.requiredField(value, "Invoice Number"),
+      },
+      {
+        field: "invdate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
+        field: "duedate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
+        field: "curr",
+        rule: coreValidationRules.currencyExists,
+      },
+      {
+        field: "recordaccount",
+        rule: coreValidationRules.accountExists,
+      },
+      {
+        field: "line_account",
+        rule: coreValidationRules.accountExists,
+      },
+      {
+        field: "line_amount",
+        rule: (value) => {
+          const num = parseNumber(value);
+          return {
+            valid: num !== 0,
+            message: num === 0 ? "Line amount cannot be zero" : "",
+          };
+        },
+      },
+      {
+        field: "payment_account",
+        rule: (value) => {
+          if (!value) return { valid: true, message: "" };
+          return coreValidationRules.accountExists(value);
+        },
+      },
+      {
+        field: "payment_date",
+        rule: (value) => {
+          if (!value) return { valid: true, message: "" };
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
+        field: "payment_amount",
+        rule: (value) => {
+          if (!value) return { valid: true, message: "" };
+          const num = parseNumber(value);
+          return {
+            valid: num > 0,
+            message: num <= 0 ? "Payment amount must be greater than 0" : "",
+          };
+        },
+      },
+    ],
+  },
+  ap_transaction: {
+    fieldValidations: [
+      {
+        field: "vendornumber",
+        rule: coreValidationRules.vendorExists,
+      },
+      {
+        field: "invnumber",
+        rule: (value) =>
+          coreValidationRules.requiredField(value, "Invoice Number"),
+      },
+      {
+        field: "invdate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
+        field: "duedate",
+        rule: (value) => {
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
+        field: "curr",
+        rule: coreValidationRules.currencyExists,
+      },
+      {
+        field: "recordaccount",
+        rule: coreValidationRules.accountExists,
+      },
+      {
+        field: "line_account",
+        rule: coreValidationRules.accountExists,
+      },
+      {
+        field: "line_amount",
+        rule: (value) => {
+          const num = parseNumber(value);
+          return {
+            valid: num !== 0,
+            message: num === 0 ? "Line amount cannot be zero" : "",
+          };
+        },
+      },
+      {
+        field: "payment_account",
+        rule: (value) => {
+          if (!value) return { valid: true, message: "" };
+          return coreValidationRules.accountExists(value);
+        },
+      },
+      {
+        field: "payment_date",
+        rule: (value) => {
+          if (!value) return { valid: true, message: "" };
+          const formattedDate = formatDate(value);
+          return {
+            valid: formattedDate !== "",
+            message:
+              formattedDate === ""
+                ? "Invalid date format. Use yyyy-mm-dd format."
+                : "",
+          };
+        },
+      },
+      {
+        field: "payment_amount",
+        rule: (value) => {
+          if (!value) return { valid: true, message: "" };
+          const num = parseNumber(value);
+          return {
+            valid: num > 0,
+            message: num <= 0 ? "Payment amount must be greater than 0" : "",
+          };
+        },
+      },
+    ],
+  },
 };
 
 const getColumnLetter = (index) => {
@@ -1326,6 +1665,7 @@ const validateData = () => {
         position: "center",
         color: "negative",
       });
+      importDisabled.value = false;
       return false;
     } else {
       Notify.create({
@@ -1344,6 +1684,7 @@ const validateData = () => {
       icon: "error",
       position: "center",
     });
+    importDisabled.value = false;
     return false;
   }
 };
@@ -1398,6 +1739,16 @@ const formatEntityData = (row) => {
   return entity;
 };
 
+const clearSpreadsheetData = () => {
+  if (spreadsheet.value?.current?.[0]) {
+    const sheet = spreadsheet.value.current[0];
+    const colCount = visibleColumns.value.length;
+    spreadsheetData.value = createEmptyRows(50, colCount);
+    sheet.setData(spreadsheetData.value);
+    refreshSpreadsheet();
+  }
+};
+
 const importData = async () => {
   if (!spreadsheet.value) {
     Notify.create({
@@ -1414,6 +1765,8 @@ const importData = async () => {
     return;
   }
 
+  importDisabled.value = true;
+
   const sheet = spreadsheet.value.current?.[0];
   if (!sheet) {
     Notify.create({
@@ -1422,6 +1775,7 @@ const importData = async () => {
       icon: "error",
       position: "center",
     });
+    importDisabled.value = false;
     return;
   }
 
@@ -1569,6 +1923,92 @@ const importData = async () => {
       importType.value === "vendor"
     ) {
       formattedData = nonEmptyRows.map((row) => formatEntityData(row));
+    } else if (
+      importType.value === "ar_transaction" ||
+      importType.value === "ap_transaction"
+    ) {
+      const transactionsByNumber = {};
+
+      nonEmptyRows.forEach((row) => {
+        const rowObj = rowToObject(row, importType.value);
+        const invNumber = rowObj.invnumber || "";
+        const entityKey =
+          importType.value === "ar_transaction"
+            ? "customernumber"
+            : "vendornumber";
+        const entityNumber = rowObj[entityKey] || "";
+
+        let entityId = null;
+        if (importType.value === "ar_transaction") {
+          const customer = repositories.customers.value.find(
+            (c) => c.customernumber === entityNumber
+          );
+          if (customer) entityId = customer.id;
+        } else {
+          const vendor = repositories.vendors.value.find(
+            (v) => v.vendornumber === entityNumber
+          );
+          if (vendor) entityId = vendor.id;
+        }
+
+        if (!transactionsByNumber[invNumber]) {
+          transactionsByNumber[invNumber] = {
+            invNumber: invNumber,
+            description: rowObj.description || "",
+            invDate: formatDate(rowObj.invdate || ""),
+            dueDate: formatDate(rowObj.duedate || ""),
+            currency: rowObj.curr || "",
+            exchangerate: parseNumber(rowObj.exchangerate) || 1.0,
+            notes: rowObj.notes || "",
+            intnotes: rowObj.intnotes || "",
+            department: rowObj.department || "",
+            recordAccount: rowObj.recordaccount || "",
+            [importType.value === "ar_transaction"
+              ? "customer_id"
+              : "vendor_id"]: entityId,
+            ordNumber: rowObj.ordnumber || "",
+            poNumber: rowObj.ponumber || "",
+            taxincluded:
+              rowObj.taxincluded === "1" ||
+              rowObj.taxincluded === "true" ||
+              rowObj.taxincluded === true,
+            lines: [],
+            payments: [],
+          };
+        }
+
+        // Add line item if present
+        if (
+          rowObj.line_description &&
+          rowObj.line_amount &&
+          rowObj.line_account
+        ) {
+          transactionsByNumber[invNumber].lines.push({
+            description: rowObj.line_description,
+            amount: parseNumber(rowObj.line_amount),
+            account: rowObj.line_account,
+            project: rowObj.line_project || "",
+          });
+        }
+
+        // Add payment if present
+        if (
+          rowObj.payment_date &&
+          rowObj.payment_amount &&
+          rowObj.payment_account
+        ) {
+          transactionsByNumber[invNumber].payments.push({
+            date: formatDate(rowObj.payment_date),
+            source: rowObj.payment_source || "",
+            memo: rowObj.payment_memo || "",
+            amount: parseNumber(rowObj.payment_amount),
+            exchangerate: parseNumber(rowObj.payment_exchangerate) || 1.0,
+            account: rowObj.payment_account,
+          });
+        }
+      });
+
+      formattedData = Object.values(transactionsByNumber);
     }
 
     try {
@@ -1579,35 +2019,72 @@ const importData = async () => {
           ? `/import/invoice/customer`
           : importType.value === "ap_invoice"
           ? `/import/invoice/vendor`
+          : importType.value === "ar_transaction"
+          ? `/import/transaction/customer`
+          : importType.value === "ap_transaction"
+          ? `/import/transaction/vendor`
           : `/import/arap/${importType.value}`;
+
       const response = await api.post(endpoint, formattedData);
 
-      if (response.data.success) {
+      if (response.status === 200) {
+        clearSpreadsheetData();
         Notify.create({
           color: "positive",
           message: t("Data imported successfully"),
           icon: "check_circle",
           position: "center",
         });
-      } else {
+      } else if (response.status === 207) {
+        clearSpreadsheetData();
+        const results = response.data;
+        const successCount = results.filter((r) => r.success).length;
+        const failureCount = results.filter((r) => !r.success).length;
+
         Notify.create({
-          color: "negative",
-          message: t(response.data.message || "Import failed"),
-          icon: "error",
+          color: "warning",
+          message: t(
+            `Partial import: ${successCount} items imported, ${failureCount} items failed`
+          ),
+          icon: "warning",
           position: "center",
+          timeout: 5000,
         });
+
+        if (failureCount > 0) {
+          const errorMessages = results
+            .filter((r) => !r.success)
+            .map((r) => r.error)
+            .join("<br>");
+
+          Notify.create({
+            color: "negative",
+            message: t("Failed items errors:") + "<br>" + errorMessages,
+            html: true,
+            position: "center",
+            timeout: 10000,
+          });
+        }
+      } else {
+        throw new Error("Unsupported response status");
       }
     } catch (error) {
       console.error("API import error:", error);
+      importDisabled.value =
+        error.response?.status === 400 || error.response?.status === 500;
+
       Notify.create({
         color: "negative",
-        message: t("Failed to send data to server"),
+        message: t(
+          error.response?.data?.message || "Failed to send data to server"
+        ),
         icon: "error",
         position: "center",
       });
     }
   } catch (error) {
     console.error("Import error:", error);
+    importDisabled.value = false;
     Notify.create({
       color: "negative",
       message: t("An error occurred during import"),
@@ -1816,6 +2293,66 @@ const columnGroups = computed(() => {
           "price",
           "discount",
           "unit",
+        ].includes(col.key)
+      ),
+    });
+  } else if (
+    currentType === "ar_transaction" ||
+    currentType === "ap_transaction"
+  ) {
+    // First column is always customer/vendor number
+    const firstCol = availableColumns.value.find(
+      (col) => col.key === "customernumber" || col.key === "vendornumber"
+    );
+
+    groups.push({
+      title: t("Number"),
+      columns: firstCol ? [firstCol] : [],
+    });
+
+    groups.push({
+      title: t("Transaction Header"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "invnumber",
+          "description",
+          "invdate",
+          "duedate",
+          "curr",
+          "exchangerate",
+          "notes",
+          "intnotes",
+          "department",
+          "recordaccount",
+          "ordnumber",
+          "ponumber",
+          "taxincluded",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Line Items"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "line_description",
+          "line_amount",
+          "line_account",
+          "line_project",
+        ].includes(col.key)
+      ),
+    });
+
+    groups.push({
+      title: t("Payments"),
+      columns: availableColumns.value.filter((col) =>
+        [
+          "payment_date",
+          "payment_source",
+          "payment_memo",
+          "payment_amount",
+          "payment_exchangerate",
+          "payment_account",
         ].includes(col.key)
       ),
     });
