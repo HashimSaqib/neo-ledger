@@ -847,7 +847,9 @@ const updateTaxAmount = (val, index) => {
     console.warn("taxAccounts is not available");
     return;
   }
-  const taxAcc = taxAccounts.value.find((item) => item.accno === val.accno);
+  const taxAcc = filteredTaxAccounts.value.find(
+    (item) => item.accno === val.accno
+  );
   if (!taxAcc || !taxAcc.rate) {
     lines.value[index].linetaxamount = 0;
     return;
