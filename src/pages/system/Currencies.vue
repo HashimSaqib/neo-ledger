@@ -97,7 +97,7 @@ const getCurrencies = async () => {
 };
 
 const openAddPopup = () => {
-  selectedCurrency.value = { curr: "", prec: 0 };
+  selectedCurrency.value = { curr: "", prec: 2 };
   isEditMode.value = false;
   editDialog.value = true;
 };

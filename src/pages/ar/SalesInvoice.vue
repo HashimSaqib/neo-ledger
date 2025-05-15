@@ -130,7 +130,7 @@
             <s-select
               outlined
               v-model="recordAccount"
-              :options="recordAccounts"
+              :options="openRecordAccounts"
               :label="t('Record In')"
               dense
               popup-content-class="mainbg maintext"
@@ -762,7 +762,7 @@
         <s-select
           outlined
           v-model="payment.account"
-          :options="paymentAccounts"
+          :options="openPaymentAccounts"
           :label="t('Account')"
           option-label="label"
           option-value="id"
@@ -1091,7 +1091,7 @@ const fetchAccounts = async () => {
       account.link.split(":").includes("AR_paid")
     );
     defaultPaymentAccount.value = paymentAccounts.value[0];
-    recordAccount.value = recordAccounts.value[0];
+    recordAccount.value = openRecordAccounts.value[0];
   } catch (error) {
     console.log(error);
     Notify.create({
@@ -1101,7 +1101,12 @@ const fetchAccounts = async () => {
     });
   }
 };
-
+const openRecordAccounts = computed(() =>
+  recordAccounts.value.filter((account) => account.closed === 0)
+);
+const openPaymentAccounts = computed(() =>
+  paymentAccounts.value.filter((account) => account.closed === 0)
+);
 // Links & Currencies & Projects
 const departments = ref([]);
 const selectedDepartment = ref();
