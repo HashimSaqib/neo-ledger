@@ -1158,13 +1158,7 @@ const validationConfigs = {
     ],
   },
   customer: {
-    fieldValidations: [
-      {
-        field: "customernumber",
-        rule: coreValidationRules.customerExists,
-      },
-      ...entityValidationRules,
-    ],
+    fieldValidations: [...entityValidationRules],
   },
   vendor: {
     fieldValidations: [
