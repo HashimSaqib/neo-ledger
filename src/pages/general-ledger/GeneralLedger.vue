@@ -125,7 +125,7 @@
           <s-select
             outlined
             v-model="line.account"
-            :options="accounts"
+            :options="openAccounts"
             :label="t('Account')"
             dense
             class="col-3"
@@ -587,6 +587,9 @@ const fetchLinks = async () => {
     console.log(error);
   }
 };
+const openAccounts = computed(() =>
+  accounts.value.filter((account) => account.closed === 0)
+);
 
 const loading = ref(false);
 

@@ -70,7 +70,7 @@
                 <s-select
                   outlined
                   v-model="recordAccount"
-                  :options="recordAccounts"
+                  :options="openRecordAccounts"
                   :label="t('Record In')"
                   dense
                   bg-color="input"
@@ -245,7 +245,7 @@
                 <s-select
                   outlined
                   v-model="line.account"
-                  :options="itemAccounts"
+                  :options="openItemAccounts"
                   :label="t('Account')"
                   option-label="label"
                   option-value="id"
@@ -973,7 +973,7 @@ const fetchAccounts = async () => {
     recordAccounts.value = accounts.value.filter(
       (account) => account.link === linkType
     );
-    recordAccount.value = recordAccounts.value[0] || null;
+    recordAccount.value = openRecordAccounts.value[0] || null;
     paymentAccounts.value = accounts.value.filter((account) =>
       account.link.split(":").includes(linkPaid)
     );
@@ -1393,7 +1393,7 @@ const loadInvoice = async (invoice) => {
           source: "",
           memo: "",
           amount: 0,
-          account: paymentAccounts.value[0],
+          account: openPaymentAccounts.value[0],
         },
       ];
     }
@@ -1654,7 +1654,7 @@ watch(
       itemAccounts.value = accounts.value.filter((account) =>
         account.link.split(":").includes(icLink)
       );
-      recordAccount.value = recordAccounts.value[0] || null;
+      recordAccount.value = openRecordAccounts.value[0] || null;
       payments.value[0].account = paymentAccounts.value[0] || null;
     }
     invoicePreview.value = null;
@@ -1662,6 +1662,16 @@ watch(
     splitterModel.value = 100;
   },
   { immediate: true }
+);
+
+const openRecordAccounts = computed(() =>
+  recordAccounts.value.filter((account) => account.closed === 0)
+);
+const openPaymentAccounts = computed(() =>
+  paymentAccounts.value.filter((account) => account.closed === 0)
+);
+const openItemAccounts = computed(() =>
+  itemAccounts.value.filter((account) => account.closed === 0)
 );
 
 onMounted(() => {
