@@ -546,17 +546,17 @@ const importConfigs = {
         title: t("Debit"),
         type: "numeric",
         key: "debit",
-        required: false,
+        required: true,
         default: true,
       },
       {
         title: t("Credit"),
         type: "numeric",
         key: "credit",
-        required: false,
+        required: true,
         default: true,
       },
-      { title: t("Source"), key: "source", required: false, default: false },
+      { title: t("Source"), key: "source", required: false, default: true },
       { title: t("Memo"), key: "memo", required: false, default: true },
       {
         title: t("Project Number"),
@@ -640,7 +640,7 @@ const importConfigs = {
   },
 };
 
-// Define column utils
+// column utils
 const getColumnsConfig = (type) => {
   const config = importConfigs[type] || importConfigs.default;
   return config.columns;
@@ -648,13 +648,13 @@ const getColumnsConfig = (type) => {
 
 const columns = computed(() => getColumnsConfig(importType.value));
 
-// Define available columns and visible columns
+// available columns and visible columns
 const availableColumns = ref([]);
 const visibleColumns = computed(() => {
   return availableColumns.value.filter((col) => col.checked);
 });
 
-// Define createEmptyRows before it's used
+// createEmptyRows before it's used
 const createEmptyRows = (count, colCount = null) => {
   const config = importConfigs[importType.value] || importConfigs.default;
   const columnsToUse =
@@ -667,7 +667,8 @@ const createEmptyRows = (count, colCount = null) => {
 };
 
 // Now we can initialize spreadsheetData
-const spreadsheetData = ref(createEmptyRows(50));
+// 1 isused for columns so watcher automatically sets the right value
+const spreadsheetData = ref(createEmptyRows(50, 1));
 
 const getColumnIndexes = (type) => {
   const indexes = {};
@@ -702,64 +703,71 @@ const rowToObject = (row, type) => {
   return obj;
 };
 
-const updateVisibleColumns = () => {
-  const sheet = spreadsheet.value?.current?.[0];
-  if (!sheet) return;
-
-  // We need to rebuild the spreadsheet data when columns change
-  const data = sheet.getData?.() || [];
-  const oldColumnCount = sheet.colgroup?.length || 0;
-  const newColumnCount = visibleColumns.value.length;
-
-  if (oldColumnCount !== newColumnCount) {
-    const updatedData = data.map((row) => {
-      if (!row) return Array(newColumnCount).fill("");
-
-      const newRow = Array(newColumnCount).fill("");
-      visibleColumns.value.forEach((col, newIndex) => {
-        const oldIndex = availableColumns.value.findIndex(
-          (oldCol) => oldCol.key === col.key
-        );
-        if (oldIndex >= 0 && oldIndex < row.length) {
-          newRow[newIndex] = row[oldIndex];
-        }
-      });
-      return newRow;
-    });
-
-    spreadsheetData.value = updatedData;
-
-    // Force a complete refresh of the spreadsheet component
-    setTimeout(() => {
-      refreshSpreadsheet();
-    }, 10);
-  }
-};
-
-// Add a new handler for checkbox toggle
-const handleColumnToggle = () => {
-  updateVisibleColumns();
-};
-
 const initializeColumns = () => {
   const currentConfig = columns.value;
   availableColumns.value = currentConfig.map((col) => ({
     ...col,
     checked: col.required || col.default || false,
   }));
-
-  // Reset spreadsheet data with the new column count
-  const visibleColCount = visibleColumns.value.length;
-  spreadsheetData.value = createEmptyRows(50, visibleColCount);
 };
 
-// Add watcher for importType
 watch(
   importType,
   () => {
     initializeColumns();
   },
   { immediate: true }
+);
+
+watch(
+  visibleColumns,
+  (newVisible, oldVisible) => {
+    if (!spreadsheet.value?.current?.[0]) {
+      return; // Spreadsheet component not ready
+    }
+
+    const currentRawData = spreadsheet.value.current[0].getData();
+    const dataToProcess =
+      spreadsheetData.value.length > 0
+        ? [...spreadsheetData.value]
+        : currentRawData.length > 0
+        ? [...currentRawData]
+        : [];
+
+    const isInitialOrDataEmpty = !oldVisible || dataToProcess.length === 0;
+
+    if (isInitialOrDataEmpty) {
+      if (newVisible.length > 0) {
+        const rowCount = dataToProcess.length > 0 ? dataToProcess.length : 50;
+        spreadsheetData.value = createEmptyRows(rowCount, newVisible.length);
+      } else {
+        spreadsheetData.value = [];
+      }
+    } else {
+      // Transform existing data
+      // Ensure oldVisible is an array, even if it was initially undefined and newVisible populated it
+      const actualOldVisible = oldVisible || [];
+
+      const transformedData = dataToProcess.map((rowData) => {
+        const newRow = [];
+        newVisible.forEach((newColConfig) => {
+          const oldColIndex = actualOldVisible.findIndex(
+            (oldColConfig) => oldColConfig.key === newColConfig.key
+          );
+          if (oldColIndex !== -1 && oldColIndex < rowData.length) {
+            newRow.push(rowData[oldColIndex]);
+          } else {
+            newRow.push("");
+          }
+        });
+        return newRow;
+      });
+      spreadsheetData.value = transformedData;
+    }
+
+    refreshSpreadsheet();
+  },
+  { deep: false }
 );
 
 const addLines = () => {
@@ -2367,21 +2375,18 @@ const selectAllColumns = () => {
   availableColumns.value.forEach((col) => {
     col.checked = true;
   });
-  updateVisibleColumns();
 };
 
 const resetToDefaultColumns = () => {
   availableColumns.value.forEach((col) => {
     col.checked = col.required || col.default;
   });
-  updateVisibleColumns();
 };
 
 const selectOnlyRequiredColumns = () => {
   availableColumns.value.forEach((col) => {
     col.checked = col.required;
   });
-  updateVisibleColumns();
 };
 </script>
 
