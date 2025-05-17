@@ -180,6 +180,9 @@ defineExpose({
   focus: () => {
     qSelectRef.value.focus();
   },
+  blur: () => {
+    qSelectRef.value.blur();
+  },
 });
 function onPopupShow() {
   if (internalValue.value != null && internalValue.value !== "") {
