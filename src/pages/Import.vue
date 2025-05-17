@@ -128,7 +128,7 @@
           search="description"
           v-model="selectValues.project"
           @update:model-value="
-            (value) => value && copyClipboard(value.description, 'project')
+            (value) => value && copyClipboard(value.projectnumber, 'project')
           "
         ></s-select>
       </div>
@@ -1929,6 +1929,26 @@ const formatEntityData = (row) => {
   return entity;
 };
 
+const getDepartment = (department) => {
+  if (department) {
+    const departmentObj = repositories.departments.value.find(
+      (d) => d.description === department
+    );
+    if (departmentObj) {
+      return `${departmentObj.description}--${departmentObj.id}`;
+    }
+  }
+};
+const getProject = (project) => {
+  if (project) {
+    const projectObj = repositories.projects.value.find(
+      (p) => p.projectnumber === project
+    );
+    if (projectObj) {
+      return `${projectObj.projectnumber}--${projectObj.id}`;
+    }
+  }
+};
 const clearSpreadsheetData = () => {
   if (spreadsheet.value?.current?.[0]) {
     const sheet = spreadsheet.value.current[0];
@@ -2026,7 +2046,7 @@ const importData = async () => {
             notes: rowObj.notes || "",
             intnotes: rowObj.intnotes || "",
             till: rowObj.till || "",
-            department: rowObj.department || "",
+            department: getDepartment(rowObj.department),
             recordAccount: rowObj.recordaccount || "",
             [importType.value === "ar_invoice" ? "customer_id" : "vendor_id"]:
               entityId,
@@ -2087,7 +2107,7 @@ const importData = async () => {
         const transaction = {
           reference: reference,
           transdate: formatDate(firstRow.transdate || ""),
-          department: firstRow.department || 0,
+          department: getDepartment(firstRow.department),
           description: firstRow.description || "",
           notes: firstRow.notes || "",
           curr: firstRow.curr || "",
@@ -2102,7 +2122,7 @@ const importData = async () => {
             credit: parseNumber(row.credit) || 0,
             memo: row.memo || "",
             source: row.source || "",
-            project: row.projectnumber || "",
+            project: getProject(row.projectnumber),
           });
         });
 
@@ -2151,7 +2171,7 @@ const importData = async () => {
             exchangerate: parseNumber(rowObj.exchangerate) || 1.0,
             notes: rowObj.notes || "",
             intnotes: rowObj.intnotes || "",
-            department: rowObj.department || "",
+            department: getDepartment(rowObj.department),
             recordAccount: rowObj.recordaccount || "",
             [importType.value === "ar_transaction"
               ? "customer_id"
@@ -2177,7 +2197,7 @@ const importData = async () => {
             description: rowObj.line_description,
             amount: parseNumber(rowObj.line_amount),
             account: rowObj.line_account,
-            project: rowObj.line_project || "",
+            project: getProject(rowObj.line_project),
           });
         }
 
