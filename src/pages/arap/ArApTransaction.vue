@@ -510,6 +510,12 @@
             v-if="canPost"
           />
           <q-btn
+            :label="t('New Number')"
+            color="primary"
+            @click="newNumber"
+            class="q-mr-md"
+          />
+          <q-btn
             class="q-mr-md"
             :label="t('Print')"
             color="accent"

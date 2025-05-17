@@ -298,6 +298,13 @@
       />
       <q-btn
         color="primary"
+        :label="t('New Number')"
+        @click="newNumber"
+        :loading="loading"
+        v-if="canPostAsNew"
+      />
+      <q-btn
+        color="primary"
         :label="t('Post As New')"
         @click="submitTransaction(false, true)"
         :loading="loading"
@@ -830,7 +837,14 @@ const deleteTransaction = async () => {
     console.error(error);
   }
 };
-
+const newNumber = async () => {
+  try {
+    const response = await api.get("next_number/gl");
+    formData.value.reference = response.data.number;
+  } catch (error) {
+    console.error(error);
+  }
+};
 const resetForm = () => {
   formData.value = { ...initialFormData };
   if (currencies.value.length > 0) {

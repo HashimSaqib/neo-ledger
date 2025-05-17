@@ -803,6 +803,12 @@
       />
       <q-btn
         color="primary"
+        :label="t('New Number')"
+        @click="newNumber"
+        class="q-mr-md"
+      />
+      <q-btn
+        color="primary"
         :label="t('Post As New')"
         @click="postInvoice(false, true)"
         class="q-mr-md"
@@ -1286,7 +1292,14 @@ const handleLineItemChange = (newValue, index) => {
     }
   });
 };
-
+const newNumber = async () => {
+  try {
+    const response = await api.get(`next_number/ar`);
+    invNumber.value = response.data.number;
+  } catch (error) {
+    console.error(error);
+  }
+};
 // Watch Lines for Recalculation
 watch(
   lines,

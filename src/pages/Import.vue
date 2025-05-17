@@ -2597,6 +2597,30 @@ const copyClipboard = (value, select) => {
   });
   return null;
 };
+// get next number
+const newNumber = async () => {
+  try {
+    // Map every import type to the correct module name
+    const moduleMap = {
+      gl: "gl",
+      ap_transaction: "ap",
+      ap_invoice: "ap",
+      ar_transaction: "ar",
+      ar_invoice: "ar",
+      customer: "customer",
+      vendor: "vendor",
+    };
+
+    // Fallback to "gl" (or any sensible default) if the key isn’t in the map
+    const module = moduleMap[importType.value] ?? "gl";
+
+    const { data } = await api.get(`next_number/${module}`);
+    return data.number;
+  } catch (error) {
+    console.error("Failed to fetch next number:", error);
+    return null; // or re-throw if you want the caller to handle it
+  }
+};
 
 // Add refs for the select components
 const accountSelect = ref(null);
@@ -2607,7 +2631,7 @@ const vendorSelect = ref(null);
 const paymentAccountSelect = ref(null);
 const lastSelected = ref(null);
 const selectValues = ref({});
-const handleShortcuts = (event) => {
+const handleShortcuts = async (event) => {
   //  Bail out  if both modifiers are not held
   if (!event.ctrlKey || !event.shiftKey) return;
 
@@ -2618,7 +2642,7 @@ const handleShortcuts = (event) => {
   if (["control", "shift", "alt", "meta"].includes(key)) return;
 
   // Get current cell position if spreadsheet is focused
-  const sheet = spreadsheet.value.current?.[0];
+  const sheet = spreadsheet.value?.current?.[0];
   if (sheet) {
     const currentCell = sheet.getSelected();
     if (currentCell[0] && currentCell.length == 1) {
@@ -2628,6 +2652,24 @@ const handleShortcuts = (event) => {
       // Get the column key from the visible columns
       const columnKey = visibleColumns.value[colIndex]?.key;
     }
+  }
+  if (key === "t") {
+    if (!lastSelected.value) return;
+    const { colIndex, rowIndex } = lastSelected.value;
+    document.activeElement?.blur();
+    const today = new Date().toLocaleDateString("en-CA");
+    sheet.paste(colIndex, rowIndex, today);
+    lastSelected.value = null;
+    event.preventDefault();
+    return;
+  }
+  if (key === "n") {
+    if (!lastSelected.value) return;
+    const { colIndex, rowIndex } = lastSelected.value;
+    document.activeElement?.blur();
+    const number = await newNumber();
+    sheet.paste(colIndex, rowIndex, number);
+    return;
   }
 
   //  Map of valid shortcuts
