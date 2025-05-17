@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-col mainbg q-pa-md">
+  <q-page class="flex flex-col mainbg q-pa-md" @keydown="handleShortcuts">
     <div class="column q-gutter-y-md full-width q-mb-md">
       <div class="row q-gutter-sm q-mt-md">
         <q-btn
@@ -32,53 +32,160 @@
           header-class="text-h6"
           :default-opened="true"
         >
-          <q-card class="q-pa-md">
-            <div class="row justify-between q-mb-md">
-              <q-btn
-                dense
-                color="primary"
-                :label="t('Select All')"
-                @click="selectAllColumns"
-              />
-              <q-btn
-                dense
-                color="primary"
-                :label="t('Default Columns')"
-                @click="resetToDefaultColumns"
-              />
-              <q-btn
-                dense
-                color="primary"
-                :label="t('Required Only')"
-                @click="selectOnlyRequiredColumns"
-              />
-            </div>
+          <div class="row justify-between q-my-sm">
+            <q-btn
+              dense
+              color="primary"
+              :label="t('Select All')"
+              @click="selectAllColumns"
+            />
+            <q-btn
+              dense
+              color="primary"
+              :label="t('Default Columns')"
+              @click="resetToDefaultColumns"
+            />
+            <q-btn
+              dense
+              color="primary"
+              :label="t('Required Only')"
+              @click="selectOnlyRequiredColumns"
+            />
+          </div>
 
-            <div
-              v-for="(group, index) in columnGroups"
-              :key="index"
-              class="column q-mb-sm"
-            >
-              <div class="text-subtitle2 q-mb-xs">{{ group.title }}</div>
-              <div class="row q-gutter-x-md wrap q-gutter-y-xs">
-                <q-checkbox
-                  v-for="col in group.columns"
-                  :key="col.key"
-                  v-model="col.checked"
-                  :label="col.title"
-                  :disable="col.required"
-                  dense
-                  class="col-auto"
-                  @update:model-value="handleColumnToggle"
-                />
-              </div>
-              <q-separator
-                class="q-my-sm"
-                v-if="index < columnGroups.length - 1"
+          <div
+            v-for="(group, index) in columnGroups"
+            :key="index"
+            class="column q-mb-sm"
+          >
+            <div class="text-subtitle2 q-mb-xs">{{ group.title }}</div>
+            <div class="row q-gutter-x-md wrap q-gutter-y-xs">
+              <q-checkbox
+                v-for="col in group.columns"
+                :key="col.key"
+                v-model="col.checked"
+                :label="col.title"
+                :disable="col.required"
+                dense
+                class="col-auto"
+                @update:model-value="handleColumnToggle"
               />
             </div>
-          </q-card>
+            <q-separator
+              class="q-my-sm"
+              v-if="index < columnGroups.length - 1"
+            />
+          </div>
         </q-expansion-item>
+      </div>
+      <div class="q-mt-md row q-gutter-x-sm">
+        <s-select
+          v-if="openAccounts.length > 0"
+          ref="accountSelect"
+          :options="openAccounts"
+          :label="t('Accounts')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          search="label"
+          account
+          v-model="selectValues.account"
+          @update:model-value="
+            (value) => value && copyClipboard(value.accno, 'account')
+          "
+        ></s-select>
+        <s-select
+          v-if="openDepartments.length > 0"
+          ref="departmentSelect"
+          :options="openDepartments"
+          :label="t('Departments')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="description"
+          search="description"
+          v-model="selectValues.department"
+          @update:model-value="
+            (value) => value && copyClipboard(value.description, 'department')
+          "
+        ></s-select>
+
+        <s-select
+          v-if="openProjects.length > 0"
+          ref="projectSelect"
+          :options="openProjects"
+          :label="t('Projects')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="description"
+          search="description"
+          v-model="selectValues.project"
+          @update:model-value="
+            (value) => value && copyClipboard(value.description, 'project')
+          "
+        ></s-select>
+      </div>
+      <div class="row q-mt-none q-gutter-sm">
+        <s-select
+          v-if="openCustomers.length > 0"
+          ref="customerSelect"
+          :options="openCustomers"
+          :label="t('Customers')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="label"
+          search="label"
+          v-model="selectValues.customer"
+          @update:model-value="
+            (value) => value && copyClipboard(value.customernumber, 'customer')
+          "
+        ></s-select>
+        <s-select
+          v-if="openVendors.length > 0"
+          ref="vendorSelect"
+          :options="openVendors"
+          :label="t('Vendors')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="label"
+          search="label"
+          v-model="selectValues.vendor"
+          @update:model-value="
+            (value) => value && copyClipboard(value.vendornumber, 'vendor')
+          "
+        ></s-select>
+
+        <s-select
+          v-if="openPaymentAccounts.length > 0"
+          ref="paymentAccountSelect"
+          :options="openPaymentAccounts"
+          :label="t('Payment Account')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="label"
+          search="label"
+          account
+          v-model="selectValues.paymentAccount"
+          @update:model-value="
+            (value) => value && copyClipboard(value.accno, 'paymentAccount')
+          "
+        ></s-select>
       </div>
     </div>
     <div v-if="loading" class="full-width flex justify-center">
@@ -91,7 +198,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, computed, watch } from "vue";
+import {
+  ref,
+  onMounted,
+  onBeforeUnmount,
+  inject,
+  computed,
+  watch,
+  nextTick,
+} from "vue";
 import { Spreadsheet, Worksheet } from "@jspreadsheet-ce/vue";
 import "jsuites/dist/jsuites.css";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
@@ -110,8 +225,10 @@ const pageTitles = {
   gl: "Import General Ledger",
   customer: "Import Customers",
   vendor: "Import Vendors",
-  ar_invoice: "Import AR Invoices",
-  ap_invoice: "Import AP Invoices",
+  ar_invoice: "Import Customer Invoices",
+  ap_invoice: "Import Vendor Invoices",
+  ar_transaction: "Import Customer Transactions",
+  ap_transaction: "Import Vendor Transactions",
   default: "Import",
 };
 
@@ -313,7 +430,7 @@ const invoiceColumns = [
     type: "numeric",
     key: "exchangerate",
     required: false,
-    default: true,
+    default: false,
   },
   { title: t("Notes"), key: "notes", required: false, default: false },
   {
@@ -411,7 +528,7 @@ const transactionColumns = [
     type: "numeric",
     key: "exchangerate",
     required: false,
-    default: true,
+    default: false,
   },
   { title: t("Notes"), key: "notes", required: false, default: false },
   {
@@ -539,7 +656,7 @@ const importConfigs = {
         type: "numeric",
         key: "exchangerate",
         required: false,
-        default: true,
+        default: false,
       },
       { title: t("Account No"), key: "accno", required: true, default: true },
       {
@@ -811,6 +928,77 @@ const fetchModules = async () => {
     });
   }
 };
+const openAccounts = computed(() => {
+  const type = importType.value;
+  if (type === "gl") {
+    return repositories.accounts.value.filter(
+      (account) => account.closed === 0
+    );
+  }
+
+  if (
+    type === "ar_invoice" ||
+    type === "ar_transaction" ||
+    type === "customer"
+  ) {
+    return repositories.accounts.value.filter((account) => {
+      const links = account.link ? account.link.split(":") : [];
+      return links.includes("AR");
+    });
+  }
+
+  if (type === "ap_invoice" || type === "ap_transaction" || type === "vendor") {
+    return repositories.accounts.value.filter((account) => {
+      const links = account.link ? account.link.split(":") : [];
+      return links.includes("AP");
+    });
+  }
+  return [];
+});
+const openDepartments = computed(() => repositories.departments.value);
+const openProjects = computed(() => repositories.projects.value);
+const openCustomers = computed(() => {
+  const type = importType.value;
+  if (
+    type === "ar_invoice" ||
+    type === "ar_transaction" ||
+    type === "customer"
+  ) {
+    return repositories.customers.value;
+  }
+  return [];
+});
+const openVendors = computed(() => {
+  const type = importType.value;
+  if (type === "ap_invoice" || type === "ap_transaction" || type === "vendor") {
+    return repositories.vendors.value;
+  }
+  return [];
+});
+
+const openPaymentAccounts = computed(() => {
+  const type = importType.value;
+
+  if (
+    type === "ar_invoice" ||
+    type === "ar_transaction" ||
+    type === "customer"
+  ) {
+    return repositories.accounts.value.filter((account) => {
+      const links = account.link ? account.link.split(":") : [];
+      return links.includes("AR_paid");
+    });
+  }
+
+  if (type === "ap_invoice" || type === "ap_transaction" || type === "vendor") {
+    return repositories.accounts.value.filter((account) => {
+      const links = account.link ? account.link.split(":") : [];
+      return links.includes("AP_paid");
+    });
+  }
+
+  return [];
+});
 
 const parseNumber = (value) => {
   if (value === null || value === undefined || value === "") return 0;
@@ -2100,11 +2288,14 @@ const importData = async () => {
 onMounted(async () => {
   await fetchModules();
   initializeColumns();
+  window.addEventListener("keydown", handleShortcuts);
   setTimeout(() => {
     loading.value = false;
   }, 500);
 });
-
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleShortcuts);
+});
 // Update refreshSpreadsheet function to be more robust
 const refreshSpreadsheet = () => {
   if (!spreadsheet.value) return;
@@ -2387,6 +2578,104 @@ const selectOnlyRequiredColumns = () => {
   availableColumns.value.forEach((col) => {
     col.checked = col.required;
   });
+};
+
+const copyClipboard = (value, select) => {
+  if (lastSelected.value) {
+    document.activeElement?.blur();
+    const { colIndex, rowIndex } = lastSelected.value;
+    const sheet = spreadsheet.value?.current?.[0];
+    if (sheet) {
+      sheet.paste(colIndex, rowIndex, value);
+      sheet.getCell(colIndex, rowIndex).focus();
+    }
+    lastSelected.value = null;
+  }
+  window.navigator.clipboard.writeText(value);
+  nextTick(() => {
+    selectValues.value[select] = null;
+  });
+  return null;
+};
+
+// Add refs for the select components
+const accountSelect = ref(null);
+const departmentSelect = ref(null);
+const projectSelect = ref(null);
+const customerSelect = ref(null);
+const vendorSelect = ref(null);
+const paymentAccountSelect = ref(null);
+const lastSelected = ref(null);
+const selectValues = ref({});
+const handleShortcuts = (event) => {
+  //  Bail out  if both modifiers are not held
+  if (!event.ctrlKey || !event.shiftKey) return;
+
+  //  Normalise the key name
+  const key = event.key.toLowerCase();
+  if (key === "control" || key === "shift") return;
+  // 3Ignore the modifier keys themselves (Ctrl, Shift, Alt, Meta)
+  if (["control", "shift", "alt", "meta"].includes(key)) return;
+
+  // Get current cell position if spreadsheet is focused
+  const sheet = spreadsheet.value.current?.[0];
+  if (sheet) {
+    const currentCell = sheet.getSelected();
+    if (currentCell[0] && currentCell.length == 1) {
+      const colIndex = currentCell[0].x;
+      const rowIndex = currentCell[0].y;
+      lastSelected.value = { colIndex, rowIndex };
+      // Get the column key from the visible columns
+      const columnKey = visibleColumns.value[colIndex]?.key;
+    }
+  }
+
+  //  Map of valid shortcuts
+  const shortcutMap = {
+    c: { items: openCustomers, select: customerSelect, label: t("Customers") },
+    a: { items: openAccounts, select: accountSelect, label: t("Accounts") },
+    d: {
+      items: openDepartments,
+      select: departmentSelect,
+      label: t("Departments"),
+    },
+    p: { items: openProjects, select: projectSelect, label: t("Projects") },
+    v: { items: openVendors, select: vendorSelect, label: t("Vendors") },
+    m: {
+      items: openPaymentAccounts,
+      select: paymentAccountSelect,
+      label: t("Payment Accounts"),
+    },
+  };
+
+  const target = shortcutMap[key];
+
+  if (!target) {
+    // Ctrl+Shift were held, key isn't mapped → "invalid shortcut" warning
+    Notify.create({
+      color: "warning",
+      message: t("Invalid shortcut key"),
+      icon: "warning",
+      position: "center",
+    });
+    return;
+  }
+
+  const { items, select, label } = target;
+
+  // Focus or show "dropdown unavailable" warning
+  if (items.value.length && select.value) {
+    select.value.focus();
+    // Prevent browser/default Ctrl-Shift behaviour (e.g. Ctrl+Shift+C in DevTools)
+    event.preventDefault();
+  } else {
+    Notify.create({
+      color: "warning",
+      message: t(`${label} dropdown is not available`),
+      icon: "warning",
+      position: "center",
+    });
+  }
 };
 </script>
 
