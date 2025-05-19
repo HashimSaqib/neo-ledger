@@ -533,6 +533,9 @@
             v-if="canDelete"
           />
         </div>
+        <div class="row">
+          <LastTransactions :type="db" class="col-12 col-lg-6" />
+        </div>
       </template>
 
       <!-- Right Panel - Invoice Preview -->
@@ -602,6 +605,7 @@ import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import FileList from "src/components/FileList.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
+import LastTransactions from "src/components/LastTransactions.vue";
 // -------------------------
 // Internationalization and Routing
 // -------------------------
@@ -618,7 +622,9 @@ const getTodayDate = () => formatDate(new Date(), "YYYY-MM-DD");
 const type = ref(route.params.type || route.query.type || "vendor");
 const reverse = ref(route.params.reverse || route.query.reverse || 0);
 const transactionType = ref("transaction");
+const db = ref("");
 if (type.value === "customer") {
+  db.value = "ar";
   if (reverse.value == 1) {
     updateTitle("Credit Note");
     transactionType.value = "credit_note";
@@ -626,6 +632,7 @@ if (type.value === "customer") {
     updateTitle("AR Transaction");
   }
 } else {
+  db.value = "ap";
   if (reverse.value == 1) {
     updateTitle("Debit Note");
     transactionType.value = "debit_note";

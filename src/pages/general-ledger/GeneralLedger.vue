@@ -322,6 +322,9 @@
         v-if="canDelete"
       />
     </div>
+    <div class="row">
+      <LastTransactions type="gl" class="col-12 col-lg-6" />
+    </div>
   </q-page>
 </template>
 
@@ -334,7 +337,7 @@ import { formatAmount, confirmDelete } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import FileList from "src/components/FileList.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
-
+import LastTransactions from "src/components/LastTransactions.vue";
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 
