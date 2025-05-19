@@ -145,6 +145,10 @@
                   multiple
                   append
                   use-chips
+                  :error="connection.error ? true : false"
+                  :disable="connection.error ? true : false"
+                  :error-message="connection.error"
+                  :hint="connection"
                 >
                   <template v-slot:prepend>
                     <q-icon name="attachment" />
@@ -924,6 +928,7 @@ const filterProjects = () => {
     return invDateObj >= start && invDateObj <= end; // Include if within range
   });
 };
+const connection = ref({});
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/${type.value}/`);
@@ -935,6 +940,7 @@ const fetchLinks = async () => {
     closedto.value = response.data.closedto;
     taxes.value = response.data.tax_accounts;
     lockNumber.value = response.data.locknumber ? true : false;
+    connection.value = response.data.connection;
   } catch (error) {
     console.error("Failed to fetch links:", error);
     Notify.create({

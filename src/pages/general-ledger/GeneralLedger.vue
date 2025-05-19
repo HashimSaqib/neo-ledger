@@ -92,6 +92,8 @@
       </div>
       <div class="row">
         <q-file
+          :disable="connection.error ? true : false"
+          :error="connection.error ? true : false"
           bg-color="input"
           label-color="secondary"
           filled
@@ -102,6 +104,9 @@
           multiple
           append
           use-chips
+          class="row"
+          :error-message="connection.error"
+          :hint="connection"
         >
           <template v-slot:prepend>
             <q-icon name="attachment" />
@@ -571,7 +576,7 @@ const filterProjects = () => {
 };
 
 const currencies = ref([]);
-
+const connection = ref({});
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/gl");
@@ -582,6 +587,7 @@ const fetchLinks = async () => {
     projects.value = response.data.projects;
     revtrans.value = response.data.revtrans;
     closedto.value = response.data.closedto;
+    connection.value = response.data.connection;
     filterProjects();
     currencies.value = response.data.currencies;
     if (currencies.value.length > 0) {
