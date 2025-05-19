@@ -88,7 +88,6 @@ const columns = computed(() => {
         field: "department",
         align: "left",
       },
-      { name: "approved", label: "Approved", field: "approved", align: "left" },
       { name: "curr", label: "Currency", field: "curr", align: "left" },
       {
         name: "exchangerate",
