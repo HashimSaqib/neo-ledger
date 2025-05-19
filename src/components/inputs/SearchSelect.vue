@@ -25,7 +25,7 @@
 <script setup>
 import { ref, watch } from "vue";
 
-// Define props that mirror q-select’s props plus our custom search/account props
+// Define props that mirror q-select's props plus our custom search/account props
 const props = defineProps({
   modelValue: {
     default: null,
@@ -182,6 +182,9 @@ defineExpose({
   },
   blur: () => {
     qSelectRef.value.blur();
+  },
+  showPopup: () => {
+    qSelectRef.value.showPopup();
   },
 });
 function onPopupShow() {

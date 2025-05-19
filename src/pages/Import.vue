@@ -78,7 +78,22 @@
           </div>
         </q-expansion-item>
       </div>
-      <div class="q-mt-md row q-gutter-x-sm">
+      <div class="q-mt-none q-gutter-x-sm">
+        <h6 class="q-my-none">Shortcuts</h6>
+        <p>
+          All Shorts Use Ctrl + Shift as the base key. For dropdowns, use arrow
+          key or search and press enter to select. Value will be copied to the
+          cell and clipboard.
+          <br />
+          <span class="text-weight-bold">Ctrl + Shift + N</span> - Next Number
+          (GL Number, Invoice Number or Customer/Vendor Number)
+          <br />
+          <span class="text-weight-bold">Ctrl + Shift + T</span> - Today's Date
+          in yyyy-mm-dd.
+          <br />
+        </p>
+      </div>
+      <div class="q-mt-none row q-gutter-x-sm">
         <s-select
           v-if="openAccounts.length > 0"
           ref="accountSelect"
@@ -95,6 +110,7 @@
           @update:model-value="
             (value) => value && copyClipboard(value.accno, 'account')
           "
+          :hint="'Ctrl + Shift + A'"
         ></s-select>
         <s-select
           v-if="openDepartments.length > 0"
@@ -112,6 +128,7 @@
           @update:model-value="
             (value) => value && copyClipboard(value.description, 'department')
           "
+          :hint="'Ctrl + Shift + D'"
         ></s-select>
 
         <s-select
@@ -130,6 +147,7 @@
           @update:model-value="
             (value) => value && copyClipboard(value.projectnumber, 'project')
           "
+          :hint="'Ctrl + Shift + P'"
         ></s-select>
       </div>
       <div class="row q-mt-none q-gutter-sm">
@@ -149,6 +167,7 @@
           @update:model-value="
             (value) => value && copyClipboard(value.customernumber, 'customer')
           "
+          :hint="'Ctrl + Shift + C'"
         ></s-select>
         <s-select
           v-if="openVendors.length > 0"
@@ -166,6 +185,27 @@
           @update:model-value="
             (value) => value && copyClipboard(value.vendornumber, 'vendor')
           "
+          :hint="'Ctrl + Shift + V'"
+        ></s-select>
+
+        <s-select
+          v-if="openLineAccounts.length > 0"
+          ref="lineAccountSelect"
+          :options="openLineAccounts"
+          :label="t('Line Accounts')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="label"
+          search="label"
+          account
+          v-model="selectValues.lineAccount"
+          @update:model-value="
+            (value) => value && copyClipboard(value.accno, 'lineAccount')
+          "
+          :hint="'Ctrl + Shift + L'"
         ></s-select>
 
         <s-select
@@ -185,6 +225,7 @@
           @update:model-value="
             (value) => value && copyClipboard(value.accno, 'paymentAccount')
           "
+          :hint="'Ctrl + Shift + M'"
         ></s-select>
       </div>
     </div>
@@ -994,6 +1035,26 @@ const openPaymentAccounts = computed(() => {
     return repositories.accounts.value.filter((account) => {
       const links = account.link ? account.link.split(":") : [];
       return links.includes("AP_paid");
+    });
+  }
+
+  return [];
+});
+
+const openLineAccounts = computed(() => {
+  const type = importType.value;
+
+  if (type === "ar_transaction") {
+    return repositories.accounts.value.filter((account) => {
+      const links = account.link ? account.link.split(":") : [];
+      return links.includes("AR_amount");
+    });
+  }
+
+  if (type === "ap_transaction") {
+    return repositories.accounts.value.filter((account) => {
+      const links = account.link ? account.link.split(":") : [];
+      return links.includes("AP_amount");
     });
   }
 
@@ -2606,12 +2667,16 @@ const copyClipboard = (value, select) => {
     const { colIndex, rowIndex } = lastSelected.value;
     const sheet = spreadsheet.value?.current?.[0];
     if (sheet) {
-      sheet.paste(colIndex, rowIndex, value);
-      sheet.getCell(colIndex, rowIndex).focus();
+      sheet.setValueFromCoords(colIndex, rowIndex, value);
+      sheet.updateSelectionFromCoords(colIndex, rowIndex);
+      const cell = sheet.getCell(colIndex, rowIndex);
+      cell.focus();
+      console.log(cell);
     }
     lastSelected.value = null;
   }
   window.navigator.clipboard.writeText(value);
+
   nextTick(() => {
     selectValues.value[select] = null;
   });
@@ -2649,6 +2714,7 @@ const projectSelect = ref(null);
 const customerSelect = ref(null);
 const vendorSelect = ref(null);
 const paymentAccountSelect = ref(null);
+const lineAccountSelect = ref(null);
 const lastSelected = ref(null);
 const selectValues = ref({});
 const handleShortcuts = async (event) => {
@@ -2678,7 +2744,7 @@ const handleShortcuts = async (event) => {
     const { colIndex, rowIndex } = lastSelected.value;
     document.activeElement?.blur();
     const today = new Date().toLocaleDateString("en-CA");
-    sheet.paste(colIndex, rowIndex, today);
+    sheet.setValueFromCoords(colIndex, rowIndex, today);
     lastSelected.value = null;
     event.preventDefault();
     return;
@@ -2688,7 +2754,7 @@ const handleShortcuts = async (event) => {
     const { colIndex, rowIndex } = lastSelected.value;
     document.activeElement?.blur();
     const number = await newNumber();
-    sheet.paste(colIndex, rowIndex, number);
+    sheet.setValueFromCoords(colIndex, rowIndex, number);
     return;
   }
 
@@ -2707,6 +2773,11 @@ const handleShortcuts = async (event) => {
       items: openPaymentAccounts,
       select: paymentAccountSelect,
       label: t("Payment Accounts"),
+    },
+    l: {
+      items: openLineAccounts,
+      select: lineAccountSelect,
+      label: t("Line Accounts"),
     },
   };
 
@@ -2727,9 +2798,10 @@ const handleShortcuts = async (event) => {
 
   // Focus or show "dropdown unavailable" warning
   if (items.value.length && select.value) {
+    document.activeElement?.blur();
+    sheet.resetSelection(true);
     select.value.focus();
-    // Prevent browser/default Ctrl-Shift behaviour (e.g. Ctrl+Shift+C in DevTools)
-    event.preventDefault();
+    select.value.showPopup();
   } else {
     Notify.create({
       color: "warning",
