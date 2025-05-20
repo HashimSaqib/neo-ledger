@@ -55,6 +55,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  invoice: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const loading = ref(false);
@@ -140,7 +144,9 @@ const columns = computed(() => {
 const fetchTransactions = async () => {
   loading.value = true;
   try {
-    const response = await api.get(`/last_transactions/${props.type}`);
+    const response = await api.get(
+      `/last_transactions/${props.type}?invoice=${props.invoice}`
+    );
     transactions.value = response.data;
   } catch (error) {
     console.error("Failed to fetch transactions:", error);

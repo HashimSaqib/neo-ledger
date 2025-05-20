@@ -866,6 +866,9 @@
         class="q-ml-sm"
       />
     </div>
+    <div class="row q-mt-md">
+      <LastTransactions type="ar" class="col-12 col-lg-6" />
+    </div>
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
@@ -944,6 +947,7 @@ import AddPart from "src/pages/goodservices/AddPart.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import FileList from "src/components/FileList.vue";
 import EmailOptions from "src/components/EmailOptions.vue";
+import LastTransactions from "src/components/LastTransactions.vue";
 
 const route = useRoute();
 const router = useRouter();
