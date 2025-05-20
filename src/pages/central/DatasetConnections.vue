@@ -91,13 +91,13 @@
                 }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
                   redirectUrl
                 )}/connection`
-              : `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&response_type=code&scope=${
+              : `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&response_type=code&access_type=offline&prompt=consent&scope=${
                   allDrive
                     ? 'https://www.googleapis.com/auth/drive'
                     : 'https://www.googleapis.com/auth/drive.file'
                 }&state=${
                   dataset.db_name
-                }|google_drive&access_type=offline&redirect_uri=${encodeURIComponent(
+                }|google_drive&redirect_uri=${encodeURIComponent(
                   redirectUrl
                 )}/connection`
           "
@@ -125,13 +125,13 @@
         label="Connect Google Drive"
         color="primary"
         icon="folder"
-        :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&response_type=code&scope=${
+        :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&access_type=offline&prompt=consent&response_type=code&scope=${
           allDrive
             ? 'https://www.googleapis.com/auth/drive'
             : 'https://www.googleapis.com/auth/drive.file'
         }&state=${
           dataset.db_name
-        }|google_drive&access_type=offline&redirect_uri=${encodeURIComponent(
+        }|google_drive&redirect_uri=${encodeURIComponent(
           redirectUrl
         )}/connection`"
         v-if="googleClientId"
