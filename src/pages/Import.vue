@@ -21,7 +21,7 @@
           min="1"
           outlined
         />
-        <q-btn color="secondary" :label="t('Insert Rows')" @click="addLines" />
+        <q-btn color="dark" :label="t('Insert Rows')" @click="addLines" />
       </div>
 
       <div class="column q-gutter-y-md">
@@ -81,9 +81,9 @@
       <div class="q-mt-none q-gutter-x-sm">
         <h6 class="q-my-none">Shortcuts</h6>
         <p>
-          All Shorts Use Ctrl + Shift as the base key. For dropdowns, use arrow
-          key or search and press enter to select. Value will be copied to the
-          cell and clipboard.
+          All shortcut Use Ctrl + Shift as the base key. For dropdowns, use
+          arrow key or search and press enter to select. Value will be copied to
+          the cell and clipboard.
           <br />
           <span class="text-weight-bold">Ctrl + Shift + N</span> - Next Number
           (GL Number, Invoice Number or Customer/Vendor Number)
@@ -232,9 +232,11 @@
     <div v-if="loading" class="full-width flex justify-center">
       <q-spinner color="primary" size="3em" />
     </div>
-    <Spreadsheet ref="spreadsheet" v-else>
-      <Worksheet :data="spreadsheetData" :columns="visibleColumns" />
-    </Spreadsheet>
+    <div v-else style="color: #000 !important">
+      <Spreadsheet ref="spreadsheet">
+        <Worksheet :data="spreadsheetData" :columns="visibleColumns" />
+      </Spreadsheet>
+    </div>
   </q-page>
 </template>
 
@@ -251,6 +253,7 @@ import {
 import { Spreadsheet, Worksheet } from "@jspreadsheet-ce/vue";
 import "jsuites/dist/jsuites.css";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
+
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";

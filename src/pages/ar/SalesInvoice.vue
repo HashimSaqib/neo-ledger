@@ -867,7 +867,7 @@
       />
     </div>
     <div class="row q-mt-md">
-      <LastTransactions type="ar" class="col-12 col-lg-6" />
+      <LastTransactions type="ar" :invoice="true" class="col-12 col-lg-6" />
     </div>
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
