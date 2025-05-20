@@ -170,6 +170,24 @@
           :hint="'Ctrl + Shift + C'"
         ></s-select>
         <s-select
+          v-if="openParts.length > 0"
+          ref="partSelect"
+          :options="openParts"
+          :label="t('Items')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          option-label="label"
+          search="label"
+          v-model="selectValues.part"
+          @update:model-value="
+            (value) => value && copyClipboard(value.partnumber, 'part')
+          "
+          :hint="'Ctrl + Shift + I'"
+        ></s-select>
+        <s-select
           v-if="openVendors.length > 0"
           ref="vendorSelect"
           :options="openVendors"
@@ -1064,6 +1082,13 @@ const openLineAccounts = computed(() => {
   return [];
 });
 
+const openParts = computed(() => {
+  const type = importType.value;
+  if (type === "ar_invoice" || type === "ap_invoice") {
+    return repositories.parts.value;
+  }
+  return [];
+});
 const parseNumber = (value) => {
   if (value === null || value === undefined || value === "") return 0;
 
@@ -2718,6 +2743,7 @@ const customerSelect = ref(null);
 const vendorSelect = ref(null);
 const paymentAccountSelect = ref(null);
 const lineAccountSelect = ref(null);
+const partSelect = ref(null);
 const lastSelected = ref(null);
 const selectValues = ref({});
 const handleShortcuts = async (event) => {
@@ -2781,6 +2807,11 @@ const handleShortcuts = async (event) => {
       items: openLineAccounts,
       select: lineAccountSelect,
       label: t("Line Accounts"),
+    },
+    i: {
+      items: openParts,
+      select: partSelect,
+      label: t("Parts"),
     },
   };
 
