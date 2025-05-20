@@ -2256,7 +2256,7 @@ const importData = async () => {
             description: rowObj.description || "",
             invDate: formatDate(rowObj.invdate || ""),
             dueDate: formatDate(rowObj.duedate || ""),
-            currency: rowObj.curr || "",
+            curr: rowObj.curr || "",
             exchangerate: parseNumber(rowObj.exchangerate) || 1.0,
             notes: rowObj.notes || "",
             intnotes: rowObj.intnotes || "",
@@ -2831,7 +2831,7 @@ const handleShortcuts = async (event) => {
   const { items, select, label } = target;
 
   // Focus or show "dropdown unavailable" warning
-  if (items.value.length && select.value) {
+  if (items.value.length > 0 && select.value) {
     document.activeElement?.blur();
     sheet.resetSelection(true);
     select.value.focus();
