@@ -180,4 +180,8 @@ const getPath = (row) => {
 onMounted(() => {
   fetchTransactions();
 });
+
+defineExpose({
+  fetchTransactions,
+});
 </script>

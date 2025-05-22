@@ -231,9 +231,8 @@ import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 import { formatAmount, roundAmount } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
-const triggerPrint = inject("triggerPrint");
 const updateTitle = inject("updateTitle");
-
+const createLink = inject("createLink");
 const { t } = useI18n();
 const route = useRoute();
 
@@ -380,9 +379,8 @@ function getUid() {
 
 // Returns the proper router link for a group header.
 function getGroupLink(id) {
-  return vcType.value === "vendor"
-    ? `/arap/vendor/?id=${id}`
-    : `/arap/customer/?id=${id}`;
+  const base = createLink(vcType.value);
+  return `${base}?id=${id}`;
 }
 
 /*

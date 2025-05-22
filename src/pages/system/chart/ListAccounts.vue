@@ -425,6 +425,7 @@ const results = ref([]);
 
 const columns = [
   { name: "accno", label: t("Account"), field: "accno", align: "left" },
+  { name: "parent", label: t("Parent"), field: "parent", align: "left" },
   { name: "gifi", label: t("GIFI"), field: "gifi_accno", align: "left" },
   {
     name: "description",

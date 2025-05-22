@@ -867,7 +867,12 @@
       />
     </div>
     <div class="row q-mt-md">
-      <LastTransactions type="ar" :invoice="true" class="col-12 col-lg-6" />
+      <LastTransactions
+        type="ar"
+        :invoice="true"
+        class="col-12 col-lg-6"
+        ref="lastTransactionsRef"
+      />
     </div>
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
@@ -948,7 +953,7 @@ import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import FileList from "src/components/FileList.vue";
 import EmailOptions from "src/components/EmailOptions.vue";
 import LastTransactions from "src/components/LastTransactions.vue";
-
+const lastTransactionsRef = ref(null);
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -1895,11 +1900,13 @@ const postInvoice = async (save = false, isNew = false) => {
     if (save) {
       fetchInvoice(id);
       files.value = null;
+      lastTransactionsRef.value.fetchTransactions();
     } else if (route.query.callback) {
       const query = { ...route.query, search: 1 };
       router.push({ path: route.query.callback, query: query });
     } else {
       resetForm();
+      lastTransactionsRef.value.fetchTransactions();
     }
   } catch (error) {
     console.log(error);

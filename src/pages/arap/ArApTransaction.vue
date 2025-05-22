@@ -534,7 +534,11 @@
           />
         </div>
         <div class="row">
-          <LastTransactions :type="db" class="col-12 col-lg-6" />
+          <LastTransactions
+            :type="db"
+            class="col-12 col-lg-6"
+            ref="lastTransactionsRef"
+          />
         </div>
       </template>
 
@@ -606,6 +610,7 @@ import AddVC from "src/pages/arap/AddVC.vue";
 import FileList from "src/components/FileList.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import LastTransactions from "src/components/LastTransactions.vue";
+const lastTransactionsRef = ref(null);
 // -------------------------
 // Internationalization and Routing
 // -------------------------
@@ -1206,6 +1211,7 @@ const postInvoice = async () => {
     } else {
       // Otherwise, reset form data for a new transaction.
       resetForm();
+      lastTransactionsRef.value.fetchTransactions();
     }
   } catch (error) {
     console.error("Transaction error:", error);

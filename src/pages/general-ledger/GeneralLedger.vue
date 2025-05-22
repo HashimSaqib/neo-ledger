@@ -323,7 +323,11 @@
       />
     </div>
     <div class="row">
-      <LastTransactions type="gl" class="col-12 col-lg-6" />
+      <LastTransactions
+        type="gl"
+        class="col-12 col-lg-6"
+        ref="lastTransactionsRef"
+      />
     </div>
   </q-page>
 </template>
@@ -338,6 +342,7 @@ import { useI18n } from "vue-i18n";
 import FileList from "src/components/FileList.vue";
 import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import LastTransactions from "src/components/LastTransactions.vue";
+const lastTransactionsRef = ref(null);
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 
@@ -727,10 +732,12 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
       formData.value.selectedDepartment = null;
       lines.value = [{ ...initialLine }, { ...initialLine }];
       existingFiles.value = [];
+      lastTransactionsRef.value.fetchTransactions();
     } else {
       // For Save, load the transaction data if an ID is returned
       if (response.data?.id) {
         await loadTransaction(response.data.id);
+        lastTransactionsRef.value.fetchTransactions();
       }
     }
   } catch (error) {
