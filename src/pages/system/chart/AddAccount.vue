@@ -23,6 +23,14 @@
                 false-value="0"
                 class="q-pa-xs"
               />
+              <q-checkbox
+                dense
+                v-model="selectedAccount.allow_gl"
+                :label="t('Allow GL?')"
+                :true-value="1"
+                :false-value="0"
+                class="q-pa-xs"
+              />
             </div>
           </div>
 
@@ -33,6 +41,23 @@
             v-model="selectedAccount.description"
             :label="t('Description')"
             class="q-mt-xs"
+          />
+
+          <!-- Parent Account Selection -->
+          <s-select
+            dense
+            outlined
+            v-model="selectedAccount.parent_id"
+            :options="parentAccounts"
+            :label="t('Parent Account')"
+            option-label="label"
+            option-value="accno"
+            emit-value
+            map-options
+            clearable
+            class="q-mt-xs"
+            account
+            search="accno"
           />
 
           <!-- Row 3: Account Type, Contra and Chart Type -->
@@ -249,7 +274,7 @@
 </template>
 
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, onMounted } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
@@ -265,6 +290,7 @@ const selectedAccount = ref({
   closed: "0",
   contra: "0",
   charttype: "A", // default to Account
+  parent: null,
   AR: "",
   AP: "",
   IC: "",
@@ -321,6 +347,36 @@ const possibleLinks = [
   "IC_expense",
   "IC_taxservice",
 ];
+
+// Add parent accounts ref
+const parentAccounts = ref([]);
+
+// Add function to fetch parent accounts
+async function fetchParentAccounts() {
+  try {
+    const response = await api.get("/system/chart/accounts/");
+    parentAccounts.value = response.data.filter(
+      (account) =>
+        account.charttype === "A" && account.id !== selectedAccount.value.id
+    );
+    parentAccounts.value = parentAccounts.value.map((account) => ({
+      label: `${account.accno} - ${account.description}`,
+      accno: account.accno,
+    }));
+  } catch (error) {
+    console.error("Error fetching parent accounts:", error);
+    Notify.create({
+      message: t("Failed to fetch parent accounts"),
+      color: "negative",
+      position: "center",
+    });
+  }
+}
+
+// Call fetchParentAccounts when component mounts
+onMounted(() => {
+  fetchParentAccounts();
+});
 
 function countSelected(options) {
   return options.reduce(
@@ -451,6 +507,7 @@ function resetForm() {
     closed: "0",
     contra: "0",
     charttype: "A",
+    parent_id: null,
     AR: "",
     AP: "",
     IC: "",

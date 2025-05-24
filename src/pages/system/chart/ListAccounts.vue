@@ -96,8 +96,33 @@
                   false-value="0"
                   class="q-pa-xs"
                 />
+                <q-checkbox
+                  dense
+                  v-model="selectedAccount.allow_gl"
+                  :label="t('Allow GL?')"
+                  :true-value="1"
+                  :false-value="0"
+                  class="q-pa-xs"
+                />
               </div>
             </div>
+
+            <!-- Parent Account Dropdown -->
+            <s-select
+              dense
+              outlined
+              v-model="selectedAccount.parent"
+              :options="headingAccounts"
+              :label="t('Parent Account')"
+              option-value="accno"
+              option-label="label"
+              emit-value
+              map-options
+              clearable
+              class="q-mt-xs"
+              account
+              search="account"
+            />
 
             <!-- Row 2: Description -->
             <q-input
@@ -422,6 +447,7 @@ const updateTitle = inject("updateTitle");
 updateTitle(t("Chart Of Accounts"));
 const triggerPrint = inject("triggerPrint");
 const results = ref([]);
+const headingAccounts = ref([]);
 
 const columns = [
   { name: "accno", label: t("Account"), field: "accno", align: "left" },
@@ -483,6 +509,13 @@ const fetchData = async () => {
   try {
     const response = await api.get("/system/chart/accounts");
     results.value = response.data;
+    // Filter and store heading accounts
+    headingAccounts.value = results.value
+      .filter((account) => account.charttype === "H")
+      .map((account) => ({
+        label: `${account.accno} - ${account.description}`,
+        accno: account.accno,
+      }));
   } catch (error) {
     console.error(error);
   }
