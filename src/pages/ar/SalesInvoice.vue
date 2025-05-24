@@ -885,7 +885,6 @@
           <AddVC
             :id="dialogMode === 'edit' ? selectedCustomer.id : null"
             type="customer"
-            @close="customerDialog = false"
             @saved="customerSaved"
           />
         </q-card-section>
@@ -903,7 +902,6 @@
                 : null
             "
             :type="selectedPartType"
-            @close="closePartDialog"
             @saved="partSaved"
           />
         </q-card-section>
@@ -995,9 +993,6 @@ const openAddPart = (type) => {
   // Determine type based on inventory_accno_id property
   selectedPartType.value = type;
   partDialog.value = true;
-};
-const closePartDialog = () => {
-  partDialog.value = false;
 };
 const partSaved = async () => {
   // When a part is saved, re-fetch the items list.
@@ -1328,6 +1323,12 @@ watch(
 // Add watcher for invoice date changes
 watch(invDate, () => {
   calculateTaxes();
+});
+watch(partDialog, () => {
+  if (!partDialog.value) {
+    selectedPartLine.value = null;
+    selectedPartType.value = "";
+  }
 });
 
 // =====================

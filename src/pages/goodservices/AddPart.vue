@@ -665,9 +665,7 @@ const props = defineProps({
   type: { type: String, default: null },
 });
 const emit = defineEmits(["saved"]);
-const componentId = computed(
-  () => props.id ?? route.params.id ?? route.query.id
-);
+const componentId = computed(() => (props.type ? props.id : route.query.id));
 const componentType = computed(() => props.type ?? route.params.type);
 const type = ref(componentType.value || "part");
 
@@ -969,6 +967,14 @@ const submitForm = async () => {
       delete postData[key];
     }
   });
+
+  if (type.value === "service") {
+    delete postData.IC_inventory;
+    delete postData.IC_cogs;
+    delete postData.averageCost;
+    delete postData.weight;
+    delete postData.onhand;
+  }
 
   // Map customer and vendor objects to "name--id" strings in their respective arrays.
   if (postData.vendorLines && Array.isArray(postData.vendorLines)) {
