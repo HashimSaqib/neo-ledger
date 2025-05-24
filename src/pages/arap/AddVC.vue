@@ -687,6 +687,14 @@ const submitForm = async () => {
       });
       return;
     }
+    if (!form.value.name) {
+      Notify.create({
+        message: t("Name is required"),
+        type: "negative",
+        position: "center",
+      });
+      return;
+    }
 
     loading.value = true;
     // Create a payload based on current form values
