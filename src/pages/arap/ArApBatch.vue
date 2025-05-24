@@ -217,7 +217,6 @@
             :label="t('Message')"
             type="textarea"
             outlined
-            autogrow
           />
         </q-card-section>
         <q-card-actions align="right">

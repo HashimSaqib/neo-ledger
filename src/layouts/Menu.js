@@ -10,33 +10,57 @@ export const menuLinks = [
     icon: "people",
     perm: "customer",
     sublinks: [
-      // Non-report items from AR and Customers
       {
-        title: "AR Transaction",
-        link: "/arap/transaction/customer",
-        perm: "customer.transaction",
-      },
-      {
-        title: "Sales Invoice",
-        link: "/ar/sales-invoice",
-        perm: "customer.invoice",
-      },
-      {
-        title: "Credit Invoice",
-        link: "/ar/sales-invoice?credit_invoice=1",
-        perm: "customer.invoice.return",
-      },
-      {
-        title: "Credit Note",
-        link: "/arap/transaction/customer?reverse=1",
-        perm: "customer.transaction.return",
-      },
-      {
-        title: "Add Customer",
-        link: "/arap/customer",
-        perm: "customer.add",
-      },
+        title: "Postings",
+        sublinks: [
+          {
+            title: "Customer Transaction",
+            link: "/arap/transaction/customer",
+            perm: "customer.transaction",
+          },
+          {
+            title: "Sales Invoice",
+            link: "/ar/sales-invoice",
+            perm: "customer.invoice",
+          },
+          {
+            title: "Credit Transaction",
+            link: "/arap/transaction/customer?reverse=1",
+            perm: "customer.transaction.return",
+          },
+          {
+            title: "Credit Invoice",
+            link: "/ar/sales-invoice?credit_invoice=1",
+            perm: "customer.invoice.return",
+          },
 
+          {
+            title: "Add Customer",
+            link: "/arap/customer",
+            perm: "customer.add",
+          },
+        ],
+      },
+      {
+        title: "Batch",
+        sublinks: [
+          {
+            title: "Batch Email Invoices",
+            link: "/arap/batch/customer/invoice",
+            perm: "customer.batch",
+          },
+          {
+            title: "Reminder",
+            link: "/ar/reminder",
+            perm: "customer.reminder",
+          },
+          {
+            title: "Consolidate Invoices",
+            link: "/ar/consolidate-invoices",
+            perm: "customer.consolidate",
+          },
+        ],
+      },
       {
         title: "Reports",
         sublinks: [
@@ -45,11 +69,7 @@ export const menuLinks = [
             link: "/arap/transactions/customer",
             perm: "customer.transactions",
           },
-          {
-            title: "Reminder",
-            link: "/ar/reminder",
-            perm: "customer.reminder",
-          },
+
           {
             title: "Customer Search",
             link: "/arap/search/customer",
@@ -62,16 +82,6 @@ export const menuLinks = [
           },
         ],
       },
-      {
-        title: "Consolidate Invoices",
-        link: "/ar/consolidate-invoices",
-        perm: "customer.consolidate",
-      },
-      {
-        title: "Batch Email Invoices",
-        link: "/arap/batch/customer/invoice",
-        perm: "customer.batch",
-      },
     ],
   },
   {
@@ -79,33 +89,36 @@ export const menuLinks = [
     icon: "storefront",
     perm: "vendor",
     sublinks: [
-      // Non-report items from AP and Vendors
       {
-        title: "AP Transaction",
-        link: "/arap/transaction/vendor",
-        perm: "vendor.transaction",
+        title: "Postings",
+        sublinks: [
+          {
+            title: "Vendor Transaction",
+            link: "/arap/transaction/vendor",
+            perm: "vendor.transaction",
+          },
+          {
+            title: "Vendor Invoice",
+            link: "/ap/vendor-invoice",
+            perm: "vendor.invoice",
+          },
+          {
+            title: "Debit Transaction",
+            link: "/arap/transaction/vendor?reverse=1",
+            perm: "vendor.transaction.return",
+          },
+          {
+            title: "Debit Invoice",
+            link: "/ap/vendor-invoice?debit_invoice=1",
+            perm: "vendor.invoice.return",
+          },
+          {
+            title: "Add Vendor",
+            link: "/arap/Vendor",
+            perm: "vendor.add",
+          },
+        ],
       },
-      {
-        title: "Debit Note",
-        link: "/arap/transaction/vendor?reverse=1",
-        perm: "vendor.transaction.return",
-      },
-      {
-        title: "Vendor Invoice",
-        link: "/ap/vendor-invoice",
-        perm: "vendor.invoice",
-      },
-      {
-        title: "Debit Invoice",
-        link: "/ap/vendor-invoice?debit_invoice=1",
-        perm: "vendor.invoice.return",
-      },
-      {
-        title: "Add Vendor",
-        link: "/arap/Vendor",
-        perm: "vendor.add",
-      },
-      // Combined Reports submenu for AP & Vendors
       {
         title: "Reports",
         sublinks: [
@@ -252,16 +265,6 @@ export const menuLinks = [
         title: "Defaults",
         link: "/system/defaults",
         perm: "system.defaults",
-      },
-      {
-        title: "Roles",
-        link: "/system/roles",
-        perm: "system.user.roles",
-      },
-      {
-        title: "Employees",
-        link: "/system/employees",
-        perm: "system.user.employees",
       },
       {
         title: "Templates",

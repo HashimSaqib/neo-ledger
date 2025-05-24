@@ -171,7 +171,7 @@
             <div class="col-6">
               <q-select
                 v-model="emailData.attachment"
-                :label="t('Attachment')"
+                :label="t('Attachment (PDF)')"
                 :options="attachmentOptions"
                 outlined
                 dense
@@ -188,7 +188,6 @@
             :label="t('Message')"
             type="textarea"
             outlined
-            autogrow
           />
         </q-card-section>
         <q-card-actions align="right">

@@ -6,7 +6,7 @@
           v-model="emailData.email"
           outlined
           dense
-          label="Email"
+          :label="t('Email')"
           bg-color="input"
           label-color="secondary"
         />
@@ -16,7 +16,7 @@
           v-model="emailData.subject"
           outlined
           dense
-          label="Subject"
+          :label="t('Subject')"
           bg-color="input"
           label-color="secondary"
         />
@@ -26,7 +26,7 @@
           v-model="emailData.cc"
           outlined
           dense
-          label="CC"
+          :label="t('CC')"
           bg-color="input"
           label-color="secondary"
         />
@@ -36,7 +36,7 @@
           v-model="emailData.bcc"
           outlined
           dense
-          label="BCC"
+          :label="t('BCC')"
           bg-color="input"
           label-color="secondary"
         />
@@ -46,7 +46,7 @@
           v-model="emailData.message"
           outlined
           type="textarea"
-          label="Message"
+          :label="t('Message')"
           bg-color="input"
           label-color="secondary"
           rows="4"
@@ -57,14 +57,14 @@
           v-model="emailData.inline"
           :true-value="1"
           :false-value="0"
-          label="Inline (HTML)"
+          :label="t('Inline (HTML)')"
         />
       </div>
       <div class="col-6">
         <q-select
           v-model="emailData.attachment"
           :options="attachmentOptions"
-          label="Attachment"
+          :label="t('Attachment (PDF)')"
           outlined
           dense
           bg-color="input"
@@ -76,7 +76,7 @@
       <div class="col-12">
         <q-btn
           color="primary"
-          label="Send Email"
+          :label="t('Send Email')"
           @click="sendEmail"
           class="full-width"
         />
@@ -120,9 +120,9 @@ const emit = defineEmits(["close"]);
 const loading = ref(false);
 
 const attachmentOptions = [
-  { label: "TEX", value: "tex" },
-  { label: "HTML", value: "html" },
-  { label: "None", value: "" },
+  { label: t("TEX"), value: "tex" },
+  { label: t("HTML"), value: "html" },
+  { label: t("None"), value: "" },
 ];
 
 const emailData = ref({
