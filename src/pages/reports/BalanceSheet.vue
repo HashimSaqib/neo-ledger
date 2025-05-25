@@ -278,11 +278,18 @@
             <template v-for="(account, index) in assetAccounts" :key="index">
               <q-item>
                 <q-item-section>
-                  {{
-                    formData.l_accno
-                      ? account.accno + " - " + account.description
-                      : account.description
-                  }}
+                  <div :style="{ marginLeft: `${account.level * 20}px` }">
+                    <template v-if="account.charttype === 'H'">
+                      <strong>{{ account.description }}</strong>
+                    </template>
+                    <template v-else>
+                      {{
+                        formData.l_accno
+                          ? account.accno + " - " + account.description
+                          : account.description
+                      }}
+                    </template>
+                  </div>
                 </q-item-section>
                 <q-item-section
                   v-for="period in results.periods"
@@ -340,11 +347,18 @@
             >
               <q-item>
                 <q-item-section>
-                  {{
-                    formData.l_accno
-                      ? account.accno + " - " + account.description
-                      : account.description
-                  }}
+                  <div :style="{ marginLeft: `${account.level * 20}px` }">
+                    <template v-if="account.charttype === 'H'">
+                      <strong>{{ account.description }}</strong>
+                    </template>
+                    <template v-else>
+                      {{
+                        formData.l_accno
+                          ? account.accno + " - " + account.description
+                          : account.description
+                      }}
+                    </template>
+                  </div>
                 </q-item-section>
                 <q-item-section
                   v-for="period in results.periods"
@@ -401,11 +415,18 @@
             <template v-for="(account, index) in equityAccounts" :key="index">
               <q-item>
                 <q-item-section>
-                  {{
-                    formData.l_accno
-                      ? account.accno + " - " + account.description
-                      : account.description
-                  }}
+                  <div :style="{ marginLeft: `${account.level * 20}px` }">
+                    <template v-if="account.charttype === 'H'">
+                      <strong>{{ account.description }}</strong>
+                    </template>
+                    <template v-else>
+                      {{
+                        formData.l_accno
+                          ? account.accno + " - " + account.description
+                          : account.description
+                      }}
+                    </template>
+                  </div>
                 </q-item-section>
                 <q-item-section
                   v-for="period in results.periods"
@@ -567,77 +588,114 @@ const formattedDateRange = computed(() => {
 ============================================================================ */
 const assetAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    const charttype = results.value.accounts?.[accno]?.charttype;
-    if (charttype === "H") return acc;
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].A) {
-        periodsData[periodLabel] = {
-          ...accountPeriods[periodLabel].A,
-          amount: -Number(accountPeriods[periodLabel].A.amount),
-        };
+  const accounts = [];
+
+  // First, collect all accounts and their data
+  Object.keys(rawAccounts)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach((accno) => {
+      const periodsRaw = rawAccounts[accno];
+      const charttype = results.value.accounts?.[accno]?.charttype;
+      const periods = {};
+      const level = results.value.accounts?.[accno]?.level || 0;
+
+      Object.keys(periodsRaw).forEach((label) => {
+        const entry = periodsRaw[label].A;
+        if (entry) {
+          periods[label] = {
+            ...entry,
+            amount: -Number(entry.amount),
+            charttype,
+          };
+        }
+      });
+
+      if (Object.keys(periods).length) {
+        accounts.push({
+          accno,
+          description: results.value.accounts?.[accno]?.description,
+          charttype,
+          level,
+          periods,
+        });
       }
     });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
+
+  // Sort accounts by level and then by account number
+  return accounts.sort((a, b) => {
+    if (a.level !== b.level) return a.level - b.level;
+    return a.accno.localeCompare(b.accno);
+  });
 });
 
 const liabilityAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    const charttype = results.value.accounts?.[accno]?.charttype;
-    if (charttype === "H") return acc;
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].L) {
-        periodsData[periodLabel] = accountPeriods[periodLabel].L;
+  const accounts = [];
+
+  Object.keys(rawAccounts)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach((accno) => {
+      const accountPeriods = rawAccounts[accno];
+      const charttype = results.value.accounts?.[accno]?.charttype;
+      const level = results.value.accounts?.[accno]?.level || 0;
+
+      const periodsData = {};
+      Object.keys(accountPeriods).forEach((periodLabel) => {
+        if (accountPeriods[periodLabel].L) {
+          periodsData[periodLabel] = accountPeriods[periodLabel].L;
+        }
+      });
+
+      if (Object.keys(periodsData).length) {
+        accounts.push({
+          accno,
+          description: results.value.accounts?.[accno]?.description,
+          charttype,
+          level,
+          periods: periodsData,
+        });
       }
     });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
+
+  return accounts.sort((a, b) => {
+    if (a.level !== b.level) return a.level - b.level;
+    return a.accno.localeCompare(b.accno);
+  });
 });
 
 const equityAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    const charttype = results.value.accounts?.[accno]?.charttype;
-    if (charttype === "H") return acc;
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].Q) {
-        periodsData[periodLabel] = accountPeriods[periodLabel].Q;
+  const accounts = [];
+
+  Object.keys(rawAccounts)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach((accno) => {
+      const accountPeriods = rawAccounts[accno];
+      const charttype = results.value.accounts?.[accno]?.charttype;
+      const level = results.value.accounts?.[accno]?.level || 0;
+
+      const periodsData = {};
+      Object.keys(accountPeriods).forEach((periodLabel) => {
+        if (accountPeriods[periodLabel].Q) {
+          periodsData[periodLabel] = accountPeriods[periodLabel].Q;
+        }
+      });
+
+      if (Object.keys(periodsData).length) {
+        accounts.push({
+          accno,
+          description: results.value.accounts?.[accno]?.description,
+          charttype,
+          level,
+          periods: periodsData,
+        });
       }
     });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
+
+  return accounts.sort((a, b) => {
+    if (a.level !== b.level) return a.level - b.level;
+    return a.accno.localeCompare(b.accno);
+  });
 });
 
 /* ============================================================================
@@ -657,6 +715,8 @@ const roundAmountCustom = (value) => {
 ============================================================================ */
 const sumAccounts = (accountsArray, periodLabel) => {
   return accountsArray.reduce((sum, account) => {
+    // Skip heading accounts (charttype 'H') when calculating totals
+    if (account.charttype === "H") return sum;
     const amount = account.periods[periodLabel]?.amount || 0;
     return sum + Number(amount);
   }, 0);
