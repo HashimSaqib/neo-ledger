@@ -743,6 +743,19 @@ const importConfigs = {
         required: false,
         default: false,
       },
+      {
+        title: t("Tax Account"),
+        key: "taxAccount",
+        required: false,
+        default: false,
+      },
+      {
+        title: t("Tax Amount"),
+        type: "numeric",
+        key: "linetaxamount",
+        required: false,
+        default: false,
+      },
     ],
   },
   customer: {
@@ -994,7 +1007,7 @@ const openAccounts = computed(() => {
   const type = importType.value;
   if (type === "gl") {
     return repositories.accounts.value.filter(
-      (account) => account.closed === 0
+      (account) => account.closed === 0 && account.charttype === "A"
     );
   }
 
@@ -1017,6 +1030,7 @@ const openAccounts = computed(() => {
   }
   return [];
 });
+
 const openDepartments = computed(() => repositories.departments.value);
 const openProjects = computed(() => repositories.projects.value);
 const openCustomers = computed(() => {
@@ -2212,6 +2226,8 @@ const importData = async () => {
             memo: row.memo || "",
             source: row.source || "",
             project: getProject(row.projectnumber),
+            taxAccount: row.taxAccount || "",
+            linetaxamount: parseNumber(row.linetaxamount) || 0,
           });
         });
 
@@ -2452,6 +2468,8 @@ const columnGroups = computed(() => {
           "source",
           "memo",
           "projectnumber",
+          "taxAccount",
+          "linetaxamount",
         ].includes(col.key)
       ),
     });
@@ -2724,7 +2742,7 @@ const newNumber = async () => {
       vendor: "vendor",
     };
 
-    // Fallback to "gl" (or any sensible default) if the key isn’t in the map
+    // Fallback to "gl" (or any sensible default) if the key isn't in the map
     const module = moduleMap[importType.value] ?? "gl";
 
     const { data } = await api.get(`next_number/${module}`);

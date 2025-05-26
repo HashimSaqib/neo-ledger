@@ -755,6 +755,7 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
 
 const existingFiles = ref([]);
 const loadTransaction = async (id) => {
+  loading.value = true;
   if (id) {
     try {
       const response = await api.get(`/gl/transactions/${id}`);
@@ -802,8 +803,11 @@ const loadTransaction = async (id) => {
         };
       });
       existingFiles.value = transactionData.files;
+      await nextTick();
     } catch (error) {
       console.log("Failed to load transaction:", error);
+    } finally {
+      loading.value = false;
     }
   }
 };
@@ -872,6 +876,7 @@ const resetForm = () => {
   existingFiles.value = [];
 };
 const updateTaxAmount = (val, index) => {
+  if (loading.value) return;
   if (!val || !val.accno) {
     console.warn("Invalid value provided:", val);
     return;
