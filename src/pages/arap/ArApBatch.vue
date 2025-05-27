@@ -135,6 +135,12 @@
           class="q-mr-sm"
           color="primary"
         />
+        <q-btn
+          :label="t('Print')"
+          @click="openPrintDialog"
+          class="q-mr-sm"
+          color="secondary"
+        />
       </div>
       <q-table
         class="q-mt-sm"
@@ -226,6 +232,53 @@
             :label="t('Send')"
             color="primary"
             @click="sendEmailBatch"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Print Dialog -->
+    <q-dialog v-model="printDialog" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">{{ t("Batch Print Invoices") }}</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input
+            v-model="printData.jobtype"
+            :label="t('Batch Name')"
+            outlined
+            dense
+            class="q-mb-md"
+          />
+          <q-input
+            v-model="printData.adminemail"
+            :label="t('Admin Email')"
+            outlined
+            dense
+            class="q-mb-md"
+          />
+          <div class="row q-col-gutter-sm q-mb-md">
+            <div class="col-6">
+              <q-select
+                v-model="printData.attachment"
+                :label="t('Attachment')"
+                :options="formatOptions"
+                outlined
+                dense
+                map-options
+                emit-value
+              />
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat :label="t('Cancel')" color="negative" v-close-popup />
+          <q-btn
+            flat
+            :label="t('Print')"
+            color="primary"
+            @click="sendPrintBatch"
           />
         </q-card-actions>
       </q-card>
@@ -468,6 +521,7 @@ const downloadPDF = () => {
 };
 
 const emailDialog = ref(false);
+const printDialog = ref(false);
 const emailData = ref({
   adminemail: "",
   jobtype: "",
@@ -482,6 +536,18 @@ const attachmentOptions = [
   { label: t("TEX"), value: "tex" },
   { label: t("HTML"), value: "html" },
 ];
+
+// Format options for the print dialog
+const formatOptions = [
+  { label: t("TEX"), value: "tex" },
+  { label: t("HTML"), value: "html" },
+];
+
+const printData = ref({
+  jobtype: "",
+  attachment: "tex",
+  adminemail: "",
+});
 
 const selected = ref([]);
 
@@ -571,6 +637,74 @@ const sendEmailBatch = async () => {
     console.error("Error creating email batch:", error);
     Notify.create({
       message: t("Error creating email batch"),
+      position: "center",
+      color: "negative",
+    });
+  }
+};
+
+// Open print dialog
+const openPrintDialog = () => {
+  const rowsToPrint =
+    selected.value.length > 0 ? selected.value : results.value;
+
+  if (rowsToPrint.length === 0) {
+    Notify.create({
+      message: t("No transactions to print"),
+      position: "center",
+      color: "negative",
+    });
+    return;
+  }
+
+  // Set default jobtype with today's date
+  const today = new Date();
+  const formattedDate = today.toISOString().split("T")[0];
+  printData.value.jobtype = `Invoice Batch Print ${formattedDate}`;
+
+  printDialog.value = true;
+};
+
+// Send print batch
+const sendPrintBatch = async () => {
+  try {
+    const rowsToPrint =
+      selected.value.length > 0 ? selected.value : results.value;
+
+    // Create emails array from transactions
+    const emails = rowsToPrint.map((row) => ({
+      id: row.id,
+      type: "invoice",
+      email: row.email,
+      name: row.name,
+      invnumber: row.invnumber,
+    }));
+
+    // Create the final object
+    const batchData = {
+      attachment: printData.value.attachment,
+      jobtype: printData.value.jobtype,
+      adminemail: printData.value.adminemail,
+      emails: emails,
+      vc: type.value,
+    };
+
+    // Post to create_pdf_batch endpoint
+    const response = await api.post("/create_pdf_batch", batchData);
+
+    // Close the dialog
+    printDialog.value = false;
+
+    // Show success notification
+    Notify.create({
+      message: t("Print batch created successfully"),
+      position: "center",
+      color: "positive",
+    });
+  } catch (error) {
+    console.error("Error creating print batch:", error);
+    Notify.create({
+      message: t("Error creating print batch"),
       position: "center",
       color: "negative",
     });
