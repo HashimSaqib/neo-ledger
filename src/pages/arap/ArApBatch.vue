@@ -141,6 +141,20 @@
           class="q-mr-sm"
           color="secondary"
         />
+        <q-btn
+          :label="t('Mark As Sent')"
+          @click="updateStatus('sent')"
+          class="q-mr-sm"
+          color="positive"
+          :disable="selected.length === 0"
+        />
+        <q-btn
+          :label="t('Mark As Unsent')"
+          @click="updateStatus('unsent')"
+          class="q-mr-sm"
+          color="warning"
+          :disable="selected.length === 0"
+        />
       </div>
       <q-table
         class="q-mt-sm"
@@ -342,6 +356,13 @@ const columns = ref([
     name: "invnumber",
     label: "Invoice",
     field: "invnumber",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "emailed",
+    label: "Emailed",
+    field: "emailed",
     align: "left",
     sortable: true,
   },
@@ -724,6 +745,48 @@ watch(
   },
   { deep: true }
 );
+
+const updateStatus = async (status) => {
+  try {
+    const rowsToUpdate =
+      selected.value.length > 0 ? selected.value : results.value;
+
+    if (rowsToUpdate.length === 0) {
+      Notify.create({
+        message: t("No transactions to update"),
+        position: "center",
+        color: "negative",
+      });
+      return;
+    }
+
+    // Create invoices object with status
+    const invoices = {};
+    rowsToUpdate.forEach((row) => {
+      invoices[row.id] = status;
+    });
+
+    // Make API request
+    await api.post("/invoice_status", { invoices });
+
+    // Show success notification
+    Notify.create({
+      message: t("Status updated successfully"),
+      position: "center",
+      color: "positive",
+    });
+
+    // Refresh the results
+    await search();
+  } catch (error) {
+    console.error("Error updating status:", error);
+    Notify.create({
+      message: t("Error updating status"),
+      position: "center",
+      color: "negative",
+    });
+  }
+};
 
 onMounted(async () => {
   await fetchCustomers();
