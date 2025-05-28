@@ -113,6 +113,24 @@
           :hint="'Ctrl + Shift + A'"
         ></s-select>
         <s-select
+          v-if="openTaxAccounts.length > 0"
+          ref="taxAccountSelect"
+          :options="openTaxAccounts"
+          :label="t('Tax Accounts')"
+          dense
+          outlined
+          class="col-2"
+          bg-color="input"
+          label-color="secondary"
+          search="label"
+          account
+          v-model="selectValues.taxAccount"
+          @update:model-value="
+            (value) => value && copyClipboard(value.accno, 'taxAccount')
+          "
+          :hint="'Ctrl + Shift + K'"
+        ></s-select>
+        <s-select
           v-if="openDepartments.length > 0"
           ref="departmentSelect"
           :options="openDepartments"
@@ -639,6 +657,19 @@ const transactionColumns = [
     default: true,
   },
   {
+    title: t("Line Tax Account"),
+    key: "taxAccount",
+    required: false,
+    default: false,
+  },
+  {
+    title: t("Line Tax Amount"),
+    type: "numeric",
+    key: "linetaxamount",
+    required: false,
+    default: false,
+  },
+  {
     title: t("Line Project"),
     key: "line_project",
     required: false,
@@ -1029,6 +1060,18 @@ const openAccounts = computed(() => {
     });
   }
   return [];
+});
+
+const openTaxAccounts = computed(() => {
+  return repositories.accounts.value.filter((account) => {
+    const links = account.link ? account.link.split(":") : [];
+    return (
+      links.includes("AR_tax") ||
+      links.includes("AP_tax") ||
+      links.includes("IC_taxpart") ||
+      links.includes("IC_taxservice")
+    );
+  });
 });
 
 const openDepartments = computed(() => repositories.departments.value);
@@ -2301,6 +2344,8 @@ const importData = async () => {
           transactionsByNumber[invNumber].lines.push({
             description: rowObj.line_description,
             amount: parseNumber(rowObj.line_amount),
+            taxAccount: rowObj.taxAccount || "",
+            linetaxamount: parseNumber(rowObj.linetaxamount) || 0,
             account: rowObj.line_account,
             project: getProject(rowObj.line_project),
           });
@@ -2657,6 +2702,8 @@ const columnGroups = computed(() => {
         [
           "line_description",
           "line_amount",
+          "taxAccount",
+          "linetaxamount",
           "line_account",
           "line_project",
         ].includes(col.key)
@@ -2755,6 +2802,7 @@ const newNumber = async () => {
 
 // Add refs for the select components
 const accountSelect = ref(null);
+const taxAccountSelect = ref(null);
 const departmentSelect = ref(null);
 const projectSelect = ref(null);
 const customerSelect = ref(null);
@@ -2809,6 +2857,11 @@ const handleShortcuts = async (event) => {
   const shortcutMap = {
     c: { items: openCustomers, select: customerSelect, label: t("Customers") },
     a: { items: openAccounts, select: accountSelect, label: t("Accounts") },
+    k: {
+      items: openTaxAccounts,
+      select: taxAccountSelect,
+      label: t("Tax Accounts"),
+    },
     d: {
       items: openDepartments,
       select: departmentSelect,

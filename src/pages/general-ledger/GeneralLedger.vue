@@ -755,8 +755,9 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
 
 const existingFiles = ref([]);
 const loadTransaction = async (id) => {
-  loading.value = true;
   if (id) {
+    loading.value = true;
+
     try {
       const response = await api.get(`/gl/transactions/${id}`);
       const transactionData = response.data;
