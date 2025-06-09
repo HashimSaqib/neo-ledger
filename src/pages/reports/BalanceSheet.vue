@@ -199,6 +199,14 @@
               true-value="gifi"
               false-value="standard"
             />
+            <q-checkbox
+              v-model="formData.heading_only"
+              :label="t('Heading Only')"
+              color="primary"
+              dense
+              true-value="1"
+              false-value="0"
+            />
           </div>
 
           <!-- Submit Button -->
@@ -547,6 +555,7 @@ const formData = ref({
   l_accno: true,
   previousyear: false,
   accounttype: "standard",
+  heading_only: "0",
   periodMode: "current", // Options: current, monthly, quarterly, yearly, custom
   periods: [],
 });
@@ -903,6 +912,7 @@ const search = async () => {
         params[`periods[${index}][${key}]`] = period[key];
       });
     });
+    params.l_accno = formData.value.l_accno ? 1 : 0;
 
     const response = await api.get("/reports/balance_sheet", {
       params: params,
@@ -926,6 +936,7 @@ const getPDF = async () => {
         params[`periods[${index}][${key}]`] = period[key];
       });
     });
+    params.l_accno = formData.value.l_accno ? 1 : 0;
 
     const response = await api.get("/reports/balance_sheet", {
       params: params,
