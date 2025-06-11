@@ -270,13 +270,13 @@
     <div v-if="results.length > 0">
       <div class="row q-mb-sm hide-print">
         <q-btn
-          :label="t('Export')"
+          :label="t('Export XL')"
           @click="downloadExcel"
           class="q-mr-sm"
           color="accent"
         />
         <q-btn
-          :label="t('Print')"
+          :label="t('Export PDF')"
           @click="downloadPDF"
           class="q-mr-sm"
           color="info"

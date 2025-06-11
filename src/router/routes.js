@@ -22,6 +22,7 @@ const TrialTransactions = () =>
   import("src/pages/reports/TrialTransactions.vue");
 const IncomeStatement = () => import("src/pages/reports/IncomeStatement.vue");
 const BalanceSheet = () => import("src/pages/reports/BalanceSheet.vue");
+const AllTaxes = () => import("src/pages/reports/AllTaxes.vue");
 const Reconciliation = () => import("src/pages/cash/Reconciliation.vue");
 const SysCurrencies = () => import("src/pages/system/Currencies.vue");
 const SysDefaults = () => import("src/pages/system/Defaults.vue");
@@ -203,6 +204,11 @@ const routes = [
         path: "reports/balance_sheet",
         component: BalanceSheet,
         meta: { permission: "reports.balance" },
+      },
+      {
+        path: "reports/all_taxes",
+        component: AllTaxes,
+        meta: { permission: "reports.alltaxes" },
       },
       // Goods & Services
       {

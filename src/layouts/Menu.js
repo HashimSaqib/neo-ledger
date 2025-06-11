@@ -239,6 +239,11 @@ export const menuLinks = [
         link: "/reports/balance_sheet",
         perm: "reports.balance",
       },
+      {
+        title: "All Taxes",
+        link: "/reports/all_taxes",
+        perm: "reports.alltaxes",
+      },
     ],
   },
   {
