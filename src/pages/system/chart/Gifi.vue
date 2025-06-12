@@ -234,7 +234,7 @@ async function deleteGifi(accno) {
         Notify.create({
           message: t("GIFI deleted successfully"),
           color: "positive",
-          position: "center",
+          position: "top-right",
         });
         await fetchData();
         editDialog.value = false;

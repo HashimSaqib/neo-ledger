@@ -720,7 +720,7 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
     Notify.create({
       message: t("Transaction Posted Successfully."),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
 
     if (clearAfter) {

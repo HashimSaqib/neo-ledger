@@ -1098,7 +1098,7 @@ const saveTemplateContent = async () => {
     $q.notify({
       message: "Template saved successfully",
       color: "positive",
-      position: "center",
+      position: "top-right",
     });
   } catch (error) {
     handleError("Failed to save template", error);
@@ -1183,7 +1183,7 @@ const uploadNewTemplate = async () => {
         fileExistsWarning.value ? "replaced" : "uploaded"
       } successfully`,
       color: "positive",
-      position: "center",
+      position: "top-right",
     });
 
     // Reset form
@@ -1305,7 +1305,7 @@ const uploadReplacementFile = async (event) => {
       $q.notify({
         message: "File replaced successfully",
         color: "positive",
-        position: "center",
+        position: "top-right",
       });
 
       // Reload the content to show the updated file

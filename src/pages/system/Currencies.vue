@@ -123,7 +123,7 @@ const saveCurrency = async () => {
       Notify.create({
         message: `Currency ${selectedCurrency.value.curr} updated successfully!`,
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     } else {
       // POST request to create a new currency
@@ -134,7 +134,7 @@ const saveCurrency = async () => {
       Notify.create({
         message: `Currency ${selectedCurrency.value.curr} added successfully!`,
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
     editDialog.value = false;

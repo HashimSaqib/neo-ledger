@@ -931,7 +931,7 @@ async function submitForm() {
     Notify.create({
       message: t("Defaults saved successfully"),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
   } catch (err) {
     console.error("Error saving defaults", err);

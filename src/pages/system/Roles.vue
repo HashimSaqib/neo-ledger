@@ -288,7 +288,7 @@ const saveRole = async () => {
           " " +
           t("updated successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     } else {
       // For creation, send client info as before
@@ -299,7 +299,7 @@ const saveRole = async () => {
       Notify.create({
         message: t("Role added successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
     roleDialog.value = false;

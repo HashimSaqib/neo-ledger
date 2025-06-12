@@ -221,7 +221,7 @@ const saveDepartment = async () => {
           " " +
           t("updated successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     } else {
       // Add new department: POST to /system/departments without id
@@ -237,7 +237,7 @@ const saveDepartment = async () => {
           " " +
           t("added successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
     editDialog.value = false;
@@ -263,7 +263,7 @@ const deleteDepartment = async (department) => {
         " " +
         t("deleted successfully!"),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     getDepartments(); // Refresh the table data
   } catch (error) {

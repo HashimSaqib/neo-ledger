@@ -763,7 +763,7 @@ const postInvoice = async () => {
     Notify.create({
       message: "Transaction posted successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
   } catch (error) {
     console.log(error);

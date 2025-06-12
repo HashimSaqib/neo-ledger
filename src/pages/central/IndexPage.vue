@@ -1494,7 +1494,7 @@ const acceptInvite = async (inviteId) => {
     Notify.create({
       message: "Invite accepted successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
 
     getDatasets();
@@ -1524,7 +1524,7 @@ const declineInvite = async (inviteId) => {
     Notify.create({
       message: "Invite declined",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
   } catch (err) {
     console.error("Error declining invite:", err);
@@ -1552,7 +1552,7 @@ const cancelInvite = async (inviteId) => {
     Notify.create({
       message: "Invite canceled",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
   } catch (err) {
     console.error("Error canceling invite:", err);
@@ -1614,7 +1614,7 @@ const sendInvite = async () => {
     Notify.create({
       message: "Invite sent successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
 
     inviteDialog.value = false;
@@ -1692,7 +1692,7 @@ const saveUserAccess = async () => {
     Notify.create({
       message: "User access updated successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
 
     editUserDialog.value = false;
@@ -1751,7 +1751,7 @@ const removeUserAccess = async () => {
     Notify.create({
       message: "User access removed successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
 
     // Remove the user from the dataset's users array
@@ -1838,7 +1838,7 @@ const saveRole = async () => {
       Notify.create({
         message: "Role updated successfully",
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     } else {
       await api.post(
@@ -1848,7 +1848,7 @@ const saveRole = async () => {
       Notify.create({
         message: "Role added successfully",
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
 

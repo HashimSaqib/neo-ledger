@@ -204,7 +204,7 @@ const saveTaxes = async () => {
     Notify.create({
       message: t("Tax updated successfully!"),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     getTaxes();
   } catch (error) {

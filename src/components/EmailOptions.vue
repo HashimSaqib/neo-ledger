@@ -198,7 +198,7 @@ const sendEmail = async () => {
       Notify.create({
         message: response.data.message || "Email sent successfully",
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
       emit("close");
     } else {

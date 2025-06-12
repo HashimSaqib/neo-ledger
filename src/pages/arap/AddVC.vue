@@ -733,7 +733,7 @@ const submitForm = async () => {
     Notify.create({
       message: t(`${vcType.value} updated successfully`),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     // Refresh data with the returned id
     fetchVc(response.data.id);

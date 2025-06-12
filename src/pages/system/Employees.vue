@@ -485,14 +485,14 @@ const saveEmployee = async () => {
           " " +
           t("updated successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     } else {
       await api.post("/system/employees", payload);
       Notify.create({
         message: t("Employee added successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
     editDialog.value = false;

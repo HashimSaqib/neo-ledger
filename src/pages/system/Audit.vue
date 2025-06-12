@@ -86,7 +86,7 @@ const save = async () => {
     Notify.create({
       message: t("Audit settings saved successfully"),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
   } catch (error) {
     Notify.create({

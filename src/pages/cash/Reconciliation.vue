@@ -387,7 +387,7 @@ const saveReconciliation = async () => {
     $q.notify({
       type: "positive",
       message: t("Reconciliation saved"),
-      position: "center",
+      position: "top-right",
     });
 
     // Reload updated data

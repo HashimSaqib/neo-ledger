@@ -1565,7 +1565,7 @@ const postInvoice = async () => {
     Notify.create({
       message: "Transaction posted successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     if (route.query.callback) {
       const query = { ...route.query, search: 1 };

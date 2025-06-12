@@ -223,14 +223,14 @@ const saveProject = async () => {
       Notify.create({
         message: t("Project updated successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     } else {
       await api.post("/projects", selectedProject.value);
       Notify.create({
         message: t("Project added successfully!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
     editDialog.value = false;

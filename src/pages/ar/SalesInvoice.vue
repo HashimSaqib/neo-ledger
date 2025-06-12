@@ -1895,7 +1895,7 @@ const postInvoice = async (save = false, isNew = false) => {
     Notify.create({
       message: "Transaction posted successfully",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     const id = response.data.id;
     if (save) {

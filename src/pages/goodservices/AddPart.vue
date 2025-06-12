@@ -1039,7 +1039,7 @@ const submitForm = async () => {
     Notify.create({
       message: t("Part/Service saved successfully"),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     const fetchId = response.data.id;
     if (fetchId) {

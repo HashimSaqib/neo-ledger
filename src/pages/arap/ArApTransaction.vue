@@ -1202,7 +1202,7 @@ const postInvoice = async () => {
     Notify.create({
       message: t("Transaction posted successfully"),
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     // If there's a callback route, redirect with query params.
     if (route.query.callback) {
@@ -1279,7 +1279,7 @@ const uploadInvoice = async () => {
       type: "positive",
       message:
         t("File uploaded successfully: ") + (response.data.message || ""),
-      position: "center",
+      position: "top-right",
     });
     splitterModel.value = 70;
     invoicePreview.value = URL.createObjectURL(selectedFile.value);

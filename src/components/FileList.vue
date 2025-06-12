@@ -46,7 +46,7 @@ const handleDelete = async (file, index) => {
     Notify.create({
       message: "File deleted successfully.",
       type: "positive",
-      position: "center",
+      position: "top-right",
     });
     // Let the parent know which file was deleted
     emit("file-deleted", index);

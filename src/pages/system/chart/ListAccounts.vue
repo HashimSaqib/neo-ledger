@@ -723,7 +723,7 @@ async function saveAccount(isNew = false) {
     Notify.create({
       message: t("Account saved successfully"),
       color: "positive",
-      position: "center",
+      position: "top-right",
     });
     await fetchData();
     editDialog.value = false;
@@ -763,7 +763,7 @@ async function deleteAccount(accountId) {
         Notify.create({
           message: t("Account deleted successfully"),
           color: "positive",
-          position: "center",
+          position: "top-right",
         });
 
         await fetchData();

@@ -184,7 +184,7 @@ const signupOtp = async () => {
       Notify.create({
         message: t("Signup successful!"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
       const { sessionkey } = response.data;
       $q.cookies.set("sessionkey", sessionkey, { path: "/" });
@@ -194,7 +194,7 @@ const signupOtp = async () => {
       Notify.create({
         message: t("OTP sent to your email"),
         type: "positive",
-        position: "center",
+        position: "top-right",
       });
     }
   } catch (error) {
