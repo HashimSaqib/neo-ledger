@@ -8,21 +8,51 @@
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
-        <s-select
-          v-if="departments.length > 0"
-          :options="departments"
-          option-label="description"
-          search="description"
-          option-value="id"
-          v-model="formData.department"
-          class="lightbg q-my-md"
-          :label="t('Department')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          clearable
-        />
+        <div class="row q-gutter-md q-mb-md">
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model="formData.fromdate"
+              type="date"
+              :label="t('From Date')"
+              outlined
+              dense
+              class="lightbg"
+              input-class="maintext"
+              label-color="secondary"
+              clearable
+            />
+          </div>
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model="formData.todate"
+              type="date"
+              :label="t('To Date')"
+              outlined
+              dense
+              class="lightbg"
+              input-class="maintext"
+              label-color="secondary"
+              clearable
+            />
+          </div>
+          <div class="col-12 col-md-4">
+            <s-select
+              v-if="departments.length > 0"
+              :options="departments"
+              option-label="description"
+              search="description"
+              option-value="id"
+              v-model="formData.department"
+              class="lightbg"
+              :label="t('Department')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              clearable
+            />
+          </div>
+        </div>
 
         <div class="row q-mt-md">
           <q-btn
@@ -248,6 +278,8 @@ const title = inject("title");
 // =====================================================
 const formData = ref({
   department: route.query.department || "",
+  fromdate: route.query.fromdate || "",
+  todate: route.query.todate || "",
 });
 
 const departments = ref([]);
@@ -550,17 +582,17 @@ const exportToExcel = () => {
 const exportToPDF = () => {
   const doc = new jsPDF({ orientation: "landscape" });
 
-  doc.setFontSize(18);
-  doc.text("All Taxes Report", doc.internal.pageSize.width / 2, 20, {
+  doc.setFontSize(14);
+  doc.text("All Taxes Report", doc.internal.pageSize.width / 2, 15, {
     align: "center",
   });
 
-  let yPosition = 35;
+  let yPosition = 25;
 
   // Summary section
-  doc.setFontSize(14);
+  doc.setFontSize(11);
   doc.text("Summary", 15, yPosition);
-  yPosition += 10;
+  yPosition += 8;
 
   const summaryTableData = summaryData.value.map((row) => [
     row.module,
@@ -573,21 +605,21 @@ const exportToPDF = () => {
     head: [["Module", "Account", "Amount", "Tax"]],
     body: summaryTableData,
     startY: yPosition,
-    styles: { fontSize: 9, cellPadding: 2 },
-    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
+    styles: { fontSize: 8, cellPadding: 1 },
+    headStyles: { fontStyle: "bold" },
     columnStyles: {
       2: { halign: "right" },
       3: { halign: "right" },
     },
-    theme: "striped",
+    theme: "plain",
   });
 
-  yPosition = doc.lastAutoTable.finalY + 20;
+  yPosition = doc.lastAutoTable.finalY + 12;
 
   // Detailed section
-  doc.setFontSize(14);
+  doc.setFontSize(11);
   doc.text("Detailed Breakdown", 15, yPosition);
-  yPosition += 10;
+  yPosition += 8;
 
   const tableData = [];
 
@@ -596,8 +628,8 @@ const exportToPDF = () => {
     tableData.push([
       {
         content: module.toUpperCase(),
-        colSpan: 8,
-        styles: { fontStyle: "bold", fillColor: [245, 245, 245] },
+        colSpan: 6,
+        styles: { fontStyle: "bold" },
       },
     ]);
 
@@ -606,8 +638,8 @@ const exportToPDF = () => {
       tableData.push([
         {
           content: account,
-          colSpan: 8,
-          styles: { fontStyle: "bold", fillColor: [250, 250, 250] },
+          colSpan: 6,
+          styles: { fontStyle: "bold" },
         },
       ]);
 
@@ -620,8 +652,6 @@ const exportToPDF = () => {
           formatAmount(transaction.amount),
           formatAmount(transaction.tax),
           transaction.description,
-          "",
-          "",
         ]);
       });
 
@@ -633,8 +663,6 @@ const exportToPDF = () => {
         formatAmount(accountData.subtotal.amount),
         formatAmount(accountData.subtotal.tax),
         "",
-        "",
-        "",
       ]);
     });
 
@@ -643,7 +671,7 @@ const exportToPDF = () => {
       {
         content: `${module.toUpperCase()} Total`,
         colSpan: 3,
-        styles: { fontStyle: "bold", fillColor: [227, 242, 253] },
+        styles: { fontStyle: "bold" },
       },
       {
         content: formatAmount(moduleData.total.amount),
@@ -654,33 +682,20 @@ const exportToPDF = () => {
         styles: { fontStyle: "bold" },
       },
       "",
-      "",
-      "",
     ]);
   });
 
   autoTable(doc, {
-    head: [
-      [
-        "Date",
-        "Invoice Number",
-        "Name",
-        "Amount",
-        "Tax",
-        "Description",
-        "",
-        "",
-      ],
-    ],
+    head: [["Date", "Invoice Number", "Name", "Amount", "Tax", "Description"]],
     body: tableData,
     startY: yPosition,
-    styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
+    styles: { fontSize: 7, cellPadding: 1 },
+    headStyles: { fontStyle: "bold" },
     columnStyles: {
       3: { halign: "right" },
       4: { halign: "right" },
     },
-    theme: "striped",
+    theme: "plain",
   });
 
   doc.save("all_taxes_report.pdf");
