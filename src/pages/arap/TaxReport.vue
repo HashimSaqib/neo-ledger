@@ -144,7 +144,7 @@
 
       <!-- Grouped Results by Account Number -->
       <div
-        v-for="(group, accno) in groupedResults"
+        v-for="(group, accno, index) in groupedResults"
         :key="accno"
         class="q-mb-md"
       >
@@ -219,40 +219,31 @@
                 >
                   {{ formatAmount(group.totals[col.name]) || "" }}
                 </template>
-                <template v-else-if="col.name === 'description'"> </template>
+                <template v-else-if="col.name === 'description'">
+                  {{ t("Account Total") }}
+                </template>
+              </q-td>
+            </q-tr>
+            <!-- Grand Totals Row (only in last group) -->
+            <q-tr
+              v-if="index === Object.keys(groupedResults).length - 1"
+              class="grand-totals-row"
+            >
+              <q-td v-for="col in columns" :align="col.align" :key="col.name">
+                <template
+                  v-if="
+                    ['netamount', 'amount', 'tax', 'total'].includes(col.name)
+                  "
+                >
+                  {{ formatAmount(grandTotals[col.name]) || "" }}
+                </template>
+                <template v-else-if="col.name === 'description'">
+                  {{ t("Grand Total") }}
+                </template>
               </q-td>
             </q-tr>
           </template>
         </q-table>
-      </div>
-
-      <!-- Overall Grand Totals Section -->
-      <div
-        v-if="Object.keys(groupedResults).length > 0"
-        class="q-mt-md q-pa-sm"
-      >
-        <div class="row justify-end">
-          <div class="col-auto">
-            <div class="row items-center">
-              <div class="col-5 text-right">{{ t(" Amount") }}:</div>
-              <div class="col-auto q-pl-sm">
-                {{ formatAmount(grandTotals.netamount) }}
-              </div>
-            </div>
-            <div class="row items-center">
-              <div class="col-5 text-right">{{ t(" Tax") }}:</div>
-              <div class="col-auto q-pl-sm text-right">
-                {{ formatAmount(grandTotals.tax) }}
-              </div>
-            </div>
-            <div class="row items-center">
-              <div class="col-5 text-right">{{ t("Total") }}:</div>
-              <div class="col-auto q-pl-sm text-right">
-                {{ formatAmount(grandTotals.total) }}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </q-page>
@@ -647,8 +638,10 @@ const getPath = (row) => {
   // This can be customized based on your routing needs
   const path =
     type.value === "customer"
-      ? createLink("customer.invoice")
-      : createLink("vendor.invoice");
+      ? createLink(
+          row.invoice === 1 ? "customer.invoice" : "customer.transaction"
+        )
+      : createLink(row.invoice === 1 ? "vendor.invoice" : "vendor.transaction");
 
   const flatParams = flattenParams(formData.value);
   return {
@@ -913,6 +906,23 @@ onMounted(async () => {
 }
 
 :deep(.totals-row td) {
+  position: sticky !important;
+  bottom: 0 !important;
+  font-weight: var(--q-font-weight-bolder);
+  background-color: var(--q-maintext);
+  color: var(--q-mainbg);
+}
+
+:deep(.grand-totals-row) {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 2;
+  background-color: var(--q-maintext);
+  color: var(--q-mainbg);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.12);
+}
+
+:deep(.grand-totals-row td) {
   position: sticky !important;
   bottom: 0 !important;
   font-weight: var(--q-font-weight-bolder);
