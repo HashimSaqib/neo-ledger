@@ -5,6 +5,7 @@ const GlTransactions = () =>
   import("src/pages/general-ledger/GlTransactions.vue");
 const ArApTransaction = () => import("src/pages/arap/ArApTransaction.vue");
 const ArApTransactions = () => import("src/pages/arap/ArApTransactions.vue");
+const TaxReport = () => import("src/pages/arap/TaxReport.vue");
 const ArApBatch = () => import("src/pages/arap/ArApBatch.vue");
 const ArReminder = () => import("src/pages/arap/ArReminder.vue");
 const SalesInvoice = () => import("src/pages/ar/SalesInvoice.vue");
@@ -89,6 +90,17 @@ const routes = [
             return route.params.type === "customer"
               ? "customer.transactions"
               : "vendor.transactions";
+          },
+        },
+      },
+      {
+        path: "arap/taxreport/:type",
+        component: TaxReport,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.taxreport"
+              : "vendor.taxreport";
           },
         },
       },

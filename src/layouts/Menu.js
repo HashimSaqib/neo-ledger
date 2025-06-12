@@ -69,7 +69,11 @@ export const menuLinks = [
             link: "/arap/transactions/customer",
             perm: "customer.transactions",
           },
-
+          {
+            title: "Tax Collected",
+            link: "/arap/taxreport/customer",
+            perm: "customer.taxreport",
+          },
           {
             title: "Customer Search",
             link: "/arap/search/customer",
@@ -126,6 +130,11 @@ export const menuLinks = [
             title: "AP Transactions",
             link: "/arap/transactions/vendor",
             perm: "vendor.transactions",
+          },
+          {
+            title: "Tax Paid",
+            link: "/arap/taxreport/vendor",
+            perm: "vendor.taxreport",
           },
           {
             title: "Vendor Search",
