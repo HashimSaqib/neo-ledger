@@ -8,6 +8,7 @@
       bordered
       separator="horizontal"
       hide-bottom
+      :rows-per-page-options="[0]"
     >
       <!-- Custom cell for account number -->
       <template v-slot:body-cell-accno="props">
