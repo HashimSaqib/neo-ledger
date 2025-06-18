@@ -9,14 +9,15 @@
 
         <!-- Search Parameters Section -->
         <div class="row q-my-xs q-gutter-sm">
-          <q-select
+          <s-select
             v-if="departments.length > 0"
             v-model="formData.department"
             emit-value
             map-options
             class="col-3"
             :label="t('Department')"
-            option-label="label"
+            option-label="description"
+            search="description"
             option-value="value"
             :options="departments"
             outlined
