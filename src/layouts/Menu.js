@@ -182,6 +182,21 @@ export const menuLinks = [
         link: "/cash/payment/vendor",
         perm: "cash.payments",
       },
+      {
+        title: "Reports",
+        sublinks: [
+          {
+            title: "Customer Payments",
+            link: "/cash/report/customer",
+            perm: "cash.report.customer",
+          },
+          {
+            title: "Vendor Payments",
+            link: "/cash/report/vendor",
+            perm: "cash.report.vendor",
+          },
+        ],
+      },
     ],
   },
   {

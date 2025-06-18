@@ -6,6 +6,7 @@ const GlTransactions = () =>
 const ArApTransaction = () => import("src/pages/arap/ArApTransaction.vue");
 const ArApTransactions = () => import("src/pages/arap/ArApTransactions.vue");
 const TaxReport = () => import("src/pages/arap/TaxReport.vue");
+const PaymentsReport = () => import("src/pages/cash/PaymentsReport.vue");
 const ArApBatch = () => import("src/pages/arap/ArApBatch.vue");
 const ArReminder = () => import("src/pages/arap/ArReminder.vue");
 const SalesInvoice = () => import("src/pages/ar/SalesInvoice.vue");
@@ -291,13 +292,24 @@ const routes = [
         meta: { permission: "cash.recon" },
       },
       {
-        path: "cash/payment/:vc",
+        path: "cash/payment/:type",
         component: Payments,
         meta: {
           permission: (route) => {
-            return route.params.vc === "customer"
+            return route.params.type === "customer"
               ? "cash.receipts"
               : "cash.payments";
+          },
+        },
+      },
+      {
+        path: "cash/report/:vc",
+        component: PaymentsReport,
+        meta: {
+          permission: (route) => {
+            return route.params.vc === "customer"
+              ? "cash.report.customer"
+              : "cash.report.vendor";
           },
         },
       },
