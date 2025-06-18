@@ -343,7 +343,7 @@ const createLink = inject("createLink");
 const getPath = (row) => {
   let path = "";
 
-  path = createLink("trail.transactions");
+  path = createLink("trial.transactions");
 
   return {
     path,
