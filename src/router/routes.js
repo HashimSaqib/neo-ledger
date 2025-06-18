@@ -292,11 +292,11 @@ const routes = [
         meta: { permission: "cash.recon" },
       },
       {
-        path: "cash/payment/:type",
+        path: "cash/payment/:vc",
         component: Payments,
         meta: {
           permission: (route) => {
-            return route.params.type === "customer"
+            return route.params.vc === "customer"
               ? "cash.receipts"
               : "cash.payments";
           },
