@@ -809,7 +809,7 @@ const calculateTaxes = () => {
       const taxRate = parseFloat(vc.value[`${taxAcc}_rate`] || 0);
       const netAmount = subtotal.value;
       const taxAmount = taxIncluded.value
-        ? netAmount * (taxRate / (1 + taxRate))
+        ? netAmount - (netAmount / (taxRate * 100 + 100)) * 100
         : netAmount * taxRate;
       return {
         name: `${name} ${(taxRate * 100).toFixed(0)}%`,

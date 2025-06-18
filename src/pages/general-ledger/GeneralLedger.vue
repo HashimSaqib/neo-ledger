@@ -893,12 +893,25 @@ const updateTaxAmount = (val, index) => {
     lines.value[index].linetaxamount = 0;
     return;
   }
+
   let debit = parseFloat(lines.value[index].debit);
   let credit = parseFloat(lines.value[index].credit);
   if (isNaN(debit)) debit = 0;
   if (isNaN(credit)) credit = 0;
-  let baseAmount = debit > 0 ? debit : credit;
-  lines.value[index].linetaxamount = baseAmount ? baseAmount * taxAcc.rate : 0;
+
+  let grossAmount = debit > 0 ? debit : credit;
+
+  if (!grossAmount) {
+    lines.value[index].linetaxamount = 0;
+    return;
+  }
+
+  // Calculate base amount from gross amount that includes tax
+  taxAcc.rate = taxAcc.rate * 100;
+  let baseAmount = (grossAmount / (taxAcc.rate + 100)) * 100;
+
+  // Tax amount is the difference
+  lines.value[index].linetaxamount = grossAmount - baseAmount;
 };
 onMounted(async () => {
   try {

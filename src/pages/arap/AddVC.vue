@@ -764,23 +764,26 @@ const fetchLinks = async () => {
     accounts.value = response.data.accounts.all;
     currencies.value = response.data.currencies;
 
-    // Filter out duplicate tax accounts based on chart_id
-    const uniqueTaxAccounts = response.data.tax_accounts.reduce(
-      (acc, current) => {
-        const existingAccount = acc.find(
-          (item) => item.chart_id === current.chart_id
-        );
-        if (!existingAccount) {
-          acc.push(current);
-        }
-        return acc;
-      },
-      []
-    );
+    // Determine AR or AP based on componentType
+    const ARAP = componentType.value === "customer" ? "AR_tax" : "AP_tax";
 
+    // Filter out tax accounts that don't include the correct ARAP link
+    const filteredTaxAccounts = response.data.tax_accounts.filter((tax) => {
+      const links = tax.link?.split(":") || [];
+      return links.includes(ARAP);
+    });
+
+    // Remove duplicates based on chart_id
+    const uniqueTaxAccounts = filteredTaxAccounts.reduce((acc, current) => {
+      const exists = acc.find((item) => item.chart_id === current.chart_id);
+      if (!exists) acc.push(current);
+      return acc;
+    }, []);
+
+    // Set taxAccounts and initialize form fields
     taxAccounts.value = uniqueTaxAccounts.map((tax) => ({
       id: tax.accno,
-      description: `${tax.description} `,
+      description: `${tax.description}`,
     }));
 
     taxAccounts.value.forEach((tax) => {
@@ -790,6 +793,7 @@ const fetchLinks = async () => {
     console.error(error);
   }
 };
+
 // Initialize component
 onMounted(async () => {
   await fetchLinks();
