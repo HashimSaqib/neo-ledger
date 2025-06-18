@@ -44,6 +44,7 @@ const Connections = () => import("src/pages/Connections.vue");
 const Taxes = () => import("src/pages/system/Taxes.vue");
 const Audit = () => import("src/pages/system/Audit.vue");
 const Batch = () => import("src/pages/system/Batch.vue");
+const YearEnd = () => import("src/pages/system/YearEnd.vue");
 const Import = () => import("src/pages/Import.vue");
 
 const routes = [
@@ -342,6 +343,11 @@ const routes = [
         path: "system/batch",
         component: Batch,
         meta: { permission: "system.batch" },
+      },
+      {
+        path: "system/yearend",
+        component: YearEnd,
+        meta: { permission: "system.yearend" },
       },
       {
         path: "import/:type",

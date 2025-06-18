@@ -346,6 +346,11 @@ export const menuLinks = [
         link: "/system/batch",
         perm: "system.batch",
       },
+      {
+        title: "Year End",
+        link: "/system/yearend",
+        perm: "system.yearend",
+      },
     ],
   },
   {
