@@ -25,6 +25,7 @@ const IncomeStatement = () => import("src/pages/reports/IncomeStatement.vue");
 const BalanceSheet = () => import("src/pages/reports/BalanceSheet.vue");
 const AllTaxes = () => import("src/pages/reports/AllTaxes.vue");
 const Reconciliation = () => import("src/pages/cash/Reconciliation.vue");
+const Payments = () => import("src/pages/cash/Payments.vue");
 const SysCurrencies = () => import("src/pages/system/Currencies.vue");
 const SysDefaults = () => import("src/pages/system/Defaults.vue");
 const ListAccounts = () => import("src/pages/system/chart/ListAccounts.vue");
@@ -285,9 +286,20 @@ const routes = [
         meta: { permission: "system.projects" },
       },
       {
-        path: "reconciliation",
+        path: "cash/reconciliation",
         component: Reconciliation,
         meta: { permission: "cash.recon" },
+      },
+      {
+        path: "cash/payment/:vc",
+        component: Payments,
+        meta: {
+          permission: (route) => {
+            return route.params.vc === "customer"
+              ? "cash.receipts"
+              : "cash.payments";
+          },
+        },
       },
       {
         path: "system/roles",

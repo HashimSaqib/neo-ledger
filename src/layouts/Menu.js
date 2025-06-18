@@ -169,8 +169,18 @@ export const menuLinks = [
     sublinks: [
       {
         title: "Reconciliation",
-        link: "/reconciliation",
+        link: "/cash/reconciliation",
         perm: "cash.recon",
+      },
+      {
+        title: "Receipts",
+        link: "/cash/payment/customer",
+        perm: "cash.receipts",
+      },
+      {
+        title: "Payments",
+        link: "/cash/payment/vendor",
+        perm: "cash.payments",
       },
     ],
   },
