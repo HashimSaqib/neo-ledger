@@ -907,9 +907,9 @@ const updateTaxAmount = (val, index) => {
   }
 
   // Calculate base amount from gross amount that includes tax
-  taxAcc.rate = taxAcc.rate * 100;
-  let baseAmount = (grossAmount / (taxAcc.rate + 100)) * 100;
-
+  const newRate = taxAcc.rate * 100;
+  let baseAmount = (grossAmount / (newRate + 100)) * 100;
+  console.log(grossAmount, newRate, baseAmount);
   // Tax amount is the difference
   lines.value[index].linetaxamount = grossAmount - baseAmount;
 };
