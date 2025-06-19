@@ -200,6 +200,54 @@
           />
         </div>
 
+        <!-- Created Date Range Section -->
+        <div class="row q-mt-xs q-gutter-sm">
+          <q-input
+            v-model="formData.createdfrom"
+            type="date"
+            :label="t('Created Date From')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-4"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.createdto"
+            type="date"
+            :label="t('Created Date To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-4"
+            outlined
+            dense
+          />
+        </div>
+
+        <!-- Updated Date Range Section -->
+        <div class="row q-mt-xs q-gutter-sm">
+          <q-input
+            v-model="formData.updatedfrom"
+            type="date"
+            :label="t('Updated Date From')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-4"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.updatedto"
+            type="date"
+            :label="t('Updated Date To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-4"
+            outlined
+            dense
+          />
+        </div>
+
         <div class="row q-mt-sm q-gutter-sm">
           <q-toggle
             :model-value="formData.outstanding === 'Y'"
@@ -302,6 +350,19 @@
             </router-link>
           </q-td>
         </template>
+
+        <!-- Created Date Column -->
+        <template v-slot:body-cell-created="props">
+          <q-td :props="props">{{ formatTimestamp(props.row.created) }}</q-td>
+        </template>
+
+        <!-- Updated Date Column -->
+        <template v-slot:body-cell-updated="props">
+          <q-td :props="props">{{
+            formatUpdatedTimestamp(props.row.updated)
+          }}</q-td>
+        </template>
+
         <template v-slot:body-cell-files="props">
           <q-td :props="props">
             <file-list :files="props.row.files" :report="true" />
@@ -386,7 +447,13 @@ import { api } from "src/boot/axios";
 import { LocalStorage, Notify } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
-import { formatAmount, downloadReport, createPDF } from "src/helpers/utils";
+import {
+  formatAmount,
+  downloadReport,
+  createPDF,
+  formatTimestamp,
+  formatUpdatedTimestamp,
+} from "src/helpers/utils";
 import FileList from "src/components/FileList.vue";
 const createLink = inject("createLink");
 
@@ -433,6 +500,10 @@ const formData = ref({
   paidearly: "",
   onhold: "",
   till: "",
+  createdfrom: "",
+  createdto: "",
+  updatedfrom: "",
+  updatedto: "",
 });
 
 const filtersOpen = route.query.search == 1 ? ref(false) : ref(true);
@@ -484,6 +555,20 @@ const baseColumns = ref([
     label: "Invoice Date",
     field: "transdate",
     default: true,
+    align: "left",
+  },
+  {
+    name: "created",
+    label: "Created Date",
+    field: "created",
+    default: false,
+    align: "left",
+  },
+  {
+    name: "updated",
+    label: "Updated Date",
+    field: "updated",
+    default: false,
     align: "left",
   },
   {
@@ -854,6 +939,10 @@ const loadParams = () => {
     "source",
     "transdatefrom",
     "transdateto",
+    "createdfrom",
+    "createdto",
+    "updatedfrom",
+    "updatedto",
   ];
 
   simpleParams.forEach((key) => {

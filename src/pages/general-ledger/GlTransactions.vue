@@ -174,6 +174,50 @@
             dense
           />
         </div>
+        <div class="row justify-between q-my-md">
+          <q-input
+            v-model="formData.createdfrom"
+            type="date"
+            :label="t('Created From')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.createdto"
+            type="date"
+            :label="t('Created To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+        </div>
+        <div class="row justify-between q-my-md">
+          <q-input
+            v-model="formData.updatedfrom"
+            type="date"
+            :label="t('Updated From')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+          <q-input
+            v-model="formData.updatedto"
+            type="date"
+            :label="t('Updated To')"
+            input-class="maintext"
+            label-color="secondary"
+            class="lightbg col-5"
+            outlined
+            dense
+          />
+        </div>
         <div class="row justify-between">
           <q-input
             v-model="formData.amountfrom"
@@ -346,6 +390,12 @@
                   )
                 }}
               </span>
+              <span v-else-if="col.name === 'created'">
+                {{ formatTimestamp(props.row.created) }}
+              </span>
+              <span v-else-if="col.name === 'updated'">
+                {{ formatUpdatedTimestamp(props.row) }}
+              </span>
               <span v-else>
                 {{
                   typeof col.field === "function"
@@ -390,7 +440,12 @@ import { api } from "src/boot/axios";
 import { Notify, LocalStorage } from "quasar";
 import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
-import { formatAmount, roundAmount } from "src/helpers/utils";
+import {
+  formatAmount,
+  roundAmount,
+  formatTimestamp,
+  formatUpdatedTimestamp,
+} from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
 import { useRoute } from "vue-router";
 import FileList from "src/components/FileList.vue";
@@ -565,6 +620,22 @@ const baseColumns = ref([
     align: "left",
     label: "Contra",
     field: "contra",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "created",
+    align: "left",
+    label: "Created",
+    field: "created",
+    sortable: true,
+    default: false,
+  },
+  {
+    name: "updated",
+    align: "left",
+    label: "Updated",
+    field: "updated",
     sortable: true,
     default: false,
   },
@@ -801,6 +872,10 @@ const loadParams = () => {
     "memo",
     "datefrom",
     "dateto",
+    "createdfrom",
+    "createdto",
+    "updatedfrom",
+    "updatedto",
     "amountfrom",
     "amountto",
   ];
@@ -842,7 +917,7 @@ const search = async () => {
     results.value = appliedSplitLedger.value ? groupData(data) : data;
     tableKey.value++;
   } catch (error) {
-    // Handle errors as needed.
+    results.value = [];
     if (error.response) {
       console.error("API Error:", error.response.status, error.response.data);
     } else {
@@ -957,6 +1032,8 @@ const downloadTransactions = () => {
             typeof col.field === "function" ? col.field(row) : row[col.field]
           );
         }
+        if (col.name === "created") return formatTimestamp(row.created);
+        if (col.name === "updated") return formatUpdatedTimestamp(row);
         return typeof col.field === "function"
           ? col.field(row)
           : row[col.field];
@@ -1040,6 +1117,8 @@ const createPDF = () => {
               typeof col.field === "function" ? col.field(row) : row[col.field]
             );
           }
+          if (col.name === "created") return formatTimestamp(row.created);
+          if (col.name === "updated") return formatUpdatedTimestamp(row);
           return typeof col.field === "function"
             ? col.field(row)
             : row[col.field];
