@@ -212,6 +212,7 @@ function formatRow(result) {
   // Additional fields for linking and identification
   formatted.charttype = result.charttype;
   formatted.type = result.module;
+  formatted.module = result.module;
   formatted.id = result.id;
   formatted.till = result.till;
   formatted.accno = result.accno;
@@ -238,6 +239,8 @@ const filteredResults = computed(() => {
     totalCredits += credit;
     balance += debit - credit;
     formatted.balance = balance;
+    formatted.module = result.module;
+    console.log(formatted);
     return formatted;
   });
   processedResults.push({
@@ -261,15 +264,19 @@ const getPath = (row) => {
   if (row.module === "gl") {
     path = createLink("gl.transaction");
   } else if (row.module === "ar" || row.module === "is") {
-    path = row.till
-      ? createLink("ar.till")
-      : row.invoice
-      ? createLink("invoice.customer")
-      : createLink("transaction.customer");
+    if (row.till) {
+      path = createLink("customer.pos");
+    } else if (row.invoice !== null && row.invoice !== undefined) {
+      path = createLink("customer.invoice");
+    } else {
+      path = createLink("customer.transaction");
+    }
   } else if (row.module === "ir") {
-    path = row.invoice
-      ? createLink("invoice.vendor")
-      : createLink("transaction.vendor");
+    if (row.invoice !== null && row.invoice !== undefined) {
+      path = createLink("vendor.invoice");
+    } else {
+      path = createLink("vendor.transaction");
+    }
   }
 
   if (!path) return null;
