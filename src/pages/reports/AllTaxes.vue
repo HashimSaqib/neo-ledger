@@ -168,6 +168,12 @@
               </q-td>
             </template>
 
+            <template v-slot:body-cell-address="props">
+              <q-td :props="props">
+                {{ props.value || "-" }}
+              </q-td>
+            </template>
+
             <template v-slot:body-cell-amount="props">
               <q-td
                 :props="props"
@@ -316,6 +322,13 @@ const columns = [
     name: "name",
     label: "Name",
     field: "name",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "address",
+    label: "Address",
+    field: "address",
     align: "left",
     sortable: true,
   },
@@ -524,6 +537,7 @@ const exportToExcel = () => {
     "Date",
     "Invoice Number",
     "Name",
+    "Address",
     "Amount",
     "Tax",
     "Description",
@@ -538,6 +552,7 @@ const exportToExcel = () => {
           transaction.transdate,
           transaction.invnumber,
           transaction.name,
+          transaction.address || "",
           roundAmount(transaction.amount),
           roundAmount(transaction.tax),
           transaction.description,
@@ -548,6 +563,7 @@ const exportToExcel = () => {
       exportData.push([
         "",
         `${account} Subtotal`,
+        "",
         "",
         "",
         "",
@@ -564,13 +580,14 @@ const exportToExcel = () => {
       "",
       "",
       "",
+      "",
       roundAmount(moduleData.total.amount),
       roundAmount(moduleData.total.tax),
       "",
     ]);
 
     // Empty row
-    exportData.push(["", "", "", "", "", "", "", ""]);
+    exportData.push(["", "", "", "", "", "", "", "", ""]);
   });
 
   const worksheet = utils.aoa_to_sheet(exportData);
@@ -628,7 +645,7 @@ const exportToPDF = () => {
     tableData.push([
       {
         content: module.toUpperCase(),
-        colSpan: 6,
+        colSpan: 7,
         styles: { fontStyle: "bold" },
       },
     ]);
@@ -638,7 +655,7 @@ const exportToPDF = () => {
       tableData.push([
         {
           content: account,
-          colSpan: 6,
+          colSpan: 7,
           styles: { fontStyle: "bold" },
         },
       ]);
@@ -649,6 +666,7 @@ const exportToPDF = () => {
           transaction.transdate,
           transaction.invnumber,
           transaction.name,
+          transaction.address || "",
           formatAmount(transaction.amount),
           formatAmount(transaction.tax),
           transaction.description,
@@ -660,6 +678,7 @@ const exportToPDF = () => {
         "",
         "Account Subtotal",
         "",
+        "",
         formatAmount(accountData.subtotal.amount),
         formatAmount(accountData.subtotal.tax),
         "",
@@ -670,7 +689,7 @@ const exportToPDF = () => {
     tableData.push([
       {
         content: `${module.toUpperCase()} Total`,
-        colSpan: 3,
+        colSpan: 4,
         styles: { fontStyle: "bold" },
       },
       {
@@ -686,14 +705,24 @@ const exportToPDF = () => {
   });
 
   autoTable(doc, {
-    head: [["Date", "Invoice Number", "Name", "Amount", "Tax", "Description"]],
+    head: [
+      [
+        "Date",
+        "Invoice Number",
+        "Name",
+        "Address",
+        "Amount",
+        "Tax",
+        "Description",
+      ],
+    ],
     body: tableData,
     startY: yPosition,
     styles: { fontSize: 7, cellPadding: 1 },
     headStyles: { fontStyle: "bold" },
     columnStyles: {
-      3: { halign: "right" },
       4: { halign: "right" },
+      5: { halign: "right" },
     },
     theme: "plain",
   });
