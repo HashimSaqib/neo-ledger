@@ -105,6 +105,12 @@
             {{ formatAmount(props.value) }}
           </q-td>
         </template>
+
+        <template v-slot:body-cell-calculated_tax="props">
+          <q-td :props="props" class="text-right">
+            {{ props.value.toFixed(2) + "%" }}
+          </q-td>
+        </template>
       </q-table>
     </div>
 
@@ -121,18 +127,18 @@
         </div>
 
         <div
-          v-for="(accountData, account) in moduleData.accounts"
-          :key="account"
+          v-for="(taxGroupData, taxKey) in moduleData.taxGroups"
+          :key="taxKey"
           class="q-mb-md q-my-none"
         >
-          <!-- Account Header -->
+          <!-- Tax Group Header -->
           <div class="text-subtitle1 text-weight-medium q-my-none q-pa-sm">
-            {{ account }}
+            {{ taxGroupData.account }} - {{ taxGroupData.taxRate }}%
           </div>
 
           <!-- Transactions Table -->
           <q-table
-            :rows="accountData.transactionsWithSubtotal"
+            :rows="taxGroupData.transactionsWithSubtotal"
             :columns="columns"
             row-key="id"
             :rows-per-page-options="[0]"
@@ -194,6 +200,16 @@
               </q-td>
             </template>
 
+            <template v-slot:body-cell-calculated_tax="props">
+              <q-td
+                :props="props"
+                class="text-right"
+                :class="{ 'text-weight-bold': props.row.isSubtotal }"
+              >
+                {{ props.row.isSubtotal ? "" : props.value.toFixed(2) + "%" }}
+              </q-td>
+            </template>
+
             <template v-slot:body-row="props">
               <q-tr
                 :props="props"
@@ -223,6 +239,9 @@
                   </router-link>
                   <span v-else-if="col.name === 'amount' || col.name === 'tax'">
                     {{ formatAmount(col.value) }}
+                  </span>
+                  <span v-else-if="col.name === 'calculated_tax'">
+                    {{ props.row.isSubtotal ? "" : col.value.toFixed(2) + "%" }}
                   </span>
                   <span v-else>
                     {{ col.value || (props.row.isSubtotal ? "" : "-") }}
@@ -346,6 +365,13 @@ const columns = [
     align: "right",
     sortable: true,
   },
+  {
+    name: "calculated_tax",
+    label: "Tax %",
+    field: "calculated_tax",
+    align: "right",
+    sortable: true,
+  },
 ];
 
 const summaryColumns = [
@@ -377,6 +403,13 @@ const summaryColumns = [
     align: "right",
     sortable: true,
   },
+  {
+    name: "calculated_tax",
+    label: "Tax %",
+    field: "calculated_tax",
+    align: "right",
+    sortable: true,
+  },
 ];
 
 // =====================================================
@@ -391,43 +424,59 @@ const groupedResults = computed(() => {
 
   results.value.forEach((item) => {
     const module = item.module.toLowerCase();
+    const taxId = item.tax_id;
     const account = item.account;
+    const taxRate = item.tax_rate;
+
+    // Calculate tax percentage
+    const amount = Number(item.amount);
+    const tax = Number(item.tax);
+    const calculatedTax = amount > 0 ? (tax / amount) * 100 : 0;
+
+    // Add calculated tax to the item
+    const itemWithCalculatedTax = {
+      ...item,
+      calculated_tax: calculatedTax,
+    };
 
     if (!grouped[module]) {
       grouped[module] = {
-        accounts: {},
+        taxGroups: {},
         total: { amount: 0, tax: 0 },
       };
     }
 
-    if (!grouped[module].accounts[account]) {
-      grouped[module].accounts[account] = {
+    const taxKey = `${taxId}`;
+    if (!grouped[module].taxGroups[taxKey]) {
+      grouped[module].taxGroups[taxKey] = {
+        account: account,
+        taxRate: taxRate,
         transactions: [],
         subtotal: { amount: 0, tax: 0 },
       };
     }
 
-    grouped[module].accounts[account].transactions.push(item);
-    grouped[module].accounts[account].subtotal.amount += Number(item.amount);
-    grouped[module].accounts[account].subtotal.tax += Number(item.tax);
+    grouped[module].taxGroups[taxKey].transactions.push(itemWithCalculatedTax);
+    grouped[module].taxGroups[taxKey].subtotal.amount += amount;
+    grouped[module].taxGroups[taxKey].subtotal.tax += tax;
 
-    grouped[module].total.amount += Number(item.amount);
-    grouped[module].total.tax += Number(item.tax);
+    grouped[module].total.amount += amount;
+    grouped[module].total.tax += tax;
   });
 
-  // Add subtotal rows to each account's transactions
+  // Add subtotal rows to each tax group's transactions
   Object.values(grouped).forEach((moduleData) => {
-    Object.values(moduleData.accounts).forEach((accountData) => {
-      accountData.transactionsWithSubtotal = [
-        ...accountData.transactions,
+    Object.values(moduleData.taxGroups).forEach((taxGroupData) => {
+      taxGroupData.transactionsWithSubtotal = [
+        ...taxGroupData.transactions,
         {
           id: `subtotal-${Math.random()}`,
           isSubtotal: true,
           transdate: "",
-          invnumber: "Account Subtotal",
+          invnumber: "Tax Group Subtotal",
           name: "",
-          amount: accountData.subtotal.amount,
-          tax: accountData.subtotal.tax,
+          amount: taxGroupData.subtotal.amount,
+          tax: taxGroupData.subtotal.tax,
           description: "",
         },
       ];
@@ -443,13 +492,20 @@ const summaryData = computed(() => {
   const summary = [];
 
   Object.entries(groupedResults.value).forEach(([module, moduleData]) => {
-    Object.entries(moduleData.accounts).forEach(([account, accountData]) => {
+    Object.entries(moduleData.taxGroups).forEach(([taxKey, taxGroupData]) => {
+      // Calculate tax percentage for the tax group
+      const calculatedTax =
+        taxGroupData.subtotal.amount > 0
+          ? (taxGroupData.subtotal.tax / taxGroupData.subtotal.amount) * 100
+          : 0;
+
       summary.push({
-        key: `${module}-${account}`,
+        key: `${module}-${taxKey}`,
         module: module.toUpperCase(),
-        account: account,
-        amount: accountData.subtotal.amount,
-        tax: accountData.subtotal.tax,
+        account: `${taxGroupData.account} - ${taxGroupData.taxRate}%`,
+        amount: taxGroupData.subtotal.amount,
+        tax: taxGroupData.subtotal.tax,
+        calculated_tax: calculatedTax,
       });
     });
   });
@@ -518,16 +574,17 @@ const exportToExcel = () => {
 
   // Summary section
   exportData.push(["SUMMARY"]);
-  exportData.push(["Module", "Account", "Amount", "Tax"]);
+  exportData.push(["Module", "Account", "Amount", "Tax", "Tax %"]);
   summaryData.value.forEach((row) => {
     exportData.push([
       row.module,
       row.account,
       roundAmount(row.amount),
       roundAmount(row.tax),
+      row.calculated_tax.toFixed(2) + "%",
     ]);
   });
-  exportData.push(["", "", "", ""]); // Empty row
+  exportData.push(["", "", "", "", ""]); // Empty row
 
   // Detailed data
   exportData.push(["DETAILED BREAKDOWN"]);
@@ -540,35 +597,38 @@ const exportToExcel = () => {
     "Address",
     "Amount",
     "Tax",
+    "Tax %",
     "Description",
   ]);
 
   Object.entries(groupedResults.value).forEach(([module, moduleData]) => {
-    Object.entries(moduleData.accounts).forEach(([account, accountData]) => {
-      accountData.transactions.forEach((transaction) => {
+    Object.entries(moduleData.taxGroups).forEach(([taxKey, taxGroupData]) => {
+      taxGroupData.transactions.forEach((transaction) => {
         exportData.push([
           module.toUpperCase(),
-          account,
+          `${taxGroupData.account} - ${taxGroupData.taxRate}%`,
           transaction.transdate,
           transaction.invnumber,
           transaction.name,
           transaction.address || "",
           roundAmount(transaction.amount),
           roundAmount(transaction.tax),
+          transaction.calculated_tax.toFixed(2) + "%",
           transaction.description,
         ]);
       });
 
-      // Account subtotal
+      // Tax group subtotal
       exportData.push([
         "",
-        `${account} Subtotal`,
+        `${taxGroupData.account} - ${taxGroupData.taxRate}% Subtotal`,
         "",
         "",
         "",
         "",
-        roundAmount(accountData.subtotal.amount),
-        roundAmount(accountData.subtotal.tax),
+        roundAmount(taxGroupData.subtotal.amount),
+        roundAmount(taxGroupData.subtotal.tax),
+        "",
         "",
       ]);
     });
@@ -584,10 +644,11 @@ const exportToExcel = () => {
       roundAmount(moduleData.total.amount),
       roundAmount(moduleData.total.tax),
       "",
+      "",
     ]);
 
     // Empty row
-    exportData.push(["", "", "", "", "", "", "", "", ""]);
+    exportData.push(["", "", "", "", "", "", "", "", "", ""]);
   });
 
   const worksheet = utils.aoa_to_sheet(exportData);
@@ -616,10 +677,11 @@ const exportToPDF = () => {
     row.account,
     formatAmount(row.amount),
     formatAmount(row.tax),
+    row.calculated_tax.toFixed(2) + "%",
   ]);
 
   autoTable(doc, {
-    head: [["Module", "Account", "Amount", "Tax"]],
+    head: [["Module", "Account", "Amount", "Tax", "Tax %"]],
     body: summaryTableData,
     startY: yPosition,
     styles: { fontSize: 8, cellPadding: 1 },
@@ -627,6 +689,7 @@ const exportToPDF = () => {
     columnStyles: {
       2: { halign: "right" },
       3: { halign: "right" },
+      4: { halign: "right" },
     },
     theme: "plain",
   });
@@ -650,18 +713,18 @@ const exportToPDF = () => {
       },
     ]);
 
-    Object.entries(moduleData.accounts).forEach(([account, accountData]) => {
-      // Account header
+    Object.entries(moduleData.taxGroups).forEach(([taxKey, taxGroupData]) => {
+      // Tax group header
       tableData.push([
         {
-          content: account,
-          colSpan: 7,
+          content: `${taxGroupData.account} - ${taxGroupData.taxRate}%`,
+          colSpan: 8,
           styles: { fontStyle: "bold" },
         },
       ]);
 
       // Transactions
-      accountData.transactions.forEach((transaction) => {
+      taxGroupData.transactions.forEach((transaction) => {
         tableData.push([
           transaction.transdate,
           transaction.invnumber,
@@ -669,18 +732,20 @@ const exportToPDF = () => {
           transaction.address || "",
           formatAmount(transaction.amount),
           formatAmount(transaction.tax),
+          transaction.calculated_tax.toFixed(2) + "%",
           transaction.description,
         ]);
       });
 
-      // Account subtotal
+      // Tax group subtotal
       tableData.push([
         "",
-        "Account Subtotal",
+        "Tax Group Subtotal",
         "",
         "",
-        formatAmount(accountData.subtotal.amount),
-        formatAmount(accountData.subtotal.tax),
+        formatAmount(taxGroupData.subtotal.amount),
+        formatAmount(taxGroupData.subtotal.tax),
+        "",
         "",
       ]);
     });
@@ -701,6 +766,7 @@ const exportToPDF = () => {
         styles: { fontStyle: "bold" },
       },
       "",
+      "",
     ]);
   });
 
@@ -713,6 +779,7 @@ const exportToPDF = () => {
         "Address",
         "Amount",
         "Tax",
+        "Tax %",
         "Description",
       ],
     ],
@@ -723,6 +790,7 @@ const exportToPDF = () => {
     columnStyles: {
       4: { halign: "right" },
       5: { halign: "right" },
+      6: { halign: "right" },
     },
     theme: "plain",
   });
