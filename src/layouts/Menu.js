@@ -337,6 +337,11 @@ export const menuLinks = [
         ],
       },
       {
+        title: "Bank Accounts",
+        link: "/system/bank",
+        perm: "system.bank",
+      },
+      {
         title: "Audit",
         link: "/system/audit",
         perm: "system.audit",

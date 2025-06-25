@@ -46,6 +46,7 @@ const Audit = () => import("src/pages/system/Audit.vue");
 const Batch = () => import("src/pages/system/Batch.vue");
 const YearEnd = () => import("src/pages/system/YearEnd.vue");
 const Import = () => import("src/pages/Import.vue");
+const BankAccounts = () => import("src/pages/system/BankAccounts.vue");
 
 const routes = [
   {
@@ -261,6 +262,11 @@ const routes = [
         path: "system/defaults",
         component: SysDefaults,
         meta: { permission: "system.defaults" },
+      },
+      {
+        path: "system/bank",
+        component: BankAccounts,
+        meta: { permission: "system.bank" },
       },
       {
         path: "system/chart/list",
