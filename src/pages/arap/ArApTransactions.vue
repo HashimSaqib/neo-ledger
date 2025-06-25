@@ -358,9 +358,7 @@
 
         <!-- Updated Date Column -->
         <template v-slot:body-cell-updated="props">
-          <q-td :props="props">{{
-            formatUpdatedTimestamp(props.row.updated)
-          }}</q-td>
+          <q-td :props="props">{{ formatUpdatedTimestamp(props.row) }}</q-td>
         </template>
 
         <template v-slot:body-cell-files="props">
