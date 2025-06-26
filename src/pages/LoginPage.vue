@@ -76,8 +76,21 @@ const login = async () => {
       `${config.apiurl}/login`,
       loginData.value
     );
-    const { sessionkey } = response.data;
+    const { sessionkey, config: configData } = response.data;
     $q.cookies.set("sessionkey", sessionkey, { path: "/" });
+
+    // Handle config if it exists
+    if (configData) {
+      try {
+        const parsedConfig = JSON.parse(configData);
+        if (parsedConfig.number_format) {
+          LocalStorage.set("numberFormat", parsedConfig.number_format);
+        }
+      } catch (parseError) {
+        console.error("Error parsing config:", parseError);
+      }
+    }
+
     loading.value = false;
     if (loginData.value.client) {
       return router.push(`/client/${loginData.value.client}`);

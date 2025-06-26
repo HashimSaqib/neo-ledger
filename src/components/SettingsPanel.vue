@@ -48,6 +48,38 @@
         </q-item-section>
       </q-item>
 
+      <!-- Number Format Picker -->
+      <q-item>
+        <q-item-section avatar>
+          <q-icon name="format_list_numbered" />
+        </q-item-section>
+        <q-item-section>
+          <q-select
+            v-model="selectedNumberFormat"
+            :options="numberFormats"
+            dense
+            options-dense
+            @update:model-value="handleNumberFormatChange"
+            outlined
+            :label="$t('Number Format')"
+            class="q-px-none"
+          >
+            <template v-slot:option="{ itemProps, opt }">
+              <q-item
+                v-bind="itemProps"
+                clickable
+                @click="handleNumberFormatChange(opt)"
+              >
+                <q-item-section>
+                  <q-item-label>{{ opt.label }}</q-item-label>
+                  <q-item-label caption>{{ opt.example }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </q-item-section>
+      </q-item>
+
       <div>
         <s-select
           v-model="selectedDb"
@@ -66,6 +98,7 @@
           </template>
         </s-select>
       </div>
+
       <!-- Logout Button -->
       <q-separator spaced />
       <q-item clickable v-ripple @click="handleLogout" class="text-negative">
@@ -84,6 +117,8 @@ import { useRouter } from "vue-router";
 import { Cookies, LocalStorage } from "quasar";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
+import axios from "axios";
+import config from "../../neoledger.json";
 
 defineOptions({
   name: "SettingsPanel",
@@ -106,6 +141,73 @@ function switchLanguage(lang) {
   }
 }
 
+// Number format options
+const numberFormats = [
+  {
+    value: "1,000.00",
+    label: "1,000.00",
+    example: "Comma thousands, dot decimal",
+  },
+  {
+    value: "1'000.00",
+    label: "1'000.00",
+    example: "Apostrophe thousands, dot decimal",
+  },
+  {
+    value: "1.000,00",
+    label: "1.000,00",
+    example: "Dot thousands, comma decimal",
+  },
+  {
+    value: "1000,00",
+    label: "1000,00",
+    example: "No thousands separator, comma decimal",
+  },
+  {
+    value: "1000.00",
+    label: "1000.00",
+    example: "No thousands separator, dot decimal",
+  },
+];
+
+const selectedNumberFormat = ref(null);
+
+const handleNumberFormatChange = async (format) => {
+  if (format) {
+    selectedNumberFormat.value = format;
+    LocalStorage.set("numberFormat", format.value);
+
+    try {
+      const sessionkey = Cookies.get("sessionkey");
+      const axiosConfig = {
+        headers: {
+          Authorization: sessionkey,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const response = await axios.post(
+        `${config.apiurl}/update_config`,
+        {
+          number_format: format.value,
+        },
+        axiosConfig
+      );
+
+      if (response.data.success) {
+        // Optional: Show success message
+        console.log("Number format updated successfully");
+      }
+    } catch (error) {
+      console.error("Error updating number format:", error);
+      // Optional: Show error message to user
+      if (error.response?.data?.error) {
+        console.error("Server error:", error.response.data.error);
+      }
+    }
+  }
+};
+
 const dbOptions = ref([]);
 const selectedDb = ref(null);
 const loadDbOptions = () => {
@@ -126,6 +228,18 @@ function switchDatabase(dbName) {
 }
 onMounted(() => {
   loadDbOptions();
+
+  // Load saved number format from localStorage
+  const savedFormat = LocalStorage.getItem("numberFormat");
+  if (savedFormat) {
+    const format = numberFormats.find((f) => f.value === savedFormat);
+    if (format) {
+      selectedNumberFormat.value = format;
+    }
+  } else {
+    // Default to first format
+    selectedNumberFormat.value = numberFormats[0];
+  }
 });
 
 async function handleLogout() {

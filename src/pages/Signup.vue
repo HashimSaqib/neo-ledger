@@ -98,7 +98,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { Notify, useQuasar } from "quasar";
+import { Notify, useQuasar, LocalStorage } from "quasar";
 import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import axios from "axios";
@@ -186,8 +186,21 @@ const signupOtp = async () => {
         type: "positive",
         position: "top-right",
       });
-      const { sessionkey } = response.data;
+      const { sessionkey, config: configData } = response.data;
       $q.cookies.set("sessionkey", sessionkey, { path: "/" });
+
+      // Handle config if it exists
+      if (configData) {
+        try {
+          const parsedConfig = JSON.parse(configData);
+          if (parsedConfig.number_format) {
+            LocalStorage.set("numberFormat", parsedConfig.number_format);
+          }
+        } catch (parseError) {
+          console.error("Error parsing config:", parseError);
+        }
+      }
+
       router.push("/");
     } else {
       otpStage.value = true;
@@ -216,8 +229,21 @@ const confirmSignup = async () => {
       password: signupData.value.password,
       otp: signupData.value.otp,
     });
-    const { sessionkey } = response.data;
+    const { sessionkey, config: configData } = response.data;
     $q.cookies.set("sessionkey", sessionkey, { path: "/" });
+
+    // Handle config if it exists
+    if (configData) {
+      try {
+        const parsedConfig = JSON.parse(configData);
+        if (parsedConfig.number_format) {
+          LocalStorage.set("numberFormat", parsedConfig.number_format);
+        }
+      } catch (parseError) {
+        console.error("Error parsing config:", parseError);
+      }
+    }
+
     router.push("/");
   } catch (error) {
     Notify.create({

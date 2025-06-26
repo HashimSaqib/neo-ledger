@@ -3,13 +3,41 @@ import { utils, writeFile } from "xlsx";
 import { inject } from "vue";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Dialog } from "quasar";
+import { Dialog, LocalStorage } from "quasar";
 // Format a number as a string with commas and two decimals
 export const formatAmount = (amount) => {
   if (isNaN(amount) || amount === null || amount === undefined) return "";
-  return parseFloat(amount)
-    .toFixed(2)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  const numberFormat = LocalStorage.getItem("numberFormat") || "1,000.00";
+  const numericValue = parseFloat(amount).toFixed(2);
+
+  switch (numberFormat) {
+    case "1,000.00":
+      // Comma thousands, dot decimal (default)
+      return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    case "1'000.00":
+      // Apostrophe thousands, dot decimal
+      return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+
+    case "1.000,00":
+      // Dot thousands, comma decimal
+      return numericValue
+        .replace(".", ",")
+        .replace(/\B(?=(\d{3})+(?=,))/g, ".");
+
+    case "1000,00":
+      // No thousands separator, comma decimal
+      return numericValue.replace(".", ",");
+
+    case "1000.00":
+      // No thousands separator, dot decimal
+      return numericValue;
+
+    default:
+      // Fallback to comma thousands, dot decimal
+      return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
 };
 
 // Round the given amount to two decimals

@@ -92,6 +92,8 @@
 import { ref, onMounted, watch } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps({
   vc: {
