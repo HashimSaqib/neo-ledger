@@ -18,7 +18,8 @@
       class="mainbg column"
       :mini="miniState"
       @mouseenter="miniState = false"
-      @mouseleave="miniState = true"
+      @mouseleave="handleDrawerMouseLeave"
+      ref="drawerRef"
       style="height: 100%"
     >
       <div class="column no-wrap" style="height: 100%">
@@ -64,6 +65,9 @@ const { t } = useI18n();
 const route = useRoute();
 const leftDrawerOpen = ref(false);
 const company = Cookies.get("company");
+
+// Drawer reference
+const drawerRef = ref(null);
 
 // Extract client from the route instead of from Cookies
 const client = route.params.client;
@@ -200,4 +204,37 @@ provide("activeDropdownIndex", activeDropdownIndex);
 provide("setActiveDropdownIndex", (index) => {
   activeDropdownIndex.value = index;
 });
+
+// drawer would close when mouse is over a dropdown element
+const handleDrawerMouseLeave = (event) => {
+  // Check if the mouse is moving to a dropdown element
+  const relatedTarget = event.relatedTarget;
+
+  // If moving to a dropdown-related element, don't close the drawer
+  if (
+    relatedTarget &&
+    (relatedTarget.closest(".q-menu") ||
+      relatedTarget.closest(".q-select__dropdown") ||
+      relatedTarget.closest(".q-popup-proxy") ||
+      relatedTarget.closest(".q-virtual-scroll__content") ||
+      relatedTarget.closest(".q-item"))
+  ) {
+    return;
+  }
+
+  // Use a small delay to allow for dropdown interactions
+  setTimeout(() => {
+    // Double-check if we're still not over any dropdown elements
+    const activeElement = document.activeElement;
+    const isOverDropdown =
+      activeElement &&
+      (activeElement.closest(".q-menu") ||
+        activeElement.closest(".q-select__dropdown") ||
+        activeElement.closest(".q-popup-proxy"));
+
+    if (!isOverDropdown) {
+      miniState.value = true;
+    }
+  }, 100);
+};
 </script>

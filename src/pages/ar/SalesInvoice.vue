@@ -1386,13 +1386,13 @@ const calculateTaxes = () => {
             taxAmount = netAmount * taxRate;
           }
           const existingTax = invoiceTaxes.value.find(
-            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(0)}%`
+            (tax) => tax.name === `${name} ${taxRate * 100}%`
           );
           if (existingTax) {
             existingTax.amount += parseFloat(taxAmount.toFixed(2));
           } else {
             invoiceTaxes.value.push({
-              name: `${name} ${(taxRate * 100).toFixed(0)}%`,
+              name: `${name} ${(taxRate * 100).toFixed(2)}%`,
               amount: parseFloat(taxAmount.toFixed(2)),
               acc: taxAccount,
               rate: taxRate,
