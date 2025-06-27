@@ -122,29 +122,6 @@
             </div>
           </div>
 
-          <!-- Reference Documents -->
-          <div class="q-mb-sm">
-            <div class="text-weight-bold">{{ t("Reference Documents") }}</div>
-            <q-input
-              v-model="form.referenceDescription"
-              name="referencedescription_1"
-              :label="t('Reference Description')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-            />
-            <q-checkbox
-              v-model="form.referenceConfidential"
-              name="referenceconfidential_1"
-              :label="t('Confidential')"
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-            />
-          </div>
-
           <!-- Notes -->
           <q-input
             v-model="form.notes"
@@ -160,16 +137,7 @@
           />
 
           <!-- Additional Fields -->
-          <q-input
-            v-model="form.image"
-            name="image"
-            :label="t('Image')"
-            outlined
-            dense
-            class="q-mb-sm"
-            bg-color="input"
-            label-color="secondary"
-          />
+
           <q-input
             v-model="form.drawing"
             name="drawing"
@@ -216,6 +184,7 @@
             label-color="secondary"
           />
           <q-input
+            v-if="type == 'part'"
             v-model="form.lot"
             name="lot"
             :label="t('Lot')"
@@ -226,6 +195,7 @@
             label-color="secondary"
           />
           <q-input
+            v-if="type == 'part'"
             v-model="form.expires"
             name="expires"
             :label="t('Expires')"
@@ -429,209 +399,6 @@
         </div>
       </div>
 
-      <!-- Group: Vendor Information -->
-      <div class="q-mb-md">
-        <div class="text-weight-bold q-mb-xs">
-          {{ t("Vendor Information") }}
-        </div>
-        <div
-          v-for="(line, index) in form.vendorLines"
-          :key="'vendor-' + index"
-          class="row q-mb-md q-gutter-sm mainbg items-center"
-        >
-          <div class="col-12 col-md-2">
-            <q-select
-              v-model="line.vendor"
-              :options="vendors"
-              option-label="name"
-              :option-value="(option) => `${option.name}--${option.value}`"
-              :name="`vendor_${index}`"
-              :label="t('Vendor')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleVendorEnter(index)"
-              :ref="(el) => (vendorInputRefs[index] = el)"
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input
-              v-model="line.vendorPartNumber"
-              :name="`partnumber_${index}`"
-              :label="t('Number')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleVendorEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input
-              v-model="line.vendorCost"
-              :name="`lastcost_${index}`"
-              :label="t('Cost')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleVendorEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-1">
-            <q-select
-              v-model="line.vendorCurrency"
-              :options="currencies"
-              :name="`vendorcurr_${index}`"
-              :label="t('Curr')"
-              option-value="curr"
-              option-label="curr"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleVendorEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input
-              v-model="line.vendorLeadtime"
-              :name="`leadtime_${index}`"
-              :label="t('Leadtime (days)')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleVendorEnter(index)"
-            />
-          </div>
-          <div class="col-auto">
-            <q-btn
-              color="negative"
-              icon="delete"
-              dense
-              flat
-              @click="deleteVendorLine(index)"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Group: Customer Information -->
-      <div class="q-mb-md">
-        <div class="text-weight-bold q-mb-xs">
-          {{ t("Customer Information") }}
-        </div>
-        <div
-          v-for="(line, index) in form.customerLines"
-          :key="'customer-' + index"
-          class="row q-mb-md q-gutter-sm mainbg items-center"
-        >
-          <div class="col-12 col-md-2">
-            <q-select
-              v-model="line.customer"
-              :options="customers"
-              option-label="name"
-              :option-value="(option) => `${option.name}--${option.id}`"
-              :name="`customer_${index}`"
-              :label="t('Customer')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleCustomerEnter(index)"
-              :ref="(el) => (customerInputRefs[index] = el)"
-            />
-          </div>
-          <div class="col-12 col-md-1">
-            <q-input
-              v-model="line.priceBreak"
-              :name="`pricebreak_${index}`"
-              :label="t('Break')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleCustomerEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input
-              v-model="line.customerPrice"
-              :name="`customerprice_${index}`"
-              :label="t('Sell Price')"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleCustomerEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-1">
-            <q-select
-              v-model="line.customerCurrency"
-              :options="currencies"
-              :name="`customercurr_${index}`"
-              :label="t('Curr')"
-              option-value="curr"
-              option-label="curr"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleCustomerEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input
-              v-model="line.validFrom"
-              :name="`validfrom_${index}`"
-              :label="t('From')"
-              type="date"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleCustomerEnter(index)"
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input
-              v-model="line.validTo"
-              :name="`validto_${index}`"
-              :label="t('To')"
-              type="date"
-              outlined
-              dense
-              class="q-mb-sm"
-              bg-color="input"
-              label-color="secondary"
-              @keyup.enter.prevent="handleCustomerEnter(index)"
-            />
-          </div>
-          <div class="col-auto">
-            <q-btn
-              color="negative"
-              icon="delete"
-              dense
-              flat
-              @click="deleteCustomerLine(index)"
-            />
-          </div>
-        </div>
-      </div>
-
       <div class="row justify-start q-mt-md">
         <!-- Using type="submit" on buttons so that the q-form's validation is triggered -->
         <q-btn @click="submitForm(false)" :label="t('Save')" color="primary" />
@@ -755,21 +522,56 @@ const customerInputRefs = [];
 
 // Validation rule for required fields
 const requiredRule = (v) => !!v || t("This field is required");
-
-// Fetch static links and accounts data
 const getLinks = async () => {
   try {
     const response = await api.get("/create_links/ic");
     const links = response.data;
-    taxAccounts.value = links.tax_accounts;
-    taxAccounts.value.forEach((tax) => {
+
+    // Filter taxes based on type and deduplicate by accno
+    const filterTaxesByType = (taxes, currentType) => {
+      if (!taxes) return {};
+
+      const filteredTaxes = {};
+      const seenAccnos = new Set();
+
+      Object.keys(taxes).forEach((key) => {
+        const tax = taxes[key];
+        if (tax.link && !seenAccnos.has(tax.accno)) {
+          const linkParts = tax.link.split(":");
+
+          // Check if tax applies to current type
+          const hasPartLink = linkParts.includes("IC_taxpart");
+          const hasServiceLink = linkParts.includes("IC_taxservice");
+
+          if (currentType === "service" && hasServiceLink) {
+            filteredTaxes[key] = tax;
+            seenAccnos.add(tax.accno);
+          } else if (currentType === "part" && hasPartLink) {
+            filteredTaxes[key] = tax;
+            seenAccnos.add(tax.accno);
+          }
+        }
+      });
+
+      return filteredTaxes;
+    };
+
+    // Filter taxes based on current type
+    const filteredTaxes = filterTaxesByType(links.tax_accounts, type.value);
+    taxAccounts.value = filteredTaxes;
+
+    // Initialize form taxes
+    Object.keys(taxAccounts.value).forEach((key) => {
+      const tax = taxAccounts.value[key];
       form.value.taxes[tax.accno] = false;
     });
+
     inventoryAccounts.value = links.accounts.inventory;
     incomeAccounts.value = links.accounts.income;
     cogsAccounts.value = links.accounts.cogs;
     expenseAccounts.value = links.accounts.expense;
     serviceIncomeAccounts.value = links.accounts.service_income;
+
     // Helper function: returns account with matching id, or the first account if none match (if array isn't empty)
     const getAccount = (accounts, id) => {
       if (!accounts || accounts.length === 0) {
@@ -782,6 +584,7 @@ const getLinks = async () => {
       inventoryAccounts.value,
       links.defaults.inventory_accno_id
     );
+
     form.value.income = getAccount(
       incomeAccounts.value,
       links.defaults.income_accno_id
@@ -798,6 +601,7 @@ const getLinks = async () => {
       cogsAccounts.value,
       links.defaults.expense_accno_id
     );
+
     form.value.expense = getAccount(
       expenseAccounts.value,
       links.defaults.expense_accno_id
