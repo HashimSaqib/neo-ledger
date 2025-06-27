@@ -403,13 +403,6 @@ const summaryColumns = [
     align: "right",
     sortable: true,
   },
-  {
-    name: "calculated_tax",
-    label: "Tax %",
-    field: "calculated_tax",
-    align: "right",
-    sortable: true,
-  },
 ];
 
 // =====================================================
@@ -428,10 +421,19 @@ const groupedResults = computed(() => {
     const account = item.account;
     const taxRate = item.tax_rate;
 
-    // Calculate tax percentage
+    // Calculate tax percentage based on taxincluded flag
     const amount = Number(item.amount);
     const tax = Number(item.tax);
-    const calculatedTax = amount > 0 ? (tax / amount) * 100 : 0;
+    const taxIncluded = Boolean(item.taxincluded);
+
+    let calculatedTax = 0;
+    if (taxIncluded) {
+      // If tax is included, calculate rate as: tax / (amount - tax)
+      calculatedTax = amount - tax > 0 ? (tax / (amount - tax)) * 100 : 0;
+    } else {
+      // If tax is not included, calculate rate as: tax / amount
+      calculatedTax = amount > 0 ? (tax / amount) * 100 : 0;
+    }
 
     // Add calculated tax to the item
     const itemWithCalculatedTax = {
@@ -493,19 +495,12 @@ const summaryData = computed(() => {
 
   Object.entries(groupedResults.value).forEach(([module, moduleData]) => {
     Object.entries(moduleData.taxGroups).forEach(([taxKey, taxGroupData]) => {
-      // Calculate tax percentage for the tax group
-      const calculatedTax =
-        taxGroupData.subtotal.amount > 0
-          ? (taxGroupData.subtotal.tax / taxGroupData.subtotal.amount) * 100
-          : 0;
-
       summary.push({
         key: `${module}-${taxKey}`,
         module: module.toUpperCase(),
         account: `${taxGroupData.account} - ${taxGroupData.taxRate}%`,
         amount: taxGroupData.subtotal.amount,
         tax: taxGroupData.subtotal.tax,
-        calculated_tax: calculatedTax,
       });
     });
   });
@@ -574,17 +569,16 @@ const exportToExcel = () => {
 
   // Summary section
   exportData.push(["SUMMARY"]);
-  exportData.push(["Module", "Account", "Amount", "Tax", "Tax %"]);
+  exportData.push(["Module", "Account", "Amount", "Tax"]);
   summaryData.value.forEach((row) => {
     exportData.push([
       row.module,
       row.account,
       roundAmount(row.amount),
       roundAmount(row.tax),
-      row.calculated_tax.toFixed(2) + "%",
     ]);
   });
-  exportData.push(["", "", "", "", ""]); // Empty row
+  exportData.push(["", "", "", ""]); // Empty row
 
   // Detailed data
   exportData.push(["DETAILED BREAKDOWN"]);
@@ -677,11 +671,10 @@ const exportToPDF = () => {
     row.account,
     formatAmount(row.amount),
     formatAmount(row.tax),
-    row.calculated_tax.toFixed(2) + "%",
   ]);
 
   autoTable(doc, {
-    head: [["Module", "Account", "Amount", "Tax", "Tax %"]],
+    head: [["Module", "Account", "Amount", "Tax"]],
     body: summaryTableData,
     startY: yPosition,
     styles: { fontSize: 8, cellPadding: 1 },
@@ -689,7 +682,6 @@ const exportToPDF = () => {
     columnStyles: {
       2: { halign: "right" },
       3: { halign: "right" },
-      4: { halign: "right" },
     },
     theme: "plain",
   });

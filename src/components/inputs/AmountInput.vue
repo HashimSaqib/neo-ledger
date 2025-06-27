@@ -12,7 +12,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, parseAmount } from "src/helpers/utils";
 
 /**
  * Props:
@@ -45,28 +45,27 @@ const rawValue = ref("");
 /**
  * displayValue is what we actually pass to <q-input>.
  * - When not editing, we show a formatted string.
- * - When editing, we show the raw numeric string (unformatted).
+ * - When editing, we show the raw value the user is typing.
  */
 const displayValue = computed(() => {
-  return isEditing.value ? rawValue.value : formatAmount(props.modelValue); // Your custom format function
+  return isEditing.value ? rawValue.value : formatAmount(props.modelValue);
 });
 
 /**
- * Handle focus: switch to editing mode and show raw numeric string
+ * Handle focus: switch to editing mode and show the formatted value
  */
 function onFocus() {
   isEditing.value = true;
-  rawValue.value = props.modelValue.toString();
+  // Show the same formatted value for editing
+  rawValue.value = formatAmount(props.modelValue);
 }
 
 /**
- * Handle blur: parse the user’s input, fallback to 0 if invalid,
- * then emit the new value to the parent.
+ * Handle blur: parse the user's input and emit the new value
  */
 function onBlur() {
   isEditing.value = false;
-  const parsed = parseFloat(rawValue.value.replace(/[^0-9.-]/g, ""));
-  const newVal = isNaN(parsed) ? 0 : parsed;
+  const newVal = parseAmount(rawValue.value);
   emit("update:modelValue", newVal);
 }
 

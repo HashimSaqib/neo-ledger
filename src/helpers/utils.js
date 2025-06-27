@@ -22,9 +22,19 @@ export const formatAmount = (amount) => {
 
     case "1.000,00":
       // Dot thousands, comma decimal
-      return numericValue
-        .replace(".", ",")
-        .replace(/\B(?=(\d{3})+(?=,))/g, ".");
+      // Split the number into integer and decimal parts
+      const parts = numericValue.split(".");
+      const integerPart = parts[0];
+      const decimalPart = parts[1];
+
+      // Add dots as thousand separators to the integer part
+      const formattedInteger = integerPart.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        "."
+      );
+
+      // Combine with comma as decimal separator
+      return formattedInteger + "," + decimalPart;
 
     case "1000,00":
       // No thousands separator, comma decimal
@@ -38,6 +48,49 @@ export const formatAmount = (amount) => {
       // Fallback to comma thousands, dot decimal
       return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
+};
+
+// Parse a formatted amount string back to a number based on the current number format
+export const parseAmount = (amountString) => {
+  if (!amountString || typeof amountString !== "string") return 0;
+
+  const numberFormat = LocalStorage.getItem("numberFormat") || "1,000.00";
+  let parsed;
+
+  switch (numberFormat) {
+    case "1,000.00":
+      // Comma thousands, dot decimal (default)
+      parsed = parseFloat(amountString.replace(/,/g, ""));
+      break;
+
+    case "1'000.00":
+      // Apostrophe thousands, dot decimal
+      parsed = parseFloat(amountString.replace(/'/g, ""));
+      break;
+
+    case "1.000,00":
+      // Dot thousands, comma decimal
+      parsed = parseFloat(amountString.replace(/\./g, "").replace(/,/g, "."));
+      break;
+
+    case "1000,00":
+      // No thousands separator, comma decimal
+      parsed = parseFloat(amountString.replace(/,/g, "."));
+      break;
+
+    case "1000.00":
+      // No thousands separator, dot decimal
+      parsed = parseFloat(amountString);
+      break;
+
+    default:
+      // Fallback to comma thousands, dot decimal
+      parsed = parseFloat(amountString.replace(/,/g, ""));
+      break;
+  }
+
+  // Round to two decimal places and handle NaN
+  return isNaN(parsed) ? 0 : Math.round(parsed * 100) / 100;
 };
 
 // Round the given amount to two decimals
