@@ -219,6 +219,14 @@
             @update:allowCreation="handleAllowCreation"
           />
         </div>
+
+        <!-- API Keys Dialog -->
+        <ApiKeys
+          v-model="showApiKeysDialog"
+          :datasetId="selectedDatasetForApiKeys?.id"
+          :datasetName="selectedDatasetForApiKeys?.db_name"
+        />
+
         <!-- GRID VIEW MODE -->
         <div
           v-if="!loading && !error && filteredDatasets.length > 0 && isGridView"
@@ -319,6 +327,18 @@
                       :aria-label="`Invite to ${dataset.db_name}`"
                     >
                       <q-tooltip>Invite User</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      v-if="dataset.access_level == 'owner'"
+                      flat
+                      round
+                      dense
+                      color="primary"
+                      icon="vpn_key"
+                      @click.stop="openApiKeysDialog(dataset)"
+                      :aria-label="`Manage API Keys for ${dataset.db_name}`"
+                    >
+                      <q-tooltip>API Keys</q-tooltip>
                     </q-btn>
                     <q-btn
                       flat
@@ -1040,7 +1060,12 @@ import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 import CreateDataset from "./CreateDataset.vue";
 import DatasetConnections from "./DatasetConnections.vue";
+import ApiKeys from "./ApiKeys.vue";
 const showDatasetDialog = ref(false);
+
+// API Keys dialog state
+const showApiKeysDialog = ref(false);
+const selectedDatasetForApiKeys = ref(null);
 
 // Dataset menu and delete dialog
 const deleteDialog = ref(false);
@@ -1575,6 +1600,12 @@ const openInviteDialog = (dataset) => {
     role_id: null,
   };
   inviteDialog.value = true;
+};
+
+// Open dialog to manage API keys
+const openApiKeysDialog = (dataset) => {
+  selectedDatasetForApiKeys.value = dataset;
+  showApiKeysDialog.value = true;
 };
 
 // Cancel invite dialog
