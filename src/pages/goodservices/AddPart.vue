@@ -559,8 +559,8 @@ const getLinks = async () => {
     // Filter taxes based on current type
     const filteredTaxes = filterTaxesByType(links.tax_accounts, type.value);
     taxAccounts.value = filteredTaxes;
-
     // Initialize form taxes
+    console.log(taxAccounts.value);
     Object.keys(taxAccounts.value).forEach((key) => {
       const tax = taxAccounts.value[key];
       form.value.taxes[tax.accno] = false;
@@ -652,7 +652,8 @@ const loadData = async () => {
     form.value.expense = expenseAccounts.value.find(
       (acc) => acc.id == data.expense_accno_id
     );
-    taxAccounts.value.forEach((tax) => {
+    Object.keys(taxAccounts.value).forEach((key) => {
+      const tax = taxAccounts.value[key];
       form.value.taxes[tax.accno] = Boolean(data.amount[tax.accno]);
     });
 
@@ -709,6 +710,7 @@ const loadData = async () => {
       }));
     }
   } catch (error) {
+    console.log(error);
     Notify.create({
       message: t("Failed to load item data"),
       type: "negative",
