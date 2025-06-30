@@ -860,9 +860,14 @@ const removePeriod = (index) => {
 
 /**
  * Sums the amounts for a given period label from an array of accounts.
+ * Filters out heading accounts (charttype === 'H') when calculating totals.
  */
 const sumAccounts = (accountsArray, periodLabel) => {
   return accountsArray.reduce((sum, account) => {
+    // Skip heading accounts when calculating totals
+    if (account.charttype === "H") {
+      return sum;
+    }
     const amount = account.periods[periodLabel]?.amount || 0;
     return sum + Number(amount);
   }, 0);
