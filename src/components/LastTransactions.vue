@@ -130,9 +130,9 @@ const columns = computed(() => {
         align: "left",
       },
       {
-        name: "netamount",
-        label: "Net Amount",
-        field: "netamount",
+        name: "amount",
+        label: "Total Amount",
+        field: "amount",
         align: "right",
       },
       { name: "paid", label: "Paid", field: "paid", align: "right" },

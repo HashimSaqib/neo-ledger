@@ -782,6 +782,11 @@
           @click="removePayment(index)"
         />
       </div>
+      <div class="row">
+        <p class="q-my-xs maintext">
+          <strong>Outstanding: {{ formatAmount(balance) }}</strong>
+        </p>
+      </div>
     </div>
 
     <!-- Print Options Section (shown if invoice exists) -->
@@ -1431,6 +1436,14 @@ const total = computed(() => {
     totalValue += totalTaxes;
   }
   return parseFloat(totalValue.toFixed(2));
+});
+const totalPaid = computed(() => {
+  return payments.value.reduce((acc, payment) => {
+    return acc + (parseFloat(payment.amount) || 0);
+  }, 0);
+});
+const balance = computed(() => {
+  return total.value - totalPaid.value;
 });
 
 // =====================
