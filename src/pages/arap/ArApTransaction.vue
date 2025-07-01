@@ -603,12 +603,15 @@ import { ref, onMounted, watch, computed, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount, confirmDelete } from "src/helpers/utils";
+import {
+  formatAmount,
+  confirmDelete,
+  convertFilesToBase64,
+} from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import FileList from "src/components/FileList.vue";
-import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import LastTransactions from "src/components/LastTransactions.vue";
 const lastTransactionsRef = ref(null);
 // -------------------------
@@ -1183,19 +1186,19 @@ const postInvoice = async () => {
     invoiceData.taxincluded = taxIncluded.value;
   }
   if (files.value.length > 0) {
-    invoiceData.files = files.value;
+    // Convert files to base64
+    invoiceData.files = await convertFilesToBase64(files.value);
   }
 
   try {
     loading.value = true;
-    const formDataObj = jsonToFormData(invoiceData);
     const idParam = invId.value ? `/${invId.value}` : "";
     const response = await api.post(
       `/arap/transaction/${type.value}${idParam}`,
-      formDataObj,
+      invoiceData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       }
     );

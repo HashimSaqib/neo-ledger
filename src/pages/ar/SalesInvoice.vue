@@ -942,7 +942,11 @@ import {
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount, confirmDelete } from "src/helpers/utils";
+import {
+  formatAmount,
+  confirmDelete,
+  convertFilesToBase64,
+} from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
@@ -1570,7 +1574,7 @@ const loadInvoice = async (invoice) => {
   }
   await customerUpdate(selectedCustomer.value);
   recordAccount.value = recordAccounts.value.find(
-    (account) => account.accno === invoice.recordAccount.accno
+    (account) => account.accno == invoice.recordAccount
   );
   if (!recordAccount.value) {
     Notify.create({
@@ -1877,6 +1881,11 @@ const postInvoice = async (save = false, isNew = false) => {
     }));
     invoiceData.taxincluded = taxIncluded.value;
   }
+
+  // Convert files to base64
+  const base64Files = await convertFilesToBase64(files.value || []);
+  invoiceData.files = base64Files;
+
   const idParam = ref(invId.value);
   if (isNew) {
     idParam.value = "";

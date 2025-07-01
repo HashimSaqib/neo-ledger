@@ -337,10 +337,13 @@ import { ref, computed, onMounted, inject, nextTick, watch } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount, confirmDelete } from "src/helpers/utils";
+import {
+  formatAmount,
+  confirmDelete,
+  convertFilesToBase64,
+} from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import FileList from "src/components/FileList.vue";
-import { jsonToFormData } from "src/helpers/formDataHelper.js";
 import LastTransactions from "src/components/LastTransactions.vue";
 const lastTransactionsRef = ref(null);
 const updateTitle = inject("updateTitle");
@@ -673,46 +676,47 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
     return lineObj;
   });
 
-  // Prepare payload for multipart conversion
-  const payload = {
-    curr:
-      typeof formData.value.currency === "object"
-        ? formData.value.currency.curr
-        : formData.value.currency,
-    exchangeRate: formData.value.exchangeRate
-      ? parseFloat(formData.value.exchangeRate)
-      : undefined,
-    description: formData.value.description || "",
-    notes: formData.value.notes || "",
-    reference: formData.value.reference || "",
-    transdate: formData.value.transdate,
-    lines: JSON.stringify(linesData),
-    department: formData.value.selectedDepartment
-      ? typeof formData.value.selectedDepartment === "object"
-        ? `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`
-        : formData.value.selectedDepartment
-      : undefined,
-    files: formData.value.files,
-  };
-
-  const formDataObj = jsonToFormData(payload);
-
   try {
+    // Convert files to base64
+    const base64Files = await convertFilesToBase64(formData.value.files || []);
+
+    // Prepare JSON payload
+    const payload = {
+      curr:
+        typeof formData.value.currency === "object"
+          ? formData.value.currency.curr
+          : formData.value.currency,
+      exchangeRate: formData.value.exchangeRate
+        ? parseFloat(formData.value.exchangeRate)
+        : undefined,
+      description: formData.value.description || "",
+      notes: formData.value.notes || "",
+      reference: formData.value.reference || "",
+      transdate: formData.value.transdate,
+      lines: linesData,
+      department: formData.value.selectedDepartment
+        ? typeof formData.value.selectedDepartment === "object"
+          ? `${formData.value.selectedDepartment.description}--${formData.value.selectedDepartment.id}`
+          : formData.value.selectedDepartment
+        : undefined,
+      files: base64Files,
+    };
+
     let response;
     if (formData.value.id && !isNew) {
       response = await api.put(
         `/gl/transactions/${formData.value.id}`,
-        formDataObj,
+        payload,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
     } else {
-      response = await api.post("/gl/transactions", formDataObj, {
+      response = await api.post("/gl/transactions", payload, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       });
     }
@@ -733,6 +737,13 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
       lines.value = [{ ...initialLine }, { ...initialLine }];
       existingFiles.value = [];
       lastTransactionsRef.value.fetchTransactions();
+
+      // Remove ID from URL when posting
+      if (route.query.id) {
+        const query = { ...route.query };
+        delete query.id;
+        router.replace({ query });
+      }
     } else {
       // For Save, load the transaction data if an ID is returned
       if (response.data?.id) {

@@ -281,3 +281,27 @@ export const confirmDelete = ({
       .onOk(() => resolve(true))
       .onCancel(() => resolve(false));
   });
+
+// Convert files to base64 format for API upload
+export const convertFilesToBase64 = async (files) => {
+  const base64Files = [];
+  for (const file of files) {
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      base64Files.push({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        data: base64,
+      });
+    } catch (error) {
+      console.error("Error converting file to base64:", error);
+    }
+  }
+  return base64Files;
+};
