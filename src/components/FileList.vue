@@ -1,6 +1,11 @@
 <template>
   <q-list :bordered="!report" :separator="!report">
-    <q-item v-for="(file, index) in files" :key="index" :dense="report">
+    <q-item
+      v-for="(file, index) in files"
+      :key="index"
+      :dense="report"
+      :class="report ? 'q-pa-none' : ''"
+    >
       <q-item-section>
         <a :href="file.link" target="_blank">{{ file.name }}</a>
       </q-item-section>

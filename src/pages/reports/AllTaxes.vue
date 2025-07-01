@@ -210,6 +210,12 @@
               </q-td>
             </template>
 
+            <template v-slot:body-cell-files="props">
+              <q-td :props="props">
+                <FileList :files="props.row.files" :report="true" />
+              </q-td>
+            </template>
+
             <template v-slot:body-row="props">
               <q-tr
                 :props="props"
@@ -287,6 +293,7 @@ import { formatAmount, roundAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import FileList from "src/components/FileList.vue";
 
 // =====================================================
 // Injection and Initial Setup
@@ -327,6 +334,13 @@ const columns = [
     name: "invnumber",
     label: "Invoice Number",
     field: "invnumber",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "files",
+    label: "Documents",
+    field: "files",
     align: "left",
     sortable: true,
   },
