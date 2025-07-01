@@ -1251,9 +1251,7 @@ const addLine = () => {
   addLineAt(lines.value.length - 1);
 };
 const removeLine = (index) => {
-  if (lines.value.length > 1) {
-    lines.value.splice(index, 1);
-  }
+  lines.value.splice(index, 1);
 };
 
 // Handle Enter Key for Lines
@@ -1438,6 +1436,7 @@ const total = computed(() => {
 // =====================
 // Payments Handling
 // =====================
+const paymentmethod_id = ref(null);
 const payments = ref([
   {
     date: getTodayDate(),
@@ -1453,7 +1452,11 @@ const addPaymentAt = (index) => {
     source: "",
     memo: "",
     amount: 0,
-    account: defaultPaymentAccount.value,
+    account: paymentmethod_id.value
+      ? openPaymentAccounts.value.find(
+          (acc) => acc.id == paymentmethod_id.value
+        )
+      : defaultPaymentAccount.value,
   };
   payments.value.splice(index + 1, 0, newPayment);
   nextTick(() => {
@@ -1671,6 +1674,7 @@ const loadInvoice = async (invoice) => {
       exchangerate: payment.exchangerate,
     };
   });
+  paymentmethod_id.value = invoice.paymentmethod_id;
   const shiptoFields = [
     "name",
     "address1",
@@ -1863,7 +1867,7 @@ const postInvoice = async (save = false, isNew = false) => {
       source: payment.source,
       memo: payment.memo,
       amount: payment.amount,
-      account: payment.account ? payment.account.label : "",
+      account: payment.account ? payment.account.accno : "",
       exchangerate: payment.exchangerate,
     })),
   };

@@ -661,18 +661,19 @@ const baseColumns = ref([
     default: false,
     align: "right",
   },
-  {
-    name: "paid",
-    label: "Paid",
-    field: "paid",
-    default: false,
-    align: "right",
-  },
+
   { name: "tax", label: "Tax", field: "tax", default: false, align: "right" },
   {
     name: "amount",
     label: "Total",
     field: "amount",
+    default: false,
+    align: "right",
+  },
+  {
+    name: "paid",
+    label: "Paid",
+    field: "paid",
     default: false,
     align: "right",
   },

@@ -1162,10 +1162,7 @@ const postInvoice = async () => {
       source: payment.source,
       memo: payment.memo,
       amount: payment.amount,
-      account:
-        payment.account && payment.account.label
-          ? payment.account.label
-          : payment.account,
+      account: payment.account.accno,
       exchangerate: payment.exchangerate,
     })),
   };
@@ -1411,7 +1408,7 @@ const loadInvoice = async (invoice) => {
         amount: payment.amount || 0,
         exchangerate: payment.exchangerate,
         account:
-          paymentAccounts.value.find((acc) => acc.accno === payment.account) ||
+          paymentAccounts.value.find((acc) => acc.accno == payment.account) ||
           paymentAccounts.value[0],
       }));
     } else {
@@ -1421,7 +1418,11 @@ const loadInvoice = async (invoice) => {
           source: "",
           memo: "",
           amount: 0,
-          account: openPaymentAccounts.value[0],
+          account: invoice.paymentmethod_id
+            ? openPaymentAccounts.value.find(
+                (acc) => acc.id == invoice.paymentmethod_id
+              )
+            : openPaymentAccounts.value[0],
         },
       ];
     }
