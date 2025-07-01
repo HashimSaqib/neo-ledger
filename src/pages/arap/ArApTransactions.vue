@@ -413,7 +413,11 @@
         <!-- Totals Row -->
         <template v-slot:bottom-row>
           <q-tr class="totals-row">
-            <q-td v-for="col in columns" align-right :key="col.name">
+            <q-td
+              v-for="col in columns"
+              :key="col.name"
+              :style="{ textAlign: col.align || 'left' }"
+            >
               <template
                 v-if="
                   [
@@ -430,6 +434,7 @@
               <template v-else-if="col.name === 'description'">
                 <strong>{{ t("Totals") }}</strong>
               </template>
+              <template v-else> &nbsp; </template>
             </q-td>
           </q-tr>
         </template>
@@ -692,7 +697,7 @@ const baseColumns = ref([
     align: "left",
   },
   {
-    name: "paymentdifferent",
+    name: "paymentdiff",
     label: "Payment Difference",
     field: "paymentdiff",
     default: false,
@@ -1098,7 +1103,6 @@ onMounted(async () => {
   position: sticky !important;
   bottom: 0 !important;
   font-weight: var(--q-font-weight-bolder);
-  text-align: left;
   background-color: var(--q-maintext);
   color: var(--q-mainbg);
 }
