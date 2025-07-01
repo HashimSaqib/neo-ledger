@@ -266,13 +266,13 @@ const getPath = (row) => {
   } else if (row.module === "ar" || row.module === "is") {
     if (row.till) {
       path = createLink("customer.pos");
-    } else if (row.invoice !== null && row.invoice !== undefined) {
+    } else if (row.invoice === 1) {
       path = createLink("customer.invoice");
     } else {
       path = createLink("customer.transaction");
     }
-  } else if (row.module === "ir") {
-    if (row.invoice !== null && row.invoice !== undefined) {
+  } else if (row.module === "ir" || row.module === "ap") {
+    if (row.invoice === 1) {
       path = createLink("vendor.invoice");
     } else {
       path = createLink("vendor.transaction");
