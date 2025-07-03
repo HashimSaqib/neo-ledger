@@ -13,9 +13,28 @@
           <q-radio v-model="form.typeofcontact" val="person" label="Person" />
         </div>
 
-        <div class="row full-width justify-between">
-          <!-- First Column -->
-          <div class="col-12 col-md-4">
+        <!-- Section Toggles -->
+        <div class="row q-mb-md q-gutter-md">
+          <q-checkbox
+            v-model="showAdditionalInfo"
+            label="Additional Information"
+            class="q-mr-md"
+          />
+          <q-checkbox
+            v-model="showContactPerson"
+            label="Contact Person"
+            class="q-mr-md"
+          />
+          <q-checkbox
+            v-model="showBankInfo"
+            label="Bank Information"
+            class="q-mr-md"
+          />
+        </div>
+
+        <div class="row full-width">
+          <!-- First Column - Mandatory Fields -->
+          <div class="col-12 col-md-4 q-mr-xl">
             <q-input
               v-model="form.vcnumber"
               name="vcnumber"
@@ -58,14 +77,6 @@
               class="lightbg q-mb-sm input-box"
             />
             <q-input
-              v-model="form.state"
-              name="state"
-              :label="t('State/Province')"
-              outlined
-              dense
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
               v-model="form.zipcode"
               name="zipcode"
               :label="t('Zip/Postal Code')"
@@ -79,102 +90,6 @@
               :label="t('Country')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.notes"
-              name="notes"
-              :label="t('Notes')"
-              type="textarea"
-              outlined
-              rows="3"
-              class="lightbg q-mb-sm"
-            />
-          </div>
-
-          <!-- Second Column -->
-          <div class="col-12 col-md-3">
-            <q-input
-              v-model="form.salutation"
-              name="salutation"
-              :label="t('Salutation')"
-              outlined
-              dense
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.firstname"
-              name="firstname"
-              :label="t('First Name')"
-              outlined
-              dense
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.lastname"
-              name="lastname"
-              :label="t('Last Name')"
-              outlined
-              dense
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.contacttitle"
-              name="contacttitle"
-              :label="t('Title')"
-              outlined
-              dense
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.occupation"
-              name="occupation"
-              :label="t('Occupation')"
-              outlined
-              dense
-              class="lightbg q-mb-sm input-box"
-            />
-
-            <div class="q-mb-sm">
-              <q-radio
-                v-model="form.gender"
-                name="gender"
-                val="M"
-                label="Male"
-              />
-              <q-radio
-                v-model="form.gender"
-                name="gender"
-                val="F"
-                label="Female"
-              />
-            </div>
-
-            <q-input
-              v-model="form.phone"
-              name="phone"
-              :label="t('Phone')"
-              outlined
-              dense
-              type="tel"
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.fax"
-              name="fax"
-              :label="t('Fax')"
-              outlined
-              dense
-              type="tel"
-              class="lightbg q-mb-sm input-box"
-            />
-            <q-input
-              v-model="form.mobile"
-              name="mobile"
-              :label="t('Mobile')"
-              outlined
-              dense
-              type="tel"
               class="lightbg q-mb-sm input-box"
             />
             <q-input
@@ -204,9 +119,7 @@
               type="email"
               class="lightbg q-mb-sm input-box"
             />
-          </div>
 
-          <div class="col-12 col-md-4">
             <!-- Tax Section -->
             <div class="q-mb-md row">
               <div v-for="tax in taxAccounts" :key="tax.id">
@@ -224,6 +137,54 @@
                 :label="t('Tax Included')"
               />
             </div>
+          </div>
+
+          <!-- Second Column - Additional Information (when enabled) -->
+          <div v-show="showAdditionalInfo" class="col-12 col-md-3">
+            <q-input
+              v-model="form.state"
+              name="state"
+              :label="t('State/Province')"
+              outlined
+              dense
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.notes"
+              name="notes"
+              :label="t('Notes')"
+              type="textarea"
+              outlined
+              rows="3"
+              class="lightbg q-mb-sm"
+            />
+            <q-input
+              v-model="form.phone"
+              name="phone"
+              :label="t('Phone')"
+              outlined
+              dense
+              type="tel"
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.fax"
+              name="fax"
+              :label="t('Fax')"
+              outlined
+              dense
+              type="tel"
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.mobile"
+              name="mobile"
+              :label="t('Mobile')"
+              outlined
+              dense
+              type="tel"
+              class="lightbg q-mb-sm input-box"
+            />
 
             <!-- Account Information -->
             <div class="row q-mb-sm">
@@ -341,13 +302,74 @@
               class="lightbg q-mb-sm input-box"
             />
           </div>
+
+          <!-- Third Column - Contact Person (when enabled) -->
+          <div v-show="showContactPerson" class="col-12 col-md-3 q-ml-xl">
+            <q-input
+              v-model="form.salutation"
+              name="salutation"
+              :label="t('Salutation')"
+              outlined
+              dense
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.firstname"
+              name="firstname"
+              :label="t('First Name')"
+              outlined
+              dense
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.lastname"
+              name="lastname"
+              :label="t('Last Name')"
+              outlined
+              dense
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.contacttitle"
+              name="contacttitle"
+              :label="t('Title')"
+              outlined
+              dense
+              class="lightbg q-mb-sm input-box"
+            />
+            <q-input
+              v-model="form.occupation"
+              name="occupation"
+              :label="t('Occupation')"
+              outlined
+              dense
+              class="lightbg q-mb-sm input-box"
+            />
+
+            <div class="q-mb-sm">
+              <q-radio
+                v-model="form.gender"
+                name="gender"
+                val="M"
+                label="Male"
+              />
+              <q-radio
+                v-model="form.gender"
+                name="gender"
+                val="F"
+                label="Female"
+              />
+            </div>
+          </div>
+
+          <!-- Fourth Column - Additional Information (continued when enabled) -->
+          <div v-show="showAdditionalInfo" class="col-12 col-md-2">
+            <!-- This column will be used for additional fields when needed -->
+          </div>
         </div>
 
-        <!-- Notes Section -->
-        <div class="row q-mt-md"></div>
-
-        <!-- Bank Information -->
-        <div class="row q-mt-md q-gutter-x-lg">
+        <!-- Bank Information Section (when enabled) -->
+        <div v-show="showBankInfo" class="row q-mt-md q-gutter-x-lg">
           <div class="col-12 col-md-4">
             <q-input
               v-model="form.bankname"
@@ -505,6 +527,11 @@ const isEditMode = computed(() => !!componentId.value);
 const vcType = computed(() =>
   componentType.value === "customer" ? t("Customer") : t("Vendor")
 );
+
+// Section visibility toggles
+const showAdditionalInfo = ref(false);
+const showContactPerson = ref(false);
+const showBankInfo = ref(false);
 
 // Form state with all fields matching original HTML form
 const form = ref({
