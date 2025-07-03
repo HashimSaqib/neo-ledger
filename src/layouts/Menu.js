@@ -211,8 +211,33 @@ export const menuLinks = [
       },
       {
         title: "Reports",
-        link: "/gl/reports",
-        perm: "gl.transactions",
+        sublinks: [
+          {
+            title: "Journal",
+            link: "/gl/reports",
+            perm: "gl.transactions",
+          },
+          {
+            title: "Trial Balance",
+            link: "/reports/trial_balance",
+            perm: "reports.trial",
+          },
+          {
+            title: "Income Statement",
+            link: "/reports/income_statement",
+            perm: "reports.income",
+          },
+          {
+            title: "Balance Sheet",
+            link: "/reports/balance_sheet",
+            perm: "reports.balance",
+          },
+          {
+            title: "All Taxes",
+            link: "/reports/all_taxes",
+            perm: "reports.alltaxes",
+          },
+        ],
       },
     ],
   },
@@ -253,33 +278,7 @@ export const menuLinks = [
       },
     ],
   },
-  {
-    title: "Reports",
-    icon: "bar_chart",
-    perm: "reports",
-    sublinks: [
-      {
-        title: "Trial Balance",
-        link: "/reports/trial_balance",
-        perm: "reports.trial",
-      },
-      {
-        title: "Income Statement",
-        link: "/reports/income_statement",
-        perm: "reports.income",
-      },
-      {
-        title: "Balance Sheet",
-        link: "/reports/balance_sheet",
-        perm: "reports.balance",
-      },
-      {
-        title: "All Taxes",
-        link: "/reports/all_taxes",
-        perm: "reports.alltaxes",
-      },
-    ],
-  },
+
   {
     title: "System",
     icon: "settings",
