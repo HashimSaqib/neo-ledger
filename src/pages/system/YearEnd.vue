@@ -1,7 +1,7 @@
 <template>
   <q-page class="lightbg q-pa-sm">
-    <div class="q-pa-md">
-      <div class="q-gutter-y-md">
+    <div class="q-pa-md row">
+      <div class="q-gutter-y-md col-12 col-lg-3 col-md-6">
         <q-input
           v-model="todate"
           :label="t('Year End Date')"
@@ -10,7 +10,7 @@
           dense
           bg-color="input"
           label-color="secondary"
-          style="width: 25%"
+          class="col col-12 col-lg-6"
         />
 
         <s-select
@@ -22,7 +22,6 @@
           dense
           bg-color="input"
           label-color="secondary"
-          style="width: 25%"
           :options="accounts"
           option-label="label"
           option-value="accno"
@@ -37,7 +36,6 @@
           dense
           bg-color="input"
           label-color="secondary"
-          style="width: 50%"
         />
 
         <q-input
@@ -47,7 +45,6 @@
           dense
           bg-color="input"
           label-color="secondary"
-          style="width: 25%"
         />
 
         <q-option-group
@@ -70,6 +67,13 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <LastTransactions
+        type="yearend"
+        class="col-12 col-lg-6"
+        ref="lastTransactionsRef"
+      />
+    </div>
   </q-page>
 </template>
 
@@ -78,6 +82,7 @@ import { ref, inject, onMounted } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
+import LastTransactions from "src/components/LastTransactions.vue";
 
 const updateTitle = inject("updateTitle");
 updateTitle("Year End");
@@ -92,6 +97,7 @@ const notes = ref("");
 const reference = ref("");
 const method = ref("accrual"); // Default to accrual method
 const accounts = ref([]); // Store year end accounts
+const lastTransactionsRef = ref(null);
 
 // Fetch year end accounts
 const fetchYearEndAccounts = async () => {
@@ -133,6 +139,7 @@ const processYearEnd = async () => {
         type: "positive",
         position: "top-right",
       });
+      lastTransactionsRef.value.fetchTransactions();
     } else {
       Notify.create({
         message: response.data.message,

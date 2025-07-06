@@ -65,7 +65,7 @@ const loading = ref(false);
 const transactions = ref([]);
 
 const columns = computed(() => {
-  if (props.type === "gl") {
+  if (props.type === "gl" || props.type === "yearend") {
     return [
       {
         name: "reference",
@@ -157,7 +157,7 @@ const fetchTransactions = async () => {
 // Return router path based on row type
 const getPath = (row) => {
   let path = "";
-  if (props.type.type === "gl") {
+  if (props.type === "gl" || props.type === "yearend") {
     path = createLink("gl.transaction");
   } else if (props.type === "ar") {
     path = row.till
@@ -165,7 +165,7 @@ const getPath = (row) => {
       : row.invoice
       ? createLink("customer.invoice")
       : createLink("customer.transaction");
-  } else if (row.type === "ap") {
+  } else if (props.type === "ap") {
     path = row.invoice
       ? createLink("vendor.invoice")
       : createLink("vendor.transaction");
