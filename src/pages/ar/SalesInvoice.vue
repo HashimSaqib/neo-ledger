@@ -1101,6 +1101,7 @@ const recordAccount = ref();
 const recordAccounts = ref([]);
 const paymentAccounts = ref([]);
 const defaultPaymentAccount = ref([]);
+const invoicePaymentAccount = ref([]);
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
@@ -1523,10 +1524,17 @@ const customerUpdate = async (newValue) => {
   }
   const paymentAccountAccno =
     customer.value?.payment_accno?.split("--")[0] || "";
-  defaultPaymentAccount.value =
-    paymentAccounts.value.find(
-      (account) => account.accno === paymentAccountAccno
-    ) || paymentAccounts.value[0];
+  if (!paymentmethod_id.value) {
+    defaultPaymentAccount.value =
+      paymentAccounts.value.find(
+        (account) => account.accno === paymentAccountAccno
+      ) || paymentAccounts.value[0];
+  } else {
+    defaultPaymentAccount.value =
+      paymentAccounts.value.find(
+        (account) => account.id === paymentmethod_id.value
+      ) || paymentAccounts.value[0];
+  }
   payments.value.forEach(
     (payment) =>
       payment.amount === 0 && (payment.account = defaultPaymentAccount.value)

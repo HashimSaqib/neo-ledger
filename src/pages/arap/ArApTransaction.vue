@@ -856,6 +856,7 @@ const total = computed(() => {
 // Payment Management
 // -------------------------
 const defaultPaymentAccount = ref();
+const paymentmethod_id = ref(null);
 const payments = ref([
   { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
 ]);
@@ -1425,6 +1426,7 @@ const loadInvoice = async (invoice) => {
             : openPaymentAccounts.value[0],
         },
       ];
+      paymentmethod_id.value = invoice.paymentmethod_id;
     }
   } catch (error) {
     console.error("Error loading invoice:", error);
@@ -1556,6 +1558,12 @@ const vcUpdate = async (newValue) => {
         paymentAccounts.value.find(
           (account) => account.accno === paymentAccountAccno
         ) || paymentAccounts.value[0];
+      if (paymentmethod_id.value) {
+        defaultPaymentAccount.value =
+          paymentAccounts.value.find(
+            (account) => account.id === paymentmethod_id.value
+          ) || paymentAccounts.value[0];
+      }
       payments.value.forEach(
         (payment) =>
           payment.amount === 0 &&
