@@ -120,7 +120,7 @@
             label="Create New Dataset"
             @click="showDatasetDialog = true"
             color="primary"
-            class="col-2"
+            class="col-6 col-md-2 q-mt-md-none q-mt-md"
           />
         </div>
 

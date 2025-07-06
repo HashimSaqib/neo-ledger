@@ -3,6 +3,17 @@
     <!-- Only render header if printMode is false -->
     <q-header v-if="!printMode">
       <q-toolbar class="mainbg maintext">
+        <!-- Hamburger menu button - only visible on mobile -->
+        <q-btn
+          v-if="$q.screen.lt.md"
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+          class="q-mr-sm"
+        />
         <q-toolbar-title class="q-ml-xs">
           {{ t(title) }}
         </q-toolbar-title>
@@ -13,11 +24,12 @@
     <q-drawer
       v-if="!printMode"
       v-model="leftDrawerOpen"
-      show-if-above
+      :show-if-above="$q.screen.gt.sm"
+      :breakpoint="768"
       bordered
       class="mainbg column"
-      :mini="miniState"
-      @mouseenter="miniState = false"
+      :mini="miniState && $q.screen.gt.sm"
+      @mouseenter="handleDrawerMouseEnter"
       @mouseleave="handleDrawerMouseLeave"
       ref="drawerRef"
       style="height: 100%"
@@ -52,17 +64,20 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { ref, provide, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useQuasar } from "quasar";
 import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
 import { menuLinks } from "src/layouts/Menu.js";
 import { Cookies, Dark, LocalStorage } from "quasar";
 
+const $q = useQuasar();
 const miniState = ref(false);
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const leftDrawerOpen = ref(false);
 const company = Cookies.get("company");
 
@@ -90,6 +105,18 @@ let wasDarkMode = Dark.isActive;
 // Function to toggle print mode
 const togglePrintMode = () => {
   printMode.value = !printMode.value;
+};
+
+// Function to toggle left drawer (for mobile hamburger menu)
+const toggleLeftDrawer = () => {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
+};
+
+// Handle drawer mouse enter (only for desktop)
+const handleDrawerMouseEnter = () => {
+  if ($q.screen.gt.sm) {
+    miniState.value = false;
+  }
 };
 
 const createLink = (link) => {
@@ -196,6 +223,25 @@ provide("filterMenu", filterMenu);
 
 onMounted(() => {
   filterMenu();
+
+  // Close mobile drawer when clicking outside
+  document.addEventListener("click", (event) => {
+    if ($q.screen.lt.md && leftDrawerOpen.value) {
+      const drawer = drawerRef.value?.$el;
+      const target = event.target;
+
+      if (drawer && !drawer.contains(target) && !target.closest(".q-btn")) {
+        leftDrawerOpen.value = false;
+      }
+    }
+  });
+
+  // Close mobile drawer when route changes
+  router.afterEach((to, from) => {
+    if ($q.screen.lt.md) {
+      leftDrawerOpen.value = false;
+    }
+  });
 });
 
 // active dropdown
@@ -205,8 +251,13 @@ provide("setActiveDropdownIndex", (index) => {
   activeDropdownIndex.value = index;
 });
 
-// drawer would close when mouse is over a dropdown element
+// drawer would close when mouse is over a dropdown element (only for desktop)
 const handleDrawerMouseLeave = (event) => {
+  // Only apply mini state behavior on desktop devices
+  if (!$q.screen.gt.sm) {
+    return;
+  }
+
   // Check if the mouse is moving to a dropdown element
   const relatedTarget = event.relatedTarget;
 
