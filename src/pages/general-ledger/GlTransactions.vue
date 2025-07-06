@@ -568,10 +568,7 @@ const baseColumns = ref([
     name: "taxAcc",
     align: "left",
     label: "Tax Acc",
-    field: (row) =>
-      row.linetax_accno && row.linetax_description
-        ? `${row.linetax_accno}--${row.linetax_description}`
-        : "",
+    field: (row) => formatTaxAcc(row),
     sortable: false,
     default: true,
   },
@@ -925,6 +922,26 @@ const search = async () => {
     }
   } finally {
     loading.value = false;
+  }
+};
+
+const formatTaxAcc = (row) => {
+  if (row.invoice) {
+    if (row.linetax_accno && row.linetax_description) {
+      const accnos = row.linetax_accno.split(",");
+      const descriptions = row.linetax_description.split(",");
+      return accnos
+        .map((acc, i) => `${acc.trim()}--${(descriptions[i] || "").trim()}`)
+        .join(", ");
+    } else {
+      return "";
+    }
+  } else {
+    if (row.linetax_accno && row.linetax_description) {
+      return `${row.linetax_accno}--${row.linetax_description}`;
+    } else {
+      return "";
+    }
   }
 };
 
