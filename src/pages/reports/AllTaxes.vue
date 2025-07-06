@@ -94,21 +94,48 @@
         hide-bottom
         class="q-mb-lg"
       >
-        <template v-slot:body-cell-amount="props">
+        <template v-slot:body-cell-ar="props">
           <q-td :props="props" class="text-right">
-            {{ formatAmount(props.value) }}
+            <div>{{ formatAmount(props.value.amount) }}</div>
+            <div class="">
+              {{ formatAmount(props.value.tax) }}
+            </div>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-tax="props">
+        <template v-slot:body-cell-ap="props">
           <q-td :props="props" class="text-right">
-            {{ formatAmount(props.value) }}
+            <div>{{ formatAmount(props.value.amount) }}</div>
+            <div class="">
+              {{ formatAmount(props.value.tax) }}
+            </div>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-calculated_tax="props">
+        <template v-slot:body-cell-gl_debit="props">
           <q-td :props="props" class="text-right">
-            {{ props.value.toFixed(2) + "%" }}
+            <div>{{ formatAmount(props.value.amount) }}</div>
+            <div class="">
+              {{ formatAmount(props.value.tax) }}
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-gl_credit="props">
+          <q-td :props="props" class="text-right">
+            <div>{{ formatAmount(props.value.amount) }}</div>
+            <div class="">
+              {{ formatAmount(props.value.tax) }}
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-total="props">
+          <q-td :props="props" class="text-right text-weight-bold">
+            <div>{{ formatAmount(props.value.amount) }}</div>
+            <div class="">
+              {{ formatAmount(props.value.tax) }}
+            </div>
           </q-td>
         </template>
       </q-table>
@@ -390,13 +417,6 @@ const columns = [
 
 const summaryColumns = [
   {
-    name: "module",
-    label: "Module",
-    field: "module",
-    align: "left",
-    sortable: true,
-  },
-  {
     name: "account",
     label: "Account",
     field: "account",
@@ -404,16 +424,37 @@ const summaryColumns = [
     sortable: true,
   },
   {
-    name: "amount",
-    label: "Amount",
-    field: "amount",
+    name: "ar",
+    label: "AR",
+    field: "ar",
     align: "right",
     sortable: true,
   },
   {
-    name: "tax",
-    label: "Tax",
-    field: "tax",
+    name: "ap",
+    label: "AP",
+    field: "ap",
+    align: "right",
+    sortable: true,
+  },
+  {
+    name: "gl_debit",
+    label: "GL-Debit",
+    field: "gl_debit",
+    align: "right",
+    sortable: true,
+  },
+  {
+    name: "gl_credit",
+    label: "GL-Credit",
+    field: "gl_credit",
+    align: "right",
+    sortable: true,
+  },
+  {
+    name: "total",
+    label: "Total",
+    field: "total",
     align: "right",
     sortable: true,
   },
@@ -505,19 +546,62 @@ const groupedResults = computed(() => {
 const summaryData = computed(() => {
   if (!hasResults.value) return [];
 
-  const summary = [];
+  // Group by account/tax
+  const accountGroups = {};
 
   Object.entries(groupedResults.value).forEach(([module, moduleData]) => {
     Object.entries(moduleData.taxGroups).forEach(([taxKey, taxGroupData]) => {
-      summary.push({
-        key: `${module}-${taxKey}`,
-        module: module.toUpperCase(),
-        account: `${taxGroupData.account} - ${taxGroupData.taxRate}%`,
-        amount: taxGroupData.subtotal.amount,
-        tax: taxGroupData.subtotal.tax,
-      });
+      const accountKey = `${taxGroupData.account} - ${taxGroupData.taxRate}%`;
+
+      if (!accountGroups[accountKey]) {
+        accountGroups[accountKey] = {
+          account: accountKey,
+          ar: { amount: 0, tax: 0 },
+          ap: { amount: 0, tax: 0 },
+          gl_debit: { amount: 0, tax: 0 },
+          gl_credit: { amount: 0, tax: 0 },
+          total: { amount: 0, tax: 0 },
+        };
+      }
+
+      // Add module data to account group
+      if (module === "ar") {
+        accountGroups[accountKey].ar.amount += taxGroupData.subtotal.amount;
+        accountGroups[accountKey].ar.tax += taxGroupData.subtotal.tax;
+      } else if (module === "ap") {
+        accountGroups[accountKey].ap.amount += taxGroupData.subtotal.amount;
+        accountGroups[accountKey].ap.tax += taxGroupData.subtotal.tax;
+      } else if (module === "gl-debit") {
+        accountGroups[accountKey].gl_debit.amount +=
+          taxGroupData.subtotal.amount;
+        accountGroups[accountKey].gl_debit.tax += taxGroupData.subtotal.tax;
+      } else if (module === "gl-credit") {
+        accountGroups[accountKey].gl_credit.amount +=
+          taxGroupData.subtotal.amount;
+        accountGroups[accountKey].gl_credit.tax += taxGroupData.subtotal.tax;
+      }
+
+      // Update total - GL-Credit offsets GL-Debit for proper accounting treatment
+      if (module === "gl-credit") {
+        accountGroups[accountKey].total.amount -= taxGroupData.subtotal.amount;
+        accountGroups[accountKey].total.tax -= taxGroupData.subtotal.tax;
+      } else {
+        accountGroups[accountKey].total.amount += taxGroupData.subtotal.amount;
+        accountGroups[accountKey].total.tax += taxGroupData.subtotal.tax;
+      }
     });
   });
+
+  // Convert to array format for table
+  const summary = Object.values(accountGroups).map((group, index) => ({
+    key: `account-${index}`,
+    account: group.account,
+    ar: group.ar,
+    ap: group.ap,
+    gl_debit: group.gl_debit,
+    gl_credit: group.gl_credit,
+    total: group.total,
+  }));
 
   return summary;
 });
@@ -525,9 +609,15 @@ const summaryData = computed(() => {
 const grandTotal = computed(() => {
   const total = { amount: 0, tax: 0 };
 
-  Object.values(groupedResults.value).forEach((moduleData) => {
-    total.amount += moduleData.total.amount;
-    total.tax += moduleData.total.tax;
+  Object.entries(groupedResults.value).forEach(([module, moduleData]) => {
+    // GL-Credit offsets GL-Debit for proper accounting treatment
+    if (module === "gl-credit") {
+      total.amount -= moduleData.total.amount;
+      total.tax -= moduleData.total.tax;
+    } else {
+      total.amount += moduleData.total.amount;
+      total.tax += moduleData.total.tax;
+    }
   });
 
   return total;
@@ -543,6 +633,13 @@ const search = async () => {
       params: formData.value,
     });
     results.value = response.data;
+    results.value = results.value.map((row) => {
+      if (row.module === "AP") {
+        return { ...row, amount: row.amount * -1 };
+      } else {
+        return row;
+      }
+    });
     console.log(results.value);
   } catch (error) {
     console.error(error);
@@ -555,7 +652,7 @@ const getPath = (row) => {
   let path = "";
   const module = row.module.toLowerCase();
 
-  if (module === "gl") {
+  if (module === "gl-debit" || module === "gl-credit") {
     path = createLink("gl.transaction");
   } else if (module === "ar") {
     path =
@@ -583,16 +680,35 @@ const exportToExcel = () => {
 
   // Summary section
   exportData.push(["SUMMARY"]);
-  exportData.push(["Module", "Account", "Amount", "Tax"]);
+  exportData.push([
+    "Account/Tax",
+    "AR Amount",
+    "AR Tax",
+    "AP Amount",
+    "AP Tax",
+    "GL-Debit Amount",
+    "GL-Debit Tax",
+    "GL-Credit Amount",
+    "GL-Credit Tax",
+    "Total Amount",
+    "Total Tax",
+  ]);
   summaryData.value.forEach((row) => {
     exportData.push([
-      row.module,
       row.account,
-      roundAmount(row.amount),
-      roundAmount(row.tax),
+      roundAmount(row.ar.amount),
+      roundAmount(row.ar.tax),
+      roundAmount(row.ap.amount),
+      roundAmount(row.ap.tax),
+      roundAmount(row.gl_debit.amount),
+      roundAmount(row.gl_debit.tax),
+      roundAmount(row.gl_credit.amount),
+      roundAmount(row.gl_credit.tax),
+      roundAmount(row.total.amount),
+      roundAmount(row.total.tax),
     ]);
   });
-  exportData.push(["", "", "", ""]); // Empty row
+  exportData.push(["", "", "", "", "", "", "", "", "", "", ""]); // Empty row
 
   // Detailed data
   exportData.push(["DETAILED BREAKDOWN"]);
@@ -681,21 +797,50 @@ const exportToPDF = () => {
   yPosition += 8;
 
   const summaryTableData = summaryData.value.map((row) => [
-    row.module,
     row.account,
-    formatAmount(row.amount),
-    formatAmount(row.tax),
+    formatAmount(row.ar.amount),
+    formatAmount(row.ar.tax),
+    formatAmount(row.ap.amount),
+    formatAmount(row.ap.tax),
+    formatAmount(row.gl_debit.amount),
+    formatAmount(row.gl_debit.tax),
+    formatAmount(row.gl_credit.amount),
+    formatAmount(row.gl_credit.tax),
+    formatAmount(row.total.amount),
+    formatAmount(row.total.tax),
   ]);
 
   autoTable(doc, {
-    head: [["Module", "Account", "Amount", "Tax"]],
+    head: [
+      [
+        "Account/Tax",
+        "AR Amount",
+        "AR Tax",
+        "AP Amount",
+        "AP Tax",
+        "GL-Debit Amount",
+        "GL-Debit Tax",
+        "GL-Credit Amount",
+        "GL-Credit Tax",
+        "Total Amount",
+        "Total Tax",
+      ],
+    ],
     body: summaryTableData,
     startY: yPosition,
-    styles: { fontSize: 8, cellPadding: 1 },
+    styles: { fontSize: 7, cellPadding: 1 },
     headStyles: { fontStyle: "bold" },
     columnStyles: {
+      1: { halign: "right" },
       2: { halign: "right" },
       3: { halign: "right" },
+      4: { halign: "right" },
+      5: { halign: "right" },
+      6: { halign: "right" },
+      7: { halign: "right" },
+      8: { halign: "right" },
+      9: { halign: "right" },
+      10: { halign: "right" },
     },
     theme: "plain",
   });
