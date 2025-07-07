@@ -710,13 +710,7 @@ const baseColumns = ref([
     default: false,
     align: "left",
   },
-  {
-    name: "paymentmethod",
-    label: "Payment Method",
-    field: "paymentmethod",
-    default: false,
-    align: "left",
-  },
+
   {
     name: "duedate",
     label: "Due Date",

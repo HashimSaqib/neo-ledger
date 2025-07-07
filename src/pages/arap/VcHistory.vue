@@ -649,17 +649,18 @@ const downloadExcel = () => {
 };
 
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { PDF_STYLES, createPDFWithCustomStyles } from "src/helpers/utils.js";
 const title = inject("title");
 const createPDF = () => {
   const doc = new jsPDF({ orientation: "landscape" });
   let yPosition = 10; // Track vertical position
-  doc.setFontSize(18);
-  // Center the title on the page
+
+  // Add title using centralized styles
+  doc.setFontSize(PDF_STYLES.title.fontSize);
   doc.text(title.value, doc.internal.pageSize.width / 2, yPosition, {
-    align: "center",
+    align: PDF_STYLES.title.alignment,
   });
-  doc.setFontSize(16);
+  yPosition += 10;
 
   // Extract headers from the finalColumns computed property
   const headerRow = finalColumns.value.map((col) => col.label);
@@ -711,15 +712,10 @@ const createPDF = () => {
     }
   });
 
-  // Use autoTable to generate a table in the PDF with the correct styles
-  autoTable(doc, {
-    head: [headerRow],
-    body: exportData,
-    startY: 20,
-    styles: { fontSize: 10, cellPadding: 3 },
-    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
+  // Generate table using centralized styles for tabular layout with grey lines
+  createPDFWithCustomStyles(doc, headerRow, exportData, {
+    startY: yPosition,
     columnStyles: columnStyles,
-    theme: "striped",
   });
 
   // Trigger the download of the PDF file

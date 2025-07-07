@@ -259,7 +259,7 @@ import {
 } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { PDF_STYLES, createPDFWithCustomStyles } from "src/helpers/utils.js";
 
 const createLink = inject("createLink");
 const { t } = useI18n();
@@ -619,17 +619,17 @@ const downloadPDF = () => {
   const doc = new jsPDF({ orientation: "landscape" });
   let yPosition = 10;
 
-  // Add title
-  doc.setFontSize(18);
+  // Add title using centralized styles
+  doc.setFontSize(PDF_STYLES.title.fontSize);
   doc.text(title.value, doc.internal.pageSize.width / 2, yPosition, {
-    align: "center",
+    align: PDF_STYLES.title.alignment,
   });
   yPosition += 10;
 
   // Process each account group
   Object.entries(groupedResults.value).forEach(([accno, group]) => {
-    // Add account header
-    doc.setFontSize(14);
+    // Add account header using centralized styles
+    doc.setFontSize(PDF_STYLES.subtitle.fontSize);
     doc.text(getAccountDescription(accno), 15, yPosition);
     yPosition += 8;
 
@@ -662,20 +662,17 @@ const downloadPDF = () => {
     });
     tableData.push(totalsRow);
 
-    // Generate table
-    autoTable(doc, {
-      head: [headerRow],
-      body: tableData,
+    // Generate table using centralized styles for tabular layout with grey lines
+    const columnStyles = Object.fromEntries(
+      columns.value.map((col, index) => [
+        index,
+        col.name === "paid" ? { halign: "right" } : {},
+      ])
+    );
+
+    createPDFWithCustomStyles(doc, headerRow, tableData, {
       startY: yPosition,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
-      columnStyles: Object.fromEntries(
-        columns.value.map((col, index) => [
-          index,
-          col.name === "paid" ? { halign: "right" } : {},
-        ])
-      ),
-      theme: "striped",
+      columnStyles: columnStyles,
     });
 
     yPosition = doc.lastAutoTable.finalY + 10;
@@ -692,17 +689,16 @@ const downloadPDF = () => {
     return "";
   });
 
-  autoTable(doc, {
-    body: [grandTotalsRow],
+  // Generate grand totals table with centralized styles
+  createPDFWithCustomStyles(doc, [], [grandTotalsRow], {
     startY: yPosition,
-    styles: { fontSize: 10, fontStyle: "bold" },
     columnStyles: Object.fromEntries(
       columns.value.map((col, index) => [
         index,
         col.name === "paid" ? { halign: "right" } : {},
       ])
     ),
-    theme: "plain",
+    styles: { ...PDF_STYLES.table.styles, ...PDF_STYLES.totals },
   });
 
   doc.save("payments_report.pdf");

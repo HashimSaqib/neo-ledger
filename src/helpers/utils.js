@@ -4,6 +4,87 @@ import { inject } from "vue";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Dialog, LocalStorage } from "quasar";
+
+// Centralized PDF styling configuration
+export const PDF_STYLES = {
+  // Default table styles for tabular layout with grey lines
+  table: {
+    styles: {
+      fontSize: 8,
+      cellPadding: 3,
+      lineColor: [200, 200, 200], // Light grey table lines
+      lineWidth: 0.1,
+    },
+    headStyles: {
+      fillColor: [211, 211, 211], // Light grey header background
+      textColor: [0, 0, 0],
+      fontStyle: "bold",
+      lineColor: [200, 200, 200], // Light grey header lines
+      lineWidth: 0.1,
+    },
+    bodyStyles: {
+      lineColor: [200, 200, 200], // Light grey body lines
+      lineWidth: 0.1,
+    },
+    // Remove theme to avoid alternating colors
+    theme: "plain",
+  },
+
+  // Title styles
+  title: {
+    fontSize: 15,
+    alignment: "center",
+  },
+
+  // Subtitle styles
+  subtitle: {
+    fontSize: 14,
+  },
+
+  // Parameter styles
+  params: {
+    fontSize: 12,
+  },
+
+  // Totals row styles
+  totals: {
+    fontStyle: "bold",
+    lineColor: [200, 200, 200],
+    lineWidth: 0.1,
+  },
+
+  // Compact table styles for reports with many columns
+  compact: {
+    styles: {
+      fontSize: 8,
+      cellPadding: 2,
+      lineColor: [200, 200, 200],
+      lineWidth: 0.1,
+    },
+    headStyles: {
+      fillColor: [211, 211, 211],
+      textColor: [0, 0, 0],
+      fontStyle: "bold",
+      lineColor: [200, 200, 200],
+      lineWidth: 0.1,
+    },
+    bodyStyles: {
+      lineColor: [200, 200, 200],
+      lineWidth: 0.1,
+    },
+    theme: "plain",
+  },
+
+  // Group header styles
+  groupHeader: {
+    fontStyle: "bold",
+    fillColor: [240, 240, 240], // Very light grey for group headers
+    textColor: [0, 0, 0],
+    lineColor: [200, 200, 200],
+    lineWidth: 0.1,
+  },
+};
+
 // Format a number as a string with commas and two decimals
 export const formatAmount = (amount) => {
   if (isNaN(amount) || amount === null || amount === undefined) return "";
@@ -196,15 +277,19 @@ export const createPDF = (
   const doc = new jsPDF({ orientation: "landscape" });
   let yPosition = 10;
   const leftPadding = 15;
+
+  // Add title using centralized styles
   if (title) {
-    doc.setFontSize(18);
+    doc.setFontSize(PDF_STYLES.title.fontSize);
     doc.text(title, doc.internal.pageSize.width / 2, yPosition, {
-      align: "center",
+      align: PDF_STYLES.title.alignment,
     });
     yPosition += 8;
   }
+
+  // Add parameters using centralized styles
   if (params && Object.keys(params).length > 0) {
-    doc.setFontSize(12);
+    doc.setFontSize(PDF_STYLES.params.fontSize);
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
         doc.text(`${key}: ${value}`, leftPadding, yPosition);
@@ -213,6 +298,7 @@ export const createPDF = (
     });
     yPosition += 4;
   }
+
   const headerRow = columns.map((col) => col.label);
   const numberColumns = [
     "amount",
@@ -224,6 +310,7 @@ export const createPDF = (
     "credit",
     "balance",
   ];
+
   const dataRows = filteredResults.map((row) =>
     columns.map((col) => {
       let value = row[col.field] || "";
@@ -233,6 +320,7 @@ export const createPDF = (
       return value;
     })
   );
+
   let hasTotals = totals && numberColumns.some((col) => totals[col]);
   let totalsRow = null;
   if (hasTotals) {
@@ -245,15 +333,16 @@ export const createPDF = (
       return "";
     });
   }
+
   const tableData = [...dataRows];
   if (totalsRow) tableData.push(totalsRow);
+
+  // Use centralized PDF styles for tabular layout with grey lines
   autoTable(doc, {
     startY: yPosition,
     head: [headerRow],
     body: tableData,
-    styles: { fontSize: 10 },
-    theme: "striped",
-    headStyles: { fillColor: [211, 211, 211], textColor: [0, 0, 0] },
+    ...PDF_STYLES.table,
     columnStyles: Object.fromEntries(
       columns.map((col, index) => [
         index,
@@ -261,7 +350,33 @@ export const createPDF = (
       ])
     ),
   });
+
   doc.save(`${title}.pdf`);
+};
+
+// Helper function to create PDF with custom styling options
+export const createPDFWithCustomStyles = (
+  doc,
+  headerRow,
+  bodyData,
+  options = {}
+) => {
+  const defaultStyles = {
+    startY: 20,
+    ...PDF_STYLES.table,
+    columnStyles: {},
+  };
+
+  // Merge custom options with default styles
+  const finalOptions = {
+    ...defaultStyles,
+    ...options,
+    head: [headerRow],
+    body: bodyData,
+  };
+
+  autoTable(doc, finalOptions);
+  return doc.lastAutoTable.finalY;
 };
 
 // Display a delete confirmation dialog using Quasar's Dialog component

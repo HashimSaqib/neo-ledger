@@ -319,7 +319,7 @@ import { api } from "src/boot/axios";
 import { formatAmount, roundAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { PDF_STYLES, createPDFWithCustomStyles } from "src/helpers/utils.js";
 import FileList from "src/components/FileList.vue";
 
 // =====================================================
@@ -784,15 +784,16 @@ const exportToExcel = () => {
 const exportToPDF = () => {
   const doc = new jsPDF({ orientation: "landscape" });
 
-  doc.setFontSize(14);
+  // Add title using centralized styles
+  doc.setFontSize(PDF_STYLES.title.fontSize);
   doc.text("All Taxes Report", doc.internal.pageSize.width / 2, 15, {
-    align: "center",
+    align: PDF_STYLES.title.alignment,
   });
 
   let yPosition = 25;
 
   // Summary section
-  doc.setFontSize(11);
+  doc.setFontSize(PDF_STYLES.subtitle.fontSize);
   doc.text("Summary", 15, yPosition);
   yPosition += 8;
 
@@ -810,8 +811,10 @@ const exportToPDF = () => {
     formatAmount(row.total.tax),
   ]);
 
-  autoTable(doc, {
-    head: [
+  // Generate summary table using centralized styles for tabular layout with grey lines
+  createPDFWithCustomStyles(
+    doc,
+    [
       [
         "Account/Tax",
         "AR Amount",
@@ -826,29 +829,29 @@ const exportToPDF = () => {
         "Total Tax",
       ],
     ],
-    body: summaryTableData,
-    startY: yPosition,
-    styles: { fontSize: 7, cellPadding: 1 },
-    headStyles: { fontStyle: "bold" },
-    columnStyles: {
-      1: { halign: "right" },
-      2: { halign: "right" },
-      3: { halign: "right" },
-      4: { halign: "right" },
-      5: { halign: "right" },
-      6: { halign: "right" },
-      7: { halign: "right" },
-      8: { halign: "right" },
-      9: { halign: "right" },
-      10: { halign: "right" },
-    },
-    theme: "plain",
-  });
+    summaryTableData,
+    {
+      startY: yPosition,
+      styles: { fontSize: 7, cellPadding: 1 },
+      columnStyles: {
+        1: { halign: "right" },
+        2: { halign: "right" },
+        3: { halign: "right" },
+        4: { halign: "right" },
+        5: { halign: "right" },
+        6: { halign: "right" },
+        7: { halign: "right" },
+        8: { halign: "right" },
+        9: { halign: "right" },
+        10: { halign: "right" },
+      },
+    }
+  );
 
   yPosition = doc.lastAutoTable.finalY + 12;
 
   // Detailed section
-  doc.setFontSize(11);
+  doc.setFontSize(PDF_STYLES.subtitle.fontSize);
   doc.text("Detailed Breakdown", 15, yPosition);
   yPosition += 8;
 
@@ -921,8 +924,10 @@ const exportToPDF = () => {
     ]);
   });
 
-  autoTable(doc, {
-    head: [
+  // Generate detailed table using centralized styles for tabular layout with grey lines
+  createPDFWithCustomStyles(
+    doc,
+    [
       [
         "Date",
         "Invoice Number",
@@ -934,17 +939,17 @@ const exportToPDF = () => {
         "Description",
       ],
     ],
-    body: tableData,
-    startY: yPosition,
-    styles: { fontSize: 7, cellPadding: 1 },
-    headStyles: { fontStyle: "bold" },
-    columnStyles: {
-      4: { halign: "right" },
-      5: { halign: "right" },
-      6: { halign: "right" },
-    },
-    theme: "plain",
-  });
+    tableData,
+    {
+      startY: yPosition,
+      styles: { fontSize: 7, cellPadding: 1 },
+      columnStyles: {
+        4: { halign: "right" },
+        5: { halign: "right" },
+        6: { halign: "right" },
+      },
+    }
+  );
 
   doc.save("all_taxes_report.pdf");
 };
