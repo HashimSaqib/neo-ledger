@@ -22,12 +22,6 @@
           outlined
         />
         <q-btn color="dark" :label="t('Insert Rows')" @click="addLines" />
-        <q-btn
-          color="secondary"
-          :label="t('Import CMPT')"
-          @click="showCmptImport = true"
-          icon="upload_file"
-        />
       </div>
 
       <div class="column q-gutter-y-md">
@@ -279,18 +273,6 @@
         <Worksheet :data="spreadsheetData" :columns="visibleColumns" />
       </Spreadsheet>
     </div>
-
-    <!-- CMPT Import Dialog -->
-    <q-dialog v-model="showCmptImport">
-      <q-card style="min-width: 800px; max-width: 90vw" class="q-pa-sm">
-        <q-card-section class="q-pa-none">
-          <div class="text-h6 q-pa-md">{{ t("Import CMPT File") }}</div>
-        </q-card-section>
-        <q-card-section>
-          <CmptImport @close="showCmptImport = false" />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
@@ -313,7 +295,6 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 import { date } from "quasar";
-import CmptImport from "src/components/CmptImport.vue";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -337,7 +318,6 @@ const loading = ref(true);
 const importType = ref(route.params.type);
 const linesToAdd = ref(10);
 const importDisabled = ref(false);
-const showCmptImport = ref(false);
 
 const repositories = {
   currencies: ref([]),
