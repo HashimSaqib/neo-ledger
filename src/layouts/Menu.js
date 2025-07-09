@@ -397,6 +397,11 @@ export const menuLinks = [
         link: "/import/ap_transaction",
         perm: "import.ap.transactions",
       },
+      {
+        title: "Bank Import",
+        link: "/import/bank",
+        perm: "import.bank",
+      },
     ],
   },
 ];

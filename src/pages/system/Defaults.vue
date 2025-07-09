@@ -258,6 +258,22 @@
           search="label"
           account
         />
+        <q-input
+          v-model="form.clearing"
+          name="clearing"
+          :label="t('Clearing Account')"
+          outlined
+          dense
+          class="lightbg input-box col-12 col-md-5"
+        />
+        <q-input
+          v-model="form.transition"
+          name="transition"
+          :label="t('Transition Account')"
+          outlined
+          dense
+          class="lightbg input-box col-12 col-md-5"
+        />
       </div>
 
       <!-- Heading: Last Numbers -->
@@ -609,6 +625,8 @@ const form = ref({
   IC_expense: null,
   fxgainloss: null,
   cashovershort: null,
+  clearing: "",
+  transition: "",
   glnumber: "",
   lock_glnumber: false,
   sinumber: "",
@@ -833,6 +851,8 @@ async function loadDefaults() {
     form.value.forcewarehouse = isChecked(data.forcewarehouse);
     form.value.hideaccounts = isChecked(data.hideaccounts);
     form.value.linetax = isChecked(data.linetax);
+    form.value.clearing = data.clearing || "";
+    form.value.transition = data.transition || "";
     // Last Numbers + locks
     form.value.glnumber = data.glnumber || "";
     form.value.lock_glnumber = isChecked(data.lock_glnumber);

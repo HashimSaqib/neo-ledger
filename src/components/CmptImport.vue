@@ -190,7 +190,7 @@ import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 
 const { t } = useI18n();
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "transactions-parsed"]);
 
 const selectedFile = ref(null);
 const parsedData = ref([]);
@@ -322,6 +322,9 @@ const parseFile = async () => {
 
     console.log("Final transactions array:", transactions);
     parsedData.value = transactions;
+
+    // Emit the parsed transactions to parent component
+    emit("transactions-parsed", transactions);
 
     Notify.create({
       message: t("File parsed successfully. Found {count} transactions.", {

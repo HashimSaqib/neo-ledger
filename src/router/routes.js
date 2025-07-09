@@ -47,7 +47,7 @@ const Batch = () => import("src/pages/system/Batch.vue");
 const YearEnd = () => import("src/pages/system/YearEnd.vue");
 const Import = () => import("src/pages/Import.vue");
 const BankAccounts = () => import("src/pages/system/BankAccounts.vue");
-
+const BankImport = () => import("src/pages/ImportBank.vue");
 const routes = [
   {
     path: "/",
@@ -356,11 +356,16 @@ const routes = [
         meta: { permission: "system.yearend" },
       },
       {
+        path: "import/bank",
+        component: BankImport,
+        meta: { permission: "import.bank" },
+      },
+      {
         path: "import/:type",
         component: Import,
         meta: {
-          permission: () => {
-            return ["import.gl"];
+          permission: (route) => {
+            return ["import." + route.params.type];
           },
         },
       },
