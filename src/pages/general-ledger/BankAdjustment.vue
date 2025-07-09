@@ -8,8 +8,6 @@ import { api } from "src/boot/axios";
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 
-const loading = ref(false);
-
 onMounted(() => {
   updateTitle("Bank Adjustment");
 });
