@@ -48,6 +48,12 @@ const YearEnd = () => import("src/pages/system/YearEnd.vue");
 const Import = () => import("src/pages/Import.vue");
 const BankAccounts = () => import("src/pages/system/BankAccounts.vue");
 const BankImport = () => import("src/pages/ImportBank.vue");
+const BankAdjustment = () =>
+  import("src/pages/cash/adjustments/BankAdjustment.vue");
+const BankTransactionDetail = () =>
+  import("src/pages/cash/adjustments/BankTransactionDetail.vue");
+const BankAdjustmentConfirmation = () =>
+  import("src/pages/cash/adjustments/Confirmation.vue");
 const routes = [
   {
     path: "/",
@@ -368,6 +374,24 @@ const routes = [
             return ["import." + route.params.type];
           },
         },
+      },
+      {
+        path: "bank-adjustments",
+        component: BankAdjustment,
+        meta: { permission: "bank.adjustments" },
+        name: "BankAdjustment",
+      },
+      {
+        path: "bank-adjustments/detail/:trans_id",
+        component: BankTransactionDetail,
+        meta: { permission: "bank.adjustments" },
+        name: "BankAdjustmentDetail",
+      },
+      {
+        path: "bank-adjustments/confirm/:trans_id",
+        component: BankAdjustmentConfirmation,
+        meta: { permission: "bank.adjustments" },
+        name: "BankAdjustmentConfirmation",
       },
     ],
   },

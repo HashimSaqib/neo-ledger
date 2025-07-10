@@ -28,10 +28,7 @@
 
       <!-- CMPT Import Section -->
       <div class="q-mb-lg">
-        <CmptImport
-          @close="handleCmptClose"
-          @transactions-parsed="handleTransactionsParsed"
-        />
+        <CmptImport @transactions-parsed="handleTransactionsParsed" />
       </div>
 
       <!-- GL Transactions Preview -->
@@ -235,10 +232,6 @@ const fetchLinks = async () => {
   clearingAccount.value = response.data.clearing_account;
 };
 
-const handleCmptClose = () => {
-  // Handle CMPT import dialog close
-};
-
 const handleTransactionsParsed = (transactions) => {
   bankTransactions.value = transactions;
   generateGLTransactions();
@@ -263,22 +256,8 @@ const generateGLTransactions = () => {
     const amount = bankTx.amount || 0;
     const isCredit = bankTx.creditDebitInd === "CRDT";
 
-    // Build comprehensive description with extra information
-    let description =
-      bankTx.remittanceInfo || bankTx.counterpartyName || "Bank Transaction";
-
-    // Add counterparty information to description (similar to CMPT component)
-    const counterpartyInfo = [];
-    if (bankTx.counterpartyName && bankTx.counterpartyName !== description) {
-      counterpartyInfo.push(bankTx.counterpartyName);
-    }
-    if (bankTx.counterpartyAddress) {
-      counterpartyInfo.push(bankTx.counterpartyAddress);
-    }
-
-    if (counterpartyInfo.length > 0) {
-      description += `\n${counterpartyInfo.join("\n")}`;
-    }
+    // Build description from remittance info or use default
+    const description = bankTx.remittanceInfo || "Bank Transaction";
 
     // Build references for notes column with line breaks
     const references = [];

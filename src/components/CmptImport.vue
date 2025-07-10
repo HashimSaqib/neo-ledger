@@ -174,10 +174,6 @@
       </q-banner>
     </div>
 
-    <div class="row q-mt-md justify-end">
-      <q-btn flat :label="t('Close')" color="primary" @click="closeDialog" />
-    </div>
-
     <q-inner-loading :showing="parsing">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
@@ -188,7 +184,7 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
-
+import { formatAmount } from "src/helpers/utils";
 const { t } = useI18n();
 const emit = defineEmits(["close", "transactions-parsed"]);
 
@@ -575,13 +571,6 @@ const getNestedElementText = (parent, ...tagNames) => {
     current = element;
   }
   return current.textContent.trim();
-};
-
-const formatAmount = (amount) => {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
 };
 
 const formatDate = (dateString) => {

@@ -168,6 +168,11 @@ export const menuLinks = [
     perm: "cash",
     sublinks: [
       {
+        title: "Bank Adjustment",
+        link: "/bank-adjustments",
+        perm: "bank.adjustments",
+      },
+      {
         title: "Reconciliation",
         link: "/cash/reconciliation",
         perm: "cash.recon",
