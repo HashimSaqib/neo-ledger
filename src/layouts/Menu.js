@@ -385,7 +385,7 @@ export const menuLinks = [
       {
         title: "Customer Transactions",
         link: "/import/ar_transaction",
-        perm: "import.ar.transactions",
+        perm: "import.ar_transaction",
       },
       {
         title: "Vendors",
@@ -400,7 +400,7 @@ export const menuLinks = [
       {
         title: "Vendor Transactions",
         link: "/import/ap_transaction",
-        perm: "import.ap.transactions",
+        perm: "import.ap_transaction",
       },
       {
         title: "Bank Import",
