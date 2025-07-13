@@ -542,6 +542,12 @@ const invoiceColumns = [
   { title: t("Ship Via"), key: "shipvia", required: false, default: false },
   { title: t("Waybill"), key: "waybill", required: false, default: false },
   {
+    title: t("Tax Included"),
+    key: "taxincluded",
+    required: false,
+    default: true,
+  },
+  {
     title: t("Item Number"),
     key: "line_number",
     required: true,
@@ -2194,6 +2200,10 @@ const importData = async () => {
             till: rowObj.till || "",
             department: getDepartment(rowObj.department),
             recordAccount: rowObj.recordaccount || "",
+            taxincluded:
+              rowObj.taxincluded === "1" ||
+              rowObj.taxincluded === "true" ||
+              rowObj.taxincluded === true,
             [importType.value === "ar_invoice" ? "customer_id" : "vendor_id"]:
               entityId,
             ordNumber: rowObj.ordnumber || "",
@@ -2631,6 +2641,7 @@ const columnGroups = computed(() => {
           "intnotes",
           "department",
           "recordaccount",
+          "taxincluded",
         ].includes(col.key)
       ),
     });

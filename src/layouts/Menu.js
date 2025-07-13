@@ -26,12 +26,12 @@ export const menuLinks = [
           {
             title: "Credit Transaction",
             link: "/arap/transaction/customer?reverse=1",
-            perm: "customer.transaction.return",
+            perm: "customer.transaction_return",
           },
           {
             title: "Credit Invoice",
             link: "/ar/sales-invoice?credit_invoice=1",
-            perm: "customer.invoice.return",
+            perm: "customer.invoice_return",
           },
 
           {
@@ -109,12 +109,12 @@ export const menuLinks = [
           {
             title: "Debit Transaction",
             link: "/arap/transaction/vendor?reverse=1",
-            perm: "vendor.transaction.return",
+            perm: "vendor.transaction_return",
           },
           {
             title: "Debit Invoice",
             link: "/ap/vendor-invoice?debit_invoice=1",
-            perm: "vendor.invoice.return",
+            perm: "vendor.invoice_return",
           },
           {
             title: "Add Vendor",

@@ -166,7 +166,7 @@ const routes = [
         meta: {
           permission: (route) => {
             return route.query.credit_invoice === "1"
-              ? "customer.creditinvoice"
+              ? "customer.invoice_return"
               : "customer.invoice";
           },
         },
