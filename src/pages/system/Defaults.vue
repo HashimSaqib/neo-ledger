@@ -26,6 +26,66 @@
         </div>
         <div class="col-12 col-md-5">
           <q-input
+            v-model="form.address1"
+            name="address1"
+            :label="t('Address Line 1')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.address2"
+            name="address2"
+            :label="t('Address Line 2')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.city"
+            name="city"
+            :label="t('City')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.state"
+            name="state"
+            :label="t('State/Province')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.zip"
+            name="zip"
+            :label="t('ZIP/Postal Code')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.country"
+            name="country"
+            :label="t('Country')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
             v-model="form.businessnumber"
             name="businessnumber"
             :label="t('Business Number')"
@@ -599,6 +659,12 @@ const formRef = ref(null);
 const form = ref({
   company: "",
   address: "",
+  address1: "",
+  address2: "",
+  city: "",
+  state: "",
+  zip: "",
+  country: "",
   tel: "",
   fax: "",
   companyemail: "",
@@ -830,6 +896,12 @@ async function loadDefaults() {
     // Basic fields
     form.value.company = data.company || "";
     form.value.address = data.address || "";
+    form.value.address1 = data.address1 || "";
+    form.value.address2 = data.address2 || "";
+    form.value.city = data.city || "";
+    form.value.state = data.state || "";
+    form.value.zip = data.zip || "";
+    form.value.country = data.country || "";
     form.value.tel = data.tel || "";
     form.value.fax = data.fax || "";
     form.value.companyemail = data.companyemail || "";

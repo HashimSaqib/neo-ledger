@@ -97,8 +97,41 @@
                 <q-input
                   dense
                   outlined
+                  v-model="selectedBank.qriban"
+                  :label="t('QR IBAN')"
+                  class="q-pa-xs"
+                />
+              </div>
+            </div>
+
+            <div class="row q-col-gutter-sm">
+              <div class="col-6">
+                <q-input
+                  dense
+                  outlined
                   v-model="selectedBank.bic"
                   :label="t('BIC/SWIFT')"
+                  class="q-pa-xs"
+                />
+              </div>
+              <div class="col-6">
+                <q-input
+                  dense
+                  outlined
+                  v-model="selectedBank.strdbkginf"
+                  :label="t('Structured Bank Info')"
+                  class="q-pa-xs"
+                />
+              </div>
+            </div>
+
+            <div class="row q-col-gutter-sm">
+              <div class="col-12">
+                <q-input
+                  dense
+                  outlined
+                  v-model="selectedBank.invdescriptionqr"
+                  :label="t('Invoice Description QR')"
                   class="q-pa-xs"
                 />
               </div>
@@ -256,6 +289,7 @@ const columns = [
   },
   { name: "name", label: t("Bank Name"), field: "name", align: "left" },
   { name: "iban", label: t("IBAN"), field: "iban", align: "left" },
+  { name: "qriban", label: t("QR IBAN"), field: "qriban", align: "left" },
   { name: "bic", label: t("BIC/SWIFT"), field: "bic", align: "left" },
   {
     name: "membernumber",
@@ -271,7 +305,18 @@ const columns = [
   },
   { name: "dcn", label: t("DCN"), field: "dcn", align: "left" },
   { name: "rvc", label: t("RVC"), field: "rvc", align: "left" },
-
+  {
+    name: "strdbkginf",
+    label: t("Structured Bank Info"),
+    field: "strdbkginf",
+    align: "left",
+  },
+  {
+    name: "invdescriptionqr",
+    label: t("Invoice Description QR"),
+    field: "invdescriptionqr",
+    align: "left",
+  },
   { name: "closed", label: t("Closed"), field: "closed", align: "center" },
 ];
 
@@ -368,6 +413,7 @@ const downloadExcel = () => {
     "Account",
     "Bank Name",
     "IBAN",
+    "QR IBAN",
     "BIC/SWIFT",
     "Description",
     "Closed",
@@ -375,6 +421,8 @@ const downloadExcel = () => {
     "Clearing Number",
     "DCN",
     "RVC",
+    "Structured Bank Info",
+    "Invoice Description QR",
     "Address",
   ];
 
@@ -389,6 +437,7 @@ const downloadExcel = () => {
       bank.accno,
       bank.name,
       bank.iban || "",
+      bank.qriban || "",
       bank.bic || "",
       bank.description,
       bank.closed === 1 ? t("Yes") : "",
@@ -396,6 +445,8 @@ const downloadExcel = () => {
       bank.clearingnumber || "",
       bank.dcn || "",
       bank.rvc || "",
+      bank.strdbkginf || "",
+      bank.invdescriptionqr || "",
       bank.address || "",
     ];
 
