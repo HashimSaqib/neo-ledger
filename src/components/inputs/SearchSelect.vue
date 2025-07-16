@@ -18,6 +18,7 @@
     hide-selected
     :emit-value="emitValue"
     :map-options="mapOptions"
+    :option-value="optionValue"
     bg-color="input"
   />
 </template>
@@ -71,6 +72,14 @@ const props = defineProps({
   account: {
     type: Boolean,
     default: false,
+  },
+  /**
+   * Prop to specify which property of the option object to use as the value.
+   * This is passed through to q-select's option-value prop.
+   */
+  optionValue: {
+    type: String,
+    default: null,
   },
 });
 

@@ -603,6 +603,7 @@ const loading = ref(false);
 const formRef = ref(null);
 const accounts = ref([]);
 const recordAccounts = ref([]);
+const defaultRecordAccount = ref(null);
 const paymentAccounts = ref([]);
 const taxAccounts = ref([]);
 const arap = ref("");
@@ -635,6 +636,17 @@ const updateVCSettings = async () => {
     recordAccounts.value = accounts.value
       .filter((account) => account.link === linkType)
       .map(formatAccountOption);
+
+    console.log(defaultRecordAccount.value);
+
+    if (!defaultRecordAccount.value) {
+      defaultRecordAccount.value = recordAccounts.value[0].id;
+    }
+    if (defaultRecordAccount.value) {
+      form.value.arap_accno = recordAccounts.value.find(
+        (acc) => acc.value.id == defaultRecordAccount.value.id
+      );
+    }
 
     paymentAccounts.value = accounts.value
       .filter((account) => account.link.split(":").includes(paymentLink))
@@ -789,6 +801,7 @@ const fetchLinks = async () => {
       `/create_links/${vcType.value.toLowerCase()}`
     );
     accounts.value = response.data.accounts.all;
+    defaultRecordAccount.value = response.data.record || null;
     currencies.value = response.data.currencies;
 
     // Determine AR or AP based on componentType

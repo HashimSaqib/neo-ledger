@@ -264,7 +264,7 @@
       <!-- Inventory & Income -->
       <div class="row q-mb-sm q-gutter-md">
         <s-select
-          v-model="form.IC"
+          v-model="form.inventory_account"
           :options="inventoryOptions"
           item-label="label"
           :label="t('Inventory')"
@@ -275,7 +275,7 @@
           account
         />
         <s-select
-          v-model="form.IC_income"
+          v-model="form.income_account"
           :options="incomeOptions"
           item-label="label"
           :label="t('Income')"
@@ -286,7 +286,7 @@
           account
         />
         <s-select
-          v-model="form.IC_expense"
+          v-model="form.expense_account"
           :options="expenseOptions"
           item-label="label"
           :label="t('Expense')"
@@ -297,7 +297,7 @@
           account
         />
         <s-select
-          v-model="form.fxgainloss"
+          v-model="form.fx_gain_loss_account"
           :options="fxgainlossOptions"
           item-label="label"
           :label="t('Foreign Exchange Gain/Loss')"
@@ -308,10 +308,32 @@
           account
         />
         <s-select
-          v-model="form.cashovershort"
+          v-model="form.cash_over_short_account"
           :options="cashovershortOptions"
           item-label="label"
           :label="t('Cash Over/Short')"
+          outlined
+          dense
+          class="lightbg input-box col-12 col-md-5"
+          search="label"
+          account
+        />
+        <s-select
+          v-model="form.ar_account"
+          :options="arOptions"
+          item-label="label"
+          :label="t('AR Record')"
+          outlined
+          dense
+          class="lightbg input-box col-12 col-md-5"
+          search="label"
+          account
+        />
+        <s-select
+          v-model="form.ap_account"
+          :options="apOptions"
+          item-label="label"
+          :label="t('AP Record')"
           outlined
           dense
           class="lightbg input-box col-12 col-md-5"
@@ -686,11 +708,13 @@ const form = ref({
   forcewarehouse: false,
   hideaccounts: false,
   linetax: false,
-  IC: null,
-  IC_income: null,
-  IC_expense: null,
-  fxgainloss: null,
-  cashovershort: null,
+  inventory_account: null,
+  income_account: null,
+  expense_account: null,
+  fx_gain_loss_account: null,
+  cash_over_short_account: null,
+  ar_account: null,
+  ap_account: null,
   clearing: "",
   transition: "",
   glnumber: "",
@@ -739,6 +763,8 @@ const incomeOptions = ref([]);
 const expenseOptions = ref([]);
 const fxgainlossOptions = ref([]);
 const cashovershortOptions = ref([]);
+const arOptions = ref([]);
+const apOptions = ref([]);
 
 // Turn the original account into { ...acc, label: "accno--desc" }
 // We keep the rest of the fields (like id, accno, description).
@@ -747,6 +773,71 @@ function parseAccountOptions(arr) {
     ...acc,
     label: `${acc.accno}--${acc.description}`,
   }));
+}
+
+// Filter functions for different account types
+function filterInventoryAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some(
+      (link) =>
+        link.includes("IC") &&
+        !link.includes("sale") &&
+        !link.includes("cogs") &&
+        !link.includes("IC_tax")
+    );
+  });
+}
+
+function filterIncomeAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some(
+      (link) =>
+        (link.includes("IC") && link.includes("sale")) || link === "IC_income"
+    );
+  });
+}
+
+function filterExpenseAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some(
+      (link) =>
+        (link.includes("IC") && link.includes("cogs")) || link === "IC_expense"
+    );
+  });
+}
+
+function filterFxGainLossAccounts(accounts) {
+  return accounts.filter(
+    (acc) => ["I", "E"].includes(acc.category) && acc.charttype === "A"
+  );
+}
+
+function filterCashOverShortAccounts(accounts) {
+  return accounts.filter(
+    (acc) => ["I", "E"].includes(acc.category) && acc.charttype === "A"
+  );
+}
+
+function filterARAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some((link) => link === "AR");
+  });
+}
+
+function filterAPAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some((link) => link === "AP");
+  });
 }
 
 function isChecked(val) {
@@ -893,113 +984,129 @@ async function loadDefaults() {
   try {
     const { data } = await api.get("/system/companydefaults");
 
-    // Basic fields
-    form.value.company = data.company || "";
-    form.value.address = data.address || "";
-    form.value.address1 = data.address1 || "";
-    form.value.address2 = data.address2 || "";
-    form.value.city = data.city || "";
-    form.value.state = data.state || "";
-    form.value.zip = data.zip || "";
-    form.value.country = data.country || "";
-    form.value.tel = data.tel || "";
-    form.value.fax = data.fax || "";
-    form.value.companyemail = data.companyemail || "";
-    form.value.companywebsite = data.companywebsite || "";
-    form.value.businessnumber = data.businessnumber || "";
-    form.value.method = isChecked(data.method);
-    form.value.cdt = isChecked(data.cdt);
-    form.value.referenceurl = data.referenceurl || "";
-    form.value.precision = data.precision || "";
-    form.value.annualinterest = data.annualinterest || "";
-    form.value.latepaymentfee = data.latepaymentfee || "";
-    form.value.restockingcharge = data.restockingcharge || "";
-    form.value.roundchange = data.roundchange || "";
-    form.value.weightunit = data.weightunit || "";
-    form.value.namesbynumber = isChecked(data.namesbynumber);
-    form.value.xelatex = isChecked(data.xelatex);
-    form.value.typeofcontact = data.typeofcontact || "";
-    form.value.checkinventory = isChecked(data.checkinventory);
-    form.value.forcewarehouse = isChecked(data.forcewarehouse);
-    form.value.hideaccounts = isChecked(data.hideaccounts);
-    form.value.linetax = isChecked(data.linetax);
-    form.value.clearing = data.clearing || "";
-    form.value.transition = data.transition || "";
-    // Last Numbers + locks
-    form.value.glnumber = data.glnumber || "";
-    form.value.lock_glnumber = isChecked(data.lock_glnumber);
-    form.value.sinumber = data.sinumber || "";
-    form.value.lock_sinumber = isChecked(data.lock_sinumber);
-    form.value.sonumber = data.sonumber || "";
-    form.value.lock_sonumber = isChecked(data.lock_sonumber);
-    form.value.vinumber = data.vinumber || "";
-    form.value.batchnumber = data.batchnumber || "";
-    form.value.vouchernumber = data.vouchernumber || "";
-    form.value.ponumber = data.ponumber || "";
-    form.value.lock_ponumber = isChecked(data.lock_ponumber);
-    form.value.sqnumber = data.sqnumber || "";
-    form.value.lock_sqnumber = isChecked(data.lock_sqnumber);
-    form.value.rfqnumber = data.rfqnumber || "";
-    form.value.lock_rfqnumber = isChecked(data.lock_rfqnumber);
-    form.value.partnumber = data.partnumber || "";
-    form.value.projectnumber = data.projectnumber || "";
-    form.value.employeenumber = data.employeenumber || "";
-    form.value.lock_employeenumber = isChecked(data.lock_employeenumber);
-    form.value.customernumber = data.customernumber || "";
-    form.value.lock_customernumber = isChecked(data.lock_customernumber);
-    form.value.vendornumber = data.vendornumber || "";
-    form.value.lock_vendornumber = isChecked(data.lock_vendornumber);
-    if (data.locklinetax) {
-      locklinetax.value = true;
-    }
+    // Apply filters to create specific account option arrays
+    inventoryOptions.value = parseAccountOptions(
+      filterInventoryAccounts(data.all_accounts)
+    );
+    incomeOptions.value = parseAccountOptions(
+      filterIncomeAccounts(data.all_accounts)
+    );
+    expenseOptions.value = parseAccountOptions(
+      filterExpenseAccounts(data.all_accounts)
+    );
+    fxgainlossOptions.value = parseAccountOptions(
+      filterFxGainLossAccounts(data.all_accounts)
+    );
+    cashovershortOptions.value = parseAccountOptions(
+      filterCashOverShortAccounts(data.all_accounts)
+    );
+    arOptions.value = parseAccountOptions(filterARAccounts(data.all_accounts));
+    apOptions.value = parseAccountOptions(filterAPAccounts(data.all_accounts));
 
-    // Build the arrays for s-select
-    if (data.IC) {
-      inventoryOptions.value = parseAccountOptions(data.IC);
-    }
-    if (data.IC_income) {
-      incomeOptions.value = parseAccountOptions(data.IC_income);
-    }
-    if (data.IC_expense) {
-      expenseOptions.value = parseAccountOptions(data.IC_expense);
-    }
-    if (data.fxgainloss) {
-      fxgainlossOptions.value = parseAccountOptions(data.fxgainloss);
-    }
-    if (data.cashovershort) {
-      cashovershortOptions.value = parseAccountOptions(data.cashovershort);
-    }
+    // Company Info
+    form.value.company = data.company_info?.name || "";
+    form.value.address = data.company_info?.address?.complete || "";
+    form.value.address1 = data.company_info?.address?.line1 || "";
+    form.value.address2 = data.company_info?.address?.line2 || "";
+    form.value.city = data.company_info?.address?.city || "";
+    form.value.state = data.company_info?.address?.state || "";
+    form.value.zip = data.company_info?.address?.zip || "";
+    form.value.country = data.company_info?.address?.country || "";
+    form.value.tel = data.company_info?.contact?.phone || "";
+    form.value.fax = data.company_info?.contact?.fax || "";
+    form.value.companyemail = data.company_info?.contact?.email || "";
+    form.value.companywebsite = data.company_info?.contact?.website || "";
+    form.value.businessnumber = data.company_info?.business_number || "";
+    form.value.referenceurl = data.company_info?.reference_url || "";
 
-    if (inventoryOptions.value.length && data.inventory_accno_id) {
-      form.value.IC = findAccountById(
-        inventoryOptions.value,
-        data.inventory_accno_id
-      );
-    }
-    if (incomeOptions.value.length && data.income_accno_id) {
-      form.value.IC_income = findAccountById(
-        incomeOptions.value,
-        data.income_accno_id
-      );
-    }
-    if (expenseOptions.value.length && data.expense_accno_id) {
-      form.value.IC_expense = findAccountById(
-        expenseOptions.value,
-        data.expense_accno_id
-      );
-    }
-    if (fxgainlossOptions.value.length && data.fxgainloss_accno_id) {
-      form.value.fxgainloss = findAccountById(
-        fxgainlossOptions.value,
-        data.fxgainloss_accno_id
-      );
-    }
-    if (cashovershortOptions.value.length && data.cashovershort_accno_id) {
-      form.value.cashovershort = findAccountById(
-        cashovershortOptions.value,
-        data.cashovershort_accno_id
-      );
-    }
+    // Settings
+    form.value.precision = data.settings?.precision || "";
+    form.value.annualinterest = data.settings?.annual_interest || "";
+    form.value.latepaymentfee = data.settings?.late_payment_fee || "";
+    form.value.restockingcharge = data.settings?.restocking_charge || "";
+    form.value.roundchange = data.settings?.round_change || "";
+    form.value.weightunit = data.settings?.weight_unit || "";
+    form.value.clearing = data.settings?.clearing_account || "";
+    form.value.transition = data.settings?.transition_account || "";
+
+    form.value.method = data.settings?.reporting_method_cash || false;
+    form.value.checkinventory = data.settings?.check_inventory || false;
+    form.value.forcewarehouse = data.settings?.force_warehouse || false;
+    form.value.hideaccounts = data.settings?.hide_closed_accounts || false;
+    form.value.linetax = data.settings?.line_tax || false;
+    form.value.namesbynumber = data.settings?.sort_names_by_number || false;
+    form.value.xelatex = data.settings?.xe_latex || false;
+    form.value.typeofcontact = data.settings?.type_of_contact || "";
+
+    // Account Defaults - Find complete account objects by ID
+    form.value.inventory_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.inventory_account_id
+      ) || null;
+    form.value.income_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.income_account_id
+      ) || null;
+    form.value.expense_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.expense_account_id
+      ) || null;
+    form.value.fx_gain_loss_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.fx_gain_loss_account_id
+      ) || null;
+    form.value.cash_over_short_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.cash_over_short_account_id
+      ) || null;
+    form.value.ar_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.ar_account_id
+      ) || null;
+    form.value.ap_account =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.ap_account_id
+      ) || null;
+
+    // Number Sequences
+    form.value.glnumber = data.number_sequences?.gl_reference?.pattern || "";
+    form.value.lock_glnumber =
+      data.number_sequences?.gl_reference?.locked || false;
+    form.value.sinumber = data.number_sequences?.sales_invoice?.pattern || "";
+    form.value.lock_sinumber =
+      data.number_sequences?.sales_invoice?.locked || false;
+    form.value.sonumber = data.number_sequences?.sales_order?.pattern || "";
+    form.value.lock_sonumber =
+      data.number_sequences?.sales_order?.locked || false;
+    form.value.vinumber = data.number_sequences?.vendor_invoice?.pattern || "";
+    form.value.batchnumber = data.number_sequences?.batch?.pattern || "";
+    form.value.vouchernumber = data.number_sequences?.voucher?.pattern || "";
+    form.value.ponumber = data.number_sequences?.purchase_order?.pattern || "";
+    form.value.lock_ponumber =
+      data.number_sequences?.purchase_order?.locked || false;
+    form.value.sqnumber = data.number_sequences?.sales_quotation?.pattern || "";
+    form.value.lock_sqnumber =
+      data.number_sequences?.sales_quotation?.locked || false;
+    form.value.rfqnumber = data.number_sequences?.rfq?.pattern || "";
+    form.value.lock_rfqnumber = data.number_sequences?.rfq?.locked || false;
+    form.value.partnumber = data.number_sequences?.part?.pattern || "";
+    form.value.projectnumber = data.number_sequences?.project?.pattern || "";
+    form.value.employeenumber = data.number_sequences?.employee?.pattern || "";
+    form.value.lock_employeenumber =
+      data.number_sequences?.employee?.locked || false;
+    form.value.customernumber = data.number_sequences?.customer?.pattern || "";
+    form.value.lock_customernumber =
+      data.number_sequences?.customer?.locked || false;
+    form.value.vendornumber = data.number_sequences?.vendor?.pattern || "";
+    form.value.lock_vendornumber =
+      data.number_sequences?.vendor?.locked || false;
   } catch (err) {
     console.error("Error loading company defaults", err);
   }
@@ -1008,14 +1115,123 @@ async function loadDefaults() {
 async function submitForm() {
   try {
     console.log(form.value);
+
+    // Transform data to new structured format
     const payload = {
-      ...form.value,
-      IC: form.value.IC?.label ?? null,
-      IC_income: form.value.IC_income?.label ?? null,
-      IC_expense: form.value.IC_expense?.label ?? null,
-      fxgainloss: form.value.fxgainloss?.label ?? null,
-      cashovershort: form.value.cashovershort?.label ?? null,
+      company_info: {
+        name: form.value.company,
+        address: {
+          complete: form.value.address,
+          line1: form.value.address1,
+          line2: form.value.address2,
+          city: form.value.city,
+          state: form.value.state,
+          zip: form.value.zip,
+          country: form.value.country,
+        },
+        contact: {
+          phone: form.value.tel,
+          fax: form.value.fax,
+          email: form.value.companyemail,
+          website: form.value.companywebsite,
+        },
+        business_number: form.value.businessnumber,
+        reference_url: form.value.referenceurl,
+      },
+
+      settings: {
+        // Financial Settings
+        precision: form.value.precision,
+        annual_interest: form.value.annualinterest,
+        late_payment_fee: form.value.latepaymentfee,
+        restocking_charge: form.value.restockingcharge,
+        round_change: form.value.roundchange,
+        weight_unit: form.value.weightunit,
+        clearing_account: form.value.clearing,
+        transition_account: form.value.transition,
+
+        // System Settings
+        reporting_method_cash: form.value.method,
+        check_inventory: form.value.checkinventory,
+        force_warehouse: form.value.forcewarehouse,
+        hide_closed_accounts: form.value.hideaccounts,
+        line_tax: form.value.linetax,
+        sort_names_by_number: form.value.namesbynumber,
+        xe_latex: form.value.xelatex,
+        type_of_contact: form.value.typeofcontact,
+      },
+
+      account_defaults: {
+        inventory_account_id: form.value.inventory_account?.id || null,
+        income_account_id: form.value.income_account?.id || null,
+        expense_account_id: form.value.expense_account?.id || null,
+        fx_gain_loss_account_id: form.value.fx_gain_loss_account?.id || null,
+        cash_over_short_account_id:
+          form.value.cash_over_short_account?.id || null,
+        ar_account_id: form.value.ar_account?.id || null,
+        ap_account_id: form.value.ap_account?.id || null,
+      },
+
+      number_sequences: {
+        gl_reference: {
+          pattern: form.value.glnumber,
+          locked: form.value.lock_glnumber,
+        },
+        sales_invoice: {
+          pattern: form.value.sinumber,
+          locked: form.value.lock_sinumber,
+        },
+        sales_order: {
+          pattern: form.value.sonumber,
+          locked: form.value.lock_sonumber,
+        },
+        vendor_invoice: {
+          pattern: form.value.vinumber,
+          locked: false,
+        },
+        batch: {
+          pattern: form.value.batchnumber,
+          locked: false,
+        },
+        voucher: {
+          pattern: form.value.vouchernumber,
+          locked: false,
+        },
+        purchase_order: {
+          pattern: form.value.ponumber,
+          locked: form.value.lock_ponumber,
+        },
+        sales_quotation: {
+          pattern: form.value.sqnumber,
+          locked: form.value.lock_sqnumber,
+        },
+        rfq: {
+          pattern: form.value.rfqnumber,
+          locked: form.value.lock_rfqnumber,
+        },
+        customer: {
+          pattern: form.value.customernumber,
+          locked: form.value.lock_customernumber,
+        },
+        vendor: {
+          pattern: form.value.vendornumber,
+          locked: form.value.lock_vendornumber,
+        },
+        employee: {
+          pattern: form.value.employeenumber,
+          locked: form.value.lock_employeenumber,
+        },
+        part: {
+          pattern: form.value.partnumber,
+          locked: false,
+        },
+        project: {
+          pattern: form.value.projectnumber,
+          locked: false,
+        },
+      },
     };
+
     console.log(payload);
 
     await api.post("/system/companydefaults", payload);
