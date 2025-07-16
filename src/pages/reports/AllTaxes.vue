@@ -581,13 +581,19 @@ const summaryData = computed(() => {
         accountGroups[accountKey].gl_credit.tax += taxGroupData.subtotal.tax;
       }
 
-      // Update total - GL-Credit offsets GL-Debit for proper accounting treatment
-      if (module === "gl-credit") {
-        accountGroups[accountKey].total.amount -= taxGroupData.subtotal.amount;
-        accountGroups[accountKey].total.tax -= taxGroupData.subtotal.tax;
-      } else {
+      // Update total using the formula: AR - AP + GL Credit - GL Debit
+      if (module === "ar") {
         accountGroups[accountKey].total.amount += taxGroupData.subtotal.amount;
         accountGroups[accountKey].total.tax += taxGroupData.subtotal.tax;
+      } else if (module === "ap") {
+        accountGroups[accountKey].total.amount -= taxGroupData.subtotal.amount;
+        accountGroups[accountKey].total.tax -= taxGroupData.subtotal.tax;
+      } else if (module === "gl-credit") {
+        accountGroups[accountKey].total.amount += taxGroupData.subtotal.amount;
+        accountGroups[accountKey].total.tax += taxGroupData.subtotal.tax;
+      } else if (module === "gl-debit") {
+        accountGroups[accountKey].total.amount -= taxGroupData.subtotal.amount;
+        accountGroups[accountKey].total.tax -= taxGroupData.subtotal.tax;
       }
     });
   });
@@ -610,13 +616,19 @@ const grandTotal = computed(() => {
   const total = { amount: 0, tax: 0 };
 
   Object.entries(groupedResults.value).forEach(([module, moduleData]) => {
-    // GL-Credit offsets GL-Debit for proper accounting treatment
-    if (module === "gl-credit") {
-      total.amount -= moduleData.total.amount;
-      total.tax -= moduleData.total.tax;
-    } else {
+    // Calculate grand total using the formula: AR - AP + GL Credit - GL Debit
+    if (module === "ar") {
       total.amount += moduleData.total.amount;
       total.tax += moduleData.total.tax;
+    } else if (module === "ap") {
+      total.amount -= moduleData.total.amount;
+      total.tax -= moduleData.total.tax;
+    } else if (module === "gl-credit") {
+      total.amount += moduleData.total.amount;
+      total.tax += moduleData.total.tax;
+    } else if (module === "gl-debit") {
+      total.amount -= moduleData.total.amount;
+      total.tax -= moduleData.total.tax;
     }
   });
 
