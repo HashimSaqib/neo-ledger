@@ -29,6 +29,7 @@ const Reconciliation = () => import("src/pages/cash/Reconciliation.vue");
 const Payments = () => import("src/pages/cash/Payments.vue");
 const SysCurrencies = () => import("src/pages/system/Currencies.vue");
 const SysDefaults = () => import("src/pages/system/Defaults.vue");
+const SysAiPrompts = () => import("src/pages/system/AiPrompts.vue");
 const ListAccounts = () => import("src/pages/system/chart/ListAccounts.vue");
 const AddAccount = () => import("src/pages/system/chart/AddAccount.vue");
 const GIFI = () => import("src/pages/system/chart/Gifi.vue");
@@ -54,6 +55,8 @@ const BankTransactionDetail = () =>
   import("src/pages/cash/adjustments/BankTransactionDetail.vue");
 const BankAdjustmentConfirmation = () =>
   import("src/pages/cash/adjustments/Confirmation.vue");
+const UploadDocument = () => import("src/pages/arap/upload/UploadDocument.vue");
+const DocumentList = () => import("src/pages/arap/upload/DocumentList.vue");
 const routes = [
   {
     path: "/",
@@ -160,6 +163,22 @@ const routes = [
         },
       },
       {
+        path: "arap/upload/:type",
+        component: UploadDocument,
+        meta: {
+          permission: (route) => {
+            return route.params.type === "customer"
+              ? "customer.upload"
+              : "vendor.upload";
+          },
+        },
+      },
+      {
+        path: "arap/upload/list",
+        component: DocumentList,
+        meta: { permission: "document.list" },
+      },
+      {
         path: "ar/sales-invoice",
         component: SalesInvoice,
         props: (route) => ({ id: route.query.id }),
@@ -232,6 +251,7 @@ const routes = [
         component: AllTaxes,
         meta: { permission: "reports.alltaxes" },
       },
+
       // Goods & Services
       {
         path: "ic/add/:type",
@@ -268,6 +288,11 @@ const routes = [
         path: "system/defaults",
         component: SysDefaults,
         meta: { permission: "system.defaults" },
+      },
+      {
+        path: "system/ai_prompts",
+        component: SysAiPrompts,
+        meta: { permission: "ai.prompts" },
       },
       {
         path: "system/bank",

@@ -310,6 +310,11 @@ export const menuLinks = [
         perm: "system.defaults",
       },
       {
+        title: "AI Prompts",
+        link: "/system/ai_prompts",
+        perm: "ai.prompts",
+      },
+      {
         title: "Templates",
         link: "/system/templates",
         perm: "system.templates",
@@ -359,6 +364,28 @@ export const menuLinks = [
         title: "Year End",
         link: "/system/yearend",
         perm: "system.yearend",
+      },
+    ],
+  },
+  {
+    title: "Document Management",
+    icon: "folder",
+    perm: "document_management",
+    sublinks: [
+      {
+        title: "Customer Upload",
+        link: "/arap/upload/customer",
+        perm: "customer.upload",
+      },
+      {
+        title: "Vendor Upload",
+        link: "/arap/upload/vendor",
+        perm: "vendor.upload",
+      },
+      {
+        title: "Document List",
+        link: "/arap/upload/list",
+        perm: "document.list",
       },
     ],
   },

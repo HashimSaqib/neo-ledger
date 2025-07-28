@@ -532,6 +532,12 @@
             @click="deleteTransaction"
             v-if="canDelete"
           />
+          <q-checkbox
+            v-model="pending"
+            :label="t('Pending')"
+            true-value="1"
+            false-value="0"
+          />
         </div>
         <div class="row">
           <LastTransactions
@@ -662,6 +668,7 @@ const lockNumber = ref(false);
 const revtrans = ref(null);
 const closedto = ref(null);
 const originaldate = ref(null);
+const pending = ref("0");
 
 // -------------------------
 // Entity, Account and Currency State
@@ -1148,6 +1155,7 @@ const postInvoice = async () => {
     selectedCurrency: selectedCurrency.value,
     curr: selectedCurrency.value.curr,
     type: transactionType.value,
+    pending: pending.value,
     lines: lines.value.map((line) => ({
       amount: line.amount,
       account: line.account ? line.account.accno : null,
@@ -1428,6 +1436,7 @@ const loadInvoice = async (invoice) => {
       ];
       paymentmethod_id.value = invoice.paymentmethod_id;
     }
+    pending.value = invoice.pending || 0;
   } catch (error) {
     console.error("Error loading invoice:", error);
     Notify.create({
