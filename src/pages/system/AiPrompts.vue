@@ -76,9 +76,9 @@ const promptTypes = [
 ];
 
 const modelOptions = [
-  "gpt-4o",
-  "gpt-4o-mini",
-  "gpt-o1",
+  "gpt-5",
+  "gpt-5-mini",
+  "gpt-5-nano",
   "gemini-2.5-pro",
   "gemini-2.5-flash",
   "gemini-2.5-flash-lite",
