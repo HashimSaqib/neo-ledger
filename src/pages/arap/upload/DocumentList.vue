@@ -101,6 +101,24 @@
           </q-td>
         </template>
 
+        <template v-slot:body-cell-sender="props">
+          <q-td :props="props">
+            <div v-if="getEmailSender(props.row.additional_info)">
+              <q-btn
+                flat
+                dense
+                size="sm"
+                color="primary"
+                :label="getEmailSender(props.row.additional_info)"
+                @click="showEmailDetails(props.row.additional_info)"
+              >
+                <q-tooltip>{{ t("View Email Details") }}</q-tooltip>
+              </q-btn>
+            </div>
+            <span v-else class="text-grey-6">-</span>
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-reference_link="props">
           <q-td :props="props">
             <router-link
@@ -285,6 +303,81 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Email Details Dialog -->
+    <q-dialog v-model="emailDialog">
+      <q-card>
+        <q-card-section class="q-pa-none">
+          <div class="q-pa-md">
+            <div class="row q-gutter-md">
+              <div class="col-12">
+                <q-list bordered>
+                  <q-item v-if="emailDetails?.sender">
+                    <q-item-section>
+                      <q-item-label>{{ t("Sender") }}</q-item-label>
+                      <q-item-label caption>
+                        <q-chip
+                          color="primary"
+                          text-color="white"
+                          :label="emailDetails.sender"
+                        />
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item v-if="emailDetails?.subject">
+                    <q-item-section>
+                      <q-item-label>{{ t("Subject") }}</q-item-label>
+                      <q-item-label caption>{{
+                        emailDetails.subject
+                      }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item v-if="emailDetails?.received_date">
+                    <q-item-section>
+                      <q-item-label>{{ t("Received Date") }}</q-item-label>
+                      <q-item-label caption>{{
+                        emailDetails.received_date
+                      }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item v-if="emailDetails?.cc && emailDetails.cc.length > 0">
+                    <q-item-section>
+                      <q-item-label>{{ t("CC") }}</q-item-label>
+                      <q-item-label caption>
+                        <div class="row q-gutter-xs">
+                          <q-chip
+                            v-for="email in emailDetails.cc"
+                            :key="email"
+                            color="secondary"
+                            text-color="white"
+                            :label="email"
+                            size="sm"
+                          />
+                        </div>
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item v-if="emailDetails?.text_content">
+                    <q-item-section>
+                      <q-item-label>{{ t("Content") }}</q-item-label>
+                      <q-item-label caption>
+                        <div class="email-content">
+                          <div v-html="emailDetails.text_content"></div>
+                        </div>
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -357,6 +450,8 @@ const confirmDialog = ref(false);
 const confirmMessage = ref("");
 const confirmAction = ref("");
 const recordToManage = ref(null);
+const emailDialog = ref(false);
+const emailDetails = ref(null);
 
 // Polling
 let pollingInterval = null;
@@ -383,6 +478,12 @@ const columns = computed(() => [
     field: (row) => row.file?.name,
     align: "left",
     sortable: true,
+  },
+  {
+    name: "sender",
+    label: t("Sender"),
+    field: (row) => getEmailSender(row.additional_info),
+    align: "left",
   },
   {
     name: "additional_info",
@@ -491,6 +592,17 @@ function getTokenInfo(additionalInfo) {
   }
 }
 
+function getEmailSender(additionalInfo) {
+  if (!additionalInfo) return null;
+  try {
+    const info = JSON.parse(additionalInfo);
+    return info.email?.sender || null;
+  } catch (error) {
+    console.error("Error parsing additional_info:", error);
+    return null;
+  }
+}
+
 function showNotification(message, type = "positive") {
   Notify.create({
     message,
@@ -525,6 +637,17 @@ function confirmRetryProcessing(record) {
     "Are you sure you want to retry processing this file?"
   );
   confirmDialog.value = true;
+}
+
+function showEmailDetails(additionalInfo) {
+  try {
+    const info = JSON.parse(additionalInfo);
+    emailDetails.value = info.email || null;
+    emailDialog.value = true;
+  } catch (error) {
+    console.error("Error parsing additional_info for email details:", error);
+    showNotification(t("Failed to load email details"), "negative");
+  }
 }
 
 function clearFilters() {
@@ -694,5 +817,25 @@ onUnmounted(() => {
   font-size: 0.85em;
   color: var(--q-primary);
   font-weight: 500;
+}
+
+.email-content {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--q-separator-color);
+  border-radius: 4px;
+  padding: 12px;
+  background-color: var(--q-page-bg);
+  font-family: monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.email-content :deep(p) {
+  margin: 0 0 8px 0;
+}
+
+.email-content :deep(div) {
+  margin: 0 0 8px 0;
 }
 </style>
