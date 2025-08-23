@@ -14,16 +14,6 @@
           />
         </div>
       </div>
-      <div v-if="selectedPromptType" class="row col-md-6 q-my-none q-py-none">
-        <q-select
-          v-model="selectedModel"
-          :options="modelOptions"
-          :label="t('AI Model')"
-          outlined
-          dense
-          class="lightbg input-box q-my-none"
-        />
-      </div>
       <div v-if="selectedPromptType" class="row q-mb-md q-mt-none">
         <div class="col-12">
           <q-input
@@ -34,7 +24,11 @@
             dense
             rows="8"
             class="lightbg input-box"
-            :placeholder="t('Enter your AI prompt here...')"
+            :placeholder="
+              t(
+                'Enter your AI prompt here... (leave blank to save empty prompt)'
+              )
+            "
           />
         </div>
       </div>
@@ -46,9 +40,7 @@
             type="submit"
             color="primary"
             :loading="loading"
-            :disable="
-              !selectedPromptType || !currentPrompt.trim() || !selectedModel
-            "
+            :disable="!selectedPromptType"
           />
         </div>
       </div>
@@ -67,21 +59,11 @@ const { t } = useI18n();
 const formRef = ref(null);
 const loading = ref(false);
 const selectedPromptType = ref(null);
-const selectedModel = ref(null);
 const currentPrompt = ref("");
 
 const promptTypes = [
   { label: t("General"), value: "general" },
   { label: t("Vendor Bill"), value: "ap_transaction" },
-];
-
-const modelOptions = [
-  "gpt-5",
-  "gpt-5-mini",
-  "gpt-5-nano",
-  "gemini-2.5-pro",
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite",
 ];
 
 // Only keep a map of prompts by type
@@ -111,7 +93,6 @@ async function loadPrompts() {
 function loadPrompt() {
   if (!selectedPromptType.value) {
     currentPrompt.value = "";
-    selectedModel.value = null;
     return;
   }
   const existingPrompt = prompts.value.find(
@@ -120,23 +101,15 @@ function loadPrompt() {
   );
   if (existingPrompt) {
     currentPrompt.value = existingPrompt.prompt || "";
-    selectedModel.value = existingPrompt.model || null;
   } else {
     currentPrompt.value = "";
-    selectedModel.value = null;
   }
 }
 
 async function submitForm() {
-  if (
-    !selectedPromptType.value ||
-    !currentPrompt.value.trim() ||
-    !selectedModel.value
-  ) {
+  if (!selectedPromptType.value) {
     Notify.create({
-      message: t(
-        "Please select a prompt type, enter a prompt, and select a model"
-      ),
+      message: t("Please select a prompt type"),
       type: "warning",
       position: "center",
     });
@@ -147,8 +120,7 @@ async function submitForm() {
     loading.value = true;
     const payload = {
       name: selectedPromptType.value.value || selectedPromptType.value,
-      prompt: currentPrompt.value.trim(),
-      model: selectedModel.value,
+      prompt: currentPrompt.value,
     };
     await api.post("/ai_prompts", payload);
     Notify.create({
