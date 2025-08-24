@@ -1,6 +1,6 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
-    <div class="flex q-pa-sm mainbg column">
+    <div class="q-pa-sm mainbg column">
       <div class="row q-gutter-sm q-mb-sm">
         <q-input
           :label="t('Reference')"
@@ -24,23 +24,22 @@
           bg-color="input"
           label-color="secondary"
         />
-        <div class="col-2">
-          <q-select
-            v-if="departments.length > 0"
-            outlined
-            v-model="formData.selectedDepartment"
-            :options="departments"
-            option-value="description"
-            option-label="description"
-            :label="t('Department')"
-            dense
-            bg-color="input"
-            label-color="secondary"
-            clearable
-            autogrow
-            hide-bottom-space
-          />
-        </div>
+        <q-select
+          v-if="departments.length > 0"
+          outlined
+          v-model="formData.selectedDepartment"
+          :options="departments"
+          class="col-2"
+          option-value="description"
+          option-label="description"
+          :label="t('Department')"
+          dense
+          bg-color="input"
+          label-color="secondary"
+          clearable
+          autogrow
+          hide-bottom-space
+        />
         <q-input
           v-if="formData.currency.rn != 1"
           class="col-2"
@@ -61,6 +60,48 @@
           dense
           type="date"
         />
+      </div>
+
+      <!-- Offset Account Section -->
+      <div class="row q-gutter-sm q-mb-sm">
+        <s-select
+          outlined
+          v-model="formData.offsetAccount"
+          :options="openAccounts"
+          :label="t('Offset Account')"
+          dense
+          class="col-3"
+          popup-content-class="mainbg maintext"
+          bg-color="input"
+          label-color="secondary"
+          search="label"
+          account
+          clearable
+          @update:model-value="handleOffsetAccountChange"
+        />
+        <!-- Offset Account Totals -->
+        <template v-if="formData.offsetAccount">
+          <q-input
+            :model-value="formatAmount(totalCredit)"
+            :label="t('Debit')"
+            class="col-2"
+            bg-color="input"
+            label-color="secondary"
+            outlined
+            dense
+            readonly
+          />
+          <q-input
+            :model-value="formatAmount(totalDebit)"
+            :label="t('Credit')"
+            class="col-2"
+            bg-color="input"
+            label-color="secondary"
+            outlined
+            dense
+            readonly
+          />
+        </template>
       </div>
 
       <div class="row q-mb-sm">
@@ -130,7 +171,7 @@
           <s-select
             outlined
             v-model="line.account"
-            :options="openAccounts"
+            :options="filteredOpenAccounts"
             :label="t('Account')"
             dense
             class="col-3"
@@ -273,7 +314,9 @@
         <div
           class="q-pa-sm col-2 lightbg text-bold"
           :class="
-            totalDebit - totalCredit == 0 ? 'text-positive' : 'text-negative'
+            !formData.offsetAccount && totalDebit - totalCredit == 0
+              ? 'text-positive'
+              : 'text-negative'
           "
         >
           {{ formatAmount(totalDebit - totalCredit) }}
@@ -367,6 +410,7 @@ const initialFormData = {
   originaldate: null,
   id: null,
   files: [],
+  offsetAccount: null,
 };
 
 const initialLine = {
@@ -447,9 +491,7 @@ const handleEnter = (event, index) => {
 };
 
 const removeLine = (index) => {
-  if (lines.value.length > 2) {
-    lines.value.splice(index, 1);
-  }
+  lines.value.splice(index, 1);
 };
 
 const toggleExtra = (index) => {
@@ -567,6 +609,22 @@ watch(
   }
 );
 
+// Add watch on offset account to remove existing lines when offset account is selected
+watch(
+  () => formData.value.offsetAccount,
+  (newOffsetAccount, oldOffsetAccount) => {
+    if (newOffsetAccount) {
+      // Remove any existing lines that use the new offset account
+      lines.value = lines.value.filter(
+        (line) => !line.account || line.account.accno !== newOffsetAccount.accno
+      );
+    } else if (oldOffsetAccount) {
+      // When offset account is cleared, we don't need to do anything special
+      // The filteredOpenAccounts computed property will handle showing all accounts again
+    }
+  }
+);
+
 const projects = ref([]);
 const filteredProjects = ref([]);
 
@@ -615,6 +673,15 @@ const openAccounts = computed(() =>
   accounts.value.filter((account) => account.closed === 0)
 );
 
+const filteredOpenAccounts = computed(() => {
+  if (!formData.value.offsetAccount) {
+    return openAccounts.value;
+  }
+  return openAccounts.value.filter(
+    (account) => account.accno !== formData.value.offsetAccount.accno
+  );
+});
+
 const loading = ref(false);
 
 /**
@@ -633,8 +700,8 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
     return;
   }
 
-  // Validate that total debit and credit amounts are balanced
-  if (totalDebit.value !== totalCredit.value) {
+  // Validate that total debit and credit amounts are balanced (only when no offset account is selected)
+  if (!formData.value.offsetAccount && totalDebit.value !== totalCredit.value) {
     Notify.create({
       message: t("The total debit and credit amounts must be balanced."),
       type: "negative",
@@ -700,6 +767,9 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
           : formData.value.selectedDepartment
         : undefined,
       files: base64Files,
+      offset_accno: formData.value.offsetAccount
+        ? formData.value.offsetAccount.accno
+        : undefined,
     };
 
     let response;
@@ -734,6 +804,7 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
         formData.value.currency = currencies.value[0];
       }
       formData.value.selectedDepartment = null;
+      formData.value.offsetAccount = null;
       lines.value = [{ ...initialLine }, { ...initialLine }];
       existingFiles.value = [];
       lastTransactionsRef.value.fetchTransactions();
@@ -781,6 +852,11 @@ const loadTransaction = async (id) => {
         transdate: transactionData.transdate,
         originaldate: transactionData.transdate,
         exchangeRate: transactionData.exchangeRate,
+        offsetAccount: transactionData.offset_accno
+          ? accounts.value.find(
+              (acc) => acc.accno === transactionData.offset_accno
+            )
+          : null,
       };
       if (departments.value?.length) {
         formData.value.selectedDepartment = departments.value.find(
@@ -791,7 +867,14 @@ const loadTransaction = async (id) => {
         (curr) => curr.curr === transactionData.curr
       );
 
-      lines.value = transactionData.lines.map((line) => {
+      // Filter out lines that use the offset account if it exists
+      const filteredLines = transactionData.offset_accno
+        ? transactionData.lines.filter(
+            (line) => line.accno !== transactionData.offset_accno
+          )
+        : transactionData.lines;
+
+      lines.value = filteredLines.map((line) => {
         const foundAccount =
           accounts.value.find((acc) => acc.accno === line.accno) || "";
         return {
@@ -884,6 +967,7 @@ const resetForm = () => {
   }
   formData.value.selectedDepartment = null;
   formData.value.originaldate = null;
+  formData.value.offsetAccount = null;
   lines.value = [{ ...initialLine }, { ...initialLine }];
   existingFiles.value = [];
 };
@@ -924,6 +1008,20 @@ const updateTaxAmount = (val, index) => {
   // Tax amount is the difference
   lines.value[index].linetaxamount = grossAmount - baseAmount;
 };
+
+const handleOffsetAccountChange = (val) => {
+  if (!val) {
+    formData.value.offsetAccount = null;
+    return;
+  }
+  const foundAccount = accounts.value.find((acc) => acc.accno === val.accno);
+  if (foundAccount) {
+    formData.value.offsetAccount = foundAccount;
+  } else {
+    formData.value.offsetAccount = null;
+  }
+};
+
 onMounted(async () => {
   try {
     await Promise.all([fetchLinks()]);
