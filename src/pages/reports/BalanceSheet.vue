@@ -199,14 +199,6 @@
               true-value="gifi"
               false-value="standard"
             />
-            <q-checkbox
-              v-model="formData.heading_only"
-              :label="t('Heading Only')"
-              color="primary"
-              dense
-              true-value="1"
-              false-value="0"
-            />
           </div>
 
           <!-- Submit Button -->
@@ -236,7 +228,56 @@
     >
       <q-card-actions class="q-pa-sm no-print">
         <q-btn :label="t('Export')" @click="downloadExcel" color="accent" />
-        <q-btn :label="t('Print')" @click="getPDF" color="info" />
+
+        <!-- Print button with toggle option -->
+        <q-btn
+          :label="t('Print')"
+          :icon="formData.heading_only === '1' ? 'print' : 'print'"
+          color="info"
+          @click="getPDF"
+        >
+          <q-tooltip>
+            {{
+              formData.heading_only === "1"
+                ? t("Print Headings Only")
+                : t("Print Full Report")
+            }}
+          </q-tooltip>
+        </q-btn>
+
+        <!-- Toggle button for heading only option -->
+        <q-btn
+          :icon="formData.heading_only === '1' ? 'view_headline' : 'view_list'"
+          :color="formData.heading_only === '1' ? 'primary' : 'grey-6'"
+          flat
+          round
+          dense
+          @click="toggleHeadingOnly"
+        >
+          <q-tooltip>
+            {{
+              formData.heading_only === "1"
+                ? t("Headings Only")
+                : t("Full Report")
+            }}
+          </q-tooltip>
+        </q-btn>
+
+        <q-space />
+        <q-btn
+          :label="t('Expand All')"
+          @click="expandAllHeadings"
+          color="secondary"
+          flat
+          icon="expand_less"
+        />
+        <q-btn
+          :label="t('Collapse All')"
+          @click="collapseAllHeadings"
+          color="secondary"
+          flat
+          icon="expand_more"
+        />
       </q-card-actions>
       <!-- Report Header -->
       <q-card-section v-if="results.company" class="mutedbg">
@@ -277,26 +318,63 @@
               <strong>{{ period.label }}</strong>
             </q-item-section>
           </q-item>
-          <div class="text-h5 text-primary q-my-none q-mb-md">
+          <div class="section-header">
+            <q-icon name="account_balance_wallet" class="q-mr-sm" />
             {{ t("Assets") }}
           </div>
           <q-separator />
           <q-list bordered separator>
-            <!-- Iterate over asset accounts (hidden accounts already excluded) -->
+            <!-- Iterate over asset accounts -->
             <template v-for="(account, index) in assetAccounts" :key="index">
-              <q-item>
+              <q-item
+                :class="{
+                  'mutedbg text-bold': account.charttype === 'H',
+                  'account-row': true,
+                  'heading-account': account.charttype === 'H',
+                  'detail-account': account.charttype === 'A',
+                  'heading-row': account.charttype === 'H',
+                }"
+              >
+                <!-- Show account number as plain text with indentation -->
+                <q-item-section v-if="formData.l_accno" avatar>
+                  <div :style="{ paddingLeft: getIndentation(account.level) }">
+                    <q-icon
+                      :name="getAccountIcon(account)"
+                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
+                      size="sm"
+                      class="q-mr-xs"
+                    />
+                    {{ account.accno }}
+                  </div>
+                </q-item-section>
+                <!-- Description with indentation and clickable for headings -->
                 <q-item-section>
-                  <div :style="{ marginLeft: `${account.level * 20}px` }">
-                    <template v-if="account.charttype === 'H'">
-                      <strong>{{ account.description }}</strong>
-                    </template>
-                    <template v-else>
-                      {{
-                        formData.l_accno
-                          ? account.accno + " - " + account.description
-                          : account.description
-                      }}
-                    </template>
+                  <div
+                    :style="{
+                      paddingLeft:
+                        account.level > 0
+                          ? getIndentation(account.level)
+                          : '0px',
+                    }"
+                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
+                    @click="
+                      account.charttype === 'H'
+                        ? toggleHeading(account.accno)
+                        : null
+                    "
+                  >
+                    <div class="account-description-row">
+                      <span class="account-description-text">{{
+                        account.description
+                      }}</span>
+                      <q-icon
+                        v-if="account.charttype === 'H'"
+                        :name="getHeadingIcon(account.accno)"
+                        size="sm"
+                        class="account-description-icon expand-icon"
+                        color="primary"
+                      />
+                    </div>
                   </div>
                 </q-item-section>
                 <q-item-section
@@ -328,11 +406,19 @@
                   <template v-else>-</template>
                 </q-item-section>
               </q-item>
+              <q-separator
+                v-if="shouldShowSeparator(account, index, assetAccounts)"
+              />
             </template>
           </q-list>
           <!-- Assets Subtotal Row -->
-          <q-item class="q-pa-xs items-center">
-            <q-item-section>{{ t("Total Assets") }}</q-item-section>
+          <q-item class="q-pa-sm items-center total-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="calculate" color="primary" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
+              t("Total Assets")
+            }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
@@ -345,27 +431,66 @@
 
         <!-- Liabilities Section -->
         <div class="q-mt-sm">
-          <div class="text-h5 text-primary q-mb-sm">{{ t("Liabilities") }}</div>
+          <div class="section-header">
+            <q-icon name="account_balance" class="q-mr-sm" />
+            {{ t("Liabilities") }}
+          </div>
           <q-separator />
           <q-list bordered separator>
-            <!-- Iterate over liability accounts (hidden accounts already excluded) -->
+            <!-- Iterate over liability accounts -->
             <template
               v-for="(account, index) in liabilityAccounts"
               :key="index"
             >
-              <q-item>
+              <q-item
+                :class="{
+                  'mutedbg text-bold': account.charttype === 'H',
+                  'account-row': true,
+                  'heading-account': account.charttype === 'H',
+                  'detail-account': account.charttype === 'A',
+                  'heading-row': account.charttype === 'H',
+                }"
+              >
+                <!-- Show account number as plain text with indentation -->
+                <q-item-section v-if="formData.l_accno" avatar>
+                  <div :style="{ paddingLeft: getIndentation(account.level) }">
+                    <q-icon
+                      :name="getAccountIcon(account)"
+                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
+                      size="sm"
+                      class="q-mr-xs"
+                    />
+                    {{ account.accno }}
+                  </div>
+                </q-item-section>
+                <!-- Description with indentation and clickable for headings -->
                 <q-item-section>
-                  <div :style="{ marginLeft: `${account.level * 20}px` }">
-                    <template v-if="account.charttype === 'H'">
-                      <strong>{{ account.description }}</strong>
-                    </template>
-                    <template v-else>
-                      {{
-                        formData.l_accno
-                          ? account.accno + " - " + account.description
-                          : account.description
-                      }}
-                    </template>
+                  <div
+                    :style="{
+                      paddingLeft:
+                        account.level > 0
+                          ? getIndentation(account.level)
+                          : '0px',
+                    }"
+                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
+                    @click="
+                      account.charttype === 'H'
+                        ? toggleHeading(account.accno)
+                        : null
+                    "
+                  >
+                    <div class="account-description-row">
+                      <span class="account-description-text">{{
+                        account.description
+                      }}</span>
+                      <q-icon
+                        v-if="account.charttype === 'H'"
+                        :name="getHeadingIcon(account.accno)"
+                        size="sm"
+                        class="account-description-icon expand-icon"
+                        color="primary"
+                      />
+                    </div>
                   </div>
                 </q-item-section>
                 <q-item-section
@@ -397,11 +522,19 @@
                   <template v-else>-</template>
                 </q-item-section>
               </q-item>
+              <q-separator
+                v-if="shouldShowSeparator(account, index, liabilityAccounts)"
+              />
             </template>
           </q-list>
           <!-- Liabilities Subtotal Row -->
-          <q-item class="q-pa-xs items-center">
-            <q-item-section>{{ t("Total Liabilities") }}</q-item-section>
+          <q-item class="q-pa-sm items-center total-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="calculate" color="primary" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
+              t("Total Liabilities")
+            }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
@@ -416,24 +549,63 @@
 
         <!-- Equity Section -->
         <div class="q-mt-md">
-          <div class="text-h5 text-primary q-mb-md">{{ t("Equity") }}</div>
+          <div class="section-header">
+            <q-icon name="trending_up" class="q-mr-sm" />
+            {{ t("Equity") }}
+          </div>
           <q-separator />
           <q-list bordered separator>
-            <!-- Iterate over equity accounts (hidden accounts already excluded) -->
+            <!-- Iterate over equity accounts -->
             <template v-for="(account, index) in equityAccounts" :key="index">
-              <q-item>
+              <q-item
+                :class="{
+                  'mutedbg text-bold': account.charttype === 'H',
+                  'account-row': true,
+                  'heading-account': account.charttype === 'H',
+                  'detail-account': account.charttype === 'A',
+                  'heading-row': account.charttype === 'H',
+                }"
+              >
+                <!-- Show account number as plain text with indentation -->
+                <q-item-section v-if="formData.l_accno" avatar>
+                  <div :style="{ paddingLeft: getIndentation(account.level) }">
+                    <q-icon
+                      :name="getAccountIcon(account)"
+                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
+                      size="sm"
+                      class="q-mr-xs"
+                    />
+                    {{ account.accno }}
+                  </div>
+                </q-item-section>
+                <!-- Description with indentation and clickable for headings -->
                 <q-item-section>
-                  <div :style="{ marginLeft: `${account.level * 20}px` }">
-                    <template v-if="account.charttype === 'H'">
-                      <strong>{{ account.description }}</strong>
-                    </template>
-                    <template v-else>
-                      {{
-                        formData.l_accno
-                          ? account.accno + " - " + account.description
-                          : account.description
-                      }}
-                    </template>
+                  <div
+                    :style="{
+                      paddingLeft:
+                        account.level > 0
+                          ? getIndentation(account.level)
+                          : '0px',
+                    }"
+                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
+                    @click="
+                      account.charttype === 'H'
+                        ? toggleHeading(account.accno)
+                        : null
+                    "
+                  >
+                    <div class="account-description-row">
+                      <span class="account-description-text">{{
+                        account.description
+                      }}</span>
+                      <q-icon
+                        v-if="account.charttype === 'H'"
+                        :name="getHeadingIcon(account.accno)"
+                        size="sm"
+                        class="account-description-icon expand-icon"
+                        color="primary"
+                      />
+                    </div>
                   </div>
                 </q-item-section>
                 <q-item-section
@@ -465,11 +637,19 @@
                   <template v-else>-</template>
                 </q-item-section>
               </q-item>
+              <q-separator
+                v-if="shouldShowSeparator(account, index, equityAccounts)"
+              />
             </template>
           </q-list>
           <!-- Current Earnings Row -->
-          <q-item class="q-pa-xs items-center">
-            <q-item-section>{{ t("Current Earnings") }}</q-item-section>
+          <q-item class="q-pa-sm items-center total-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="calculate" color="primary" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
+              t("Current Earnings")
+            }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
@@ -485,8 +665,13 @@
             </q-item-section>
           </q-item>
           <!-- Updated Total Equity Row -->
-          <q-item class="q-pa-xs items-center">
-            <q-item-section>{{ t("Total Equity") }}</q-item-section>
+          <q-item class="q-pa-sm items-center total-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="calculate" color="primary" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
+              t("Total Equity")
+            }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
@@ -501,8 +686,11 @@
             </q-item-section>
           </q-item>
           <!-- New: Total Liabilities + Equity Row -->
-          <q-item class="q-pa-xs items-center">
-            <q-item-section>{{
+          <q-item class="q-pa-sm items-center net-income-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="account_balance" color="primary" size="sm" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
               t("Total Liabilities + Equity")
             }}</q-item-section>
             <q-item-section
@@ -584,6 +772,7 @@ const currencies = ref([]);
 const filtersOpen = ref(true);
 const loading = ref(false);
 const results = ref({});
+const collapsedHeadings = ref(new Set()); // Track collapsed heading account numbers
 
 const formattedDateRange = computed(() => {
   if (formData.value.periods.length) {
@@ -592,119 +781,91 @@ const formattedDateRange = computed(() => {
   return t("N/A");
 });
 
+/**
+ * Builds a hierarchical structure of accounts based on parent_accno relationships
+ * @param {Object} rawAccounts - Raw account data from API
+ * @param {Object} accountsInfo - Account metadata from API
+ * @param {string} type - 'A' for assets, 'L' for liabilities, 'Q' for equity
+ * @returns {Array} Hierarchical array of accounts with levels
+ */
+const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
+  const accountMap = new Map();
+  const rootAccounts = [];
+
+  // First pass: create account objects and store in map
+  Object.keys(rawAccounts).forEach((accno) => {
+    const accountPeriods = rawAccounts[accno];
+    let periodsData = {};
+
+    Object.keys(accountPeriods).forEach((periodLabel) => {
+      if (accountPeriods[periodLabel][type]) {
+        periodsData[periodLabel] = accountPeriods[periodLabel][type];
+      }
+    });
+
+    if (Object.keys(periodsData).length > 0) {
+      const accountInfo = accountsInfo[accno] || {};
+      const account = {
+        accno,
+        description: accountInfo.description || "",
+        charttype: accountInfo.charttype || "A",
+        parent_accno: accountInfo.parent_accno || null,
+        periods: periodsData,
+        level: 0,
+        children: [],
+      };
+      accountMap.set(accno, account);
+    }
+  });
+
+  // Second pass: build parent-child relationships
+  accountMap.forEach((account) => {
+    if (account.parent_accno && accountMap.has(account.parent_accno)) {
+      const parent = accountMap.get(account.parent_accno);
+      parent.children.push(account);
+      account.level = parent.level + 1;
+    } else {
+      rootAccounts.push(account);
+    }
+  });
+
+  // Third pass: flatten the hierarchy while preserving order and levels
+  const flattenHierarchy = (accounts, result = []) => {
+    accounts.forEach((account) => {
+      result.push(account);
+      // Only include children if the heading is not collapsed
+      if (
+        account.children.length > 0 &&
+        !collapsedHeadings.value.has(account.accno)
+      ) {
+        flattenHierarchy(account.children, result);
+      }
+    });
+    return result;
+  };
+
+  return flattenHierarchy(rootAccounts);
+};
+
 /* ============================================================================
    Computed properties for each account group.
 ============================================================================ */
 const assetAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  const accounts = [];
-
-  // First, collect all accounts and their data
-  Object.keys(rawAccounts)
-    .sort((a, b) => a.localeCompare(b))
-    .forEach((accno) => {
-      const periodsRaw = rawAccounts[accno];
-      const charttype = results.value.accounts?.[accno]?.charttype;
-      const periods = {};
-      const level = results.value.accounts?.[accno]?.level || 0;
-
-      Object.keys(periodsRaw).forEach((label) => {
-        const entry = periodsRaw[label].A;
-        if (entry) {
-          periods[label] = {
-            ...entry,
-            amount: -Number(entry.amount),
-            charttype,
-          };
-        }
-      });
-
-      if (Object.keys(periods).length) {
-        accounts.push({
-          accno,
-          description: results.value.accounts?.[accno]?.description,
-          charttype,
-          level,
-          periods,
-        });
-      }
-    });
-
-  // Sort accounts by level and then by account number
-  return accounts.sort((a, b) => {
-    if (a.level !== b.level) return a.level - b.level;
-    return a.accno.localeCompare(b.accno);
-  });
+  const accountsInfo = results.value.accounts || {};
+  return buildAccountHierarchy(rawAccounts, accountsInfo, "A");
 });
 
 const liabilityAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  const accounts = [];
-
-  Object.keys(rawAccounts)
-    .sort((a, b) => a.localeCompare(b))
-    .forEach((accno) => {
-      const accountPeriods = rawAccounts[accno];
-      const charttype = results.value.accounts?.[accno]?.charttype;
-      const level = results.value.accounts?.[accno]?.level || 0;
-
-      const periodsData = {};
-      Object.keys(accountPeriods).forEach((periodLabel) => {
-        if (accountPeriods[periodLabel].L) {
-          periodsData[periodLabel] = accountPeriods[periodLabel].L;
-        }
-      });
-
-      if (Object.keys(periodsData).length) {
-        accounts.push({
-          accno,
-          description: results.value.accounts?.[accno]?.description,
-          charttype,
-          level,
-          periods: periodsData,
-        });
-      }
-    });
-
-  return accounts.sort((a, b) => {
-    if (a.level !== b.level) return a.level - b.level;
-    return a.accno.localeCompare(b.accno);
-  });
+  const accountsInfo = results.value.accounts || {};
+  return buildAccountHierarchy(rawAccounts, accountsInfo, "L");
 });
 
 const equityAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  const accounts = [];
-
-  Object.keys(rawAccounts)
-    .sort((a, b) => a.localeCompare(b))
-    .forEach((accno) => {
-      const accountPeriods = rawAccounts[accno];
-      const charttype = results.value.accounts?.[accno]?.charttype;
-      const level = results.value.accounts?.[accno]?.level || 0;
-
-      const periodsData = {};
-      Object.keys(accountPeriods).forEach((periodLabel) => {
-        if (accountPeriods[periodLabel].Q) {
-          periodsData[periodLabel] = accountPeriods[periodLabel].Q;
-        }
-      });
-
-      if (Object.keys(periodsData).length) {
-        accounts.push({
-          accno,
-          description: results.value.accounts?.[accno]?.description,
-          charttype,
-          level,
-          periods: periodsData,
-        });
-      }
-    });
-
-  return accounts.sort((a, b) => {
-    if (a.level !== b.level) return a.level - b.level;
-    return a.accno.localeCompare(b.accno);
-  });
+  const accountsInfo = results.value.accounts || {};
+  return buildAccountHierarchy(rawAccounts, accountsInfo, "Q");
 });
 
 /* ============================================================================
@@ -717,6 +878,106 @@ const formatAmountCustom = (value) => {
 
 const roundAmountCustom = (value) => {
   return roundAmount(value);
+};
+
+/**
+ * Generates CSS padding based on account level for indentation
+ * @param {number} level - Account hierarchy level
+ * @returns {string} CSS padding value
+ */
+const getIndentation = (level) => {
+  const basePadding = 16; // Base padding in pixels
+  const indentPerLevel = 24; // Additional padding per level
+  return `${basePadding + level * indentPerLevel}px`;
+};
+
+/**
+ * Determines if an account should show a separator line
+ * @param {Object} account - Account object
+ * @param {number} index - Account index in the list
+ * @param {Array} accounts - Full accounts array
+ * @returns {boolean} Whether to show separator
+ */
+const shouldShowSeparator = (account, index, accounts) => {
+  // Show separator after heading accounts
+  if (account.charttype === "H") {
+    return true;
+  }
+
+  // Show separator if next account is at a lower level (end of a group)
+  if (index < accounts.length - 1) {
+    const nextAccount = accounts[index + 1];
+    return nextAccount.level < account.level;
+  }
+
+  return false;
+};
+
+/**
+ * Gets the appropriate icon for an account based on its type and level
+ * @param {Object} account - Account object
+ * @returns {string} Icon name
+ */
+const getAccountIcon = (account) => {
+  if (account.charttype === "H") {
+    return "folder";
+  }
+  return "description";
+};
+
+/**
+ * Toggles the collapsed state of a heading account
+ * @param {string} accno - Account number to toggle
+ */
+const toggleHeading = (accno) => {
+  if (collapsedHeadings.value.has(accno)) {
+    collapsedHeadings.value.delete(accno);
+  } else {
+    collapsedHeadings.value.add(accno);
+  }
+};
+
+/**
+ * Checks if a heading account is collapsed
+ * @param {string} accno - Account number to check
+ * @returns {boolean} Whether the heading is collapsed
+ */
+const isHeadingCollapsed = (accno) => {
+  return collapsedHeadings.value.has(accno);
+};
+
+/**
+ * Gets the appropriate icon for a heading based on its collapsed state
+ * @param {string} accno - Account number
+ * @returns {string} Icon name
+ */
+const getHeadingIcon = (accno) => {
+  return isHeadingCollapsed(accno) ? "expand_more" : "expand_less";
+};
+
+/**
+ * Expands all heading accounts
+ */
+const expandAllHeadings = () => {
+  collapsedHeadings.value.clear();
+};
+
+/**
+ * Collapses all heading accounts
+ */
+const collapseAllHeadings = () => {
+  // Get all heading account numbers from all account types
+  const allAccounts = [
+    ...assetAccounts.value,
+    ...liabilityAccounts.value,
+    ...equityAccounts.value,
+  ];
+  const headingAccounts = allAccounts.filter(
+    (account) => account.charttype === "H"
+  );
+  headingAccounts.forEach((account) => {
+    collapsedHeadings.value.add(account.accno);
+  });
 };
 
 /* ============================================================================
@@ -958,6 +1219,10 @@ const getPDF = async () => {
   }
 };
 
+const toggleHeadingOnly = () => {
+  formData.value.heading_only = formData.value.heading_only === "1" ? "0" : "1";
+};
+
 const createLink = inject("createLink");
 
 const getPath = (accno, period) => {
@@ -1156,3 +1421,229 @@ const fetchLinks = async () => {
   }
 };
 </script>
+
+<style scoped>
+@media print {
+  .q-page {
+    padding: 0 !important;
+  }
+  .q-card,
+  .q-card-section {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .q-btn,
+  .q-expansion-item {
+    display: none !important;
+  }
+  .text-primary {
+    color: #000 !important;
+  }
+  .q-list--bordered {
+    border: none !important;
+  }
+}
+
+.border-top {
+  border-top: 2px solid #eee;
+  padding-top: 1rem;
+}
+
+.drag-handle:hover {
+  cursor: grab;
+}
+
+/* Account hierarchy styling */
+.account-row {
+  transition: background-color 0.2s ease;
+}
+
+.account-row:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.heading-account {
+  border-left: 4px solid var(--q-primary);
+  background-color: rgba(var(--q-primary), 0.05);
+  transition: background-color 0.2s ease;
+}
+
+.heading-account:hover {
+  background-color: rgba(var(--q-primary), 0.1);
+}
+
+.detail-account {
+  border-left: 2px solid #e0e0e0;
+}
+
+.detail-account:hover {
+  border-left-color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.02);
+}
+
+/* Indentation styling */
+.account-indent {
+  position: relative;
+}
+
+.account-indent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: #e0e0e0;
+  transform: translateY(-50%);
+}
+
+/* Amount styling - removed colors for better dark mode compatibility */
+.amount-positive {
+  font-weight: 500;
+}
+
+.amount-negative {
+  font-weight: 500;
+}
+
+.amount-zero {
+  color: #757575;
+}
+
+/* Section headers */
+.section-header {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  color: white;
+  padding: 12px 16px;
+  margin: 16px 0 8px 0;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Totals styling */
+.total-row {
+  background-color: #f5f5f5;
+  border-top: 2px solid #1976d2;
+  font-weight: 600;
+  color: #000 !important;
+}
+
+.net-income-row {
+  background-color: #e3f2fd;
+  border-top: 3px solid #1976d2;
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #000 !important;
+}
+
+/* Expand/collapse icon styling */
+.expand-icon {
+  transition: transform 0.2s ease;
+}
+
+.expand-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Target the expand/collapse icons specifically */
+.q-icon.expand-icon {
+  transition: transform 0.2s ease;
+}
+
+.q-icon.expand-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Heading row styling */
+.heading-row {
+  user-select: none;
+}
+
+.heading-row:hover .expand-icon {
+  opacity: 1;
+}
+
+/* Target all icons in heading rows for expand/collapse effect */
+.heading-row .q-icon {
+  transition: transform 0.2s ease;
+}
+
+.heading-row:hover .q-icon {
+  transform: scale(1.1);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Ensure account description and icon stay on same line */
+.account-description-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-width: 0;
+  position: relative;
+}
+
+.account-description-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-description-icon {
+  flex-shrink: 0;
+  margin-left: 8px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Override Quasar's row items-center to prevent wrapping */
+.row.items-center {
+  flex-wrap: nowrap !important;
+}
+
+/* Ensure amounts are always aligned regardless of description indentation */
+.q-item-section.col.text-right {
+  padding-left: 0 !important;
+}
+
+/* Fix amount alignment by ensuring the description section doesn't affect amount positioning */
+.q-item-section:not(.col) {
+  min-width: 0;
+  flex: 1;
+}
+
+/* Ensure the description text doesn't push amounts out of alignment */
+.account-description-text {
+  display: inline-block;
+  max-width: calc(100% - 40px); /* Leave space for the icon */
+}
+
+@media (max-width: 600px) {
+  .text-h4 {
+    font-size: 1.5rem;
+  }
+  .text-h5 {
+    font-size: 1.2rem;
+  }
+  .q-item {
+    padding: 8px 16px;
+  }
+
+  .account-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .q-item-section {
+    margin-bottom: 4px;
+  }
+}
+</style>

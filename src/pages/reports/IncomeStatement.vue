@@ -317,6 +317,21 @@
       <q-card-actions class="q-pa-sm no-print">
         <q-btn :label="t('Export')" @click="downloadExcel" color="accent" />
         <q-btn :label="t('Print')" @click="getPDF" color="info" />
+        <q-space />
+        <q-btn
+          :label="t('Expand All')"
+          @click="expandAllHeadings"
+          color="secondary"
+          flat
+          icon="expand_less"
+        />
+        <q-btn
+          :label="t('Collapse All')"
+          @click="collapseAllHeadings"
+          color="secondary"
+          flat
+          icon="expand_more"
+        />
       </q-card-actions>
       <!-- Report Header -->
       <q-card-section v-if="results.company" class="mutedbg">
@@ -352,7 +367,8 @@
               <strong>{{ period.label }}</strong>
             </q-item-section>
           </q-item>
-          <div class="text-h5 text-primary q-my-none q-mb-md">
+          <div class="section-header">
+            <q-icon name="trending_up" class="q-mr-sm" />
             {{ t("Income") }}
           </div>
           <q-separator />
@@ -360,13 +376,54 @@
             <!-- Iterate over income accounts -->
             <template v-for="(account, index) in incomeAccounts" :key="index">
               <q-item
-                :class="{ 'mutedbg text-bold': account.charttype === 'H' }"
+                :class="{
+                  'mutedbg text-bold': account.charttype === 'H',
+                  'account-row': true,
+                  'heading-account': account.charttype === 'H',
+                  'detail-account': account.charttype === 'A',
+                  'heading-row': account.charttype === 'H',
+                }"
               >
-                <!-- Show account number as plain text -->
+                <!-- Show account number as plain text with indentation -->
                 <q-item-section v-if="formData.l_accno" avatar>
-                  {{ account.accno }}
+                  <div :style="{ paddingLeft: getIndentation(account.level) }">
+                    <q-icon
+                      :name="getAccountIcon(account)"
+                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
+                      size="sm"
+                      class="q-mr-xs"
+                    />
+                    {{ account.accno }}
+                  </div>
                 </q-item-section>
-                <q-item-section>{{ account.description }}</q-item-section>
+                <!-- Description with indentation and clickable for headings -->
+                <q-item-section>
+                  <div
+                    :style="{
+                      paddingLeft:
+                        account.level > 0
+                          ? getIndentation(account.level)
+                          : '0px',
+                    }"
+                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
+                    @click="
+                      account.charttype === 'H'
+                        ? toggleHeading(account.accno)
+                        : null
+                    "
+                  >
+                    <div class="row items-center">
+                      <span>{{ account.description }}</span>
+                      <q-icon
+                        v-if="account.charttype === 'H'"
+                        :name="getHeadingIcon(account.accno)"
+                        size="sm"
+                        class="q-ml-xs"
+                        color="primary"
+                      />
+                    </div>
+                  </div>
+                </q-item-section>
                 <!-- For each period, render the amount as a clickable link if applicable -->
                 <q-item-section
                   v-for="period in results.periods"
@@ -384,66 +441,128 @@
                         <template
                           v-if="account.periods[period.label].amount < 0"
                         >
-                          {{
-                            formatAmount(
-                              Math.abs(account.periods[period.label].amount)
-                            )
-                          }}
+                          <span class="amount-negative">
+                            {{
+                              formatAmount(
+                                Math.abs(account.periods[period.label].amount)
+                              )
+                            }}
+                          </span>
                         </template>
                         <template v-else>
-                          {{
-                            formatAmount(account.periods[period.label].amount)
-                          }}
+                          <span class="amount-positive">
+                            {{
+                              formatAmount(account.periods[period.label].amount)
+                            }}
+                          </span>
                         </template>
                       </router-link>
                     </template>
                     <template v-else>
                       <template v-if="account.periods[period.label].amount < 0">
-                        {{
-                          formatAmount(
-                            Math.abs(account.periods[period.label].amount)
-                          )
-                        }}
+                        <span class="amount-negative">
+                          {{
+                            formatAmount(
+                              Math.abs(account.periods[period.label].amount)
+                            )
+                          }}
+                        </span>
                       </template>
                       <template v-else>
-                        {{ formatAmount(account.periods[period.label].amount) }}
+                        <span class="amount-positive">
+                          {{
+                            formatAmount(account.periods[period.label].amount)
+                          }}
+                        </span>
                       </template>
                     </template>
                   </template>
                   <template v-else>-</template>
                 </q-item-section>
               </q-item>
-              <q-separator v-if="account.charttype === 'H'" />
+              <q-separator
+                v-if="shouldShowSeparator(account, index, incomeAccounts)"
+              />
             </template>
           </q-list>
           <!-- Income Subtotal Row -->
-          <q-item class="q-pa-sm items-center">
-            <q-item-section v-if="formData.l_accno" avatar></q-item-section>
-            <q-item-section>{{ t("Total Income") }}</q-item-section>
+          <q-item class="q-pa-sm items-center total-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="calculate" color="primary" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
+              t("Total Income")
+            }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
               class="col text-right text-bold"
             >
-              {{ formatAmount(sumAccounts(incomeAccounts, period.label)) }}
+              <span class="amount-positive">
+                {{ formatAmount(sumAccounts(incomeAccounts, period.label)) }}
+              </span>
             </q-item-section>
           </q-item>
         </div>
 
         <!-- Expenses Section -->
         <div>
-          <div class="text-h5 text-primary q-mb-md">{{ t("Expenses") }}</div>
+          <div class="section-header">
+            <q-icon name="trending_down" class="q-mr-sm" />
+            {{ t("Expenses") }}
+          </div>
           <q-list bordered separator>
             <!-- Iterate over expense accounts -->
             <template v-for="(account, index) in expenseAccounts" :key="index">
               <q-item
-                :class="{ 'mutedbg text-bold': account.charttype === 'H' }"
+                :class="{
+                  'mutedbg text-bold': account.charttype === 'H',
+                  'account-row': true,
+                  'heading-account': account.charttype === 'H',
+                  'detail-account': account.charttype === 'A',
+                  'heading-row': account.charttype === 'H',
+                }"
               >
-                <!-- Show account number as plain text -->
+                <!-- Show account number as plain text with indentation -->
                 <q-item-section v-if="formData.l_accno" avatar>
-                  {{ account.accno }}
+                  <div :style="{ paddingLeft: getIndentation(account.level) }">
+                    <q-icon
+                      :name="getAccountIcon(account)"
+                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
+                      size="sm"
+                      class="q-mr-xs"
+                    />
+                    {{ account.accno }}
+                  </div>
                 </q-item-section>
-                <q-item-section>{{ account.description }}</q-item-section>
+                <!-- Description with indentation and clickable for headings -->
+                <q-item-section>
+                  <div
+                    :style="{
+                      paddingLeft:
+                        account.level > 0
+                          ? getIndentation(account.level)
+                          : '0px',
+                    }"
+                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
+                    @click="
+                      account.charttype === 'H'
+                        ? toggleHeading(account.accno)
+                        : null
+                    "
+                  >
+                    <div class="row items-center">
+                      <span>{{ account.description }}</span>
+                      <q-icon
+                        v-if="account.charttype === 'H'"
+                        :name="getHeadingIcon(account.accno)"
+                        size="sm"
+                        class="q-ml-xs"
+                        color="primary"
+                      />
+                    </div>
+                  </div>
+                </q-item-section>
                 <!-- For each period, render the expense amount as a clickable link if applicable -->
                 <q-item-section
                   v-for="period in results.periods"
@@ -461,84 +580,110 @@
                         <template
                           v-if="account.periods[period.label].amount < 0"
                         >
-                          {{
-                            formatAmount(
-                              Math.abs(account.periods[period.label].amount)
-                            )
-                          }}
+                          <span class="amount-negative">
+                            {{
+                              formatAmount(
+                                Math.abs(account.periods[period.label].amount)
+                              )
+                            }}
+                          </span>
                         </template>
                         <template
                           v-else-if="account.periods[period.label].amount > 0"
                         >
-                          {{
-                            formatAmount(-account.periods[period.label].amount)
-                          }}
+                          <span class="amount-negative">
+                            {{
+                              formatAmount(
+                                -account.periods[period.label].amount
+                              )
+                            }}
+                          </span>
                         </template>
                         <template v-else>
-                          {{ formatAmount(0) }}
+                          <span class="amount-zero">
+                            {{ formatAmount(0) }}
+                          </span>
                         </template>
                       </router-link>
                     </template>
                     <template v-else>
                       <template v-if="account.periods[period.label].amount < 0">
-                        {{
-                          formatAmount(
-                            Math.abs(account.periods[period.label].amount)
-                          )
-                        }}
+                        <span class="amount-negative">
+                          {{
+                            formatAmount(
+                              Math.abs(account.periods[period.label].amount)
+                            )
+                          }}
+                        </span>
                       </template>
                       <template
                         v-else-if="account.periods[period.label].amount > 0"
                       >
-                        {{
-                          formatAmount(-account.periods[period.label].amount)
-                        }}
+                        <span class="amount-negative">
+                          {{
+                            formatAmount(-account.periods[period.label].amount)
+                          }}
+                        </span>
                       </template>
                       <template v-else>
-                        {{ formatAmount(0) }}
+                        <span class="amount-zero">
+                          {{ formatAmount(0) }}
+                        </span>
                       </template>
                     </template>
                   </template>
                   <template v-else>-</template>
                 </q-item-section>
               </q-item>
-              <q-separator v-if="account.charttype === 'H'" />
+              <q-separator
+                v-if="shouldShowSeparator(account, index, expenseAccounts)"
+              />
             </template>
           </q-list>
           <!-- Expense Subtotal Row -->
-          <q-item class="q-pa-sm items-center">
-            <q-item-section v-if="formData.l_accno" avatar></q-item-section>
-            <q-item-section>{{ t("Total Expenses") }}</q-item-section>
+          <q-item class="q-pa-sm items-center total-row">
+            <q-item-section v-if="formData.l_accno" avatar>
+              <q-icon name="calculate" color="primary" />
+            </q-item-section>
+            <q-item-section class="text-bold">{{
+              t("Total Expenses")
+            }}</q-item-section>
             <q-item-section
               v-for="period in results.periods"
               :key="period.label"
               class="col text-right text-bold"
             >
-              <template v-if="sumAccounts(expenseAccounts, period.label) < 0">
-                {{
-                  formatAmount(
-                    Math.abs(sumAccounts(expenseAccounts, period.label))
-                  )
-                }}
-              </template>
-              <template
-                v-else-if="sumAccounts(expenseAccounts, period.label) > 0"
-              >
-                {{ formatAmount(-sumAccounts(expenseAccounts, period.label)) }}
-              </template>
-              <template v-else>
-                {{ formatAmount(0) }}
-              </template>
+              <span class="amount-negative">
+                <template v-if="sumAccounts(expenseAccounts, period.label) < 0">
+                  {{
+                    formatAmount(
+                      Math.abs(sumAccounts(expenseAccounts, period.label))
+                    )
+                  }}
+                </template>
+                <template
+                  v-else-if="sumAccounts(expenseAccounts, period.label) > 0"
+                >
+                  {{
+                    formatAmount(-sumAccounts(expenseAccounts, period.label))
+                  }}
+                </template>
+                <template v-else>
+                  {{ formatAmount(0) }}
+                </template>
+              </span>
             </q-item-section>
           </q-item>
         </div>
 
         <!-- Net Income Section -->
         <q-separator />
-        <q-item class="items-center q-my-none q-py-none text-bold">
-          <q-item-section v-if="formData.l_accno" avatar></q-item-section>
+        <q-item class="items-center q-my-none q-py-none net-income-row">
+          <q-item-section v-if="formData.l_accno" avatar>
+            <q-icon name="account_balance" color="primary" size="sm" />
+          </q-item-section>
           <q-item-section class="q-pa-sm">
-            {{ t("Income/(Loss)") }}:
+            {{ t("Net Income/(Loss)") }}:
           </q-item-section>
           <q-item-section
             v-for="period in results.periods"
@@ -546,10 +691,14 @@
             class="col text-right"
           >
             <template v-if="netIncome(period.label) < 0">
-              ({{ formatAmount(Math.abs(netIncome(period.label))) }})
+              <span class="amount-negative">
+                ({{ formatAmount(Math.abs(netIncome(period.label))) }})
+              </span>
             </template>
             <template v-else>
-              {{ formatAmount(netIncome(period.label)) }}
+              <span class="amount-positive">
+                {{ formatAmount(netIncome(period.label)) }}
+              </span>
             </template>
           </q-item-section>
         </q-item>
@@ -635,6 +784,7 @@ const currencies = ref([]);
 const filtersOpen = ref(true);
 const loading = ref(false);
 const results = ref({});
+const collapsedHeadings = ref(new Set()); // Track collapsed heading account numbers
 
 // =====================================================
 // Computed Properties
@@ -648,55 +798,202 @@ const formattedDateRange = computed(() => {
   return t("N/A");
 });
 
-// Compute income accounts from results
+/**
+ * Builds a hierarchical structure of accounts based on parent_accno relationships
+ * @param {Object} rawAccounts - Raw account data from API
+ * @param {Object} accountsInfo - Account metadata from API
+ * @param {string} type - 'I' for income, 'E' for expenses
+ * @returns {Array} Hierarchical array of accounts with levels
+ */
+const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
+  const accountMap = new Map();
+  const rootAccounts = [];
+
+  // First pass: create account objects and store in map
+  Object.keys(rawAccounts).forEach((accno) => {
+    const accountPeriods = rawAccounts[accno];
+    let periodsData = {};
+
+    Object.keys(accountPeriods).forEach((periodLabel) => {
+      if (accountPeriods[periodLabel][type]) {
+        periodsData[periodLabel] = accountPeriods[periodLabel][type];
+      }
+    });
+
+    if (Object.keys(periodsData).length > 0) {
+      const accountInfo = accountsInfo[accno] || {};
+      const account = {
+        accno,
+        description: accountInfo.description || "",
+        charttype: accountInfo.charttype || "A",
+        parent_accno: accountInfo.parent_accno || null,
+        periods: periodsData,
+        level: 0,
+        children: [],
+      };
+      accountMap.set(accno, account);
+    }
+  });
+
+  // Second pass: build parent-child relationships
+  accountMap.forEach((account) => {
+    if (account.parent_accno && accountMap.has(account.parent_accno)) {
+      const parent = accountMap.get(account.parent_accno);
+      parent.children.push(account);
+      account.level = parent.level + 1;
+    } else {
+      rootAccounts.push(account);
+    }
+  });
+
+  // Third pass: flatten the hierarchy while preserving order and levels
+  const flattenHierarchy = (accounts, result = []) => {
+    accounts.forEach((account) => {
+      result.push(account);
+      // Only include children if the heading is not collapsed
+      if (
+        account.children.length > 0 &&
+        !collapsedHeadings.value.has(account.accno)
+      ) {
+        flattenHierarchy(account.children, result);
+      }
+    });
+    return result;
+  };
+
+  return flattenHierarchy(rootAccounts);
+};
+
+// Compute income accounts from results with hierarchy
 const incomeAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].I) {
-        periodsData[periodLabel] = accountPeriods[periodLabel].I;
-      }
-    });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype: results.value.accounts?.[accno]?.charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
+  const accountsInfo = results.value.accounts || {};
+  return buildAccountHierarchy(rawAccounts, accountsInfo, "I");
 });
 
-// Compute expense accounts from results
+// Compute expense accounts from results with hierarchy
 const expenseAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
-  return Object.keys(rawAccounts).reduce((acc, accno) => {
-    const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel].E) {
-        periodsData[periodLabel] = accountPeriods[periodLabel].E;
-      }
-    });
-    if (Object.keys(periodsData).length > 0) {
-      acc.push({
-        accno,
-        description: results.value.accounts?.[accno]?.description,
-        charttype: results.value.accounts?.[accno]?.charttype,
-        periods: periodsData,
-      });
-    }
-    return acc;
-  }, []);
+  const accountsInfo = results.value.accounts || {};
+  return buildAccountHierarchy(rawAccounts, accountsInfo, "E");
 });
 
 // =====================================================
 // Helper Functions
 // =====================================================
+
+/**
+ * Generates CSS padding based on account level for indentation
+ * @param {number} level - Account hierarchy level
+ * @returns {string} CSS padding value
+ */
+const getIndentation = (level) => {
+  const basePadding = 16; // Base padding in pixels
+  const indentPerLevel = 24; // Additional padding per level
+  return `${basePadding + level * indentPerLevel}px`;
+};
+
+/**
+ * Determines if an account should show a separator line
+ * @param {Object} account - Account object
+ * @param {number} index - Account index in the list
+ * @param {Array} accounts - Full accounts array
+ * @returns {boolean} Whether to show separator
+ */
+const shouldShowSeparator = (account, index, accounts) => {
+  // Show separator after heading accounts
+  if (account.charttype === "H") {
+    return true;
+  }
+
+  // Show separator if next account is at a lower level (end of a group)
+  if (index < accounts.length - 1) {
+    const nextAccount = accounts[index + 1];
+    return nextAccount.level < account.level;
+  }
+
+  return false;
+};
+
+/**
+ * Gets the appropriate icon for an account based on its type and level
+ * @param {Object} account - Account object
+ * @returns {string} Icon name
+ */
+const getAccountIcon = (account) => {
+  if (account.charttype === "H") {
+    return "folder";
+  }
+  return "description";
+};
+
+/**
+ * Calculates the total for a specific account group (parent and its children)
+ * @param {Array} accounts - All accounts array
+ * @param {string} parentAccno - Parent account number
+ * @param {string} periodLabel - Period label
+ * @returns {number} Total amount for the group
+ */
+const getGroupTotal = (accounts, parentAccno, periodLabel) => {
+  return accounts.reduce((total, account) => {
+    if (account.parent_accno === parentAccno || account.accno === parentAccno) {
+      const amount = account.periods[periodLabel]?.amount || 0;
+      return total + amount;
+    }
+    return total;
+  }, 0);
+};
+
+/**
+ * Toggles the collapsed state of a heading account
+ * @param {string} accno - Account number to toggle
+ */
+const toggleHeading = (accno) => {
+  if (collapsedHeadings.value.has(accno)) {
+    collapsedHeadings.value.delete(accno);
+  } else {
+    collapsedHeadings.value.add(accno);
+  }
+};
+
+/**
+ * Checks if a heading account is collapsed
+ * @param {string} accno - Account number to check
+ * @returns {boolean} Whether the heading is collapsed
+ */
+const isHeadingCollapsed = (accno) => {
+  return collapsedHeadings.value.has(accno);
+};
+
+/**
+ * Gets the appropriate icon for a heading based on its collapsed state
+ * @param {string} accno - Account number
+ * @returns {string} Icon name
+ */
+const getHeadingIcon = (accno) => {
+  return isHeadingCollapsed(accno) ? "expand_more" : "expand_less";
+};
+
+/**
+ * Expands all heading accounts
+ */
+const expandAllHeadings = () => {
+  collapsedHeadings.value.clear();
+};
+
+/**
+ * Collapses all heading accounts
+ */
+const collapseAllHeadings = () => {
+  // Get all heading account numbers from both income and expense accounts
+  const allAccounts = [...incomeAccounts.value, ...expenseAccounts.value];
+  const headingAccounts = allAccounts.filter(
+    (account) => account.charttype === "H"
+  );
+  headingAccounts.forEach((account) => {
+    collapsedHeadings.value.add(account.accno);
+  });
+};
 
 /**
  * Updates a period object based on the current period mode.
@@ -1124,13 +1421,141 @@ const fetchLinks = async () => {
     border: none !important;
   }
 }
+
 .border-top {
   border-top: 2px solid #eee;
   padding-top: 1rem;
 }
+
 .drag-handle:hover {
   cursor: grab;
 }
+
+/* Account hierarchy styling */
+.account-row {
+  transition: background-color 0.2s ease;
+}
+
+.account-row:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.heading-account {
+  border-left: 4px solid var(--q-primary);
+  background-color: rgba(var(--q-primary), 0.05);
+  transition: background-color 0.2s ease;
+}
+
+.heading-account:hover {
+  background-color: rgba(var(--q-primary), 0.1);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Expand/collapse icon styling */
+.expand-icon {
+  transition: transform 0.2s ease;
+}
+
+.expand-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Target the expand/collapse icons specifically */
+.q-icon.expand-icon {
+  transition: transform 0.2s ease;
+}
+
+.q-icon.expand-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Heading row styling */
+.heading-row {
+  user-select: none;
+}
+
+.heading-row:hover .expand-icon {
+  opacity: 1;
+}
+
+/* Target all icons in heading rows for expand/collapse effect */
+.heading-row .q-icon {
+  transition: transform 0.2s ease;
+}
+
+.heading-row:hover .q-icon {
+  transform: scale(1.1);
+}
+
+.detail-account {
+  border-left: 2px solid #e0e0e0;
+}
+
+.detail-account:hover {
+  border-left-color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.02);
+}
+
+/* Indentation styling */
+.account-indent {
+  position: relative;
+}
+
+.account-indent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: #e0e0e0;
+  transform: translateY(-50%);
+}
+
+/* Amount styling - removed colors for better dark mode compatibility */
+.amount-positive {
+  font-weight: 500;
+}
+
+.amount-negative {
+  font-weight: 500;
+}
+
+.amount-zero {
+  color: #757575;
+}
+
+/* Section headers */
+.section-header {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  color: white;
+  padding: 12px 16px;
+  margin: 16px 0 8px 0;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Totals styling */
+.total-row {
+  background-color: #f5f5f5;
+  border-top: 2px solid var(--q-primary);
+  font-weight: 600;
+  color: #000 !important;
+}
+
+.net-income-row {
+  background-color: #e3f2fd;
+  border-top: 3px solid var(--q-primary);
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #000 !important;
+}
+
 @media (max-width: 600px) {
   .text-h4 {
     font-size: 1.5rem;
@@ -1140,6 +1565,15 @@ const fetchLinks = async () => {
   }
   .q-item {
     padding: 8px 16px;
+  }
+
+  .account-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .q-item-section {
+    margin-bottom: 4px;
   }
 }
 </style>
