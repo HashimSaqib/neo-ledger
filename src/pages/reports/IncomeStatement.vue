@@ -438,43 +438,17 @@
                         style="text-decoration: none"
                         class="maintext"
                       >
-                        <template
-                          v-if="account.periods[period.label].amount < 0"
-                        >
-                          <span class="amount-negative">
-                            {{
-                              formatAmount(
-                                Math.abs(account.periods[period.label].amount)
-                              )
-                            }}
-                          </span>
-                        </template>
-                        <template v-else>
-                          <span class="amount-positive">
-                            {{
-                              formatAmount(account.periods[period.label].amount)
-                            }}
-                          </span>
-                        </template>
+                        {{
+                          formatAmountCustom(
+                            account.periods[period.label].amount
+                          )
+                        }}
                       </router-link>
                     </template>
                     <template v-else>
-                      <template v-if="account.periods[period.label].amount < 0">
-                        <span class="amount-negative">
-                          {{
-                            formatAmount(
-                              Math.abs(account.periods[period.label].amount)
-                            )
-                          }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span class="amount-positive">
-                          {{
-                            formatAmount(account.periods[period.label].amount)
-                          }}
-                        </span>
-                      </template>
+                      {{
+                        formatAmountCustom(account.periods[period.label].amount)
+                      }}
                     </template>
                   </template>
                   <template v-else>-</template>
@@ -577,59 +551,17 @@
                         style="text-decoration: none"
                         class="maintext"
                       >
-                        <template
-                          v-if="account.periods[period.label].amount < 0"
-                        >
-                          <span class="amount-negative">
-                            {{
-                              formatAmount(
-                                Math.abs(account.periods[period.label].amount)
-                              )
-                            }}
-                          </span>
-                        </template>
-                        <template
-                          v-else-if="account.periods[period.label].amount > 0"
-                        >
-                          <span class="amount-negative">
-                            {{
-                              formatAmount(
-                                -account.periods[period.label].amount
-                              )
-                            }}
-                          </span>
-                        </template>
-                        <template v-else>
-                          <span class="amount-zero">
-                            {{ formatAmount(0) }}
-                          </span>
-                        </template>
+                        {{
+                          formatAmountCustom(
+                            account.periods[period.label].amount
+                          )
+                        }}
                       </router-link>
                     </template>
                     <template v-else>
-                      <template v-if="account.periods[period.label].amount < 0">
-                        <span class="amount-negative">
-                          {{
-                            formatAmount(
-                              Math.abs(account.periods[period.label].amount)
-                            )
-                          }}
-                        </span>
-                      </template>
-                      <template
-                        v-else-if="account.periods[period.label].amount > 0"
-                      >
-                        <span class="amount-negative">
-                          {{
-                            formatAmount(-account.periods[period.label].amount)
-                          }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span class="amount-zero">
-                          {{ formatAmount(0) }}
-                        </span>
-                      </template>
+                      {{
+                        formatAmountCustom(account.periods[period.label].amount)
+                      }}
                     </template>
                   </template>
                   <template v-else>-</template>
@@ -1168,6 +1100,13 @@ const sumAccounts = (accountsArray, periodLabel) => {
     const amount = account.periods[periodLabel]?.amount || 0;
     return sum + Number(amount);
   }, 0);
+};
+
+/**
+ * Custom amount formatting function to match Balance Sheet styling
+ */
+const formatAmountCustom = (value) => {
+  return formatAmount(value);
 };
 
 /**
