@@ -473,7 +473,11 @@
               class="col text-right text-bold"
             >
               <span class="amount-positive">
-                {{ formatAmount(sumAccounts(incomeAccounts, period.label)) }}
+                {{
+                  formatAmount(
+                    sumAllAccounts(completeIncomeAccounts, period.label)
+                  )
+                }}
               </span>
             </q-item-section>
           </q-item>
@@ -586,18 +590,28 @@
               class="col text-right text-bold"
             >
               <span class="amount-negative">
-                <template v-if="sumAccounts(expenseAccounts, period.label) < 0">
+                <template
+                  v-if="
+                    sumAllAccounts(completeExpenseAccounts, period.label) < 0
+                  "
+                >
                   {{
                     formatAmount(
-                      Math.abs(sumAccounts(expenseAccounts, period.label))
+                      Math.abs(
+                        sumAllAccounts(completeExpenseAccounts, period.label)
+                      )
                     )
                   }}
                 </template>
                 <template
-                  v-else-if="sumAccounts(expenseAccounts, period.label) > 0"
+                  v-else-if="
+                    sumAllAccounts(completeExpenseAccounts, period.label) > 0
+                  "
                 >
                   {{
-                    formatAmount(-sumAccounts(expenseAccounts, period.label))
+                    formatAmount(
+                      -sumAllAccounts(completeExpenseAccounts, period.label)
+                    )
                   }}
                 </template>
                 <template v-else>
@@ -796,6 +810,71 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
   return flattenHierarchy(rootAccounts);
 };
 
+/**
+ * Builds a complete hierarchical structure of accounts for total calculations
+ * This includes ALL accounts regardless of collapsed state
+ * @param {Object} rawAccounts - Raw account data from API
+ * @param {Object} accountsInfo - Account metadata from API
+ * @param {string} type - 'I' for income, 'E' for expenses
+ * @returns {Array} Complete hierarchical array of accounts with levels
+ */
+const buildCompleteAccountHierarchy = (rawAccounts, accountsInfo, type) => {
+  const accountMap = new Map();
+  const rootAccounts = [];
+
+  // First pass: create account objects and store in map
+  Object.keys(rawAccounts).forEach((accno) => {
+    const accountPeriods = rawAccounts[accno];
+    let periodsData = {};
+
+    Object.keys(accountPeriods).forEach((periodLabel) => {
+      if (accountPeriods[periodLabel][type]) {
+        periodsData[periodLabel] = accountPeriods[periodLabel][type];
+      }
+    });
+
+    if (Object.keys(periodsData).length > 0) {
+      const accountInfo = accountsInfo[accno] || {};
+      const account = {
+        accno,
+        description: accountInfo.description || "",
+        charttype: accountInfo.charttype || "A",
+        parent_accno: accountInfo.parent_accno || null,
+        periods: periodsData,
+        level: 0,
+        children: [],
+      };
+      accountMap.set(accno, account);
+    }
+  });
+
+  // Second pass: build parent-child relationships
+  accountMap.forEach((account) => {
+    if (account.parent_accno && accountMap.has(account.parent_accno)) {
+      const parent = accountMap.get(account.parent_accno);
+      parent.children.push(account);
+      account.level = parent.level + 1;
+    } else {
+      rootAccounts.push(account);
+    }
+  });
+
+  // Third pass: flatten the hierarchy while preserving order and levels
+  // This version includes ALL accounts regardless of collapsed state
+  const flattenHierarchy = (accounts, result = []) => {
+    accounts.forEach((account) => {
+      result.push(account);
+      // Include all children regardless of collapsed state
+      if (account.children.length > 0) {
+        flattenHierarchy(account.children, result);
+      }
+    });
+    return result;
+  };
+
+  return flattenHierarchy(rootAccounts);
+};
+
 // Compute income accounts from results with hierarchy
 const incomeAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
@@ -808,6 +887,19 @@ const expenseAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
   const accountsInfo = results.value.accounts || {};
   return buildAccountHierarchy(rawAccounts, accountsInfo, "E");
+});
+
+// Complete account hierarchies for total calculations (includes all accounts regardless of collapsed state)
+const completeIncomeAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  const accountsInfo = results.value.accounts || {};
+  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "I");
+});
+
+const completeExpenseAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  const accountsInfo = results.value.accounts || {};
+  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "E");
 });
 
 // =====================================================
@@ -1103,6 +1195,19 @@ const sumAccounts = (accountsArray, periodLabel) => {
 };
 
 /**
+ * Sums all accounts for a given period label, including collapsed accounts
+ * This is used for total calculations that should include all accounts regardless of display state
+ */
+const sumAllAccounts = (completeAccountsArray, periodLabel) => {
+  return completeAccountsArray.reduce((sum, account) => {
+    // Skip heading accounts (charttype 'H') when calculating totals
+    if (account.charttype === "H") return sum;
+    const amount = account.periods[periodLabel]?.amount || 0;
+    return sum + Number(amount);
+  }, 0);
+};
+
+/**
  * Custom amount formatting function to match Balance Sheet styling
  */
 const formatAmountCustom = (value) => {
@@ -1113,8 +1218,8 @@ const formatAmountCustom = (value) => {
  * Calculates net income (income + expenses) for a given period label.
  */
 const netIncome = (periodLabel) => {
-  const incomeSum = sumAccounts(incomeAccounts.value, periodLabel);
-  const expenseSum = sumAccounts(expenseAccounts.value, periodLabel);
+  const incomeSum = sumAllAccounts(completeIncomeAccounts.value, periodLabel);
+  const expenseSum = sumAllAccounts(completeExpenseAccounts.value, periodLabel);
   return incomeSum + expenseSum;
 };
 
@@ -1230,7 +1335,7 @@ const downloadExcel = () => {
 
   let incomeTotalRow = includeAccNo ? ["", "Total Income"] : ["Total Income"];
   periods.forEach((period) => {
-    const total = sumAccounts(incomeAccounts.value, period.label);
+    const total = sumAllAccounts(completeIncomeAccounts.value, period.label);
     incomeTotalRow.push(roundAmount(total));
   });
   exportData.push(incomeTotalRow);
@@ -1258,7 +1363,7 @@ const downloadExcel = () => {
     ? ["", "Total Expenses"]
     : ["Total Expenses"];
   periods.forEach((period) => {
-    const total = sumAccounts(expenseAccounts.value, period.label);
+    const total = sumAllAccounts(completeExpenseAccounts.value, period.label);
     expenseTotalRow.push(roundAmount(total));
   });
   exportData.push(expenseTotalRow);

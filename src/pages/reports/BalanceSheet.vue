@@ -363,15 +363,13 @@
                         : null
                     "
                   >
-                    <div class="account-description-row">
-                      <span class="account-description-text">{{
-                        account.description
-                      }}</span>
+                    <div class="row items-center">
+                      <span>{{ account.description }}</span>
                       <q-icon
                         v-if="account.charttype === 'H'"
                         :name="getHeadingIcon(account.accno)"
                         size="sm"
-                        class="account-description-icon expand-icon"
+                        class="q-ml-xs"
                         color="primary"
                       />
                     </div>
@@ -424,7 +422,11 @@
               :key="period.label"
               class="col text-right text-bold"
             >
-              {{ formatAmountCustom(sumAccounts(assetAccounts, period.label)) }}
+              {{
+                formatAmountCustom(
+                  sumAllAccounts(completeAssetAccounts, period.label)
+                )
+              }}
             </q-item-section>
           </q-item>
         </div>
@@ -479,15 +481,13 @@
                         : null
                     "
                   >
-                    <div class="account-description-row">
-                      <span class="account-description-text">{{
-                        account.description
-                      }}</span>
+                    <div class="row items-center">
+                      <span>{{ account.description }}</span>
                       <q-icon
                         v-if="account.charttype === 'H'"
                         :name="getHeadingIcon(account.accno)"
                         size="sm"
-                        class="account-description-icon expand-icon"
+                        class="q-ml-xs"
                         color="primary"
                       />
                     </div>
@@ -541,7 +541,9 @@
               class="col text-right text-bold"
             >
               {{
-                formatAmountCustom(sumAccounts(liabilityAccounts, period.label))
+                formatAmountCustom(
+                  sumAllAccounts(completeLiabilityAccounts, period.label)
+                )
               }}
             </q-item-section>
           </q-item>
@@ -594,15 +596,13 @@
                         : null
                     "
                   >
-                    <div class="account-description-row">
-                      <span class="account-description-text">{{
-                        account.description
-                      }}</span>
+                    <div class="row items-center">
+                      <span>{{ account.description }}</span>
                       <q-icon
                         v-if="account.charttype === 'H'"
                         :name="getHeadingIcon(account.accno)"
                         size="sm"
-                        class="account-description-icon expand-icon"
+                        class="q-ml-xs"
                         color="primary"
                       />
                     </div>
@@ -657,9 +657,9 @@
             >
               {{
                 formatAmountCustom(
-                  sumAccounts(assetAccounts, period.label) -
-                    sumAccounts(liabilityAccounts, period.label) -
-                    sumAccounts(equityAccounts, period.label)
+                  sumAllAccounts(completeAssetAccounts, period.label) -
+                    sumAllAccounts(completeLiabilityAccounts, period.label) -
+                    sumAllAccounts(completeEquityAccounts, period.label)
                 )
               }}
             </q-item-section>
@@ -679,8 +679,8 @@
             >
               {{
                 formatAmountCustom(
-                  sumAccounts(assetAccounts, period.label) -
-                    sumAccounts(liabilityAccounts, period.label)
+                  sumAllAccounts(completeAssetAccounts, period.label) -
+                    sumAllAccounts(completeLiabilityAccounts, period.label)
                 )
               }}
             </q-item-section>
@@ -700,9 +700,9 @@
             >
               {{
                 formatAmountCustom(
-                  sumAccounts(liabilityAccounts, period.label) +
-                    (sumAccounts(assetAccounts, period.label) -
-                      sumAccounts(liabilityAccounts, period.label))
+                  sumAllAccounts(completeLiabilityAccounts, period.label) +
+                    (sumAllAccounts(completeAssetAccounts, period.label) -
+                      sumAllAccounts(completeLiabilityAccounts, period.label))
                 )
               }}
             </q-item-section>
@@ -847,6 +847,71 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
   return flattenHierarchy(rootAccounts);
 };
 
+/**
+ * Builds a complete hierarchical structure of accounts for total calculations
+ * This includes ALL accounts regardless of collapsed state
+ * @param {Object} rawAccounts - Raw account data from API
+ * @param {Object} accountsInfo - Account metadata from API
+ * @param {string} type - 'A' for assets, 'L' for liabilities, 'Q' for equity
+ * @returns {Array} Complete hierarchical array of accounts with levels
+ */
+const buildCompleteAccountHierarchy = (rawAccounts, accountsInfo, type) => {
+  const accountMap = new Map();
+  const rootAccounts = [];
+
+  // First pass: create account objects and store in map
+  Object.keys(rawAccounts).forEach((accno) => {
+    const accountPeriods = rawAccounts[accno];
+    let periodsData = {};
+
+    Object.keys(accountPeriods).forEach((periodLabel) => {
+      if (accountPeriods[periodLabel][type]) {
+        periodsData[periodLabel] = accountPeriods[periodLabel][type];
+      }
+    });
+
+    if (Object.keys(periodsData).length > 0) {
+      const accountInfo = accountsInfo[accno] || {};
+      const account = {
+        accno,
+        description: accountInfo.description || "",
+        charttype: accountInfo.charttype || "A",
+        parent_accno: accountInfo.parent_accno || null,
+        periods: periodsData,
+        level: 0,
+        children: [],
+      };
+      accountMap.set(accno, account);
+    }
+  });
+
+  // Second pass: build parent-child relationships
+  accountMap.forEach((account) => {
+    if (account.parent_accno && accountMap.has(account.parent_accno)) {
+      const parent = accountMap.get(account.parent_accno);
+      parent.children.push(account);
+      account.level = parent.level + 1;
+    } else {
+      rootAccounts.push(account);
+    }
+  });
+
+  // Third pass: flatten the hierarchy while preserving order and levels
+  // This version includes ALL accounts regardless of collapsed state
+  const flattenHierarchy = (accounts, result = []) => {
+    accounts.forEach((account) => {
+      result.push(account);
+      // Include all children regardless of collapsed state
+      if (account.children.length > 0) {
+        flattenHierarchy(account.children, result);
+      }
+    });
+    return result;
+  };
+
+  return flattenHierarchy(rootAccounts);
+};
+
 /* ============================================================================
    Computed properties for each account group.
 ============================================================================ */
@@ -866,6 +931,25 @@ const equityAccounts = computed(() => {
   const rawAccounts = results.value[""] || {};
   const accountsInfo = results.value.accounts || {};
   return buildAccountHierarchy(rawAccounts, accountsInfo, "Q");
+});
+
+// Complete account hierarchies for total calculations (includes all accounts regardless of collapsed state)
+const completeAssetAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  const accountsInfo = results.value.accounts || {};
+  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "A");
+});
+
+const completeLiabilityAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  const accountsInfo = results.value.accounts || {};
+  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "L");
+});
+
+const completeEquityAccounts = computed(() => {
+  const rawAccounts = results.value[""] || {};
+  const accountsInfo = results.value.accounts || {};
+  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "Q");
 });
 
 /* ============================================================================
@@ -985,6 +1069,19 @@ const collapseAllHeadings = () => {
 ============================================================================ */
 const sumAccounts = (accountsArray, periodLabel) => {
   return accountsArray.reduce((sum, account) => {
+    // Skip heading accounts (charttype 'H') when calculating totals
+    if (account.charttype === "H") return sum;
+    const amount = account.periods[periodLabel]?.amount || 0;
+    return sum + Number(amount);
+  }, 0);
+};
+
+/**
+ * Sums all accounts for a given period label, including collapsed accounts
+ * This is used for total calculations that should include all accounts regardless of display state
+ */
+const sumAllAccounts = (completeAccountsArray, periodLabel) => {
+  return completeAccountsArray.reduce((sum, account) => {
     // Skip heading accounts (charttype 'H') when calculating totals
     if (account.charttype === "H") return sum;
     const amount = account.periods[periodLabel]?.amount || 0;
@@ -1281,7 +1378,7 @@ const downloadExcel = () => {
 
   let assetsTotalRow = ["Total Assets"];
   periods.forEach((period) => {
-    const total = sumAccounts(assetAccounts.value, period.label);
+    const total = sumAllAccounts(completeAssetAccounts.value, period.label);
     assetsTotalRow.push(roundAmountCustom(total));
   });
   exportData.push(assetsTotalRow);
@@ -1307,7 +1404,7 @@ const downloadExcel = () => {
 
   let liabilitiesTotalRow = ["Total Liabilities"];
   periods.forEach((period) => {
-    const total = sumAccounts(liabilityAccounts.value, period.label);
+    const total = sumAllAccounts(completeLiabilityAccounts.value, period.label);
     liabilitiesTotalRow.push(roundAmountCustom(total));
   });
   exportData.push(liabilitiesTotalRow);
@@ -1334,9 +1431,9 @@ const downloadExcel = () => {
   let currentEarningsRow = ["Current Earnings"];
   periods.forEach((period) => {
     const currentEarnings =
-      sumAccounts(assetAccounts.value, period.label) -
-      sumAccounts(liabilityAccounts.value, period.label) -
-      sumAccounts(equityAccounts.value, period.label);
+      sumAllAccounts(completeAssetAccounts.value, period.label) -
+      sumAllAccounts(completeLiabilityAccounts.value, period.label) -
+      sumAllAccounts(completeEquityAccounts.value, period.label);
     currentEarningsRow.push(roundAmountCustom(currentEarnings));
   });
   exportData.push(currentEarningsRow);
@@ -1344,8 +1441,8 @@ const downloadExcel = () => {
   let equityTotalRow = ["Total Equity"];
   periods.forEach((period) => {
     const totalEquity =
-      sumAccounts(assetAccounts.value, period.label) -
-      sumAccounts(liabilityAccounts.value, period.label);
+      sumAllAccounts(completeAssetAccounts.value, period.label) -
+      sumAllAccounts(completeLiabilityAccounts.value, period.label);
     equityTotalRow.push(roundAmountCustom(totalEquity));
   });
   exportData.push(equityTotalRow);
@@ -1354,9 +1451,9 @@ const downloadExcel = () => {
   let liabEquityTotalRow = ["Total Liabilities + Equity"];
   periods.forEach((period) => {
     const totalLiabEquity =
-      sumAccounts(liabilityAccounts.value, period.label) +
-      (sumAccounts(assetAccounts.value, period.label) -
-        sumAccounts(liabilityAccounts.value, period.label));
+      sumAllAccounts(completeLiabilityAccounts.value, period.label) +
+      (sumAllAccounts(completeAssetAccounts.value, period.label) -
+        sumAllAccounts(completeLiabilityAccounts.value, period.label));
     liabEquityTotalRow.push(roundAmountCustom(totalLiabEquity));
   });
   exportData.push(liabEquityTotalRow);
@@ -1538,92 +1635,13 @@ const fetchLinks = async () => {
   color: #000 !important;
 }
 
-/* Expand/collapse icon styling */
-.expand-icon {
-  transition: transform 0.2s ease;
-}
-
-.expand-icon:hover {
-  transform: scale(1.1);
-}
-
-/* Target the expand/collapse icons specifically */
-.q-icon.expand-icon {
-  transition: transform 0.2s ease;
-}
-
-.q-icon.expand-icon:hover {
-  transform: scale(1.1);
-}
-
 /* Heading row styling */
 .heading-row {
   user-select: none;
 }
 
-.heading-row:hover .expand-icon {
-  opacity: 1;
-}
-
-/* Target all icons in heading rows for expand/collapse effect */
-.heading-row .q-icon {
-  transition: transform 0.2s ease;
-}
-
-.heading-row:hover .q-icon {
-  transform: scale(1.1);
-}
-
 .cursor-pointer {
   cursor: pointer;
-}
-
-/* Ensure account description and icon stay on same line */
-.account-description-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  min-width: 0;
-  position: relative;
-}
-
-.account-description-text {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.account-description-icon {
-  flex-shrink: 0;
-  margin-left: 8px;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-/* Override Quasar's row items-center to prevent wrapping */
-.row.items-center {
-  flex-wrap: nowrap !important;
-}
-
-/* Ensure amounts are always aligned regardless of description indentation */
-.q-item-section.col.text-right {
-  padding-left: 0 !important;
-}
-
-/* Fix amount alignment by ensuring the description section doesn't affect amount positioning */
-.q-item-section:not(.col) {
-  min-width: 0;
-  flex: 1;
-}
-
-/* Ensure the description text doesn't push amounts out of alignment */
-.account-description-text {
-  display: inline-block;
-  max-width: calc(100% - 40px); /* Leave space for the icon */
 }
 
 @media (max-width: 600px) {
