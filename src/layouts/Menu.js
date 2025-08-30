@@ -151,6 +151,63 @@ export const menuLinks = [
     ],
   },
   {
+    title: "Orders & Quotations",
+    icon: "shopping_cart",
+    perm: "oe",
+    sublinks: [
+      {
+        title: "Postings",
+        sublinks: [
+          {
+            title: "Sales Order",
+            link: "/oe/order/customer",
+            perm: "customer.order",
+          },
+          {
+            title: "Purchase Order",
+            link: "/oe/order/vendor",
+            perm: "vendor.order",
+          },
+          {
+            title: "Quotation",
+            link: "/oe/quotation/customer",
+            perm: "customer.quotation",
+          },
+          {
+            title: "Request For Quotation",
+            link: "/oe/quotation/vendor",
+            perm: "vendor.quotation",
+          },
+        ],
+      },
+      {
+        title: "Reports",
+        sublinks: [
+          {
+            title: "Sales Order Reports",
+            link: "/oe/order/customer/reports",
+            perm: "customer.orders",
+          },
+          {
+            title: "Purchase Order Reports",
+            link: "/oe/order/vendor/reports",
+            perm: "vendor.orders",
+          },
+          {
+            title: "Quotation Reports",
+            link: "/oe/quotation/customer/reports",
+            perm: "customer.quotations",
+          },
+          {
+            title: "RFQ Reports",
+            link: "/oe/quotation/vendor/reports",
+            perm: "vendor.quotations",
+          },
+        ],
+      },
+    ],
+  },
+  {
     title: "POS",
     icon: "receipt",
     perm: "pos",

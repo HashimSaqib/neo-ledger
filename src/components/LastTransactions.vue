@@ -18,6 +18,20 @@
           </router-link>
         </q-td>
       </template>
+      <template v-slot:body-cell-quonumber="props">
+        <q-td :props="props">
+          <router-link :to="getPath(props.row)" class="text-primary">
+            {{ props.row.quonumber }}
+          </router-link>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-ordnumber="props">
+        <q-td :props="props">
+          <router-link :to="getPath(props.row)" class="text-primary">
+            {{ props.row.ordnumber }}
+          </router-link>
+        </q-td>
+      </template>
       <template v-slot:body-cell-invnumber="props">
         <q-td :props="props">
           <router-link :to="getPath(props.row)" class="text-primary">
@@ -58,6 +72,14 @@ const props = defineProps({
   invoice: {
     type: Boolean,
     default: false,
+  },
+  vc: {
+    type: String,
+    default: "",
+  },
+  oe_type: {
+    type: String,
+    default: "",
   },
 });
 
@@ -137,6 +159,41 @@ const columns = computed(() => {
       },
       { name: "paid", label: "Paid", field: "paid", align: "right" },
     ];
+  } else if (props.type === "oe") {
+    return [
+      {
+        name: props.oe_type === "quotation" ? "quonumber" : "ordnumber",
+        label: "Number",
+        field: props.oe_type === "quotation" ? "quonumber" : "ordnumber",
+        align: "left",
+      },
+      { name: "name", label: "Name", field: "name", align: "left" },
+
+      {
+        name: "description",
+        label: "Description",
+        field: "description",
+        align: "left",
+      },
+      {
+        name: "transdate",
+        label: "Transaction Date",
+        field: "transdate",
+        align: "left",
+      },
+      {
+        name: "department",
+        label: "Department",
+        field: "department",
+        align: "left",
+      },
+      {
+        name: "amount",
+        label: "Total Amount",
+        field: "amount",
+        align: "right",
+      },
+    ];
   }
   return [];
 });
@@ -145,7 +202,7 @@ const fetchTransactions = async () => {
   loading.value = true;
   try {
     const response = await api.get(
-      `/last_transactions/${props.type}?invoice=${props.invoice}`
+      `/last_transactions/${props.type}?invoice=${props.invoice}&vc=${props.vc}&oe_type=${props.oe_type}`
     );
     transactions.value = response.data;
   } catch (error) {
@@ -169,6 +226,30 @@ const getPath = (row) => {
     path = row.invoice
       ? createLink("vendor.invoice")
       : createLink("vendor.transaction");
+  } else if (
+    props.type === "oe" &&
+    props.oe_type === "quotation" &&
+    props.vc === "customer"
+  ) {
+    path = createLink("customer.quotation");
+  } else if (
+    props.type === "oe" &&
+    props.oe_type === "quotation" &&
+    props.vc === "vendor"
+  ) {
+    path = createLink("vendor.quotation");
+  } else if (
+    props.type === "oe" &&
+    props.oe_type === "order" &&
+    props.vc === "customer"
+  ) {
+    path = createLink("customer.order");
+  } else if (
+    props.type === "oe" &&
+    props.oe_type === "order" &&
+    props.vc === "vendor"
+  ) {
+    path = createLink("vendor.order");
   }
   return {
     path,

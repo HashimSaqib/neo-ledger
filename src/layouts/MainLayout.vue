@@ -147,6 +147,14 @@ const createLink = (link) => {
     path = `${base}/ic/add/part`;
   } else if (link === "service.add") {
     path = `${base}/ic/add/service`;
+  } else if (link === "customer.order") {
+    path = `${base}/oe/order/customer`;
+  } else if (link === "vendor.order") {
+    path = `${base}/oe/order/vendor`;
+  } else if (link === "customer.quotation") {
+    path = `${base}/oe/quotation/customer`;
+  } else if (link === "vendor.quotation") {
+    path = `${base}/oe/quotation/vendor`;
   }
 
   return path;

@@ -57,6 +57,8 @@ const BankAdjustmentConfirmation = () =>
   import("src/pages/cash/adjustments/Confirmation.vue");
 const UploadDocument = () => import("src/pages/arap/upload/UploadDocument.vue");
 const DocumentList = () => import("src/pages/arap/upload/DocumentList.vue");
+const OrderEntry = () => import("src/pages/oe/OrderEntry.vue");
+const OrderReports = () => import("src/pages/oe/OrderReports.vue");
 const routes = [
   {
     path: "/",
@@ -170,6 +172,44 @@ const routes = [
             return route.params.type === "customer"
               ? "customer.upload"
               : "vendor.upload";
+          },
+        },
+      },
+      // OE - Order Entry
+      {
+        path: "oe/:type/:vc",
+        component: OrderEntry,
+        props: (route) => ({ id: route.query.id }),
+        meta: {
+          permission: (route) => {
+            const type = route.params.type;
+            const vc = route.params.vc;
+            if (type === "order") {
+              return vc === "customer" ? "customer.order" : "vendor.order";
+            } else {
+              return vc === "customer"
+                ? "customer.quotation"
+                : "vendor.quotation";
+            }
+          },
+        },
+      },
+      {
+        path: "oe/:type/:vc/reports",
+        component: OrderReports,
+        meta: {
+          permission: (route) => {
+            const type = route.params.type;
+            const vc = route.params.vc;
+            if (type === "order") {
+              return vc === "customer"
+                ? "customer.orders"
+                : "vendor.orders";
+            } else {
+              return vc === "customer"
+                ? "customer.quotations"
+                : "vendor.quotations";
+            }
           },
         },
       },
