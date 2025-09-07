@@ -1,6 +1,6 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
-    <q-splitter v-model="splitterModel" class="full-width">
+    <q-splitter v-model="splitterModel" class="full-width" :limits="[40, 100]">
       <!-- Left Panel - Invoice Form -->
       <template v-slot:before>
         <div class="mainbg textmain q-pa-sm">
@@ -159,7 +159,9 @@
                 <FileList
                   :files="existingFiles"
                   module="gl"
+                  :preview="true"
                   @file-deleted="handleFileDeletion"
+                  @file-preview="handleFilePreview"
                 />
               </div>
               <div class="row" v-if="link">
@@ -537,12 +539,32 @@
             :label="t('Pending')"
             true-value="1"
             false-value="0"
-          />
+            :disable="isPendingDisabled"
+          >
+            <q-tooltip
+              v-if="isPendingDisabled && type === 'vendor' && aiHelpers"
+            >
+              {{ getPendingDisabledTooltip() }}
+            </q-tooltip>
+          </q-checkbox>
         </div>
+        <StationTransfer
+          v-if="
+            StationTransfer && type === 'vendor' && invId && stations.length > 0
+          "
+          :type="type"
+          :inv-id="invId"
+          :stations="stations"
+          :transferHistory="transfer_history"
+          :current-station-id="selectedTransferStation"
+          @transfer-success="handleTransferSuccess"
+          @refresh-invoice="handleRefreshInvoice"
+        />
+
         <div class="row">
           <LastTransactions
             :type="db"
-            class="col-12 col-lg-6"
+            class="col-12"
             ref="lastTransactionsRef"
           />
         </div>
@@ -551,33 +573,13 @@
       <!-- Right Panel - Invoice Preview -->
       <template v-slot:after>
         <div class="q-px-md">
-          <div v-if="invoicePreview">
-            <q-card flat bordered>
-              <q-card-section>
-                <div class="text-h6">{{ t("Invoice Preview") }}</div>
-              </q-card-section>
-              <q-card-section class="q-pt-none">
-                <q-img
-                  :src="invoicePreview"
-                  spinner-color="primary"
-                  fit="contain"
-                >
-                  <template v-slot:loading>
-                    <div class="text-center">
-                      <q-spinner-dots color="primary" size="40px" />
-                    </div>
-                  </template>
-                </q-img>
-              </q-card-section>
-            </q-card>
-          </div>
-          <div v-else class="text-center full-height flex flex-center">
-            <div class="text-grey-6">
-              <q-icon name="file_upload" size="48px" />
-              <div class="text-h6 q-mt-md">
-                {{ t("Upload an invoice to preview") }}
-              </div>
-            </div>
+          <div v-if="filePreviewUrl">
+            <iframe
+              :src="filePreviewUrl"
+              width="100%"
+              style="height: 90vh"
+              bg
+            ></iframe>
           </div>
         </div>
       </template>
@@ -619,6 +621,13 @@ import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import FileList from "src/components/FileList.vue";
 import LastTransactions from "src/components/LastTransactions.vue";
+
+// Import neoledger configuration
+import neoledgerConfig from "../../../neoledger.json";
+
+// AI plugin components (loaded conditionally)
+let StationTransfer = null;
+let aiHelpers = null;
 const lastTransactionsRef = ref(null);
 // -------------------------
 // Internationalization and Routing
@@ -659,7 +668,8 @@ if (type.value === "customer") {
 // UI and Form State
 // -------------------------
 const splitterModel = ref(100);
-const invoicePreview = ref(null);
+const invoicePreview = ref("null");
+const filePreviewUrl = ref(null);
 const loading = ref(false);
 const selectedFile = ref(null);
 const vcDialog = ref(false);
@@ -710,6 +720,7 @@ const link = ref("");
 
 const taxIncluded = ref(false);
 const invoiceTaxes = ref([]);
+const selectedTransferStation = ref(null);
 
 // -------------------------
 // Line Items Management
@@ -859,6 +870,44 @@ const total = computed(() => {
   return parseFloat(totalValue.toFixed(2));
 });
 
+const isPendingDisabled = computed(() => {
+  // explicitly access reactive values to establish dependency tracking
+  const typeValue = type.value;
+  const stationsValue = stations.value;
+  const allowedAllValue = allowed_all.value;
+  const allowedAmountValue = allowed_amount.value;
+  const totalValue = total.value;
+
+  if (aiHelpers) {
+    const result = aiHelpers.isPendingDisabled(
+      typeValue,
+      stationsValue,
+      allowedAllValue,
+      allowedAmountValue,
+      totalValue,
+      (value) => {
+        pending.value = value;
+      }
+    );
+    return result;
+  }
+
+  return false;
+});
+
+const getPendingDisabledTooltip = () => {
+  if (aiHelpers) {
+    return aiHelpers.getPendingDisabledTooltip(
+      stations.value,
+      allowed_amount.value,
+      t,
+      formatAmount
+    );
+  }
+
+  return "";
+};
+
 // -------------------------
 // Payment Management
 // -------------------------
@@ -952,6 +1001,10 @@ const filterProjects = () => {
   });
 };
 const connection = ref({});
+const stations = ref([]);
+const user_stations = ref({});
+const allowed_all = ref(false);
+const allowed_amount = ref(0);
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/${type.value}/`);
@@ -964,6 +1017,22 @@ const fetchLinks = async () => {
     taxes.value = response.data.tax_accounts;
     lockNumber.value = response.data.locknumber ? true : false;
     connection.value = response.data.connection;
+    // Only process workstation data if AI plugin is available
+    if (aiHelpers) {
+      stations.value = response.data.stations || null;
+      user_stations.value = response.data.user_stations || {};
+
+      const permissions = aiHelpers.processStationPermissions(
+        user_stations.value
+      );
+      allowed_all.value = permissions.allowed_all;
+      allowed_amount.value = permissions.allowed_amount;
+    } else {
+      stations.value = [];
+      user_stations.value = {};
+      allowed_all.value = false;
+      allowed_amount.value = 0;
+    }
   } catch (error) {
     console.error("Failed to fetch links:", error);
     Notify.create({
@@ -1075,10 +1144,12 @@ const resetForm = () => {
   invoiceTaxes.value = [];
   preserveApiTaxes.value = false;
   invoicePreview.value = null;
+  filePreviewUrl.value = null;
   selectedFile.value = null;
   splitterModel.value = 100;
   existingFiles.value = [];
   originaldate.value = null;
+  pending.value = "0";
 };
 const postInvoice = async () => {
   if (!selectedVc.value) {
@@ -1277,33 +1348,6 @@ async function deleteTransaction(id) {
     console.error(error);
   }
 }
-const uploadInvoice = async () => {
-  loading.value = true;
-  const formData = new FormData();
-  try {
-    const response = await api.post("/upload_invoice", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    Notify.create({
-      type: "positive",
-      message:
-        t("File uploaded successfully: ") + (response.data.message || ""),
-      position: "top-right",
-    });
-    splitterModel.value = 70;
-    invoicePreview.value = URL.createObjectURL(selectedFile.value);
-    loadInvoice(response.data);
-  } catch (error) {
-    console.error("Upload Error:", error);
-    Notify.create({
-      type: "negative",
-      message: t("File upload failed: Please try again"),
-      position: "center",
-    });
-  } finally {
-    loading.value = false;
-  }
-};
 
 const fetchInvoice = async (id) => {
   if (id) {
@@ -1317,6 +1361,7 @@ const fetchInvoice = async (id) => {
 };
 const files = ref([]);
 const existingFiles = ref([]);
+const transfer_history = ref([]);
 const loadInvoice = async (invoice) => {
   if (
     !vcList.value.length ||
@@ -1437,6 +1482,14 @@ const loadInvoice = async (invoice) => {
       paymentmethod_id.value = invoice.paymentmethod_id;
     }
     pending.value = invoice.pending || 0;
+    // Only process transfer history if AI plugin is available
+    if (aiHelpers) {
+      transfer_history.value = invoice.history || [];
+      selectedTransferStation.value = invoice.station_id || null;
+      console.log(selectedTransferStation.value);
+    } else {
+      transfer_history.value = [];
+    }
   } catch (error) {
     console.error("Error loading invoice:", error);
     Notify.create({
@@ -1452,6 +1505,21 @@ const loadInvoice = async (invoice) => {
 };
 const handleFileDeletion = (index) => {
   existingFiles.value.splice(index, 1);
+};
+
+const handleFilePreview = (link) => {
+  if (link.includes("drive.google.com/file/d/")) {
+    const fileIdMatch = link.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
+    if (fileIdMatch) {
+      filePreviewUrl.value = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+    } else {
+      filePreviewUrl.value = link;
+    }
+  } else {
+    filePreviewUrl.value = link;
+  }
+
+  splitterModel.value = 60;
 };
 
 // -------------------------
@@ -1684,6 +1752,7 @@ watch(
     taxIncluded.value = false;
     invoiceTaxes.value = [];
     preserveApiTaxes.value = false;
+    pending.value = "0";
 
     await fetchvcList();
     if (accounts.value.length > 0) {
@@ -1720,7 +1789,32 @@ const openItemAccounts = computed(() =>
   itemAccounts.value.filter((account) => account.closed === 0)
 );
 
-onMounted(() => {
+// Load AI plugin components conditionally
+const loadAIPluginComponents = async () => {
+  if (neoledgerConfig.ai_plugin) {
+    try {
+      const { default: StationTransferComponent } = await import(
+        "../../../ai_plugin/components/StationTransfer.vue"
+      );
+      const {
+        isPendingDisabled,
+        getPendingDisabledTooltip,
+        processStationPermissions,
+      } = await import("../../../ai_plugin/helpers.js");
+      StationTransfer = StationTransferComponent;
+      aiHelpers = {
+        isPendingDisabled,
+        getPendingDisabledTooltip,
+        processStationPermissions,
+      };
+    } catch (error) {
+      console.warn("Failed to load AI plugin components:", error);
+    }
+  }
+};
+
+onMounted(async () => {
+  await loadAIPluginComponents();
   fetchLinks();
   fetchAccounts();
   fetchCurrencies();
@@ -1768,6 +1862,18 @@ const printTransaction = async () => {
     });
     console.error("Error downloading invoice:", error);
     loading.value = false;
+  }
+};
+
+const handleTransferSuccess = () => {
+  if (lastTransactionsRef.value) {
+    lastTransactionsRef.value.fetchTransactions();
+  }
+};
+
+const handleRefreshInvoice = async () => {
+  if (invId.value) {
+    await fetchInvoice(invId.value);
   }
 };
 </script>

@@ -158,7 +158,7 @@ import { ref, onMounted, computed } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
-import { menuLinks } from "src/layouts/Menu.js";
+import { getMenuLinks } from "src/layouts/Menu.js";
 const { t } = useI18n();
 
 const datasets = ref([]);
@@ -173,7 +173,11 @@ const selectedDataset = ref(null);
 const selectedRole = ref({ id: null, description: "", acs: [] });
 
 // Build grouped access controls from menuLinks (recursive flattening for sublinks)
-const groupedAcs = computed(() => {
+const groupedAcs = ref([]);
+
+const computeGroupedAcs = async () => {
+  const menuLinks = await getMenuLinks();
+
   const flattenSublinks = (links) => {
     return links.flatMap((link) => {
       let items = [];
@@ -187,7 +191,7 @@ const groupedAcs = computed(() => {
     });
   };
 
-  return menuLinks.map((link) => {
+  groupedAcs.value = menuLinks.map((link) => {
     const groupPerm = link.perm || link.perl;
     const groupLabel = link.title;
     const subs = link.sublinks ? flattenSublinks(link.sublinks) : [];
@@ -198,7 +202,7 @@ const groupedAcs = computed(() => {
       subs: subs,
     };
   });
-});
+};
 
 // Group an array of access controls for display (chips with tooltips)
 const groupRowAcs = (acsArray) => {
@@ -239,8 +243,9 @@ const getDatasets = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   getDatasets();
+  await computeGroupedAcs();
 });
 
 // Open the role creation dialog for a given dataset

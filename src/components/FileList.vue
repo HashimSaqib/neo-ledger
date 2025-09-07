@@ -7,7 +7,13 @@
       :class="report ? 'q-pa-none' : ''"
     >
       <q-item-section>
-        <a :href="file.link" target="_blank">{{ file.name }}</a>
+        <a
+          :href="preview ? '#' : file.link"
+          :target="preview ? '_self' : '_blank'"
+          @click="preview ? handlePreview(file.link) : null"
+        >
+          {{ file.name }}
+        </a>
       </q-item-section>
       <q-item-section side v-if="!report">
         <q-btn
@@ -40,9 +46,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  preview: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["file-deleted"]);
+const emit = defineEmits(["file-deleted", "file-preview"]);
+
+const handlePreview = (link) => {
+  emit("file-preview", link);
+};
 
 const handleDelete = async (file, index) => {
   try {

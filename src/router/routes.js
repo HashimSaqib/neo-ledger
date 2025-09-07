@@ -59,429 +59,447 @@ const UploadDocument = () => import("src/pages/arap/upload/UploadDocument.vue");
 const DocumentList = () => import("src/pages/arap/upload/DocumentList.vue");
 const OrderEntry = () => import("src/pages/oe/OrderEntry.vue");
 const OrderReports = () => import("src/pages/oe/OrderReports.vue");
-const routes = [
-  {
-    path: "/",
-    component: () => import("src/pages/central/IndexPage.vue"),
-  },
-  {
-    path: "/client/:client",
-    component: MainLayout,
-    children: [
-      {
-        path: "",
-        component: () => import("src/pages/IndexPage.vue"),
-      },
-      // General Ledger
-      {
-        path: "gl/add-gl",
-        component: GeneralLedger,
-        props: (route) => ({ id: route.query.id }),
-        meta: { permission: "gl.add" },
-      },
-      {
-        path: "gl/reports",
-        component: GlTransactions,
-        meta: { permission: "gl.transactions" },
-      },
-      // ARAP
-      {
-        path: "arap/transaction/:type",
-        component: ArApTransaction,
-        props: (route) => ({ id: route.query.id }),
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.transaction"
-              : "vendor.transaction";
-          },
-        },
-      },
-      {
-        path: "arap/transactions/:type",
-        component: ArApTransactions,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.transactions"
-              : "vendor.transactions";
-          },
-        },
-      },
-      {
-        path: "arap/taxreport/:type",
-        component: TaxReport,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.taxreport"
-              : "vendor.taxreport";
-          },
-        },
-      },
-      {
-        path: "arap/batch/:type/invoice",
-        component: ArApBatch,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.batch"
-              : "vendor.batch";
-          },
-        },
-      },
-      {
-        path: "history/:type",
-        component: VcHistory,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.history"
-              : "vendor.history";
-          },
-        },
-      },
-      {
-        path: "arap/:type",
-        component: AddVC,
-        props: (route) => ({ id: route.query.id }),
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.add"
-              : "vendor.add";
-          },
-        },
-      },
-      {
-        path: "arap/search/:type",
-        component: SearchVC,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.search"
-              : "vendor.search";
-          },
-        },
-      },
-      {
-        path: "arap/upload/:type",
-        component: UploadDocument,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "customer"
-              ? "customer.upload"
-              : "vendor.upload";
-          },
-        },
-      },
-      // OE - Order Entry
-      {
-        path: "oe/:type/:vc",
-        component: OrderEntry,
-        props: (route) => ({ id: route.query.id }),
-        meta: {
-          permission: (route) => {
-            const type = route.params.type;
-            const vc = route.params.vc;
-            if (type === "order") {
-              return vc === "customer" ? "customer.order" : "vendor.order";
-            } else {
-              return vc === "customer"
-                ? "customer.quotation"
-                : "vendor.quotation";
-            }
-          },
-        },
-      },
-      {
-        path: "oe/:type/:vc/reports",
-        component: OrderReports,
-        meta: {
-          permission: (route) => {
-            const type = route.params.type;
-            const vc = route.params.vc;
-            if (type === "order") {
-              return vc === "customer"
-                ? "customer.orders"
-                : "vendor.orders";
-            } else {
-              return vc === "customer"
-                ? "customer.quotations"
-                : "vendor.quotations";
-            }
-          },
-        },
-      },
-      {
-        path: "arap/upload/list",
-        component: DocumentList,
-        meta: { permission: "document.list" },
-      },
-      {
-        path: "ar/sales-invoice",
-        component: SalesInvoice,
-        props: (route) => ({ id: route.query.id }),
-        meta: {
-          permission: (route) => {
-            return route.query.credit_invoice === "1"
-              ? "customer.invoice_return"
-              : "customer.invoice";
-          },
-        },
-      },
-      {
-        path: "ar/reminder",
-        component: ArReminder,
-        meta: { permission: "customer.reminder" },
-      },
-      {
-        path: "ar/consolidate-invoices",
-        component: ConsolidateInvoices,
-        meta: { permission: "customer.consolidate" },
-      },
-      {
-        path: "pos/sale",
-        component: PointOfSale,
-        props: (route) => ({ id: route.query.id }),
-        meta: { permission: "pos.sale" },
-      },
-      {
-        path: "ap/vendor-invoice",
-        component: VendorInvoice,
-        props: (route) => ({ id: route.query.id }),
-        meta: { permission: "vendor.invoice" },
-      },
-      // Reports
-      {
-        path: "reports/trial_balance",
-        component: TrialBalance,
-        props: (route) => ({
-          from: route.query.fromdate,
-          to: route.query.todate,
-        }),
-        meta: { permission: "reports.trial" },
-      },
-      {
-        path: "reports/trial_transactions",
-        component: TrialTransactions,
-        props: (route) => ({
-          accno: route.query.accno,
-          from: route.query.fromdate,
-          to: route.query.todate,
-        }),
-        meta: {
-          permission: () => {
-            return ["reports.income", "reports.trial"];
-          },
-        },
-      },
-      {
-        path: "reports/income_statement",
-        component: IncomeStatement,
-        meta: { permission: "reports.income" },
-      },
-      {
-        path: "reports/balance_sheet",
-        component: BalanceSheet,
-        meta: { permission: "reports.balance" },
-      },
-      {
-        path: "reports/all_taxes",
-        component: AllTaxes,
-        meta: { permission: "reports.alltaxes" },
-      },
 
-      // Goods & Services
-      {
-        path: "ic/add/:type",
-        component: AddPart,
-        meta: {
-          permission: (route) => {
-            return route.params.type === "part"
-              ? "items.part"
-              : "items.service";
-          },
-        },
-      },
-      {
-        path: "ic/search/:type",
-        component: SearchPart,
-        meta: {
-          permission: (route) => {
-            if (route.params.type === "allitems")
-              return "items.search.allitems";
-            if (route.params.type === "parts") return "items.search.parts";
-            if (route.params.type === "services")
-              return "items.search.services";
-            return null;
-          },
-        },
-      },
-      // System Settings
-      {
-        path: "system/currencies",
-        component: SysCurrencies,
-        meta: { permission: "system.currencies" },
-      },
-      {
-        path: "system/defaults",
-        component: SysDefaults,
-        meta: { permission: "system.defaults" },
-      },
-      {
-        path: "system/ai_prompts",
-        component: SysAiPrompts,
-        meta: { permission: "ai.prompts" },
-      },
-      {
-        path: "system/bank",
-        component: BankAccounts,
-        meta: { permission: "system.bank" },
-      },
-      {
-        path: "system/chart/list",
-        component: ListAccounts,
-        meta: { permission: "system.chart.list" },
-      },
-      {
-        path: "system/chart/addaccount",
-        component: AddAccount,
-        meta: { permission: "system.chart.add" },
-      },
-      {
-        path: "system/chart/gifi",
-        component: GIFI,
-        meta: { permission: "system.chart.gifi" },
-      },
-      {
-        path: "system/departments",
-        component: ListDepartments,
-        meta: { permission: "system.departments" },
-      },
-      {
-        path: "system/projects",
-        component: ListProjects,
-        meta: { permission: "system.projects" },
-      },
-      {
-        path: "cash/reconciliation",
-        component: Reconciliation,
-        meta: { permission: "cash.recon" },
-      },
-      {
-        path: "cash/payment/:vc",
-        component: Payments,
-        meta: {
-          permission: (route) => {
-            return route.params.vc === "customer"
-              ? "cash.receipts"
-              : "cash.payments";
-          },
-        },
-      },
-      {
-        path: "cash/report/:vc",
-        component: PaymentsReport,
-        meta: {
-          permission: (route) => {
-            return route.params.vc === "customer"
-              ? "cash.report.customer"
-              : "cash.report.vendor";
-          },
-        },
-      },
-      {
-        path: "system/roles",
-        component: Roles,
-        meta: { permission: "system.user.roles" },
-      },
-      {
-        path: "system/employees",
-        component: Employees,
-        meta: { permission: "system.user.employees" },
-      },
-      {
-        path: "system/templates",
-        component: () => import("src/pages/system/Templates.vue"),
-        meta: { permission: "system.templates" },
-      },
-      {
-        path: "system/taxes",
-        component: Taxes,
-        meta: { permission: "system.taxes" },
-      },
-      {
-        path: "system/audit",
-        component: Audit,
-        meta: { permission: "system.audit" },
-      },
-      {
-        path: "system/batch",
-        component: Batch,
-        meta: { permission: "system.batch" },
-      },
-      {
-        path: "system/yearend",
-        component: YearEnd,
-        meta: { permission: "system.yearend" },
-      },
-      {
-        path: "import/bank",
-        component: BankImport,
-        meta: { permission: "import.bank" },
-      },
-      {
-        path: "import/:type",
-        component: Import,
-        meta: {
-          permission: (route) => {
-            return ["import." + route.params.type];
-          },
-        },
-      },
-      {
-        path: "bank-adjustments",
-        component: BankAdjustment,
-        meta: { permission: "bank.adjustments" },
-        name: "BankAdjustment",
-      },
-      {
-        path: "bank-adjustments/detail/:trans_id",
-        component: BankTransactionDetail,
-        meta: { permission: "bank.adjustments" },
-        name: "BankAdjustmentDetail",
-      },
-      {
-        path: "bank-adjustments/confirm/:trans_id",
-        component: BankAdjustmentConfirmation,
-        meta: { permission: "bank.adjustments" },
-        name: "BankAdjustmentConfirmation",
-      },
-    ],
-  },
-  {
-    path: "/connection",
-    component: Connections,
-  },
-  {
-    path: "/client/:client/login",
-    component: LoginPage,
-  },
-  {
-    path: "/login",
-    component: LoginPage,
-  },
+import neoledgerConfig from "../../neoledger.json";
 
-  {
-    path: "/signup",
-    component: SignUp,
-  },
-  // Catch-all for undefined routes
-  {
-    path: "/:catchAll(.*)*",
-    component: ErrorNotFound,
-  },
-];
+const getRoutes = async () => {
+  let pluginRoutes = [];
 
-export default routes;
+  if (neoledgerConfig.ai_plugin) {
+    try {
+      const { pluginRoutes: importedRoutes } = await import(
+        "../../ai_plugin/configs.js"
+      );
+      pluginRoutes = importedRoutes || [];
+    } catch (error) {
+      console.warn("Failed to load plugin routes:", error);
+    }
+  }
+
+  return [
+    {
+      path: "/",
+      component: () => import("src/pages/central/IndexPage.vue"),
+    },
+    {
+      path: "/client/:client",
+      component: MainLayout,
+      children: [
+        {
+          path: "",
+          component: () => import("src/pages/IndexPage.vue"),
+        },
+        // General Ledger
+        {
+          path: "gl/add-gl",
+          component: GeneralLedger,
+          props: (route) => ({ id: route.query.id }),
+          meta: { permission: "gl.add" },
+        },
+        {
+          path: "gl/reports",
+          component: GlTransactions,
+          meta: { permission: "gl.transactions" },
+        },
+        // ARAP
+        {
+          path: "arap/transaction/:type",
+          component: ArApTransaction,
+          props: (route) => ({ id: route.query.id }),
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.transaction"
+                : "vendor.transaction";
+            },
+          },
+        },
+        {
+          path: "arap/transactions/:type",
+          component: ArApTransactions,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.transactions"
+                : "vendor.transactions";
+            },
+          },
+        },
+        {
+          path: "arap/taxreport/:type",
+          component: TaxReport,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.taxreport"
+                : "vendor.taxreport";
+            },
+          },
+        },
+        {
+          path: "arap/batch/:type/invoice",
+          component: ArApBatch,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.batch"
+                : "vendor.batch";
+            },
+          },
+        },
+        {
+          path: "history/:type",
+          component: VcHistory,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.history"
+                : "vendor.history";
+            },
+          },
+        },
+        {
+          path: "arap/:type",
+          component: AddVC,
+          props: (route) => ({ id: route.query.id }),
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.add"
+                : "vendor.add";
+            },
+          },
+        },
+        {
+          path: "arap/search/:type",
+          component: SearchVC,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.search"
+                : "vendor.search";
+            },
+          },
+        },
+        {
+          path: "arap/upload/:type",
+          component: UploadDocument,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.upload"
+                : "vendor.upload";
+            },
+          },
+        },
+        // OE - Order Entry
+        {
+          path: "oe/:type/:vc",
+          component: OrderEntry,
+          props: (route) => ({ id: route.query.id }),
+          meta: {
+            permission: (route) => {
+              const type = route.params.type;
+              const vc = route.params.vc;
+              if (type === "order") {
+                return vc === "customer" ? "customer.order" : "vendor.order";
+              } else {
+                return vc === "customer"
+                  ? "customer.quotation"
+                  : "vendor.quotation";
+              }
+            },
+          },
+        },
+        {
+          path: "oe/:type/:vc/reports",
+          component: OrderReports,
+          meta: {
+            permission: (route) => {
+              const type = route.params.type;
+              const vc = route.params.vc;
+              if (type === "order") {
+                return vc === "customer" ? "customer.orders" : "vendor.orders";
+              } else {
+                return vc === "customer"
+                  ? "customer.quotations"
+                  : "vendor.quotations";
+              }
+            },
+          },
+        },
+        {
+          path: "arap/upload/list",
+          component: DocumentList,
+          meta: { permission: "document.list" },
+        },
+        {
+          path: "ar/sales-invoice",
+          component: SalesInvoice,
+          props: (route) => ({ id: route.query.id }),
+          meta: {
+            permission: (route) => {
+              return route.query.credit_invoice === "1"
+                ? "customer.invoice_return"
+                : "customer.invoice";
+            },
+          },
+        },
+        {
+          path: "ar/reminder",
+          component: ArReminder,
+          meta: { permission: "customer.reminder" },
+        },
+        {
+          path: "ar/consolidate-invoices",
+          component: ConsolidateInvoices,
+          meta: { permission: "customer.consolidate" },
+        },
+        {
+          path: "pos/sale",
+          component: PointOfSale,
+          props: (route) => ({ id: route.query.id }),
+          meta: { permission: "pos.sale" },
+        },
+        {
+          path: "ap/vendor-invoice",
+          component: VendorInvoice,
+          props: (route) => ({ id: route.query.id }),
+          meta: { permission: "vendor.invoice" },
+        },
+        // Reports
+        {
+          path: "reports/trial_balance",
+          component: TrialBalance,
+          props: (route) => ({
+            from: route.query.fromdate,
+            to: route.query.todate,
+          }),
+          meta: { permission: "reports.trial" },
+        },
+        {
+          path: "reports/trial_transactions",
+          component: TrialTransactions,
+          props: (route) => ({
+            accno: route.query.accno,
+            from: route.query.fromdate,
+            to: route.query.todate,
+          }),
+          meta: {
+            permission: () => {
+              return ["reports.income", "reports.trial"];
+            },
+          },
+        },
+        {
+          path: "reports/income_statement",
+          component: IncomeStatement,
+          meta: { permission: "reports.income" },
+        },
+        {
+          path: "reports/balance_sheet",
+          component: BalanceSheet,
+          meta: { permission: "reports.balance" },
+        },
+        {
+          path: "reports/all_taxes",
+          component: AllTaxes,
+          meta: { permission: "reports.alltaxes" },
+        },
+
+        // Goods & Services
+        {
+          path: "ic/add/:type",
+          component: AddPart,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "part"
+                ? "items.part"
+                : "items.service";
+            },
+          },
+        },
+        {
+          path: "ic/search/:type",
+          component: SearchPart,
+          meta: {
+            permission: (route) => {
+              if (route.params.type === "allitems")
+                return "items.search.allitems";
+              if (route.params.type === "parts") return "items.search.parts";
+              if (route.params.type === "services")
+                return "items.search.services";
+              return null;
+            },
+          },
+        },
+        // System Settings
+        {
+          path: "system/currencies",
+          component: SysCurrencies,
+          meta: { permission: "system.currencies" },
+        },
+        {
+          path: "system/defaults",
+          component: SysDefaults,
+          meta: { permission: "system.defaults" },
+        },
+        {
+          path: "system/ai_prompts",
+          component: SysAiPrompts,
+          meta: { permission: "ai.prompts" },
+        },
+        {
+          path: "system/bank",
+          component: BankAccounts,
+          meta: { permission: "system.bank" },
+        },
+        {
+          path: "system/chart/list",
+          component: ListAccounts,
+          meta: { permission: "system.chart.list" },
+        },
+        {
+          path: "system/chart/addaccount",
+          component: AddAccount,
+          meta: { permission: "system.chart.add" },
+        },
+        {
+          path: "system/chart/gifi",
+          component: GIFI,
+          meta: { permission: "system.chart.gifi" },
+        },
+        {
+          path: "system/departments",
+          component: ListDepartments,
+          meta: { permission: "system.departments" },
+        },
+        {
+          path: "system/projects",
+          component: ListProjects,
+          meta: { permission: "system.projects" },
+        },
+        {
+          path: "cash/reconciliation",
+          component: Reconciliation,
+          meta: { permission: "cash.recon" },
+        },
+        {
+          path: "cash/payment/:vc",
+          component: Payments,
+          meta: {
+            permission: (route) => {
+              return route.params.vc === "customer"
+                ? "cash.receipts"
+                : "cash.payments";
+            },
+          },
+        },
+        {
+          path: "cash/report/:vc",
+          component: PaymentsReport,
+          meta: {
+            permission: (route) => {
+              return route.params.vc === "customer"
+                ? "cash.report.customer"
+                : "cash.report.vendor";
+            },
+          },
+        },
+        {
+          path: "system/roles",
+          component: Roles,
+          meta: { permission: "system.user.roles" },
+        },
+        {
+          path: "system/employees",
+          component: Employees,
+          meta: { permission: "system.user.employees" },
+        },
+        {
+          path: "system/templates",
+          component: () => import("src/pages/system/Templates.vue"),
+          meta: { permission: "system.templates" },
+        },
+        {
+          path: "system/taxes",
+          component: Taxes,
+          meta: { permission: "system.taxes" },
+        },
+        {
+          path: "system/audit",
+          component: Audit,
+          meta: { permission: "system.audit" },
+        },
+        {
+          path: "system/batch",
+          component: Batch,
+          meta: { permission: "system.batch" },
+        },
+        {
+          path: "system/yearend",
+          component: YearEnd,
+          meta: { permission: "system.yearend" },
+        },
+        {
+          path: "import/bank",
+          component: BankImport,
+          meta: { permission: "import.bank" },
+        },
+        {
+          path: "import/:type",
+          component: Import,
+          meta: {
+            permission: (route) => {
+              return ["import." + route.params.type];
+            },
+          },
+        },
+        {
+          path: "bank-adjustments",
+          component: BankAdjustment,
+          meta: { permission: "bank.adjustments" },
+          name: "BankAdjustment",
+        },
+        {
+          path: "bank-adjustments/detail/:trans_id",
+          component: BankTransactionDetail,
+          meta: { permission: "bank.adjustments" },
+          name: "BankAdjustmentDetail",
+        },
+        {
+          path: "bank-adjustments/confirm/:trans_id",
+          component: BankAdjustmentConfirmation,
+          meta: { permission: "bank.adjustments" },
+          name: "BankAdjustmentConfirmation",
+        },
+        // Merge AI plugin routes
+        ...pluginRoutes,
+      ],
+    },
+    {
+      path: "/connection",
+      component: Connections,
+    },
+    {
+      path: "/client/:client/login",
+      component: LoginPage,
+    },
+    {
+      path: "/login",
+      component: LoginPage,
+    },
+
+    {
+      path: "/signup",
+      component: SignUp,
+    },
+    // Catch-all for undefined routes
+    {
+      path: "/:catchAll(.*)*",
+      component: ErrorNotFound,
+    },
+  ];
+};
+
+export default getRoutes;

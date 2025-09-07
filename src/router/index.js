@@ -5,9 +5,10 @@ import {
   createWebHistory,
   createWebHashHistory,
 } from "vue-router";
-import routes from "./routes";
+import getRoutes from "./routes";
 import { Cookies, LocalStorage, Notify } from "quasar";
-export default route(function () {
+export default route(async function () {
+  const routes = await getRoutes();
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,

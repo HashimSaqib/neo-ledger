@@ -1054,7 +1054,7 @@ import { ref, onMounted, computed, useTemplateRef } from "vue";
 import { api } from "src/boot/axios";
 import { Notify, Cookies, useQuasar, LocalStorage } from "quasar";
 import { useI18n } from "vue-i18n";
-import { menuLinks } from "src/layouts/Menu.js";
+import { getMenuLinks } from "src/layouts/Menu.js";
 import { useRouter } from "vue-router";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
@@ -1339,7 +1339,11 @@ const roleOptionsForEdit = computed(() => {
 });
 
 // Compute grouped access controls from menuLinks
-const groupedAcs = computed(() => {
+const groupedAcs = ref([]);
+
+const computeGroupedAcs = async () => {
+  const menuLinks = await getMenuLinks();
+
   const flattenSublinks = (links) => {
     return links.flatMap((link) => {
       let items = [];
@@ -1353,7 +1357,7 @@ const groupedAcs = computed(() => {
     });
   };
 
-  return menuLinks.map((link) => {
+  groupedAcs.value = menuLinks.map((link) => {
     const groupPerm = link.perm || link.perl;
     const groupLabel = link.title;
     const subs = link.sublinks ? flattenSublinks(link.sublinks) : [];
@@ -1364,7 +1368,7 @@ const groupedAcs = computed(() => {
       subs: subs,
     };
   });
-});
+};
 
 // Get invites for a specific dataset
 const getDatasetInvites = (datasetId) => {
@@ -1810,10 +1814,11 @@ const removeUserAccess = async () => {
 };
 
 const redirectUrl = ref();
-onMounted(() => {
+onMounted(async () => {
   getDatasets();
   connectionKeys();
   redirectUrl.value = window.location.origin;
+  await computeGroupedAcs();
 });
 
 // Open dialog to add a new role

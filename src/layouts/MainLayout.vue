@@ -70,7 +70,7 @@ import { useI18n } from "vue-i18n";
 import { useQuasar } from "quasar";
 import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
-import { menuLinks } from "src/layouts/Menu.js";
+import { getMenuLinks } from "src/layouts/Menu.js";
 import { Cookies, Dark, LocalStorage } from "quasar";
 
 const $q = useQuasar();
@@ -194,10 +194,10 @@ window.addEventListener("afterprint", () => {
 
 const filteredMenu = ref();
 
-// Create a filtering function to process menu links based on permissions.
-
 // Define the filterMenu function without parameters.
-const filterMenu = () => {
+const filterMenu = async () => {
+  const menuLinks = await getMenuLinks();
+
   let acs = LocalStorage.getItem(`${client}_acs`);
   try {
     acs = acs ? acs : [];
