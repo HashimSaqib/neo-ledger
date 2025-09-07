@@ -1793,17 +1793,21 @@ const openItemAccounts = computed(() =>
 const loadAIPluginComponents = async () => {
   if (neoledgerConfig.ai_plugin) {
     try {
+      const getStationTransferPath = () =>
+        "../../../ai_plugin/components/StationTransfer.vue";
+      const getHelpersPath = () => "../../../ai_plugin/helpers.js";
+
       const StationTransferModule = await import(
-        "../../../ai_plugin/components/StationTransfer.vue"
+        /* @vite-ignore */ getStationTransferPath()
       ).catch((error) => {
         return null;
       });
 
-      const helpersModule = await import("../../../ai_plugin/helpers.js").catch(
-        (error) => {
-          return null;
-        }
-      );
+      const helpersModule = await import(
+        /* @vite-ignore */ getHelpersPath()
+      ).catch((error) => {
+        return null;
+      });
 
       if (StationTransferModule && StationTransferModule.default) {
         StationTransfer = StationTransferModule.default;

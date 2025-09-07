@@ -6,7 +6,8 @@ const getMenuLinks = async () => {
 
   if (neoledgerConfig.ai_plugin) {
     try {
-      const module = await import("../../ai_plugin/configs.js").catch(
+      const getImportPath = () => "../../ai_plugin/configs.js";
+      const module = await import(/* @vite-ignore */ getImportPath()).catch(
         (error) => {
           return null;
         }

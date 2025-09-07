@@ -67,7 +67,8 @@ const loadPluginConfig = async () => {
     return { pluginRoutes: [], pluginMenu: [] };
   }
   try {
-    const module = await import("../../ai_plugin/configs.js");
+    const getImportPath = () => "../../ai_plugin/configs.js";
+    const module = await import(/* @vite-ignore */ getImportPath());
     return {
       pluginRoutes: module.pluginRoutes || [],
       pluginMenu: module.pluginMenu || [],
