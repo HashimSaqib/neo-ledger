@@ -62,19 +62,23 @@ const OrderReports = () => import("src/pages/oe/OrderReports.vue");
 
 import neoledgerConfig from "../../neoledger.json";
 
-const getRoutes = async () => {
-  let pluginRoutes = [];
-
-  if (neoledgerConfig.ai_plugin) {
-    try {
-      const { pluginRoutes: importedRoutes } = await import(
-        "../../ai_plugin/configs.js"
-      );
-      pluginRoutes = importedRoutes || [];
-    } catch (error) {
-      console.warn("Failed to load plugin routes:", error);
-    }
+const loadPluginConfig = async () => {
+  if (!neoledgerConfig.ai_plugin) {
+    return { pluginRoutes: [], pluginMenu: [] };
   }
+  try {
+    const module = await import("../../ai_plugin/configs.js");
+    return {
+      pluginRoutes: module.pluginRoutes || [],
+      pluginMenu: module.pluginMenu || [],
+    };
+  } catch (error) {
+    return { pluginRoutes: [], pluginMenu: [] };
+  }
+};
+
+const getRoutes = async () => {
+  const { pluginRoutes } = await loadPluginConfig();
 
   return [
     {

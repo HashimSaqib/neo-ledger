@@ -6,12 +6,17 @@ const getMenuLinks = async () => {
 
   if (neoledgerConfig.ai_plugin) {
     try {
-      const { pluginMenu: importedMenu } = await import(
-        "../../ai_plugin/configs.js"
+      const module = await import("../../ai_plugin/configs.js").catch(
+        (error) => {
+          return null;
+        }
       );
-      pluginMenu = importedMenu || [];
+
+      if (module && module.pluginMenu) {
+        pluginMenu = module.pluginMenu;
+      }
     } catch (error) {
-      console.warn("Failed to load AI plugin menu:", error);
+      pluginMenu = [];
     }
   }
 

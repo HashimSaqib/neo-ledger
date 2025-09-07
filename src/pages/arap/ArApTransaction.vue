@@ -1793,23 +1793,30 @@ const openItemAccounts = computed(() =>
 const loadAIPluginComponents = async () => {
   if (neoledgerConfig.ai_plugin) {
     try {
-      const { default: StationTransferComponent } = await import(
+      const StationTransferModule = await import(
         "../../../ai_plugin/components/StationTransfer.vue"
+      ).catch((error) => {
+        return null;
+      });
+
+      const helpersModule = await import("../../../ai_plugin/helpers.js").catch(
+        (error) => {
+          return null;
+        }
       );
-      const {
-        isPendingDisabled,
-        getPendingDisabledTooltip,
-        processStationPermissions,
-      } = await import("../../../ai_plugin/helpers.js");
-      StationTransfer = StationTransferComponent;
-      aiHelpers = {
-        isPendingDisabled,
-        getPendingDisabledTooltip,
-        processStationPermissions,
-      };
-    } catch (error) {
-      console.warn("Failed to load AI plugin components:", error);
-    }
+
+      if (StationTransferModule && StationTransferModule.default) {
+        StationTransfer = StationTransferModule.default;
+      }
+
+      if (helpersModule) {
+        aiHelpers = {
+          isPendingDisabled: helpersModule.isPendingDisabled,
+          getPendingDisabledTooltip: helpersModule.getPendingDisabledTooltip,
+          processStationPermissions: helpersModule.processStationPermissions,
+        };
+      }
+    } catch (error) {}
   }
 };
 
