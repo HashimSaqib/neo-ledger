@@ -402,110 +402,110 @@
             </div>
           </div>
         </div>
-
         <!-- Payments Section -->
-        <div class="mainbg q-my-md q-pa-md">
-          <div class="row q-mb-md">
-            <h6 class="q-my-none q-pa-none text-secondary">
-              {{ t("Payments") }}
-            </h6>
-            <q-btn
-              color="primary"
-              label-color="secondary"
-              icon="add"
-              dense
-              flat
-              :label="t('Add Line')"
-              @click="addPayment"
-              class="q-ml-md"
-            />
-          </div>
-          <div
-            v-for="(payment, index) in payments"
-            :key="index"
-            class="row q-mb-md justify-between"
-          >
-            <!-- Date field with inline ref and enter key -->
-            <q-input
-              outlined
-              v-model="payment.date"
-              :label="t('Date')"
-              class="q-mt-sm"
-              bg-color="input"
-              label-color="secondary"
-              dense
-              type="date"
-              :ref="(el) => (paymentDateRefs[index] = el)"
-              @keyup.enter="() => handlePaymentEnter(index)"
-            />
-            <q-input
-              outlined
-              v-model="payment.source"
-              :label="t('Source')"
-              class="q-mt-sm"
-              bg-color="input"
-              label-color="secondary"
-              dense
-              @keyup.enter="() => handlePaymentEnter(index)"
-            />
-            <q-input
-              outlined
-              v-model="payment.memo"
-              :label="t('Memo')"
-              class="q-mt-sm"
-              bg-color="input"
-              label-color="secondary"
-              dense
-              @keyup.enter="() => handlePaymentEnter(index)"
-            />
-            <fn-input
-              outlined
-              v-model="payment.amount"
-              :label="t('Amount')"
-              class="q-mt-sm"
-              label-color="secondary"
-              bg-color="input"
-              dense
-              @keyup.enter="() => handlePaymentEnter(index)"
-            />
-            <fn-input
-              v-if="selectedCurrency && selectedCurrency.rn != 1"
-              outlined
-              v-model="payment.exchangerate"
-              :label="t('Exhcnage Rate')"
-              class="q-mt-sm"
-              bg-color="input"
-              label-color="secondary"
-              dense
-              @keyup.enter="() => handlePaymentEnter(index)"
-            />
-            <s-select
-              outlined
-              v-model="payment.account"
-              :options="paymentAccounts"
-              :label="t('Account')"
-              option-label="label"
-              option-value="id"
-              label-color="secondary"
-              class="col-2 q-mt-sm"
-              :class="
-                selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
-              "
-              bg-color="input"
-              dense
-              search="label"
-              account
-            />
-            <q-btn
-              color="negative"
-              icon="delete"
-              dense
-              flat
-              @click="removePayment(index)"
-            />
+        <div class="mainbg textmain q-mt-md">
+          <div class="mainbg q-my-md q-pa-md">
+            <div class="row q-mb-md">
+              <h6 class="q-my-none q-pa-none text-secondary">
+                {{ t("Payments") }}
+              </h6>
+              <q-btn
+                color="primary"
+                label-color="secondary"
+                icon="add"
+                dense
+                flat
+                :label="t('Add Line')"
+                @click="addPayment"
+                class="q-ml-md"
+              />
+            </div>
+            <div
+              v-for="(payment, index) in payments"
+              :key="index"
+              class="row q-mb-md justify-between"
+            >
+              <!-- Date field with inline ref and enter key -->
+              <q-input
+                outlined
+                v-model="payment.date"
+                :label="t('Date')"
+                class="q-mt-sm"
+                bg-color="input"
+                label-color="secondary"
+                dense
+                type="date"
+                :ref="(el) => (paymentDateRefs[index] = el)"
+                @keyup.enter="() => handlePaymentEnter(index)"
+              />
+              <q-input
+                outlined
+                v-model="payment.source"
+                :label="t('Source')"
+                class="q-mt-sm"
+                bg-color="input"
+                label-color="secondary"
+                dense
+                @keyup.enter="() => handlePaymentEnter(index)"
+              />
+              <q-input
+                outlined
+                v-model="payment.memo"
+                :label="t('Memo')"
+                class="q-mt-sm"
+                bg-color="input"
+                label-color="secondary"
+                dense
+                @keyup.enter="() => handlePaymentEnter(index)"
+              />
+              <fn-input
+                outlined
+                v-model="payment.amount"
+                :label="t('Amount')"
+                class="q-mt-sm"
+                label-color="secondary"
+                bg-color="input"
+                dense
+                @keyup.enter="() => handlePaymentEnter(index)"
+              />
+              <fn-input
+                v-if="selectedCurrency && selectedCurrency.rn != 1"
+                outlined
+                v-model="payment.exchangerate"
+                :label="t('Exhcnage Rate')"
+                class="q-mt-sm"
+                bg-color="input"
+                label-color="secondary"
+                dense
+                @keyup.enter="() => handlePaymentEnter(index)"
+              />
+              <s-select
+                outlined
+                v-model="payment.account"
+                :options="paymentAccounts"
+                :label="t('Account')"
+                option-label="label"
+                option-value="id"
+                label-color="secondary"
+                class="col-2 q-mt-sm"
+                :class="
+                  selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
+                "
+                bg-color="input"
+                dense
+                search="label"
+                account
+              />
+              <q-btn
+                color="negative"
+                icon="delete"
+                dense
+                flat
+                @click="removePayment(index)"
+              />
+            </div>
           </div>
         </div>
-
         <!-- Action Buttons -->
         <div class="row q-my-sm">
           <q-btn
@@ -572,7 +572,7 @@
 
       <!-- Right Panel - Invoice Preview -->
       <template v-slot:after>
-        <div class="q-px-md">
+        <div class="q-px-none">
           <div v-if="filePreviewUrl">
             <iframe
               :src="filePreviewUrl"
@@ -1454,6 +1454,11 @@ const loadInvoice = async (invoice) => {
     ordNumber.value = "";
     poNumber.value = "";
     existingFiles.value = invoice.files;
+    console.log(invoice.files);
+    console.log(invoice.files[0].link);
+    if (route.query.preview == 1 && invoice.files.length > 0) {
+      handleFilePreview(invoice.files[0].link);
+    }
     if (invoice.payments && invoice.payments.length > 0) {
       payments.value = invoice.payments.map((payment) => ({
         date: payment.date || getTodayDate(),

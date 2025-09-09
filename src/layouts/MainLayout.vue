@@ -248,6 +248,8 @@ onMounted(() => {
   router.afterEach((to, from) => {
     if ($q.screen.lt.md) {
       leftDrawerOpen.value = false;
+    } else {
+      miniState.value = true;
     }
   });
 });
