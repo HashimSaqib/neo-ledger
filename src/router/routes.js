@@ -55,8 +55,6 @@ const BankTransactionDetail = () =>
   import("src/pages/cash/adjustments/BankTransactionDetail.vue");
 const BankAdjustmentConfirmation = () =>
   import("src/pages/cash/adjustments/Confirmation.vue");
-const UploadDocument = () => import("src/pages/arap/upload/UploadDocument.vue");
-const DocumentList = () => import("src/pages/arap/upload/DocumentList.vue");
 const OrderEntry = () => import("src/pages/oe/OrderEntry.vue");
 const OrderReports = () => import("src/pages/oe/OrderReports.vue");
 
@@ -186,17 +184,6 @@ const getRoutes = async () => {
             },
           },
         },
-        {
-          path: "arap/upload/:type",
-          component: UploadDocument,
-          meta: {
-            permission: (route) => {
-              return route.params.type === "customer"
-                ? "customer.upload"
-                : "vendor.upload";
-            },
-          },
-        },
         // OE - Order Entry
         {
           path: "oe/:type/:vc",
@@ -232,11 +219,6 @@ const getRoutes = async () => {
               }
             },
           },
-        },
-        {
-          path: "arap/upload/list",
-          component: DocumentList,
-          meta: { permission: "document.list" },
         },
         {
           path: "ar/sales-invoice",

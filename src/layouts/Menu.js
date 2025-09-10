@@ -452,28 +452,6 @@ const getMenuLinks = async () => {
       ],
     },
     {
-      title: "Document Management",
-      icon: "folder",
-      perm: "document_management",
-      sublinks: [
-        {
-          title: "Customer Upload",
-          link: "/arap/upload/customer",
-          perm: "customer.upload",
-        },
-        {
-          title: "Vendor Upload",
-          link: "/arap/upload/vendor",
-          perm: "vendor.upload",
-        },
-        {
-          title: "Document List",
-          link: "/arap/upload/list",
-          perm: "document.list",
-        },
-      ],
-    },
-    {
       title: "Import",
       perm: "import",
       icon: "file_present",
