@@ -58,23 +58,7 @@ const BankAdjustmentConfirmation = () =>
 const OrderEntry = () => import("src/pages/oe/OrderEntry.vue");
 const OrderReports = () => import("src/pages/oe/OrderReports.vue");
 
-import neoledgerConfig from "../../neoledger.json";
-
-const loadPluginConfig = async () => {
-  if (!neoledgerConfig.ai_plugin) {
-    return { pluginRoutes: [], pluginMenu: [] };
-  }
-  try {
-    const getImportPath = () => "../../ai_plugin/configs.js";
-    const module = await import(/* @vite-ignore */ getImportPath());
-    return {
-      pluginRoutes: module.pluginRoutes || [],
-      pluginMenu: module.pluginMenu || [],
-    };
-  } catch (error) {
-    return { pluginRoutes: [], pluginMenu: [] };
-  }
-};
+import { loadPluginConfig } from "../ai_plugin/index.js";
 
 const getRoutes = async () => {
   const { pluginRoutes } = await loadPluginConfig();

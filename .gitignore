@@ -34,4 +34,4 @@ yarn-error.log*
 .env.local*
 
 neoledger.json
-ai_plugin
+/src/ai_plugin

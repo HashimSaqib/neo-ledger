@@ -1,25 +1,8 @@
 // Import neoledger configuration
-import neoledgerConfig from "../../neoledger.json";
+import { loadPluginConfig } from "../ai_plugin/index.js";
 
 const getMenuLinks = async () => {
-  let pluginMenu = [];
-
-  if (neoledgerConfig.ai_plugin) {
-    try {
-      const getImportPath = () => "../../ai_plugin/configs.js";
-      const module = await import(/* @vite-ignore */ getImportPath()).catch(
-        (error) => {
-          return null;
-        }
-      );
-
-      if (module && module.pluginMenu) {
-        pluginMenu = module.pluginMenu;
-      }
-    } catch (error) {
-      pluginMenu = [];
-    }
-  }
+  const { pluginMenu } = await loadPluginConfig();
 
   const menuLinks = [
     {

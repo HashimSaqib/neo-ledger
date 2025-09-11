@@ -1799,8 +1799,8 @@ const loadAIPluginComponents = async () => {
   if (neoledgerConfig.ai_plugin) {
     try {
       const getStationTransferPath = () =>
-        "../../../ai_plugin/components/StationTransfer.vue";
-      const getHelpersPath = () => "../../../ai_plugin/helpers.js";
+        "src/ai_plugin/components/StationTransfer.vue";
+      const getHelpersPath = () => "src/ai_plugin/helpers.js";
 
       const StationTransferModule = await import(
         /* @vite-ignore */ getStationTransferPath()
