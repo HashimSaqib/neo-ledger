@@ -548,6 +548,7 @@
             </q-tooltip>
           </q-checkbox>
         </div>
+
         <StationTransfer
           v-if="
             StationTransfer && type === 'vendor' && invId && stations.length > 0
@@ -560,6 +561,8 @@
           @transfer-success="handleTransferSuccess"
           @refresh-invoice="handleRefreshInvoice"
         />
+
+        <AiPrompt v-if="AiPrompt && invId" :inv-id="invId" />
 
         <div class="row">
           <LastTransactions
@@ -627,6 +630,7 @@ import neoledgerConfig from "../../../neoledger.json";
 
 // AI plugin components (loaded conditionally)
 let StationTransfer = null;
+let AiPrompt = null;
 let aiHelpers = null;
 const lastTransactionsRef = ref(null);
 // -------------------------
@@ -1798,24 +1802,33 @@ const openItemAccounts = computed(() =>
 const loadAIPluginComponents = async () => {
   if (neoledgerConfig.ai_plugin) {
     try {
-      const getStationTransferPath = () =>
-        "src/ai_plugin/components/StationTransfer.vue";
-      const getHelpersPath = () => "src/ai_plugin/helpers.js";
-
       const StationTransferModule = await import(
-        /* @vite-ignore */ getStationTransferPath()
+        /* @vite-ignore */ "../../ai_plugin/components/StationTransfer.vue"
       ).catch((error) => {
+        console.warn("AI Plugin: StationTransfer component not available");
+        return null;
+      });
+
+      const AiPromptModule = await import(
+        /* @vite-ignore */ "../../ai_plugin/components/AiPrompt.vue"
+      ).catch((error) => {
+        console.warn("AI Plugin: AiPrompt component not available");
         return null;
       });
 
       const helpersModule = await import(
-        /* @vite-ignore */ getHelpersPath()
+        /* @vite-ignore */ "../../ai_plugin/helpers.js"
       ).catch((error) => {
+        console.warn("AI Plugin: Helpers module not available");
         return null;
       });
 
       if (StationTransferModule && StationTransferModule.default) {
         StationTransfer = StationTransferModule.default;
+      }
+
+      if (AiPromptModule && AiPromptModule.default) {
+        AiPrompt = AiPromptModule.default;
       }
 
       if (helpersModule) {
@@ -1825,7 +1838,9 @@ const loadAIPluginComponents = async () => {
           processStationPermissions: helpersModule.processStationPermissions,
         };
       }
-    } catch (error) {}
+    } catch (error) {
+      console.warn("AI Plugin: Error loading components", error);
+    }
   }
 };
 
