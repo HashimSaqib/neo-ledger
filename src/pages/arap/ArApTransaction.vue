@@ -1458,8 +1458,6 @@ const loadInvoice = async (invoice) => {
     ordNumber.value = "";
     poNumber.value = "";
     existingFiles.value = invoice.files;
-    console.log(invoice.files);
-    console.log(invoice.files[0].link);
     if (route.query.preview == 1 && invoice.files.length > 0) {
       handleFilePreview(invoice.files[0].link);
     }

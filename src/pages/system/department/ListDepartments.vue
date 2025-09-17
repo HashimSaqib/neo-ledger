@@ -70,6 +70,16 @@
             class="q-my-sm"
           />
 
+          <q-input
+            v-model="selectedDepartment.detail"
+            :label="t('Detail')"
+            outlined
+            dense
+            class="q-my-sm"
+            rows="2"
+            autogrow
+          />
+
           <!-- Radio group for Cost Center / Profit Center.
                Disable the option group if transactions is 1 -->
           <q-option-group
@@ -114,6 +124,7 @@ const isEditMode = ref(false);
 // For new department, transactions is not used.
 const selectedDepartment = ref({
   description: "",
+  detail: "",
   roleType: "", // Will be 'C' or 'P'
   id: null,
   transactions: 0,
@@ -125,6 +136,12 @@ const columns = [
     name: "description",
     label: t("Description"),
     field: "description",
+    align: "left",
+  },
+  {
+    name: "detail",
+    label: t("Detail"),
+    field: "detail",
     align: "left",
   },
   {
@@ -172,6 +189,7 @@ const isProfitCenter = (row) => row.role === "P";
 const openAddPopup = () => {
   selectedDepartment.value = {
     description: "",
+    detail: "",
     roleType: "",
     id: null,
     transactions: 0,
@@ -192,6 +210,7 @@ const openEditPopup = (department) => {
 
   selectedDepartment.value = {
     description: department.description,
+    detail: department.detail || "",
     roleType,
     id: department.id,
     transactions: department.transactions,
@@ -207,10 +226,11 @@ const saveDepartment = async () => {
     const role = selectedDepartment.value.roleType || "";
 
     if (isEditMode.value) {
-      // Update existing department: send id, description, and role
+      // Update existing department: send id, description, detail, and role
       await api.post(`/system/departments`, {
         id: selectedDepartment.value.id,
         description: selectedDepartment.value.description,
+        detail: selectedDepartment.value.detail,
         role: role,
       });
       Notify.create({
@@ -227,6 +247,7 @@ const saveDepartment = async () => {
       // Add new department: POST to /system/departments without id
       await api.post("/system/departments", {
         description: selectedDepartment.value.description,
+        detail: selectedDepartment.value.detail,
         role: role,
       });
       Notify.create({
