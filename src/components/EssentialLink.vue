@@ -1,12 +1,25 @@
 <template>
   <div>
-    <!-- For links without sublinks -->
+    <q-expansion-item
+      clickable
+      tag="a"
+      :to="props.link"
+      v-if="props.title == 'Dashboard'"
+      :icon="props.icon"
+      :label="t(props.title)"
+      text-color="maintext"
+      expand-icon="none"
+      active-class="maintext"
+    >
+    </q-expansion-item>
+
     <q-item
       clickable
       tag="a"
       :to="props.link"
-      v-if="!hasDropdown"
+      v-if="!hasDropdown && props.title != 'Dashboard'"
       class="q-pa-none"
+      :icon="props.icon"
     >
       <!-- Inner wrapper applies left padding without shifting on hover -->
       <div :style="innerStyle" class="row items-center">
@@ -162,3 +175,4 @@ function computeInnerStyle(depth) {
   };
 }
 </script>
+<style scoped></style>
