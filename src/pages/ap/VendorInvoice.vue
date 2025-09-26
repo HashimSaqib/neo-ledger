@@ -824,10 +824,10 @@ const partSaved = async () => {
 // =====================
 
 updateTitle("Vendor Invoice");
-if (route.query.credit_invoice) {
-  updateTitle("Credit Invoice");
+if (route.params.type === "debit_invoice") {
+  updateTitle("Debit Invoice");
 }
-const invType = ref(route.query.credit_invoice ? "credit_invoice" : "invoice");
+const invType = ref(route.params.type ? "debit_invoice" : "invoice");
 
 const templates = [
   { label: t("Invoice"), value: "vendor_invoice" },
@@ -1343,8 +1343,8 @@ const loadInvoice = async (invoice) => {
   invDate.value = invoice.invDate;
   dueDate.value = invoice.dueDate;
   poNumber.value = invoice.poNumber;
-  if (invType.value === "credit_invoice") {
-    updateTitle("Credit Invoice");
+  if (invType.value === "debit_invoice") {
+    updateTitle("Debit Invoice");
   }
   if (invoice.currency) {
     selectedCurrency.value = currencies.value.find(

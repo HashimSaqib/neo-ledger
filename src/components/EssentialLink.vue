@@ -9,7 +9,8 @@
       :label="t(props.title)"
       text-color="maintext"
       expand-icon="none"
-      active-class="maintext"
+      class="menu-link"
+      active-class="menu-link"
     >
     </q-expansion-item>
 
@@ -18,16 +19,16 @@
       tag="a"
       :to="props.link"
       v-if="!hasDropdown && props.title != 'Dashboard'"
-      class="q-pa-none"
+      class="q-pa-none menu-link"
       :icon="props.icon"
     >
       <!-- Inner wrapper applies left padding without shifting on hover -->
       <div :style="innerStyle" class="row items-center">
-        <q-item-section avatar v-if="props.icon" class="maintext">
+        <q-item-section avatar v-if="props.icon" class="menu-link">
           <q-icon :name="props.icon" />
         </q-item-section>
         <q-item-section>
-          <q-item-label class="maintext">
+          <q-item-label class="menu-link">
             {{ props.title }}
           </q-item-label>
         </q-item-section>
@@ -39,7 +40,8 @@
       v-if="hasDropdown"
       v-model="isExpanded"
       expand-separator
-      header-class="maintext"
+      active-class="menu-link"
+      class="menu-link"
       :icon="props.icon"
       :label="t(props.title)"
     >
@@ -57,7 +59,7 @@
             :style="computeInnerStyle(props.depth + 1)"
             class="row items-center"
           >
-            <q-item-section class="maintext">
+            <q-item-section class="menu-link">
               {{ sublink.title }}
             </q-item-section>
           </div>
@@ -68,7 +70,7 @@
           v-if="hasSubDropdown(sublink)"
           :key="'dropdown-' + index"
           expand-separator
-          header-class="maintext q-pa-none"
+          header-class="menu-link q-pa-none"
           content-class="q-pa-none"
           class="q-pa-none"
         >
@@ -175,4 +177,8 @@ function computeInnerStyle(depth) {
   };
 }
 </script>
-<style scoped></style>
+<style scoped>
+.menu-link {
+  font-weight: 600;
+}
+</style>

@@ -21,22 +21,22 @@ const getMenuLinks = async () => {
           sublinks: [
             {
               title: "Customer Transaction",
-              link: "/arap/transaction/customer",
+              link: "/arap/transaction/customer/transaction",
               perm: "customer.transaction",
             },
             {
               title: "Sales Invoice",
-              link: "/ar/sales-invoice",
+              link: "/ar/sales-invoice/invoice",
               perm: "customer.invoice",
             },
             {
               title: "Credit Transaction",
-              link: "/arap/transaction/customer?reverse=1",
+              link: "/arap/transaction/customer/reverse",
               perm: "customer.transaction_return",
             },
             {
               title: "Credit Invoice",
-              link: "/ar/sales-invoice?credit_invoice=1",
+              link: "/ar/sales-invoice/credit_invoice",
               perm: "customer.invoice_return",
             },
 
@@ -104,22 +104,22 @@ const getMenuLinks = async () => {
           sublinks: [
             {
               title: "Vendor Transaction",
-              link: "/arap/transaction/vendor",
+              link: "/arap/transaction/vendor/transaction",
               perm: "vendor.transaction",
             },
             {
               title: "Vendor Invoice",
-              link: "/ap/vendor-invoice",
+              link: "/ap/vendor-invoice/invoice",
               perm: "vendor.invoice",
             },
             {
               title: "Debit Transaction",
-              link: "/arap/transaction/vendor?reverse=1",
+              link: "/arap/transaction/vendor/reverse",
               perm: "vendor.transaction_return",
             },
             {
               title: "Debit Invoice",
-              link: "/ap/vendor-invoice?debit_invoice=1",
+              link: "/ap/vendor-invoice/debit_invoice",
               perm: "vendor.invoice_return",
             },
             {

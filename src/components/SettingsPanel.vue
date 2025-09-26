@@ -3,7 +3,7 @@
   <q-expansion-item
     icon="settings"
     :label="$t('Settings')"
-    class="settings-panel mainbg"
+    class="settings-panel menu-link"
     dense-toggle
     expand-separator
   >
@@ -15,6 +15,7 @@
         </q-item-section>
         <q-item-section>
           <q-toggle
+            class="menu-link"
             v-model="$q.dark.isActive"
             @update:model-value="setTheme"
             :label="$t($q.dark.isActive ? 'Dark Mode' : 'Light Mode')"
@@ -37,7 +38,8 @@
             @update:model-value="switchLanguage"
             outlined
             :label="$t('Language')"
-            class="q-px-none"
+            class="q-px-none menu-link"
+            bg-color="input"
           >
             <template v-slot:option="{ itemProps, opt }">
               <q-item v-bind="itemProps" clickable @click="switchLanguage(opt)">
@@ -57,6 +59,7 @@
           <q-select
             v-model="selectedNumberFormat"
             :options="numberFormats"
+            bg-color="input"
             dense
             options-dense
             @update:model-value="handleNumberFormatChange"
@@ -100,7 +103,7 @@
       </div>
 
       <!-- Logout Button -->
-      <q-separator spaced />
+      <q-separator spaced color="grey-5" />
       <q-item clickable v-ripple @click="handleLogout" class="text-negative">
         <q-item-section avatar>
           <q-icon name="logout" color="negative" />

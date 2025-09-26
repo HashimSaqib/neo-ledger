@@ -90,7 +90,7 @@ const getRoutes = async () => {
         },
         // ARAP
         {
-          path: "arap/transaction/:type",
+          path: "arap/transaction/:type/:reverse",
           component: ArApTransaction,
           props: (route) => ({ id: route.query.id }),
           meta: {
@@ -205,12 +205,12 @@ const getRoutes = async () => {
           },
         },
         {
-          path: "ar/sales-invoice",
+          path: "ar/sales-invoice/:type",
           component: SalesInvoice,
           props: (route) => ({ id: route.query.id }),
           meta: {
             permission: (route) => {
-              return route.query.credit_invoice === "1"
+              return route.params.type === "credit_invoice"
                 ? "customer.invoice_return"
                 : "customer.invoice";
             },
@@ -233,11 +233,18 @@ const getRoutes = async () => {
           meta: { permission: "pos.sale" },
         },
         {
-          path: "ap/vendor-invoice",
+          path: "ap/vendor-invoice/:type",
           component: VendorInvoice,
           props: (route) => ({ id: route.query.id }),
-          meta: { permission: "vendor.invoice" },
+          meta: {
+            permission: (route) => {
+              return route.params.type === "debit_invoice"
+                ? "vendor.invoice_return"
+                : "vendor.invoice";
+            },
+          },
         },
+
         // Reports
         {
           path: "reports/trial_balance",

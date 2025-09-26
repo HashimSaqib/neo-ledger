@@ -652,7 +652,7 @@ const transactionType = ref("transaction");
 const db = ref("");
 if (type.value === "customer") {
   db.value = "ar";
-  if (reverse.value == 1) {
+  if (reverse.value == "reverse") {
     updateTitle("Credit Note");
     transactionType.value = "credit_note";
   } else {
@@ -660,7 +660,7 @@ if (type.value === "customer") {
   }
 } else {
   db.value = "ap";
-  if (reverse.value == 1) {
+  if (reverse.value == "reverse") {
     updateTitle("Debit Note");
     transactionType.value = "debit_note";
   } else {

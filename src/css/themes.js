@@ -1,5 +1,6 @@
 export const themes = {
   light: {
+    menubg: "#1F2937",
     primary: "#77c9d9",
     mainbg: "#ffffff",
     lightbg: "#f8f8f8",
@@ -10,9 +11,10 @@ export const themes = {
     mutedtext: "#eee",
   },
   dark: {
+    menubg: "#0B0F14",
     primary: "#77c9c8",
-    mainbg: "#1a1a1a",
-    lightbg: "#000000",
+    mainbg: "#141B24",
+    lightbg: "#11161D",
     mutedbg: "#333333",
     maintext: "#ffffff",
     secondary: "#ffffff",

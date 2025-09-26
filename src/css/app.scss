@@ -41,3 +41,23 @@
 .q-field__bottom {
   color: var(--q-maintext) !important;
 }
+
+@font-face {
+  font-family: 'Inter';
+  src: url('InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+body,
+.q-body,
+.q-page,
+.q-layout,
+.q-btn,
+.q-field__native,
+.q-input,
+.q-table {
+  font-family: 'Inter', sans-serif;
+}

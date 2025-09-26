@@ -27,7 +27,7 @@
       :show-if-above="$q.screen.gt.sm"
       :breakpoint="768"
       bordered
-      class="mainbg column"
+      class="column side-drawer"
       :mini="miniState && $q.screen.gt.sm"
       @mouseenter="handleDrawerMouseEnter"
       @mouseleave="handleDrawerMouseLeave"
@@ -128,13 +128,13 @@ const createLink = (link) => {
   } else if (link === "customer.pos") {
     path = `${base}/pos/sale`;
   } else if (link === "customer.invoice") {
-    path = `${base}/ar/sales-invoice`;
+    path = `${base}/ar/sales-invoice/invoice`;
   } else if (link === "customer.transaction") {
-    path = `${base}/arap/transaction/customer`;
+    path = `${base}/arap/transaction/customer/transaction`;
   } else if (link === "vendor.invoice") {
-    path = `${base}/ap/vendor-invoice`;
+    path = `${base}/ap/vendor-invoice/invoice`;
   } else if (link === "vendor.transaction") {
-    path = `${base}/arap/transaction/vendor`;
+    path = `${base}/arap/transaction/vendor/transaction`;
   } else if (link === "base") {
     path = `${base}`;
   } else if (link === "trial.transactions") {
@@ -299,3 +299,12 @@ const handleDrawerMouseLeave = (event) => {
   }, 100);
 };
 </script>
+<style>
+.side-drawer {
+  background-color: var(--q-menubg) !important;
+  color: #ffffff !important;
+}
+.menu-link {
+  font-weight: 600;
+}
+</style>

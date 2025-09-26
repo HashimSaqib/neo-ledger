@@ -1014,10 +1014,10 @@ const partSaved = async () => {
 // =====================
 
 updateTitle("Customer Invoice");
-if (route.query.credit_invoice) {
+if (route.params.type === "credit_invoice") {
   updateTitle("Credit Invoice");
 }
-const invType = ref(route.query.credit_invoice ? "credit_invoice" : "invoice");
+const invType = ref(route.params.type ? "credit_invoice" : "invoice");
 
 const templates = [
   { label: t("Invoice"), value: "invoice" },
