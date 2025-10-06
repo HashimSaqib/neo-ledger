@@ -83,6 +83,12 @@
         </q-item-section>
       </q-item>
 
+      <q-item clickable v-ripple @click="handleDatasetList" class="q-mb-sm">
+        <q-item-section avatar>
+          <q-icon name="list_alt" />
+        </q-item-section>
+        <q-item-section>{{ $t("Dataset List") }}</q-item-section>
+      </q-item>
       <div>
         <s-select
           v-model="selectedDb"
@@ -102,8 +108,9 @@
         </s-select>
       </div>
 
-      <!-- Logout Button -->
       <q-separator spaced color="grey-5" />
+
+      <!-- Logout Button -->
       <q-item clickable v-ripple @click="handleLogout" class="text-negative">
         <q-item-section avatar>
           <q-icon name="logout" color="negative" />
@@ -244,6 +251,11 @@ onMounted(() => {
     selectedNumberFormat.value = numberFormats[0];
   }
 });
+
+function handleDatasetList() {
+  // Navigate to dataset list page
+  router.push("/");
+}
 
 async function handleLogout() {
   Cookies.remove("client");

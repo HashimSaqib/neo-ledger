@@ -1,14 +1,14 @@
 <template>
-  <q-page class="q-pa-sm">
+  <q-page class="q-pa-md">
     <!-- Search Form Card -->
-    <q-form @submit.prevent class="q-pa-sm mainbg form no-print">
+    <q-form @submit.prevent class="q-pa-sm mainbg form no-print container">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
-        <div class="row q-gutter-md q-mb-md">
+        <div class="row q-gutter-md q-my-md">
           <div class="col-12 col-md-4">
             <q-input
               v-model="formData.fromdate"
@@ -54,31 +54,19 @@
           </div>
         </div>
 
-        <div class="row q-mt-md">
-          <q-btn
-            :label="t('Search')"
-            color="primary"
-            @click="search"
-            :loading="loading"
-            class="q-mr-sm"
-          />
+        <div class="row q-mt-md justify-end">
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>
     <div class="row q-mt-md">
-      <q-btn
-        :label="t('Export XL')"
-        color="accent"
+      <s-button
+        type="export-xl"
         @click="exportToExcel"
-        :disable="!hasResults"
+        v-if="hasResults"
         class="q-mr-sm"
       />
-      <q-btn
-        :label="t('Export PDF')"
-        color="info"
-        @click="exportToPDF"
-        :disable="!hasResults"
-      />
+      <s-button type="export-pdf" @click="exportToPDF" v-if="hasResults" />
     </div>
     <!-- Summary Table -->
     <div v-if="hasResults" class="q-mt-md">

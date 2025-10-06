@@ -1,12 +1,15 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
     <!-- Page title based on customer/vendor mode -->
-    <q-form @submit.prevent="search" class="q-px-md q-py-md mainbg hide-print">
+    <q-form
+      @submit.prevent="search"
+      class="q-px-md q-py-md mainbg hide-print container"
+    >
       <q-expansion-item
         label="Search Params"
         v-model="filtersOpen"
         expand-separator
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
       >
         <!-- Basic Info -->
@@ -143,14 +146,10 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="row q-mt-md">
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            class="q-mr-sm"
-          />
-          <q-btn :label="t('Clear')" @click="clearForm" />
+        <div class="row q-mt-md justify-end">
+          <s-button type="clear" @click="clearForm" class="q-mr-sm" />
+
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>
@@ -158,18 +157,8 @@
     <!-- Results Table -->
     <div v-if="processedResults.length" class="q-mt-lg">
       <div class="row q-mb-sm hide-print">
-        <q-btn
-          :label="t('Export')"
-          @click="downloadExcel"
-          class="q-mr-sm"
-          color="accent"
-        />
-        <q-btn
-          :label="t('Print')"
-          @click="createPDF"
-          class="q-mr-sm"
-          color="info"
-        />
+        <s-button type="export-xl" @click="downloadExcel" class="q-mr-sm" />
+        <s-button type="export-pdf" @click="createPDF" class="q-mr-sm" />
       </div>
       <q-table
         :rows="processedResults"

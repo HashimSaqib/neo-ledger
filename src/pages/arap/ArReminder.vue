@@ -1,9 +1,9 @@
 <template>
   <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg">
+    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg container">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
@@ -12,6 +12,7 @@
             :label="t('Customer')"
             :options="customers"
             v-model="formData.customer"
+            option-label="label"
             class="lightbg col-6 col-md-3"
             input-class="maintext"
             label-color="secondary"
@@ -37,13 +38,13 @@
             map-options
             search="description"
           />
-          <q-btn :label="t('Search')" color="primary" @click.prevent="search" />
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>
 
     <!-- Bulk Update Buttons (visible when one or more rows are selected) -->
-    <div class="row q-mb-sm hide-print" v-if="selected.length">
+    <div class="row q-my-md hide-print" v-if="selected.length">
       <q-btn
         :label="t('One Level Up')"
         @click="bulkUpdate('up')"
@@ -71,19 +72,9 @@
     </div>
 
     <!-- Export Buttons -->
-    <div class="row q-mb-sm hide-print" v-if="results.length > 0">
-      <q-btn
-        :label="t('Export')"
-        @click="downloadExcel"
-        class="q-mr-sm"
-        color="accent"
-      />
-      <q-btn
-        :label="t('Print')"
-        @click="downloadPDF"
-        class="q-mr-sm"
-        color="info"
-      />
+    <div class="row q-mb-md hide-print" v-if="results.length > 0">
+      <s-button type="export-xl" @click="downloadExcel" class="q-mr-sm" />
+      <s-button type="export-pdf" @click="downloadPDF" />
     </div>
 
     <!-- Transactions Table with Selection -->
@@ -139,12 +130,8 @@
       <!-- Actions Column (Print Button) -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn
-            dense
-            flat
-            color="primary"
-            icon="print"
-            :label="t('Print')"
+          <s-button
+            type="print"
             @click="printReminder(props.row)"
             :loading="props.row.printing"
           />

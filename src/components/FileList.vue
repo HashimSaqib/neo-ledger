@@ -1,5 +1,8 @@
 <template>
-  <q-list :bordered="!report" :separator="!report">
+  <q-list
+    :separator="!report"
+    style="background-color: var(--q-highlight); border-radius: 10px"
+  >
     <q-item
       v-for="(file, index) in files"
       :key="index"
@@ -79,3 +82,19 @@ const handleDelete = async (file, index) => {
   }
 };
 </script>
+
+<style scoped>
+a {
+  color: var(--q-maintext);
+  text-decoration: none;
+}
+
+a:visited {
+  color: var(--q-secondary);
+}
+
+a:hover {
+  color: var(--q-maintext);
+  text-decoration: underline;
+}
+</style>

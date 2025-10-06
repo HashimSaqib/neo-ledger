@@ -1,270 +1,250 @@
 <template>
-  <q-page class="lightbg q-pa-sm relative-position">
+  <q-page class="q-pa-md relative-position">
     <!-- Search form -->
-    <q-form @submit.prevent class="q-pa-sm mainbg form no-print">
+    <q-form @submit.prevent class="form no-print q-pa-none container">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
-        expand-icon-class="maintext"
+        header-class="container-bg"
+        expand-icon-class="maintext q-ma-none -bg q-pa-none"
         v-model="filtersOpen"
       >
-        <q-input
-          v-model="formData.reference"
-          class="lightbg q-my-md"
-          :label="t('Reference')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.description"
-          class="lightbg q-my-md"
-          :label="t('Description')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-
-        <s-select
-          v-if="customers.length > 0"
-          :options="customers"
-          option-label="label"
-          search="label"
-          option-value="name"
-          v-model="formData.customer"
-          class="lightbg q-my-md"
-          :label="t('Customer')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          clearable
-        />
-        <s-select
-          v-if="vendors.length > 0"
-          :options="vendors"
-          option-label="label"
-          search="label"
-          option-value="name"
-          v-model="formData.vendor"
-          class="lightbg q-my-md"
-          :label="t('Vendor')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          clearable
-        />
-        <q-input
-          v-model="formData.name"
-          class="lightbg q-my-md"
-          :label="t('Company Name')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <s-select
-          v-if="departments.length > 0"
-          :options="departments"
-          option-label="description"
-          search="description"
-          optionvalue="id"
-          v-model="formData.selectedDepartment"
-          class="lightbg q-my-md"
-          :label="t('Department')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          clearable
-        />
-        <s-select
-          v-if="projects.length > 0"
-          :options="projects"
-          option-label="description"
-          search="description"
-          optionvalue="id"
-          v-model="formData.selectedProject"
-          class="lightbg q-my-md"
-          :label="t('Project')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-          clearable
-        />
-        <q-input
-          v-model="formData.lineitem"
-          class="lightbg q-my-md"
-          :label="t('Line Item')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.source"
-          class="lightbg q-my-md"
-          :label="t('Source')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <q-input
-          v-model="formData.memo"
-          class="lightbg q-my-md"
-          :label="t('Memo')"
-          input-class="maintext"
-          label-color="secondary"
-          outlined
-          dense
-        />
-        <div class="row justify-between q-my-md">
-          <s-select
-            :options="accounts"
-            option-label="label"
-            option-value="accno"
-            v-model="formData.accnofrom"
-            class="lightbg col-5"
-            :label="t('Account Number From')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-            account
-          />
-          <s-select
-            :options="accounts"
-            option-label="label"
-            option-value="accno"
-            v-model="formData.accnoto"
-            :label="t('Account Number To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-            account
-          />
-        </div>
-
-        <div class="row justify-between q-my-md">
-          <q-input
-            v-model="formData.datefrom"
-            type="date"
-            :label="t('Date From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.dateto"
-            type="date"
-            :label="t('Date To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
-        <div class="row justify-between q-my-md">
-          <q-input
-            v-model="formData.createdfrom"
-            type="date"
-            :label="t('Created From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.createdto"
-            type="date"
-            :label="t('Created To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
-        <div class="row justify-between q-my-md">
-          <q-input
-            v-model="formData.updatedfrom"
-            type="date"
-            :label="t('Updated From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.updatedto"
-            type="date"
-            :label="t('Updated To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
-        <div class="row justify-between">
-          <q-input
-            v-model="formData.amountfrom"
-            type="number"
-            :label="t('Amount From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.amountto"
-            type="number"
-            :label="t('Amount To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-5"
-            outlined
-            dense
-          />
-        </div>
-        <div class="q-py-md justify-center align-items-center">
-          <q-checkbox
-            v-model="splitLedger"
-            :label="t('Split Ledger')"
-            size="2rem"
-          />
-          <draggable v-model="baseColumns" item-key="name" class="drag-area">
-            <template #item="{ element }">
-              <q-checkbox
-                size="2rem"
-                v-model="selectedColumns[element.name]"
-                :label="t(element.label)"
-                color="primary"
-                class="q-mr-md maintext"
+        <div class="q-pt-md q-mt-none">
+          <div class="flex-container">
+            <div class="container flex-container">
+              <text-input
+                v-model="formData.reference"
+                :label="t('Reference')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
               />
-            </template>
-          </draggable>
-
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            class="q-mt-md"
-            @click="search"
-          />
+              <text-input
+                v-model="formData.description"
+                class="flex-item"
+                :label="t('Description')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <s-select
+                v-if="customers.length > 0"
+                :options="customers"
+                option-label="label"
+                search="label"
+                option-value="name"
+                v-model="formData.customer"
+                :label="t('Customer')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+                clearable
+              />
+              <s-select
+                v-if="vendors.length > 0"
+                :options="vendors"
+                option-label="label"
+                search="label"
+                option-value="name"
+                v-model="formData.vendor"
+                :label="t('Vendor')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+                clearable
+              />
+              <text-input
+                v-model="formData.name"
+                :label="t('Company Name')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <s-select
+                v-if="departments.length > 0"
+                :options="departments"
+                option-label="description"
+                search="description"
+                optionvalue="id"
+                v-model="formData.selectedDepartment"
+                :label="t('Department')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+                clearable
+              />
+              <s-select
+                v-if="projects.length > 0"
+                :options="projects"
+                option-label="description"
+                search="description"
+                optionvalue="id"
+                v-model="formData.selectedProject"
+                :label="t('Project')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+                clearable
+              />
+              <text-input
+                v-model="formData.lineitem"
+                :label="t('Line Item')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <text-input
+                v-model="formData.source"
+                :label="t('Source')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <text-input
+                v-model="formData.memo"
+                :label="t('Memo')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <text-input
+                v-model="formData.amountfrom"
+                type="number"
+                :label="t('Amount From')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <text-input
+                v-model="formData.amountto"
+                type="number"
+                :label="t('Amount To')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <s-select
+                :options="accounts"
+                option-label="label"
+                option-value="accno"
+                v-model="formData.accnofrom"
+                :label="t('Account Number From')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+                account
+              />
+              <s-select
+                :options="accounts"
+                option-label="label"
+                option-value="accno"
+                v-model="formData.accnoto"
+                :label="t('Account Number To')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+                account
+              />
+            </div>
+            <div>
+              <div class="container">
+                <div class="flex-container q-my-md">
+                  <text-input
+                    v-model="formData.datefrom"
+                    type="date"
+                    :label="t('Date From')"
+                    input-class="maintext"
+                    label-color="secondary"
+                    outlined
+                    dense
+                  />
+                  <text-input
+                    v-model="formData.dateto"
+                    type="date"
+                    :label="t('Date To')"
+                    input-class="maintext"
+                    label-color="secondary"
+                    outlined
+                    dense
+                  />
+                  <text-input
+                    v-model="formData.createdfrom"
+                    type="date"
+                    :label="t('Created From')"
+                    input-class="maintext"
+                    label-color="secondary"
+                    outlined
+                    dense
+                  />
+                  <text-input
+                    v-model="formData.createdto"
+                    type="date"
+                    :label="t('Created To')"
+                    input-class="maintext"
+                    label-color="secondary"
+                    outlined
+                    dense
+                  />
+                  <text-input
+                    v-model="formData.updatedfrom"
+                    type="date"
+                    :label="t('Updated From')"
+                    input-class="maintext"
+                    label-color="secondary"
+                    outlined
+                    dense
+                  />
+                  <text-input
+                    v-model="formData.updatedto"
+                    type="date"
+                    :label="t('Updated To')"
+                    input-class="maintext"
+                    label-color="secondary"
+                    outlined
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="container">
+                <q-checkbox
+                  v-model="splitLedger"
+                  :label="t('Split Ledger')"
+                  size="2rem"
+                />
+                <draggable
+                  v-model="baseColumns"
+                  item-key="name"
+                  class="drag-area"
+                >
+                  <template #item="{ element }">
+                    <q-checkbox
+                      size="2rem"
+                      v-model="selectedColumns[element.name]"
+                      :label="t(element.label)"
+                      color="primary"
+                      class="q-mr-md maintext"
+                    />
+                  </template>
+                </draggable>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="q-px-md row q-mt-none justify-end">
+          <s-button type="search" @click="search" />
         </div>
         <q-inner-loading :showing="loading">
           <q-spinner-gears size="50px" color="primary" />
@@ -274,20 +254,18 @@
 
     <!-- New action buttons: Export and clear accno filter -->
     <div class="row items-center q-mt-md no-print">
-      <q-btn
-        label="Export XL"
-        color="accent"
+      <s-button
+        type="export-xl"
         @click="downloadTransactions"
-        class="q-mx-sm"
         v-if="results.length > 0"
+        class="q-mx-sm"
       />
-      <q-btn
-        label="Export PDF"
-        color="info"
+      <s-button
+        type="export-pdf"
         @click="createPDF"
-        class="q-mx-sm"
         v-if="results.length > 0"
       />
+
       <q-btn
         v-if="formData.accno"
         label="View All Transactions"

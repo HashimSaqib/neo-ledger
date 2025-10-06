@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <!-- Only render header if printMode is false -->
     <q-header v-if="!printMode">
-      <q-toolbar class="mainbg maintext">
+      <q-toolbar class="mainbg maintext toolbar">
         <!-- Hamburger menu button - only visible on mobile -->
         <q-btn
           v-if="$q.screen.lt.md"
@@ -14,7 +14,7 @@
           @click="toggleLeftDrawer"
           class="q-mr-sm"
         />
-        <q-toolbar-title class="q-ml-xs">
+        <q-toolbar-title class="q-ml-xs" style="font-weight: 600">
           {{ t(title) }}
         </q-toolbar-title>
       </q-toolbar>
@@ -306,5 +306,8 @@ const handleDrawerMouseLeave = (event) => {
 }
 .menu-link {
   font-weight: 600;
+}
+.toolbar {
+  border-bottom: 1px solid var(--q-border);
 }
 </style>

@@ -1,6 +1,10 @@
 <template>
   <q-page class="q-pa-sm relative-position">
-    <q-form ref="formRef" class="q-pa-sm" @submit.prevent="submitForm">
+    <q-form
+      ref="formRef"
+      class="q-pa-sm container container-bg"
+      @submit.prevent="submitForm"
+    >
       <!-- Section Visibility Controls -->
       <div class="row q-mb-md q-gutter-sm">
         <div class="col-12">
@@ -25,19 +29,18 @@
       </div>
 
       <!-- Mandatory Fields Section -->
-      <div class="row q-mb-sm mainbg q-gutter-sm">
+      <div class="row q-mb-sm q-gutter-sm">
         <div class="col-12 col-md-6">
-          <q-input
+          <text-input
             v-model="form.partnumber"
             name="partnumber"
             :label="t('Number')"
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
           />
-          <q-input
+          <text-input
             v-model="form.description"
             name="description"
             :label="t('Description')"
@@ -46,38 +49,35 @@
             dense
             rows="2"
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
             :rules="[requiredRule]"
             hide-bottom-space
           />
-          <q-input
+          <text-input
             v-model="form.unit"
             name="unit"
             :label="t('Unit')"
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
           />
         </div>
         <div class="col-12 col-md-6">
-          <q-input
+          <text-input
             v-model="form.sellprice"
             name="sellprice"
             :label="t('Sell Price')"
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
           />
         </div>
       </div>
 
       <!-- Accounts Section (Always visible) -->
-      <div class="row q-mb-sm mainbg q-gutter-sm">
+      <div class="row q-mb-sm q-gutter-sm">
         <div class="col-12 col-md-6">
           <s-select
             v-if="type == 'part'"
@@ -88,12 +88,12 @@
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
             search="label"
             account
             :rules="[requiredRule]"
             hide-bottom-space
+            option-label="label"
           />
           <s-select
             v-if="type == 'part'"
@@ -104,12 +104,12 @@
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
             search="label"
             account
             :rules="[requiredRule]"
             hide-bottom-space
+            option-label="label"
           />
           <s-select
             v-if="type == 'part'"
@@ -120,12 +120,12 @@
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
             search="label"
             account
             :rules="[requiredRule]"
             hide-bottom-space
+            option-label="label"
           />
           <s-select
             v-if="type == 'service'"
@@ -136,12 +136,12 @@
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
             search="label"
             account
             :rules="[requiredRule]"
             hide-bottom-space
+            option-label="label"
           />
           <s-select
             v-if="type == 'service'"
@@ -152,12 +152,12 @@
             outlined
             dense
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
             search="label"
             account
             :rules="[requiredRule]"
             hide-bottom-space
+            option-label="label"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -171,7 +171,7 @@
               />
             </div>
           </div>
-          <q-input
+          <text-input
             v-model="form.notes"
             name="notes"
             :label="t('Notes')"
@@ -180,7 +180,6 @@
             dense
             rows="2"
             class="q-mb-sm"
-            bg-color="input"
             label-color="secondary"
           />
         </div>
@@ -191,39 +190,36 @@
         <div class="text-weight-bold q-mb-xs">
           {{ t("Additional Details") }}
         </div>
-        <div class="row q-mb-sm mainbg q-gutter-sm">
+        <div class="row q-mb-sm q-gutter-sm">
           <div class="col-12 col-md-6">
-            <q-input
+            <text-input
               v-model="form.drawing"
               name="drawing"
               :label="t('Drawing')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.microfiche"
               name="microfiche"
               :label="t('Microfiche')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.toolnumber"
               name="toolnumber"
               :label="t('Tool Number')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.priceupdate"
               name="priceupdate"
               :label="t('Updated')"
@@ -231,10 +227,9 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-if="type == 'part'"
               v-model="form.lot"
               name="lot"
@@ -242,39 +237,35 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
           </div>
           <div class="col-12 col-md-6">
-            <q-input
+            <text-input
               v-model="form.countryorigin"
               name="countryorigin"
               :label="t('Country of Origin')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.tariff_hscode"
               name="tariff_hscode"
               :label="t('HS Code')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.barcode"
               name="barcode"
               :label="t('Barcode')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
           </div>
@@ -286,31 +277,29 @@
           <div
             v-for="(line, index) in form.makeModelLines"
             :key="'mm-' + index"
-            class="row q-mb-md q-gutter-sm mainbg items-center"
+            class="row q-mb-md q-gutter-sm items-center"
           >
             <div class="col-12 col-md-4">
-              <q-input
+              <text-input
                 v-model="line.make"
                 :name="`make_${index}`"
                 :label="t('Make')"
                 outlined
                 dense
                 class="q-mb-sm"
-                bg-color="input"
                 label-color="secondary"
                 @keyup.enter.prevent="handleMakeModelEnter(index)"
                 :ref="(el) => (makeInputRefs[index] = el)"
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-input
+              <text-input
                 v-model="line.model"
                 :name="`model_${index}`"
                 :label="t('Model')"
                 outlined
                 dense
                 class="q-mb-sm"
-                bg-color="input"
                 label-color="secondary"
                 @keyup.enter.prevent="handleMakeModelEnter(index)"
               />
@@ -331,9 +320,9 @@
       <!-- Inventory Details Section -->
       <div v-show="showInventoryDetails" class="q-mb-sm">
         <div class="text-weight-bold q-mb-xs">{{ t("Inventory Details") }}</div>
-        <div class="row q-mb-sm mainbg q-gutter-sm">
+        <div class="row q-mb-sm q-gutter-sm">
           <div class="col-12 col-md-6">
-            <q-input
+            <text-input
               v-if="type == 'part'"
               v-model="form.expires"
               name="expires"
@@ -342,30 +331,27 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.listprice"
               name="listprice"
               :label="t('List Price')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-model="form.lastcost"
               name="lastcost"
               :label="t('Last Cost')"
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-if="type !== 'service'"
               v-model="form.averageCost"
               name="averageCost"
@@ -373,10 +359,9 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-if="type !== 'service'"
               v-model="form.weight"
               name="weight"
@@ -384,12 +369,11 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
           </div>
           <div class="col-12 col-md-6">
-            <q-input
+            <text-input
               v-if="type !== 'service'"
               v-model="form.onhand"
               name="onhand"
@@ -397,7 +381,6 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
             <q-checkbox
@@ -407,7 +390,7 @@
               :label="t('Check Inventory')"
               class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-if="type !== 'service'"
               v-model="form.rop"
               name="rop"
@@ -415,10 +398,9 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-if="type !== 'service'"
               v-model="form.bin"
               name="bin"
@@ -426,7 +408,6 @@
               outlined
               dense
               class="q-mb-sm"
-              bg-color="input"
               label-color="secondary"
             />
           </div>
@@ -435,10 +416,10 @@
 
       <div class="row justify-start q-mt-md">
         <!-- Using type="submit" on buttons so that the q-form's validation is triggered -->
-        <q-btn @click="submitForm(false)" :label="t('Save')" color="primary" />
-        <q-btn
+        <s-button type="post" @click="submitForm(false)" class="q-mx-sm" />
+        <s-button
+          type="post-as-new"
           @click="submitForm(true)"
-          :label="t('Save As New')"
           class="q-mx-sm"
         />
       </div>

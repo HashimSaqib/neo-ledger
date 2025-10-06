@@ -61,3 +61,37 @@ body,
 .q-table {
   font-family: 'Inter', sans-serif;
 }
+
+.container {
+  border: 1px solid var(--q-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.container-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0px;
+  margin-bottom: 0.5rem;
+}
+
+.container-bg {
+  background-color: var(--q-tint);
+  border-radius: 10px;
+}
+
+.line-bg {
+  background-color: var(--q-tint);
+  border-radius: 10px;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.flex-container > * {
+  flex: 0 0 calc(50% - 10px);
+}

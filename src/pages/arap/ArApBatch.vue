@@ -1,9 +1,9 @@
 <template>
   <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg hide-print">
+    <q-form @submit.prevent class="q-px-sm q-py-sm container hide-print">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
@@ -13,10 +13,9 @@
         </div>
 
         <!-- Basic Info Section -->
-        <div class="row q-mt-xs q-gutter-sm">
+        <div class="flex-container q-mt-md">
           <s-select
             v-model="formData.customer"
-            class="lightbg col-3"
             :label="partyListLabel"
             input-class="maintext"
             label-color="secondary"
@@ -24,8 +23,9 @@
             dense
             :options="customers"
             search="label"
+            option-label="label"
           />
-          <q-input
+          <text-input
             v-model="formData.customernumber"
             class="lightbg"
             :label="partyNumberLabel"
@@ -34,7 +34,7 @@
             outlined
             dense
           />
-          <q-input
+          <text-input
             v-model="formData.invnumber"
             class="lightbg"
             :label="t('Invoice Number')"
@@ -43,11 +43,7 @@
             outlined
             dense
           />
-        </div>
-
-        <!-- Description Field -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
+          <text-input
             v-model="formData.description"
             class="lightbg col-5"
             :label="t('Description')"
@@ -56,11 +52,7 @@
             outlined
             dense
           />
-        </div>
-
-        <!-- Date Range Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
+          <text-input
             v-model="formData.transdatefrom"
             type="date"
             :label="t('Transaction Date From')"
@@ -70,7 +62,7 @@
             outlined
             dense
           />
-          <q-input
+          <text-input
             v-model="formData.transdateto"
             type="date"
             :label="t('Transaction Date To')"
@@ -111,14 +103,10 @@
           />
         </div>
 
-        <div class="row q-mt-sm q-gutter-x-sm">
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            @click="search"
-          />
-          <q-btn :label="t('Clear')" @click="clearForm" />
+        <div class="row justify-end">
+          <s-button type="clear" @click="clearForm" class="q-mr-sm" />
+
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>
@@ -202,14 +190,14 @@
           <div class="text-h6">{{ t("Email Invoices") }}</div>
         </q-card-section>
         <q-card-section>
-          <q-input
+          <text-input
             v-model="emailData.adminemail"
             :label="t('Admin Email')"
             outlined
             dense
             class="q-mb-md"
           />
-          <q-input
+          <text-input
             v-model="emailData.jobtype"
             :label="t('Batch Name')"
             outlined
@@ -232,7 +220,7 @@
               <q-checkbox v-model="emailData.inline" :label="t('Inline')" />
             </div>
           </div>
-          <q-input
+          <text-input
             v-model="emailData.message"
             :label="t('Message')"
             type="textarea"
@@ -258,14 +246,14 @@
           <div class="text-h6">{{ t("Batch Print Invoices") }}</div>
         </q-card-section>
         <q-card-section>
-          <q-input
+          <text-input
             v-model="printData.jobtype"
             :label="t('Batch Name')"
             outlined
             dense
             class="q-mb-md"
           />
-          <q-input
+          <text-input
             v-model="printData.adminemail"
             :label="t('Admin Email')"
             outlined

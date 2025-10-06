@@ -3,12 +3,9 @@
     <q-page-container>
       <q-page class="flex flex-center lightbg">
         <div
-          class="q-pa-xl flex column mainbg relative-position"
+          class="q-pa-xl flex column container relative-position"
           style="min-width: 40vw"
         >
-          <div class="q-mb-md text-right">
-            <LanguageSwitcher />
-          </div>
           <q-img :src="logo" class="q-mb-lg" />
           <form @submit.prevent="login" class="flex column" style="width: 100%">
             <q-input

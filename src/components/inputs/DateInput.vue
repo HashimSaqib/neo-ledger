@@ -7,7 +7,7 @@
       @blur="onBlur"
       outlined
       dense
-      bg-color="input"
+      type="date"
       :label="label"
     />
   </div>
@@ -15,7 +15,6 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { formatAmount, parseAmount } from "src/helpers/utils";
 
 /**
  * Props:
@@ -55,7 +54,7 @@ const rawValue = ref("");
  * - When editing, we show the raw value the user is typing.
  */
 const displayValue = computed(() => {
-  return isEditing.value ? rawValue.value : formatAmount(props.modelValue);
+  return isEditing.value ? rawValue.value : props.modelValue;
 });
 
 /**
@@ -64,7 +63,7 @@ const displayValue = computed(() => {
 function onFocus() {
   isEditing.value = true;
   // Show the same formatted value for editing
-  rawValue.value = formatAmount(props.modelValue);
+  rawValue.value = props.modelValue;
 }
 
 /**
@@ -72,8 +71,7 @@ function onFocus() {
  */
 function onBlur() {
   isEditing.value = false;
-  const newVal = parseAmount(rawValue.value);
-  emit("update:modelValue", newVal);
+  emit("update:modelValue", rawValue.value);
 }
 
 /**
@@ -84,8 +82,4 @@ function onInput(value) {
 }
 </script>
 
-<style scoped>
-.text-right {
-  text-align: right;
-}
-</style>
+<style></style>

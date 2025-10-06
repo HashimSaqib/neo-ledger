@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-sm relative-position">
     <!-- Main Form Header Section -->
-    <div class="mainbg textmain q-pa-md-sm q-pa-sm">
+    <div class="container q-pa-md-sm q-pa-sm">
       <div class="row justify-between full-width">
         <!-- VC Selection and Information -->
         <div class="col-sm-6 col-12">
@@ -84,7 +84,7 @@
               bg-color="input"
               label-color="secondary"
             />
-            <q-input
+            <text-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
               class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
               :label="t('Exchange Rate')"
@@ -97,7 +97,7 @@
 
           <!-- Additional Header Fields -->
           <div class="row q-mb-sm">
-            <q-input
+            <text-input
               outlined
               :label="t('Description')"
               v-model="description"
@@ -109,7 +109,7 @@
             />
           </div>
           <div class="row q-gutter-x-sm">
-            <q-input
+            <text-input
               outlined
               :label="t('Shipping Point')"
               v-model="shippingPoint"
@@ -119,7 +119,7 @@
               dense
               autogrow
             />
-            <q-input
+            <text-input
               outlined
               :label="t('Ship Via')"
               v-model="shipVia"
@@ -129,7 +129,7 @@
               dense
               autogrow
             />
-            <q-input
+            <text-input
               outlined
               :label="t('Way Bill')"
               v-model="wayBill"
@@ -161,7 +161,7 @@
         <!-- Number and Date Fields -->
         <div class="col-sm-4 col-12">
           <div class="row justify-start q-gutter-x-sm">
-            <q-input
+            <text-input
               outlined
               :label="t(numberFieldLabel)"
               v-model="formData.number"
@@ -171,7 +171,7 @@
               dense
               :disable="lockNumber"
             />
-            <q-input
+            <text-input
               v-model="formData.date"
               :label="t(dateFieldLabel)"
               class="q-mb-sm col-sm-5 col-12"
@@ -182,7 +182,7 @@
               type="date"
               @change="filterProjects"
             />
-            <q-input
+            <text-input
               v-model="formData.requiredBy"
               :label="t(requiredByLabel)"
               class="q-mb-sm col-sm-5 col-12"
@@ -198,37 +198,22 @@
     </div>
 
     <!-- Line Items Section -->
-    <div class="mainbg q-mt-sm q-mb-none q-pa-sm">
+    <div class="container q-mt-sm q-mb-none q-pa-sm">
       <div class="row q-mb-md">
         <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
-        <q-btn
-          color="primary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Line')"
-          @click="addLine"
-          class="q-ml-md"
-        />
-        <q-btn
-          color="secondary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Part')"
+        <s-button type="add-line" @click="addLine" class="q-ml-md" />
+        <s-button
+          type="add-part"
           @click="openAddPart('part')"
           class="q-ml-md"
         />
-        <q-btn
-          color="secondary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Service')"
+        <s-button
+          type="add-service"
           @click="openAddPart('service')"
           class="q-ml-md"
         />
       </div>
+
       <draggable
         v-model="lines"
         item-key="id"
@@ -239,7 +224,7 @@
           <div :key="line.id">
             <!-- Main Line Fields -->
             <div
-              class="row justify-between align-center"
+              class="row justify-between align-center container-bg q-pa-md"
               :class="line.lineitemdetail ? '' : 'q-mb-sm'"
             >
               <s-select
@@ -276,7 +261,7 @@
                 search="label"
                 :ref="(el) => (descriptionInputs[index] = el)"
               />
-              <q-input
+              <text-input
                 v-else
                 outlined
                 v-model="line.description"
@@ -289,7 +274,7 @@
                 @keydown.enter="handleLineEnter(index, $event)"
                 :ref="(el) => (descriptionInputs[index] = el)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.qty"
                 :label="t('Qty')"
@@ -300,7 +285,7 @@
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.onhand"
                 :label="t('OH')"
@@ -312,7 +297,7 @@
                 @keyup.enter="handleLineEnter(index, $event)"
                 disable
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.unit"
                 :label="t('Unit')"
@@ -332,7 +317,7 @@
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.discount"
                 :label="t('%')"
@@ -343,7 +328,7 @@
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.extended"
                 :model-value="formatAmount(line.extended)"
@@ -395,7 +380,7 @@
                 :label="t('Project')"
                 @keydown.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.devliverydate"
                 :label="t('Delivery Date')"
@@ -405,7 +390,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.itemnotes"
                 :label="t('Item Notes')"
@@ -416,7 +401,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.serialnumber"
                 :label="t('Serial No.')"
@@ -425,7 +410,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.costvendor"
                 :label="t('Vendor')"
@@ -443,7 +428,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.ordernumber"
                 :label="t('Order Number')"
@@ -452,7 +437,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.customerponumber"
                 :label="t('PO Number')"
@@ -461,7 +446,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.package"
                 :label="t('Packaging')"
@@ -495,10 +480,10 @@
     </div>
 
     <!-- Order Totals and Notes -->
-    <div class="mainbg q-mt-none q-mb-sm q-pa-sm">
+    <div class="container q-mt-none q-mb-sm q-pa-sm">
       <div class="row justify-between items-end q-mt-sm">
         <div class="col">
-          <q-input
+          <text-input
             dense
             outlined
             class="col-sm-10 col-12"
@@ -511,7 +496,7 @@
           />
         </div>
         <div class="col q-ml-md">
-          <q-input
+          <text-input
             dense
             outlined
             class="col-sm-11 col-12"
@@ -574,25 +559,17 @@
     </div>
 
     <!-- Payment Section -->
-    <div v-if="isOrder" class="mainbg q-mb-sm q-mt-none q-pa-sm">
+    <div v-if="isOrder" class="container q-mb-sm q-mt-none q-pa-sm">
       <div class="row q-mb-md">
         <h6 class="q-my-none q-pa-none text-secondary">{{ t("Payments") }}</h6>
-        <q-btn
-          color="primary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Line')"
-          @click="addPayment"
-          class="q-ml-md"
-        />
+        <s-button type="add-line" @click="addPayment" class="q-ml-md" />
       </div>
       <div
         v-for="(payment, index) in payments"
         :key="index"
-        class="row q-mb-md justify-between"
+        class="row q-mb-md justify-between container-bg q-pa-md"
       >
-        <q-input
+        <text-input
           outlined
           v-model="payment.date"
           :label="t('Date')"
@@ -604,7 +581,7 @@
           @keyup.enter="handlePaymentEnter(index, $event)"
           :ref="(el) => (paymentDateInputs[index] = el)"
         />
-        <q-input
+        <text-input
           outlined
           v-model="payment.source"
           :label="t('Source')"
@@ -614,7 +591,7 @@
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
         />
-        <q-input
+        <text-input
           outlined
           v-model="payment.memo"
           :label="t('Memo')"
@@ -674,39 +651,21 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="row q-mt-md">
-      <q-btn
-        color="primary"
-        :label="t('Save')"
-        @click="saveOrder"
+    <div class="row q-mt-md justify-end">
+      <s-button
+        type="delete"
+        @click="deleteOrder"
         class="q-mr-md"
-        v-if="canPost"
+        v-if="canDelete"
       />
-      <q-btn
-        color="primary"
-        :label="t('Post')"
-        @click="postOrder"
-        class="q-mr-md"
-        v-if="canPost"
-      />
-      <q-btn
-        color="primary"
-        :label="t('New Number')"
-        @click="newNumber"
-        class="q-mr-md"
-      />
-      <q-btn
-        color="primary"
-        :label="t('Post As New')"
+      <s-button type="save" @click="saveOrder" class="q-mr-md" v-if="canPost" />
+      <s-button type="post" @click="postOrder" class="q-mr-md" v-if="canPost" />
+      <s-button type="new-number" @click="newNumber" class="q-mr-md" />
+      <s-button
+        type="post-as-new"
         @click="postOrderAsNew"
         class="q-mr-md"
         v-if="canPostAsNew"
-      />
-      <q-btn
-        color="warning"
-        :label="t('Delete Order')"
-        @click="deleteOrder"
-        v-if="canDelete"
       />
     </div>
 
@@ -721,16 +680,15 @@
         emit-value
         v-model="printOptions.template"
         search="label"
-        label="Template"
       />
-      <q-select
+      <s-select
         :options="['tex', 'html']"
         v-model="printOptions.format"
         class="mainbg"
         dense
         outlined
       />
-      <q-select
+      <s-select
         :options="printLocations"
         v-model="printOptions.location"
         class="mainbg"
@@ -738,20 +696,10 @@
         outlined
         map-options
         emit-value
+        search="label"
       />
-      <q-btn
-        color="accent"
-        :label="t('Print')"
-        @click="printOrder"
-        v-if="orderId"
-      />
-      <q-btn
-        color="primary"
-        :label="t('Email')"
-        @click="toggleEmailDialog"
-        v-if="orderId"
-        class="q-ml-sm"
-      />
+      <s-button type="print" @click="printOrder" v-if="orderId" />
+      <s-button type="email" @click="toggleEmailDialog" v-if="orderId" />
     </div>
 
     <div class="row q-mt-md">

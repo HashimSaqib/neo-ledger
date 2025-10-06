@@ -1,46 +1,31 @@
 <template>
-  <q-page class="lightbg q-pa-sm relative-position">
-    <div class="q-pa-sm mainbg column">
+  <q-page class="lightbg q-pa-md relative-position">
+    <div class="column container">
+      <h5 class="container-title title-margin">Transaction Details</h5>
+
       <div class="row q-gutter-sm q-mb-sm">
-        <q-input
+        <text-input
           :label="t('Reference')"
-          bg-color="input"
-          label-color="secondary"
           outlined
           dense
           v-model="formData.reference"
           :disable="lockNumber"
         />
-        <q-select
+
+        <s-select
           v-if="currencies"
           outlined
           v-model="formData.currency"
           :options="currencies"
-          option-value="curr"
           option-label="curr"
+          search="curr"
           :label="t('Currency')"
           dense
           class="col-2"
           bg-color="input"
           label-color="secondary"
         />
-        <q-select
-          v-if="departments.length > 0"
-          outlined
-          v-model="formData.selectedDepartment"
-          :options="departments"
-          class="col-2"
-          option-value="description"
-          option-label="description"
-          :label="t('Department')"
-          dense
-          bg-color="input"
-          label-color="secondary"
-          clearable
-          autogrow
-          hide-bottom-space
-        />
-        <q-input
+        <text-input
           v-if="formData.currency.rn != 1"
           class="col-2"
           :label="t('Exchange Rate')"
@@ -50,7 +35,25 @@
           dense
           v-model="formData.exchangeRate"
         />
-        <q-input
+        <s-select
+          v-if="departments.length > 0"
+          outlined
+          v-model="formData.selectedDepartment"
+          :options="departments"
+          class="col-2"
+          option-value="description"
+          search="description"
+          option-label="description"
+          :label="t('Department')"
+          dense
+          bg-color="input"
+          label-color="secondary"
+          clearable
+          autogrow
+          hide-bottom-space
+        />
+
+        <date-input
           v-model="formData.transdate"
           :label="t('Date')"
           class="col-2"
@@ -63,7 +66,7 @@
       </div>
 
       <!-- Offset Account Section -->
-      <div class="row q-gutter-sm q-mb-sm">
+      <div class="row q-gutter-sm">
         <s-select
           outlined
           v-model="formData.offsetAccount"
@@ -75,28 +78,25 @@
           bg-color="input"
           label-color="secondary"
           search="label"
+          option-label="label"
           account
           clearable
           @update:model-value="handleOffsetAccountChange"
         />
         <!-- Offset Account Totals -->
-        <template v-if="formData.offsetAccount">
-          <q-input
+        <template v-if="formData.offsetAccount" class="q-my-none">
+          <text-input
             :model-value="formatAmount(totalCredit)"
             :label="t('Debit')"
             class="col-2"
-            bg-color="input"
-            label-color="secondary"
             outlined
             dense
             readonly
           />
-          <q-input
+          <text-input
             :model-value="formatAmount(totalDebit)"
             :label="t('Credit')"
             class="col-2"
-            bg-color="input"
-            label-color="secondary"
             outlined
             dense
             readonly
@@ -104,8 +104,8 @@
         </template>
       </div>
 
-      <div class="row q-mb-sm">
-        <q-input
+      <div class="row q-my-sm">
+        <text-input
           v-model="formData.description"
           :label="t('Description')"
           class="col-6"
@@ -119,7 +119,7 @@
         />
       </div>
       <div class="row q-mb-sm">
-        <q-input
+        <text-input
           v-model="formData.notes"
           :label="t('Notes')"
           class="col-6"
@@ -131,7 +131,7 @@
           rows="1"
         />
       </div>
-      <div class="row">
+      <div class="row q-pb-none">
         <q-file
           :disable="connection.error ? true : false"
           :error="connection.error ? true : false"
@@ -145,16 +145,16 @@
           multiple
           append
           use-chips
-          class="row"
           :error-message="connection.error"
           :hint="connection"
+          class="q-pb-none"
         >
           <template v-slot:prepend>
             <q-icon name="attachment" />
           </template>
         </q-file>
       </div>
-      <div class="row q-mt-sm">
+      <div class="row items-center">
         <FileList
           :files="existingFiles"
           module="gl"
@@ -164,13 +164,25 @@
       </div>
     </div>
 
-    <div class="flex q-pa-sm mainbg column q-mt-sm">
-      <div v-for="(line, index) in lines" :key="index" class="column q-mb-sm">
+    <div class="flex column container">
+      <div class="row justify-between">
+        <h5 class="container-title" style="margin-bottom: 0">
+          Journal Entries
+        </h5>
+        <s-button type="add-line" @click="addLine" />
+      </div>
+
+      <div
+        v-for="(line, index) in lines"
+        :key="index"
+        class="column q-mb-md q-pa-md line-bg"
+      >
         <div class="row q-gutter-x-xs">
           <!-- Account s-select with a ref for auto-focus -->
           <s-select
             outlined
             v-model="line.account"
+            option-label="label"
             :options="filteredOpenAccounts"
             :label="t('Account')"
             dense
@@ -234,6 +246,7 @@
             />
           </template>
           <!-- Toggle Extra Fields Button -->
+
           <q-btn
             flat
             dense
@@ -248,71 +261,56 @@
             dense
             flat
             @click="removeLine(index)"
-            v-if="!line.showExtra"
           />
         </div>
 
         <!-- Extra Fields for Source and Memo -->
-        <transition name="fade">
-          <div v-if="line.showExtra" class="row q-gutter-x-xs q-mt-xs">
-            <s-select
-              v-if="filteredProjects.length > 0"
-              outlined
-              :options="filteredProjects"
-              :label="t('Project')"
-              option-label="description"
-              option-value="description"
-              v-model="line.project"
-              class="col-3"
-              bg-color="input"
-              label-color="secondary"
-              dense
-              search="description"
-            />
-            <q-input
-              v-model="line.source"
-              :label="t('Source')"
-              class="col-3"
-              bg-color="input"
-              label-color="secondary"
-              outlined
-              dense
-              @keydown.enter="handleEnter($event, index)"
-            />
-            <q-input
-              v-model="line.memo"
-              :label="t('Memo')"
-              class="col-3"
-              bg-color="input"
-              label-color="secondary"
-              outlined
-              dense
-              @keydown.enter="handleEnter($event, index)"
-            />
-            <q-btn
-              color="negative"
-              icon="delete"
-              dense
-              flat
-              @click="removeLine(index)"
-              v-if="line.showExtra"
-            />
-          </div>
-        </transition>
+        <div v-if="line.showExtra" class="row q-gutter-x-xs q-mt-md">
+          <s-select
+            v-if="filteredProjects.length > 0"
+            outlined
+            :options="filteredProjects"
+            :label="t('Project')"
+            option-label="description"
+            option-value="description"
+            v-model="line.project"
+            class="col-3"
+            bg-color="input"
+            label-color="secondary"
+            dense
+            search="description"
+          />
+          <text-input
+            v-model="line.source"
+            :label="t('Source')"
+            class="col-3"
+            outlined
+            dense
+            @keydown.enter="handleEnter($event, index)"
+          />
+          <text-input
+            v-model="line.memo"
+            :label="t('Memo')"
+            class="col-3"
+            outlined
+            dense
+            @keydown.enter="handleEnter($event, index)"
+          />
+        </div>
       </div>
 
-      <div class="row q-py-xs q-gutter-x-xs">
-        <div class="q-pa-sm lightbg maintext col-3 text-center">
+      <div class="row q-py-xs q-gutter-x-xs total-row">
+        <div class="q-pa-sm col-3 text-center">
           {{ t("Total") }}
         </div>
-        <div class="q-pa-sm lightbg maintext col-2">
+        <div class="q-pa-sm col-2">
           {{ formatAmount(totalDebit) }}
         </div>
-        <div class="q-pa-sm lightbg maintext col-2">
+        <div class="q-pa-sm col-2">
           {{ formatAmount(totalCredit) }}
         </div>
         <div
-          class="q-pa-sm col-2 lightbg text-bold"
+          class="q-pa-sm col-2 text-bold"
           :class="
             !formData.offsetAccount && totalDebit - totalCredit == 0
               ? 'text-positive'
@@ -323,54 +321,27 @@
         </div>
       </div>
 
-      <div class="row justify-end">
-        <q-btn
-          color="primary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Line')"
-          @click="addLine"
-        />
-      </div>
+      <div class="row justify-end"></div>
     </div>
 
     <!-- Two buttons: Save and Post -->
-    <div class="row q-my-sm q-px-sm q-gutter-x-sm">
-      <q-btn
-        color="primary"
-        :label="t('Post')"
-        @click="submitTransaction(true)"
-        :loading="loading"
-        v-if="canPost"
-      />
-      <q-btn
-        color="primary"
-        :label="t('New Number')"
-        @click="newNumber"
-        :loading="loading"
+    <div class="row q-my-sm q-px-sm q-gutter-x-sm justify-end">
+      <s-button type="delete" v-if="canDelete" @click="deleteTransaction" />
+
+      <s-button type="new-number" v-if="canPostAsNew" @click="newNumber" />
+      <s-button
+        type="post-as-new"
         v-if="canPostAsNew"
-      />
-      <q-btn
-        color="primary"
-        :label="t('Post As New')"
         @click="submitTransaction(false, true)"
-        :loading="loading"
-        v-if="canPostAsNew"
       />
-      <q-btn
-        :label="t('Delete')"
-        color="warning"
-        @click="deleteTransaction"
-        v-if="canDelete"
-      />
+      <s-button type="post" v-if="canPost" @click="submitTransaction(true)" />
     </div>
-    <div class="row">
-      <LastTransactions
-        type="gl"
-        class="col-12 col-lg-6"
-        ref="lastTransactionsRef"
-      />
+
+    <div class="q-mt-md q-px-md">
+      <h6 class="q-my-md q-pa-none text-secondary">
+        {{ t("Last 5 Transactions") }}
+      </h6>
+      <LastTransactions type="gl" ref="lastTransactionsRef" />
     </div>
   </q-page>
 </template>
@@ -1031,3 +1002,12 @@ onMounted(async () => {
   }
 });
 </script>
+<style>
+.total-row {
+  background-color: var(--q-highlight);
+  border-radius: 10px;
+  border: 1px solid var(--q-border);
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+</style>

@@ -1,9 +1,9 @@
 <template>
-  <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg hide-print">
+  <q-page class="lightbg q-px-md q-py-sm relative-position">
+    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg hide-print container">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
@@ -190,14 +190,10 @@
             </template>
           </draggable>
         </div>
-        <div class="row q-mt-sm q-gutter-x-sm">
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            @click="search"
-          />
-          <q-btn :label="t('Clear')" @click="clearForm" />
+        <div class="row q-mt-sm q-gutter-x-sm justify-end">
+          <s-button type="clear" @click="clearForm" />
+
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>

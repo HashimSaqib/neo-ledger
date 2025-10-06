@@ -3,8 +3,8 @@
     <q-splitter v-model="splitterModel" class="full-width" :limits="[40, 100]">
       <!-- Left Panel - Invoice Form -->
       <template v-slot:before>
-        <div class="mainbg textmain q-pa-sm">
-          <div class="row justify-between full-width q-mt-sm">
+        <div class="container q-mr-sm">
+          <div class="row justify-between full-width">
             <div class="col-12 col-sm-5">
               <div class="row full-width">
                 <s-select
@@ -77,6 +77,7 @@
                   label-color="secondary"
                   class="q-mb-sm col-sm-9 col-12"
                   search="label"
+                  option-label="label"
                 />
               </div>
               <div v-if="currencies && currencies.length" class="row">
@@ -93,7 +94,7 @@
                   label-color="secondary"
                 />
 
-                <q-input
+                <text-input
                   v-if="selectedCurrency && selectedCurrency.rn != 1"
                   class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm"
                   :label="t('Exchange Rate')"
@@ -103,7 +104,7 @@
                 />
               </div>
               <div class="row q-mb-sm">
-                <q-input
+                <text-input
                   outlined
                   :label="t('Description')"
                   v-model="description"
@@ -172,7 +173,7 @@
             </div>
             <div class="col-12 col-sm-6">
               <div class="row q-gutter-sm">
-                <q-input
+                <text-input
                   outlined
                   :label="t('Invoice Number')"
                   v-model="invNumber"
@@ -182,7 +183,7 @@
                   dense
                   :disable="lockNumber"
                 />
-                <q-input
+                <text-input
                   outlined
                   :label="t('Order Number')"
                   v-model="ordNumber"
@@ -193,7 +194,7 @@
                 />
               </div>
               <div class="row q-gutter-sm">
-                <q-input
+                <text-input
                   v-model="invDate"
                   :label="t('Invoice Date')"
                   class="q-mb-sm col-sm-5 col-12"
@@ -204,7 +205,7 @@
                   type="date"
                   @change="filterProjects"
                 />
-                <q-input
+                <text-input
                   v-model="dueDate"
                   :label="t('Due Date')"
                   class="lightbg q-mb-sm col-sm-5 col-12"
@@ -220,24 +221,16 @@
         </div>
 
         <!-- Items Section -->
-        <div class="mainbg q-my-md q-pa-md">
+        <div class="container q-mr-sm">
           <div class="row q-mb-md">
             <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
-            <q-btn
-              color="primary"
-              icon="add"
-              dense
-              flat
-              :label="t('Add Line')"
-              @click="addLine"
-              class="q-ml-md"
-            />
+            <s-button type="add-line" @click="addLine" class="q-ml-md" />
           </div>
           <!-- Use draggable to enable reordering of line items -->
           <draggable v-model="lines" item-key="id">
             <template #item="{ element: line, index }">
-              <div class="row q-mb-md justify-between">
-                <q-input
+              <div class="row q-mb-md justify-between container-bg q-pa-md">
+                <text-input
                   outlined
                   v-model="line.description"
                   :label="t('Description')"
@@ -330,7 +323,7 @@
           <!-- Totals Section -->
           <div class="row justify-between items-end">
             <div class="col">
-              <q-input
+              <text-input
                 dense
                 outlined
                 class="col-sm-10 col-12"
@@ -342,7 +335,7 @@
               />
             </div>
             <div class="col q-ml-md">
-              <q-input
+              <text-input
                 dense
                 outlined
                 class="col-sm-11 col-12"
@@ -403,137 +396,100 @@
           </div>
         </div>
         <!-- Payments Section -->
-        <div class="mainbg textmain q-mt-md">
-          <div class="mainbg q-my-md q-pa-md">
-            <div class="row q-mb-md">
-              <h6 class="q-my-none q-pa-none text-secondary">
-                {{ t("Payments") }}
-              </h6>
-              <q-btn
-                color="primary"
-                label-color="secondary"
-                icon="add"
-                dense
-                flat
-                :label="t('Add Line')"
-                @click="addPayment"
-                class="q-ml-md"
-              />
-            </div>
-            <div
-              v-for="(payment, index) in payments"
-              :key="index"
-              class="row q-mb-md justify-between"
-            >
-              <!-- Date field with inline ref and enter key -->
-              <q-input
-                outlined
-                v-model="payment.date"
-                :label="t('Date')"
-                class="q-mt-sm"
-                bg-color="input"
-                label-color="secondary"
-                dense
-                type="date"
-                :ref="(el) => (paymentDateRefs[index] = el)"
-                @keyup.enter="() => handlePaymentEnter(index)"
-              />
-              <q-input
-                outlined
-                v-model="payment.source"
-                :label="t('Source')"
-                class="q-mt-sm"
-                bg-color="input"
-                label-color="secondary"
-                dense
-                @keyup.enter="() => handlePaymentEnter(index)"
-              />
-              <q-input
-                outlined
-                v-model="payment.memo"
-                :label="t('Memo')"
-                class="q-mt-sm"
-                bg-color="input"
-                label-color="secondary"
-                dense
-                @keyup.enter="() => handlePaymentEnter(index)"
-              />
-              <fn-input
-                outlined
-                v-model="payment.amount"
-                :label="t('Amount')"
-                class="q-mt-sm"
-                label-color="secondary"
-                bg-color="input"
-                dense
-                @keyup.enter="() => handlePaymentEnter(index)"
-              />
-              <fn-input
-                v-if="selectedCurrency && selectedCurrency.rn != 1"
-                outlined
-                v-model="payment.exchangerate"
-                :label="t('Exhcnage Rate')"
-                class="q-mt-sm"
-                bg-color="input"
-                label-color="secondary"
-                dense
-                @keyup.enter="() => handlePaymentEnter(index)"
-              />
-              <s-select
-                outlined
-                v-model="payment.account"
-                :options="paymentAccounts"
-                :label="t('Account')"
-                option-label="label"
-                option-value="id"
-                label-color="secondary"
-                class="col-2 q-mt-sm"
-                :class="
-                  selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
-                "
-                bg-color="input"
-                dense
-                search="label"
-                account
-              />
-              <q-btn
-                color="negative"
-                icon="delete"
-                dense
-                flat
-                @click="removePayment(index)"
-              />
-            </div>
+        <div class="container q-mr-sm">
+          <div class="row q-mb-md">
+            <h6 class="q-my-none q-pa-none text-secondary">
+              {{ t("Payments") }}
+            </h6>
+            <s-button type="add-line" @click="addPayment" class="q-ml-md" />
+          </div>
+          <div
+            v-for="(payment, index) in payments"
+            :key="index"
+            class="row q-mb-md justify-between container-bg q-pa-md"
+          >
+            <!-- Date field with inline ref and enter key -->
+            <date-input
+              outlined
+              v-model="payment.date"
+              :label="t('Date')"
+              class="q-mt-sm"
+              bg-color="input"
+              label-color="secondary"
+              dense
+              type="date"
+              :ref="(el) => (paymentDateRefs[index] = el)"
+              @keyup.enter="() => handlePaymentEnter(index)"
+            />
+            <text-input
+              outlined
+              v-model="payment.source"
+              :label="t('Source')"
+              class="q-mt-sm"
+              bg-color="input"
+              label-color="secondary"
+              dense
+              @keyup.enter="() => handlePaymentEnter(index)"
+            />
+            <text-input
+              outlined
+              v-model="payment.memo"
+              :label="t('Memo')"
+              class="q-mt-sm"
+              bg-color="input"
+              label-color="secondary"
+              dense
+              @keyup.enter="() => handlePaymentEnter(index)"
+            />
+            <fn-input
+              outlined
+              v-model="payment.amount"
+              :label="t('Amount')"
+              class="q-mt-sm"
+              label-color="secondary"
+              bg-color="input"
+              dense
+              @keyup.enter="() => handlePaymentEnter(index)"
+            />
+            <fn-input
+              v-if="selectedCurrency && selectedCurrency.rn != 1"
+              outlined
+              v-model="payment.exchangerate"
+              :label="t('Exhcnage Rate')"
+              class="q-mt-sm"
+              bg-color="input"
+              label-color="secondary"
+              dense
+              @keyup.enter="() => handlePaymentEnter(index)"
+            />
+            <s-select
+              outlined
+              v-model="payment.account"
+              :options="paymentAccounts"
+              :label="t('Account')"
+              option-label="label"
+              option-value="id"
+              label-color="secondary"
+              class="col-2 q-mt-sm"
+              :class="
+                selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
+              "
+              bg-color="input"
+              dense
+              search="label"
+              account
+            />
+            <q-btn
+              color="negative"
+              icon="delete"
+              dense
+              flat
+              @click="removePayment(index)"
+            />
           </div>
         </div>
         <!-- Action Buttons -->
-        <div class="row q-my-sm">
-          <q-btn
-            :label="t('Post')"
-            color="primary"
-            @click="postInvoice"
-            class="q-mr-md"
-            v-if="canPost"
-          />
-          <q-btn
-            :label="t('New Number')"
-            color="primary"
-            @click="newNumber"
-            class="q-mr-md"
-          />
-          <q-btn
-            class="q-mr-md"
-            :label="t('Print')"
-            color="accent"
-            @click="printTransaction"
-            v-if="invId"
-          />
-          <q-btn
-            :label="t('Delete')"
-            color="warning"
-            @click="deleteTransaction"
-            v-if="canDelete"
-          />
+        <div class="row q-my-sm q-px-sm justify-between">
           <q-checkbox
             v-model="pending"
             :label="t('Pending')"
@@ -547,6 +503,22 @@
               {{ getPendingDisabledTooltip() }}
             </q-tooltip>
           </q-checkbox>
+          <div>
+            <s-button
+              type="delete"
+              @click="deleteTransaction"
+              class="q-mr-md"
+              v-if="canDelete"
+            />
+            <s-button type="new-number" @click="newNumber" class="q-mr-md" />
+
+            <s-button
+              type="post"
+              @click="postInvoice"
+              class="q-mr-md"
+              v-if="canPost"
+            />
+          </div>
         </div>
 
         <StationTransfer

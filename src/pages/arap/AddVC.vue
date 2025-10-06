@@ -1,12 +1,12 @@
 <template>
-  <q-page class="lightbg q-px-sm" :class="haveProps ? 'q-py-sm' : 'q-py-sm'">
+  <q-page class="q-pa-md lightbg" :class="haveProps ? 'q-py-sm' : 'q-py-sm'">
     <q-form
       @submit.prevent="submitForm"
       ref="formRef"
-      class="q-px-md mainbg"
+      class="q-px-md container"
       :class="haveProps ? 'q-py-sm' : 'q-py-sm'"
     >
-      <div class="mainbg">
+      <div class="">
         <!-- Type Selection -->
         <div class="row q-mb-sm">
           <q-radio v-model="form.typeofcontact" val="company" label="Company" />
@@ -34,90 +34,90 @@
 
         <div class="row full-width">
           <!-- First Column - Mandatory Fields -->
-          <div class="col-12 col-md-4 q-mr-xl">
-            <q-input
+          <div class="col-12 col-md-4 q-mr-xl container-bg q-pa-md">
+            <text-input
               v-model="form.vcnumber"
               name="vcnumber"
               :label="t(`${vcType} Number`)"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.name"
               name="name"
               :label="t(`${vcType}`)"
               outlined
               dense
               required
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.address1"
               name="address1"
               :label="t('Address')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.address2"
               name="address2"
               :label="t('Address 2')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.city"
               name="city"
               :label="t('City')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.zipcode"
               name="zipcode"
               :label="t('Zip/Postal Code')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.country"
               name="country"
               :label="t('Country')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.email"
               name="email"
               :label="t('E-mail')"
               outlined
               dense
               type="email"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.cc"
               name="cc"
               :label="t('Cc')"
               outlined
               dense
               type="email"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bcc"
               name="bcc"
               :label="t('Bcc')"
               outlined
               dense
               type="email"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
 
             <!-- Tax Section -->
@@ -140,50 +140,53 @@
           </div>
 
           <!-- Second Column - Additional Information (when enabled) -->
-          <div v-show="showAdditionalInfo" class="col-12 col-md-3">
-            <q-input
+          <div
+            v-show="showAdditionalInfo"
+            class="col-12 col-md-3 container-bg q-pa-md"
+          >
+            <text-input
               v-model="form.state"
               name="state"
               :label="t('State/Province')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.notes"
               name="notes"
               :label="t('Notes')"
               type="textarea"
               outlined
               rows="3"
-              class="lightbg q-mb-sm"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.phone"
               name="phone"
               :label="t('Phone')"
               outlined
               dense
               type="tel"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.fax"
               name="fax"
               :label="t('Fax')"
               outlined
               dense
               type="tel"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.mobile"
               name="mobile"
               :label="t('Mobile')"
               outlined
               dense
               type="tel"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
 
             <!-- Account Information -->
@@ -196,7 +199,7 @@
                   :options="recordAccounts"
                   outlined
                   dense
-                  class="lightbg"
+                  class=""
                 />
               </div>
             </div>
@@ -210,7 +213,7 @@
                   :options="paymentAccounts"
                   outlined
                   dense
-                  class="lightbg"
+                  class=""
                 />
               </div>
             </div>
@@ -222,25 +225,25 @@
               :label="t('Credit Limit')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.threshold"
               name="threshold"
               :label="t('Threshold')"
               outlined
               dense
               type="number"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.terms"
               name="terms"
               :label="t('Terms (days)')"
               outlined
               dense
               type="number"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
 
             <!-- Currency and Dates -->
@@ -254,96 +257,99 @@
               emit-value
               outlined
               dense
-              class="lightbg q-mb-sm"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.startdate"
               name="startdate"
               :label="t('Start Date')"
               outlined
               dense
               type="date"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.enddate"
               name="enddate"
               :label="t('End Date')"
               outlined
               dense
               type="date"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.discount"
               name="discount"
               :label="t('Discount (%)')"
               outlined
               dense
               type="number"
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
 
             <!-- Tax Information -->
-            <q-input
+            <text-input
               v-model="form.taxnumber"
               name="taxnumber"
               :label="t('Tax Number / SSN')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.sic_code"
               name="sic_code"
               :label="t('SIC')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
           </div>
 
           <!-- Third Column - Contact Person (when enabled) -->
-          <div v-show="showContactPerson" class="col-12 col-md-3 q-ml-xl">
-            <q-input
+          <div
+            v-show="showContactPerson"
+            class="col-12 col-md-3 q-ml-xl container-bg q-pa-md"
+          >
+            <text-input
               v-model="form.salutation"
               name="salutation"
               :label="t('Salutation')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.firstname"
               name="firstname"
               :label="t('First Name')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.lastname"
               name="lastname"
               :label="t('Last Name')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.contacttitle"
               name="contacttitle"
               :label="t('Title')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.occupation"
               name="occupation"
               :label="t('Occupation')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
 
             <div class="q-mb-sm">
@@ -361,106 +367,101 @@
               />
             </div>
           </div>
-
-          <!-- Fourth Column - Additional Information (continued when enabled) -->
-          <div v-show="showAdditionalInfo" class="col-12 col-md-2">
-            <!-- This column will be used for additional fields when needed -->
-          </div>
         </div>
 
         <!-- Bank Information Section (when enabled) -->
         <div v-show="showBankInfo" class="row q-mt-md q-gutter-x-lg">
-          <div class="col-12 col-md-4">
-            <q-input
+          <div class="col-12 col-md-4 container-bg q-pa-md">
+            <text-input
               v-model="form.bankname"
               name="bankname"
               :label="t('Bank')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bankaddress1"
               name="bankaddress1"
               :label="t('Bank Address')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bankaddress2"
               name="bankaddress2"
               :label="t('Bank Address 2')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bankcity"
               name="bankcity"
               :label="t('Bank City')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bankstate"
               name="bankstate"
               :label="t('Bank State/Province')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bankzipcode"
               name="bankzipcode"
               :label="t('Bank Zip/Postal Code')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bankcountry"
               name="bankcountry"
               :label="t('Bank Country')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
           </div>
 
-          <div class="col-12 col-md-4">
-            <q-input
+          <div class="col-12 col-md-4 container-bg q-pa-md">
+            <text-input
               v-model="form.iban"
               name="iban"
               :label="t('IBAN')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.bic"
               name="bic"
               :label="t('BIC')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.membernumber"
               name="membernumber"
               :label="t('Member Number')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
-            <q-input
+            <text-input
               v-model="form.clearingnumber"
               name="clearingnumber"
               :label="t('BC Number')"
               outlined
               dense
-              class="lightbg q-mb-sm input-box"
+              class="q-mb-sm"
             />
             <q-checkbox
               v-model="form.remittancevoucher"

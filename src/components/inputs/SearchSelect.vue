@@ -1,30 +1,35 @@
 <template>
-  <q-select
-    ref="qSelectRef"
-    v-model="internalValue"
-    :label="label"
-    :options="filteredOptions"
-    use-input
-    input-debounce="0"
-    :auto-select-first="true"
-    v-model:input-value="searchTerm"
-    @filter="onFilter"
-    @popup-show="onPopupShow"
-    outlined
-    dense
-    :multiple="multiple"
-    clearable
-    fill-input
-    hide-selected
-    :emit-value="emitValue"
-    :map-options="mapOptions"
-    :option-value="optionValue"
-    bg-color="input"
-  />
+  <div class="input-container">
+    <q-select
+      ref="qSelectRef"
+      v-model="internalValue"
+      :options="filteredOptions"
+      use-input
+      input-debounce="0"
+      :auto-select-first="true"
+      v-model:input-value="searchTerm"
+      @filter="onFilter"
+      @popup-show="onPopupShow"
+      outlined
+      dense
+      :multiple="multiple"
+      clearable
+      fill-input
+      hide-selected
+      :emit-value="emitValue"
+      :map-options="mapOptions"
+      :option-value="optionValue"
+      :option-label="optionLabel"
+      bg-color="input"
+      class="mainbg"
+      popup-content-class="popupcontentclass"
+      :label="label"
+    />
+  </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 // Define props that mirror q-select's props plus our custom search/account props
 const props = defineProps({
@@ -38,6 +43,10 @@ const props = defineProps({
   label: {
     type: String,
     default: "",
+  },
+  inlinelabel: {
+    type: Boolean,
+    default: false,
   },
   multiple: {
     type: Boolean,
@@ -78,6 +87,14 @@ const props = defineProps({
    * This is passed through to q-select's option-value prop.
    */
   optionValue: {
+    type: String,
+    default: null,
+  },
+  /**
+   * Prop to specify which property of the option object to use as the display label.
+   * This is passed through to q-select's option-label prop.
+   */
+  optionLabel: {
     type: String,
     default: null,
   },
@@ -202,3 +219,32 @@ function onPopupShow() {
   }
 }
 </script>
+
+<style>
+.popupcontentclass {
+  box-shadow: none;
+  border-radius: 10px;
+  border: 1px solid var(--q-border);
+  background-color: var(--q-mainbg);
+  transform: translateY(4px);
+}
+.q-menu.popupcontentclass {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  box-shadow: none;
+  border-radius: 10px;
+  border: 1px solid var(--q-border);
+  background-color: var(--q-mainbg);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+.q-item--active,
+.q-item.q-manual-focusable--focused {
+  background-color: var(--q-highlight) !important;
+}
+
+.q-item--active .q-item__section,
+.q-item.q-manual-focusable--focused .q-item__section {
+  color: var(--q-maintext) !important;
+}
+</style>

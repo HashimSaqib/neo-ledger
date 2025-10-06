@@ -1,9 +1,9 @@
 <template>
-  <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg hide-print">
+  <q-page class="q-pa-md q-py-sm relative-position">
+    <q-form @submit.prevent class="q-px-sm q-py-sm container hide-print">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
@@ -13,303 +13,294 @@
         </div>
 
         <!-- Basic Info Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <s-select
-            v-model="formData.account"
-            class="lightbg col-6 col-md-3"
-            :label="t('Accounts')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-            :options="recordAccounts"
-            account
-          />
-          <s-select
-            v-model="formData.customer"
-            class="lightbg col-3"
-            :label="partyListLabel"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-            :options="customers"
-            search="label"
-          />
-          <q-input
-            v-model="formData.customernumber"
-            class="lightbg"
-            :label="partyNumberLabel"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-        </div>
+        <div class="flex-container">
+          <div class="flex-container q-mt-md container">
+            <s-select
+              v-model="formData.account"
+              :label="t('Accounts')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              :options="recordAccounts"
+              account
+              option-label="label"
+            />
+            <s-select
+              v-model="formData.customer"
+              :label="partyListLabel"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              :options="customers"
+              search="label"
+              option-label="label"
+            />
+            <q-input
+              v-model="formData.customernumber"
+              :label="partyNumberLabel"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+              option-label="label"
+            />
+            <q-input
+              v-model="formData.invnumber"
+              class="lightbg"
+              :label="t('Invoice Number')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.ordnumber"
+              class="lightbg"
+              :label="t('Order Number')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.ponumber"
+              class="lightbg"
+              :label="t('PO Number')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.shipvia"
+              class="lightbg"
+              :label="t('Ship Via')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.shippingpoint"
+              class="lightbg"
+              :label="t('Shipping Point')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.waybill"
+              class="lightbg"
+              :label="t('Waybill')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.warehouse"
+              class="lightbg"
+              :label="t('Warehouse')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.employee"
+              class="lightbg"
+              :label="t('Employee')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.department"
+              class="lightbg"
+              :label="t('Department')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.description"
+              class="lightbg col-5"
+              :label="t('Description')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.notes"
+              class="lightbg col-5"
+              :label="t('Notes')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.memo"
+              class="lightbg"
+              :label="t('Memo')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <q-input
+              v-model="formData.source"
+              class="lightbg"
+              :label="t('Source')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+          </div>
 
-        <!-- Document Numbers Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
-            v-model="formData.invnumber"
-            class="lightbg"
-            :label="t('Invoice Number')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.ordnumber"
-            class="lightbg"
-            :label="t('Order Number')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.ponumber"
-            class="lightbg"
-            :label="t('PO Number')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.shipvia"
-            class="lightbg"
-            :label="t('Ship Via')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.shippingpoint"
-            class="lightbg"
-            :label="t('Shipping Point')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.waybill"
-            class="lightbg"
-            :label="t('Waybill')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Entity Information Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
-            v-model="formData.warehouse"
-            class="lightbg"
-            :label="t('Warehouse')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.employee"
-            class="lightbg"
-            :label="t('Employee')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.department"
-            class="lightbg"
-            :label="t('Department')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Description Fields Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
-            v-model="formData.description"
-            class="lightbg col-5"
-            :label="t('Description')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.notes"
-            class="lightbg col-5"
-            :label="t('Notes')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.memo"
-            class="lightbg"
-            :label="t('Memo')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.source"
-            class="lightbg"
-            :label="t('Source')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Date Range Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
-            v-model="formData.transdatefrom"
-            type="date"
-            :label="t('Transaction Date From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-4"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.transdateto"
-            type="date"
-            :label="t('Transaction Date To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-4"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Created Date Range Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
-            v-model="formData.createdfrom"
-            type="date"
-            :label="t('Created Date From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-4"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.createdto"
-            type="date"
-            :label="t('Created Date To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-4"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Updated Date Range Section -->
-        <div class="row q-mt-xs q-gutter-sm">
-          <q-input
-            v-model="formData.updatedfrom"
-            type="date"
-            :label="t('Updated Date From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-4"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.updatedto"
-            type="date"
-            :label="t('Updated Date To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-4"
-            outlined
-            dense
-          />
-        </div>
-
-        <div class="row q-mt-sm q-gutter-sm">
-          <q-toggle
-            :model-value="formData.outstanding === 'Y'"
-            @update:model-value="
-              (val) => (formData.outstanding = val ? 'Y' : '')
-            "
-            :label="t('Outstanding')"
-            color="primary"
-          />
-          <q-toggle
-            :model-value="formData.open === 'Y'"
-            @update:model-value="(val) => (formData.open = val ? 'Y' : '')"
-            :label="t('Open')"
-            color="primary"
-          />
-          <q-toggle
-            :model-value="formData.closed === 'Y'"
-            @update:model-value="(val) => (formData.closed = val ? 'Y' : '')"
-            :label="t('Closed')"
-            color="primary"
-          />
-          <q-toggle
-            :model-value="formData.paidlate === 'Y'"
-            @update:model-value="(val) => (formData.paidlate = val ? 'Y' : '')"
-            :label="t('Paid Late')"
-            color="primary"
-          />
-          <q-toggle
-            :model-value="formData.paidearly === 'Y'"
-            @update:model-value="(val) => (formData.paidearly = val ? 'Y' : '')"
-            :label="t('Paid Early')"
-            color="primary"
-          />
-          <q-toggle
-            :model-value="formData.onhold === 'Y'"
-            @update:model-value="(val) => (formData.onhold = val ? 'Y' : '')"
-            :label="t('On Hold')"
-            color="primary"
-          />
-        </div>
-
-        <div class="q-py-sm">
-          <draggable v-model="baseColumns" item-key="name" class="drag-area">
-            <template #item="{ element }">
-              <q-checkbox
-                size="2rem"
-                v-model="selectedColumns[element.name]"
-                :label="t(element.label)"
-                color="primary"
-                class="q-mr-sm maintext"
+          <div>
+            <div class="flex-container q-mt-md container">
+              <q-input
+                v-model="formData.transdatefrom"
+                type="date"
+                :label="t('Transaction Date From')"
+                input-class="maintext"
+                label-color="secondary"
+                class="lightbg col-4"
+                outlined
+                dense
               />
-            </template>
-          </draggable>
+              <q-input
+                v-model="formData.transdateto"
+                type="date"
+                :label="t('Transaction Date To')"
+                input-class="maintext"
+                label-color="secondary"
+                class="lightbg col-4"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.createdfrom"
+                type="date"
+                :label="t('Created Date From')"
+                input-class="maintext"
+                label-color="secondary"
+                class="lightbg col-4"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.createdto"
+                type="date"
+                :label="t('Created Date To')"
+                input-class="maintext"
+                label-color="secondary"
+                class="lightbg col-4"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.updatedfrom"
+                type="date"
+                :label="t('Updated Date From')"
+                input-class="maintext"
+                label-color="secondary"
+                class="lightbg col-4"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.updatedto"
+                type="date"
+                :label="t('Updated Date To')"
+                input-class="maintext"
+                label-color="secondary"
+                class="lightbg col-4"
+                outlined
+                dense
+              />
+            </div>
+            <div class="container">
+              <q-toggle
+                :model-value="formData.outstanding === 'Y'"
+                @update:model-value="
+                  (val) => (formData.outstanding = val ? 'Y' : '')
+                "
+                :label="t('Outstanding')"
+                color="primary"
+              />
+              <q-toggle
+                :model-value="formData.open === 'Y'"
+                @update:model-value="(val) => (formData.open = val ? 'Y' : '')"
+                :label="t('Open')"
+                color="primary"
+              />
+              <q-toggle
+                :model-value="formData.closed === 'Y'"
+                @update:model-value="
+                  (val) => (formData.closed = val ? 'Y' : '')
+                "
+                :label="t('Closed')"
+                color="primary"
+              />
+              <q-toggle
+                :model-value="formData.paidlate === 'Y'"
+                @update:model-value="
+                  (val) => (formData.paidlate = val ? 'Y' : '')
+                "
+                :label="t('Paid Late')"
+                color="primary"
+              />
+              <q-toggle
+                :model-value="formData.paidearly === 'Y'"
+                @update:model-value="
+                  (val) => (formData.paidearly = val ? 'Y' : '')
+                "
+                :label="t('Paid Early')"
+                color="primary"
+              />
+              <q-toggle
+                :model-value="formData.onhold === 'Y'"
+                @update:model-value="
+                  (val) => (formData.onhold = val ? 'Y' : '')
+                "
+                :label="t('On Hold')"
+                color="primary"
+              />
+              <q-separator class="q-my-sm" />
+              <div class="q-py-sm">
+                <draggable
+                  v-model="baseColumns"
+                  item-key="name"
+                  class="drag-area"
+                >
+                  <template #item="{ element }">
+                    <q-checkbox
+                      size="2rem"
+                      v-model="selectedColumns[element.name]"
+                      :label="t(element.label)"
+                      color="primary"
+                      class="q-mr-sm maintext"
+                    />
+                  </template>
+                </draggable>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row q-mt-sm q-gutter-x-sm">
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            @click="search"
-          />
-          <q-btn :label="t('Clear')" @click="clearForm" />
+
+        <div class="row q-mt-sm q-gutter-x-sm justify-end">
+          <s-button type="clear" @click="clearForm" />
+
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>
@@ -317,18 +308,8 @@
     <!-- Results Table -->
     <div v-if="results.length > 0">
       <div class="row q-mb-sm hide-print">
-        <q-btn
-          :label="t('Export XL')"
-          @click="downloadExcel"
-          class="q-mr-sm"
-          color="accent"
-        />
-        <q-btn
-          :label="t('Export PDF')"
-          @click="downloadPDF"
-          class="q-mr-sm"
-          color="info"
-        />
+        <s-button type="export-xl" @click="downloadExcel" class="q-mr-md" />
+        <s-button type="export-pdf" @click="downloadPDF" />
       </div>
       <q-table
         class="q-mt-sm"

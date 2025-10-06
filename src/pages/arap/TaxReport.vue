@@ -1,10 +1,10 @@
 <template>
   <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg hide-print">
+    <q-form @submit.prevent class="q-px-sm q-py-sm hide-print container">
       <q-expansion-item
         :label="t('Search Params')"
         header-class="lightbg maintext"
-        expand-icon-class="maintext"
+        expand-icon-class="container-bg"
         v-model="filtersOpen"
       >
         <!-- Loading indicator shown inside params section when fetching -->
@@ -22,7 +22,7 @@
             class="lightbg col-3"
             :label="t('Department')"
             input-class="maintext"
-            option-label="label"
+            option-label="description"
             option-value="value"
             :options="departments"
             outlined
@@ -113,14 +113,9 @@
           </draggable>
         </div>
 
-        <div class="row q-mt-sm q-gutter-x-sm">
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            @click="search"
-          />
-          <q-btn :label="t('Clear')" @click="clearForm" />
+        <div class="row q-mt-sm q-gutter-x-sm justify-end">
+          <s-button type="clear" @click="clearForm" />
+          <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>

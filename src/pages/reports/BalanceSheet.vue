@@ -1,224 +1,226 @@
 <template>
-  <q-page class="q-pa-sm">
+  <q-page class="q-pa-md">
     <!-- Search Form Card -->
-    <q-expansion-item
-      :label="t('Report Parameters')"
-      class="q-mb-md"
-      header-class="mainbg maintext"
-      expand-icon-class="maintext"
-      v-model="filtersOpen"
-    >
-      <q-card-section class="mainbg">
-        <q-form @submit.prevent="search" class="q-gutter-y-sm">
-          <!-- Filters Section -->
-          <div class="row q-gutter-sm q-mt-none">
-            <div class="col-12 col-md-3" v-if="departments.length > 0">
-              <s-select
-                v-model="formData.department"
-                :options="departments"
-                :label="t('Department')"
-                option-value="value"
-                option-label="description"
-                outlined
-                dense
-                clearable
-                emit-value
-                map-options
-                search="description"
-              />
+    <div class="container">
+      <q-expansion-item
+        :label="t('Report Parameters')"
+        class="q-mb-md"
+        header-class="container-bg"
+        expand-icon-class="maintext"
+        v-model="filtersOpen"
+      >
+        <q-card-section class="mainbg">
+          <q-form @submit.prevent="search" class="q-gutter-y-sm">
+            <!-- Filters Section -->
+            <div class="row q-gutter-sm q-mt-none">
+              <div class="col-12 col-md-3" v-if="departments.length > 0">
+                <s-select
+                  v-model="formData.department"
+                  :options="departments"
+                  :label="t('Department')"
+                  option-value="value"
+                  option-label="description"
+                  outlined
+                  dense
+                  clearable
+                  emit-value
+                  map-options
+                  search="description"
+                />
+              </div>
+              <div class="col-12 col-md-3" v-if="projects.length > 0">
+                <s-select
+                  v-model="formData.projectnumber"
+                  :options="projects"
+                  option-label="description"
+                  option-value="value"
+                  :label="t('Project')"
+                  outlined
+                  dense
+                  clearable
+                  emit-value
+                  map-options
+                  search="description"
+                />
+              </div>
             </div>
-            <div class="col-12 col-md-3" v-if="projects.length > 0">
-              <s-select
-                v-model="formData.projectnumber"
-                :options="projects"
-                option-label="description"
-                option-value="value"
-                :label="t('Project')"
-                outlined
-                dense
-                clearable
-                emit-value
-                map-options
-                search="description"
-              />
-            </div>
-          </div>
 
-          <!-- Period Type Selection -->
-          <div class="row q-gutter-sm">
-            <div class="col-12">
-              <q-option-group
-                v-model="formData.periodMode"
-                :options="periodModeOptions"
-                inline
-                dense
-                :label="t('Period Type')"
-              />
+            <!-- Period Type Selection -->
+            <div class="row q-gutter-sm">
+              <div class="col-12">
+                <q-option-group
+                  v-model="formData.periodMode"
+                  :options="periodModeOptions"
+                  inline
+                  dense
+                  :label="t('Period Type')"
+                />
+              </div>
             </div>
-          </div>
 
-          <!-- Custom Periods Section with Drag & Drop -->
-          <div class="q-mt-md">
-            <div class="row">
-              <div class="text-h6">{{ t("As Of") }}</div>
-              <q-btn
-                :label="t('Add Date')"
-                @click="addPeriod"
-                class="q-ml-sm"
+            <!-- Custom Periods Section with Drag & Drop -->
+            <div class="q-mt-md">
+              <div class="row">
+                <div class="text-h6">{{ t("As Of") }}</div>
+                <q-btn
+                  :label="t('Add Date')"
+                  @click="addPeriod"
+                  class="q-ml-sm"
+                  color="primary"
+                />
+              </div>
+              <!-- Draggable component wraps the period list -->
+              <draggable
+                v-model="formData.periods"
+                group="periods"
+                handle=".drag-handle"
+              >
+                <template #item="{ element, index }">
+                  <div class="row q-gutter-sm q-mt-xs items-center">
+                    <!-- Drag handle icon for rearranging -->
+                    <div class="col-auto">
+                      <q-icon
+                        name="drag_indicator"
+                        class="cursor-move drag-handle"
+                        size="sm"
+                      />
+                    </div>
+                    <!-- Current Mode: only current date -->
+                    <template v-if="formData.periodMode === 'current'">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.todate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('As of Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                    </template>
+                    <!-- Monthly Mode: specific month-end -->
+                    <template v-else-if="formData.periodMode === 'monthly'">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.todate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                    </template>
+                    <!-- Quarterly Mode: quarter-end date -->
+                    <template v-else-if="formData.periodMode === 'quarterly'">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.todate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                    </template>
+                    <!-- Yearly Mode: year-end date -->
+                    <template v-else-if="formData.periodMode === 'yearly'">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.todate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                    </template>
+                    <!-- Custom Mode: specific date -->
+                    <template v-else-if="formData.periodMode === 'custom'">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.todate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('As of Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                      <!-- Hidden input to store the automatic label -->
+                      <div style="display: none">
+                        <q-input v-model="element.label" readonly />
+                      </div>
+                    </template>
+
+                    <!-- Delete Button -->
+                    <div class="col-12 col-md-1">
+                      <q-btn
+                        icon="delete"
+                        color="negative"
+                        flat
+                        round
+                        @click="removePeriod(index)"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </draggable>
+            </div>
+
+            <!-- Report Formatting -->
+            <div class="row items-center q-mb-sm" v-if="false">
+              <div class="col-12 col-md-4">
+                <q-option-group
+                  v-model="formData.accounttype"
+                  :options="accountTypeOptions"
+                  inline
+                  dense
+                  :label="t('Account Type')"
+                  type="radio"
+                />
+              </div>
+            </div>
+
+            <!-- Display Options -->
+            <div class="row q-gutter-md q-mt-sm">
+              <q-checkbox
+                v-model="formData.l_accno"
+                :label="t('Show Account Numbers')"
                 color="primary"
-              />
-            </div>
-            <!-- Draggable component wraps the period list -->
-            <draggable
-              v-model="formData.periods"
-              group="periods"
-              handle=".drag-handle"
-            >
-              <template #item="{ element, index }">
-                <div class="row q-gutter-sm q-mt-xs items-center">
-                  <!-- Drag handle icon for rearranging -->
-                  <div class="col-auto">
-                    <q-icon
-                      name="drag_indicator"
-                      class="cursor-move drag-handle"
-                      size="sm"
-                    />
-                  </div>
-                  <!-- Current Mode: only current date -->
-                  <template v-if="formData.periodMode === 'current'">
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.todate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('As of Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                  </template>
-                  <!-- Monthly Mode: specific month-end -->
-                  <template v-else-if="formData.periodMode === 'monthly'">
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.todate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                  </template>
-                  <!-- Quarterly Mode: quarter-end date -->
-                  <template v-else-if="formData.periodMode === 'quarterly'">
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.todate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                  </template>
-                  <!-- Yearly Mode: year-end date -->
-                  <template v-else-if="formData.periodMode === 'yearly'">
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.todate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                  </template>
-                  <!-- Custom Mode: specific date -->
-                  <template v-else-if="formData.periodMode === 'custom'">
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.todate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('As of Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                    <!-- Hidden input to store the automatic label -->
-                    <div style="display: none">
-                      <q-input v-model="element.label" readonly />
-                    </div>
-                  </template>
-
-                  <!-- Delete Button -->
-                  <div class="col-12 col-md-1">
-                    <q-btn
-                      icon="delete"
-                      color="negative"
-                      flat
-                      round
-                      @click="removePeriod(index)"
-                    />
-                  </div>
-                </div>
-              </template>
-            </draggable>
-          </div>
-
-          <!-- Report Formatting -->
-          <div class="row items-center q-mb-sm" v-if="false">
-            <div class="col-12 col-md-4">
-              <q-option-group
-                v-model="formData.accounttype"
-                :options="accountTypeOptions"
-                inline
                 dense
-                :label="t('Account Type')"
-                type="radio"
+              />
+              <q-checkbox
+                v-model="formData.accounttype"
+                :label="t('GIFI')"
+                color="primary"
+                dense
+                true-value="gifi"
+                false-value="standard"
               />
             </div>
-          </div>
 
-          <!-- Display Options -->
-          <div class="row q-gutter-md q-mt-sm">
-            <q-checkbox
-              v-model="formData.l_accno"
-              :label="t('Show Account Numbers')"
-              color="primary"
-              dense
-            />
-            <q-checkbox
-              v-model="formData.accounttype"
-              :label="t('GIFI')"
-              color="primary"
-              dense
-              true-value="gifi"
-              false-value="standard"
-            />
-          </div>
-
-          <!-- Submit Button -->
-          <div class="row q-mt-sm">
-            <q-btn
-              type="submit"
-              :label="t('Generate Report')"
-              color="primary"
-              icon="description"
-              :loading="loading"
-            >
-              <template v-slot:loading>
-                <q-spinner-hourglass class="on-left" />
-                {{ t("Generating...") }}
-              </template>
-            </q-btn>
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-expansion-item>
+            <!-- Submit Button -->
+            <div class="row q-mt-sm">
+              <q-btn
+                type="submit"
+                :label="t('Generate Report')"
+                color="primary"
+                icon="description"
+                :loading="loading"
+              >
+                <template v-slot:loading>
+                  <q-spinner-hourglass class="on-left" />
+                  {{ t("Generating...") }}
+                </template>
+              </q-btn>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-expansion-item>
+    </div>
 
     <!-- Report Output -->
     <q-card

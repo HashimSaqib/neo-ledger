@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-sm relative-position">
     <!-- Main Form Header Section -->
-    <div class="mainbg textmain q-pa-md-sm q-pa-sm">
+    <div class="container">
       <div class="row justify-between full-width">
         <!-- Vendor Selection and Information -->
         <div class="col-sm-6 col-12">
@@ -14,11 +14,9 @@
               v-model="selectedVendor"
               dense
               outlined
-              label-color="secondary"
               class="q-mb-sm col-12 col-sm-7"
               @update:model-value="vendorUpdate"
               search="label"
-              bg-color="input"
             />
             <div class="q-ml-sm" style="display: flex; align-items: center">
               <q-btn
@@ -30,7 +28,6 @@
                 flat
                 dense
               />
-
               <q-btn
                 @click.prevent="openAddVendor"
                 class="text-primary"
@@ -53,10 +50,77 @@
               </p>
             </div>
           </div>
+
           <div v-if="vendor">
             <p class="q-mb-sm q-px-sm maintext">
               <strong>{{ t("Address") }}</strong> {{ vendor.full_address }}
             </p>
+          </div>
+
+          <div class="row">
+            <!-- Shipto Expansion Item -->
+            <q-expansion-item
+              label="Shipto"
+              dense
+              class="q-mt-none q-mb-sm col-7 line-bg"
+            >
+              <div class="q-pa-sm">
+                <q-input
+                  v-model="shipto.name"
+                  label="Name"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
+                  v-model="shipto.address1"
+                  label="Address 1"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
+                  v-model="shipto.address2"
+                  label="Address 2"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
+                  v-model="shipto.city"
+                  label="City"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
+                  v-model="shipto.state"
+                  label="State"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
+                  v-model="shipto.zip"
+                  label="Zip"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+              </div>
+            </q-expansion-item>
           </div>
 
           <!-- Record Account & Currency Selection -->
@@ -64,33 +128,30 @@
             <s-select
               outlined
               v-model="recordAccount"
-              :options="recordAccounts"
+              :options="openRecordAccounts"
               :label="t('Record In')"
               dense
               popup-content-class="mainbg maintext"
-              label-color="secondary"
-              bg-color="input"
               class="q-mb-sm col-sm-7 col-12"
               search="label"
+              option-label="label"
               account
             />
           </div>
 
           <div v-if="currencies && currencies.length" class="row">
-            <q-select
+            <s-select
               v-if="currencies"
               outlined
               v-model="selectedCurrency"
               :options="currencies"
               option-value="curr"
               option-label="curr"
+              search="curr"
               :label="t('Currency')"
-              dense
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
             />
-            <q-input
+            <text-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
               class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
               :label="t('Exchange Rate')"
@@ -103,49 +164,37 @@
 
           <!-- Additional Header Fields -->
           <div class="row q-mb-sm">
-            <q-input
+            <text-input
               outlined
               :label="t('Description')"
               v-model="description"
-              bg-color="input"
-              label-color="secondary"
               class="col-sm-10 col-12"
-              dense
               autogrow
             />
           </div>
           <div class="row q-gutter-x-sm">
-            <q-input
+            <text-input
               outlined
               :label="t('Shipping Point')"
               v-model="shippingPoint"
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
-              dense
               autogrow
             />
-            <q-input
+            <text-input
               outlined
               :label="t('Ship Via')"
               v-model="shipVia"
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
-              dense
               autogrow
             />
-            <q-input
+            <text-input
               outlined
               :label="t('Way Bill')"
               v-model="wayBill"
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
-              dense
               autogrow
             />
-            <q-select
+            <s-select
               v-if="departments.length > 0"
               outlined
               v-model="selectedDepartment"
@@ -154,59 +203,73 @@
               option-label="description"
               :label="t('Department')"
               dense
-              bg-color="input"
-              label-color="secondary"
               clearable
+              search="description"
               autogrow
               hide-bottom-space
               class="col-sm-5 col-12 q-mb-sm"
             />
           </div>
+          <!-- New file upload section -->
         </div>
 
         <!-- Invoice Number and Date Fields -->
         <div class="col-sm-4 col-12">
           <div class="row justify-around">
-            <q-input
+            <text-input
               outlined
               :label="t('Invoice Number')"
               v-model="invNumber"
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
-              dense
+              :disable="lockNumber"
             />
-            <q-input
+            <text-input
               outlined
               :label="t('Order Number')"
               v-model="ordNumber"
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
-              dense
             />
           </div>
           <div class="row justify-around">
-            <q-input
+            <text-input
               v-model="invDate"
               :label="t('Invoice Date')"
               class="q-mb-sm col-sm-5 col-12"
-              bg-color="input"
-              label-color="secondary"
               outlined
-              dense
               type="date"
               @change="filterProjects"
             />
-            <q-input
+            <text-input
               v-model="dueDate"
               :label="t('Due Date')"
               class="q-mb-sm col-sm-5 col-12"
+              outlined
+              type="date"
+            />
+          </div>
+          <div class="row q-ml-lg q-mb-sm">
+            <q-file
               bg-color="input"
               label-color="secondary"
-              outlined
+              filled
               dense
-              type="date"
+              outlined
+              v-model="files"
+              label="Reference Documents"
+              multiple
+              append
+              use-chips
+            >
+              <template v-slot:prepend>
+                <q-icon name="attachment" />
+              </template>
+            </q-file>
+          </div>
+          <div class="row q-ml-lg q-mt-sm">
+            <FileList
+              :files="existingFiles"
+              module="ap"
+              @file-deleted="handleFileDeletion"
             />
           </div>
         </div>
@@ -214,16 +277,19 @@
     </div>
 
     <!-- Line Items Section -->
-    <div class="mainbg q-my-sm q-pa-sm">
-      <div class="row q-mb-md">
-        <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
-        <q-btn
-          color="primary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Line')"
-          @click="addLine"
+    <div class="container">
+      <div class="row q-mb-md items-center">
+        <h6 class="container-title q-my-none">{{ t("Items") }}</h6>
+        <s-button type="add-line" @click="addLine" class="q-ml-md" />
+
+        <s-button
+          type="add-part"
+          @click="openAddPart('part')"
+          class="q-ml-md"
+        />
+        <s-button
+          type="add-service"
+          @click="openAddPart('service')"
           class="q-ml-md"
         />
       </div>
@@ -234,7 +300,7 @@
         @end="dragging = false"
       >
         <template #item="{ element: line, index }">
-          <div :key="line.id">
+          <div :key="line.id" class="line-bg q-pa-md q-my-md">
             <!-- Main Line Fields -->
             <div
               class="row justify-between align-center"
@@ -256,7 +322,6 @@
                 search="label"
                 :ref="(el) => (lineSelects[index] = el)"
               />
-              <!-- Edit Product Button -->
 
               <s-select
                 v-if="!line.partnumber"
@@ -275,7 +340,7 @@
                 search="label"
                 :ref="(el) => (descriptionInputs[index] = el)"
               />
-              <q-input
+              <text-input
                 v-else
                 outlined
                 v-model="line.description"
@@ -288,7 +353,7 @@
                 @keydown.enter="handleLineEnter(index, $event)"
                 :ref="(el) => (descriptionInputs[index] = el)"
               />
-              <q-input
+              <fn-input
                 outlined
                 v-model="line.qty"
                 :label="t('Qty')"
@@ -299,18 +364,19 @@
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
-                :value="line.oh"
+                v-model="line.onhand"
                 :label="t('OH')"
-                class="col-1"
+                class="col-1 maintext"
                 bg-color="input"
                 label-color="secondary"
                 dense
-                readonly
+                type="input"
                 @keyup.enter="handleLineEnter(index, $event)"
+                disable
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.unit"
                 :label="t('Unit')"
@@ -330,7 +396,7 @@
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <fn-input
                 outlined
                 v-model="line.discount"
                 :label="t('%')"
@@ -341,7 +407,7 @@
                 dense
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.extended"
                 :model-value="formatAmount(line.extended)"
@@ -403,7 +469,7 @@
                 bg-color="input"
                 @keyup.enter="handleLineEnter(index, $event)"
               />
-              <q-input
+              <text-input
                 outlined
                 v-model="line.itemnotes"
                 :label="t('Item Notes')"
@@ -452,7 +518,7 @@
               />
               <q-input
                 outlined
-                v-model="line.vendorponumber"
+                v-model="line.customerponumber"
                 :label="t('PO Number')"
                 dense
                 class="col-3"
@@ -503,7 +569,7 @@
       <!-- Invoice Totals and Notes -->
       <div class="row justify-between items-end">
         <div class="col">
-          <q-input
+          <text-input
             dense
             outlined
             class="col-sm-10 col-12"
@@ -516,15 +582,15 @@
           />
         </div>
         <div class="col q-ml-md">
-          <q-input
+          <text-input
             dense
             outlined
             class="col-sm-11 col-12"
             rows="2"
+            autogrow
             bg-color="input"
             label-color="secondary"
             :label="t('Internal Notes')"
-            type="textarea"
             v-model="intnotes"
           />
         </div>
@@ -579,53 +645,39 @@
     </div>
 
     <!-- Payment Section -->
-    <div class="mainbg q-my-sm q-pa-sm">
+    <div class="container">
       <div class="row q-mb-md">
         <h6 class="q-my-none q-pa-none text-secondary">{{ t("Payments") }}</h6>
-        <q-btn
-          color="primary"
-          icon="add"
-          dense
-          flat
-          :label="t('Add Line')"
-          @click="addPayment"
-          class="q-ml-md"
-        />
+        <s-button type="add-line" @click="addPayment" class="q-ml-md" />
       </div>
       <div
         v-for="(payment, index) in payments"
         :key="index"
-        class="row q-mb-md justify-between"
+        class="row q-mb-md justify-between line-bg q-pa-md"
       >
-        <q-input
+        <text-input
           outlined
           v-model="payment.date"
           :label="t('Date')"
           class="q-mt-sm"
-          bg-color="input"
-          label-color="secondary"
           dense
           type="date"
           @keyup.enter="handlePaymentEnter(index, $event)"
           :ref="(el) => (paymentDateInputs[index] = el)"
         />
-        <q-input
+        <text-input
           outlined
           v-model="payment.source"
           :label="t('Source')"
           class="q-mt-sm"
-          bg-color="input"
-          label-color="secondary"
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
         />
-        <q-input
+        <text-input
           outlined
           v-model="payment.memo"
           :label="t('Memo')"
           class="q-mt-sm"
-          bg-color="input"
-          label-color="secondary"
           dense
           @keyup.enter="handlePaymentEnter(index, $event)"
         />
@@ -651,7 +703,7 @@
         <s-select
           outlined
           v-model="payment.account"
-          :options="paymentAccounts"
+          :options="openPaymentAccounts"
           :label="t('Account')"
           option-label="label"
           option-value="id"
@@ -671,11 +723,46 @@
           @click="removePayment(index)"
         />
       </div>
+      <div class="row">
+        <p class="q-my-xs maintext">
+          <strong>Outstanding: {{ formatAmount(balance) }}</strong>
+        </p>
+      </div>
     </div>
 
-    <!-- Print Options Section (shown if invoice exists) -->
+    <div class="row justify-end">
+      <s-button
+        type="delete"
+        @click="deleteInvoice"
+        class="q-mr-md"
+        v-if="canDelete"
+      />
+      <s-button
+        type="save"
+        @click="postInvoice(true, false)"
+        class="q-mr-md"
+        v-if="canPost"
+      />
+      <s-button type="new-number" @click="newNumber" class="q-mr-md" />
+      <s-button
+        type="post-as-new"
+        @click="postInvoice(false, true)"
+        class="q-mr-md"
+        v-if="canPostAsNew"
+      />
+      <s-button
+        type="post"
+        @click="postInvoice(true, false)"
+        class="q-mr-md"
+        v-if="canPost"
+      />
+    </div>
+
+    <q-separator class="q-my-sm q-mt-md" size="2px" v-if="invId" />
+
     <div class="row q-gutter-x-md" v-if="invId">
       <s-select
+        label="Template"
         :options="templates"
         option-label="label"
         option-value="value"
@@ -683,36 +770,36 @@
         emit-value
         v-model="printOptions.template"
         search="label"
-        label="Template"
       />
-      <q-select
+      <s-select
+        label="Format"
         :options="['tex', 'html']"
         v-model="printOptions.format"
         class="mainbg"
         dense
         outlined
       />
-      <q-select
-        :options="['Download']"
+      <s-select
+        label="Location"
+        :options="printLocations"
         v-model="printOptions.location"
         class="mainbg"
         dense
         outlined
+        map-options
+        emit-value
+        search="location"
+        option-label="label"
       />
+      <s-button type="print" @click="printInvoice" v-if="invId" />
+      <s-button type="email" @click="toggleEmailDialog" v-if="invId" />
     </div>
-    <q-separator class="q-my-sm" size="2px" v-if="invId" />
-    <q-btn
-      :label="t('Post')"
-      color="primary"
-      @click="postInvoice"
-      class="relative-position q-mr-md"
-    />
-    <q-btn
-      color="accent"
-      :label="t('Print')"
-      @click="printInvoice"
-      v-if="invId"
-    />
+    <div class="q-mt-md q-px-md">
+      <h6 class="q-my-md q-pa-none text-secondary">
+        {{ t("Last 5 Transactions") }}
+      </h6>
+      <LastTransactions type="ap" :invoice="true" ref="lastTransactionsRef" />
+    </div>
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
@@ -724,7 +811,6 @@
           <AddVC
             :id="dialogMode === 'edit' ? selectedVendor.id : null"
             type="vendor"
-            @close="vendorDialog = false"
             @saved="vendorSaved"
           />
         </q-card-section>
@@ -742,8 +828,23 @@
                 : null
             "
             :type="selectedPartType"
-            @close="closePartDialog"
             @saved="partSaved"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Email Dialog -->
+    <q-dialog v-model="emailDialog">
+      <q-card style="min-width: 500px" class="q-pa-sm">
+        <q-card-section class="q-pa-none"> </q-card-section>
+        <q-card-section>
+          <EmailOptions
+            :selectedVendor="vendor"
+            :invId="invId"
+            :invNumber="invNumber"
+            :type="invType"
+            vc="vendor"
           />
         </q-card-section>
       </q-card>
@@ -767,12 +868,20 @@ import {
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
-import { formatAmount } from "src/helpers/utils";
+import {
+  formatAmount,
+  confirmDelete,
+  convertFilesToBase64,
+} from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import AddPart from "src/pages/goodservices/AddPart.vue";
-
+import { jsonToFormData } from "src/helpers/formDataHelper.js";
+import FileList from "src/components/FileList.vue";
+import EmailOptions from "src/components/EmailOptions.vue";
+import LastTransactions from "src/components/LastTransactions.vue";
+const lastTransactionsRef = ref(null);
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -810,8 +919,10 @@ const openEditPart = (line) => {
     line.partnumber && line.partnumber.inventory_accno_id ? "part" : "service";
   partDialog.value = true;
 };
-const closePartDialog = () => {
-  partDialog.value = false;
+const openAddPart = (type) => {
+  // Determine type based on inventory_accno_id property
+  selectedPartType.value = type;
+  partDialog.value = true;
 };
 const partSaved = async () => {
   // When a part is saved, re-fetch the items list.
@@ -827,17 +938,26 @@ updateTitle("Vendor Invoice");
 if (route.params.type === "debit_invoice") {
   updateTitle("Debit Invoice");
 }
-const invType = ref(route.params.type ? "debit_invoice" : "invoice");
+const invType = ref(
+  route.params.type === "debit_invoice" ? "debit_invoice" : "invoice"
+);
 
-const templates = [
-  { label: t("Invoice"), value: "vendor_invoice" },
-  { label: t("Pick List"), value: "pick_list" },
-  { label: t("Packing List"), value: "packing_list" },
+const templates = [{ label: t("Vendor Invoice"), value: "vendor_invoice" }];
+const printLocations = [
+  { label: t("Screen"), value: "screen" },
+  { label: t("Download"), value: "download" },
 ];
 const printOptions = ref({
   template: "vendor_invoice",
   format: "tex",
-  location: "download",
+  location: "screen",
+});
+
+const emailOpitons = ref({
+  template: "invoice",
+  format: "tex",
+  inline: 0,
+  attachment: "pdf",
 });
 // =====================
 // Counters & Refs for Dynamic Elements
@@ -875,7 +995,7 @@ const fetchVendor = async (id) => {
 };
 const vendorSaved = async (id) => {
   await fetchVendors();
-  selectedVendor.value = vendors.value.find((cus) => cus.id == id.id);
+  selectedVendor.value = vendors.value.find((ven) => ven.id == id.id);
   vendorUpdate(id);
   vendorDialog.value = false;
 };
@@ -900,6 +1020,7 @@ const recordAccount = ref();
 const recordAccounts = ref([]);
 const paymentAccounts = ref([]);
 const defaultPaymentAccount = ref([]);
+const invoicePaymentAccount = ref([]);
 const fetchAccounts = async () => {
   try {
     const response = await api.get("/charts");
@@ -909,7 +1030,7 @@ const fetchAccounts = async () => {
       account.link.split(":").includes("AP_paid")
     );
     defaultPaymentAccount.value = paymentAccounts.value[0];
-    recordAccount.value = recordAccounts.value[0];
+    recordAccount.value = openRecordAccounts.value[0];
   } catch (error) {
     console.log(error);
     Notify.create({
@@ -919,6 +1040,12 @@ const fetchAccounts = async () => {
     });
   }
 };
+const openRecordAccounts = computed(() =>
+  recordAccounts.value.filter((account) => account.closed === 0)
+);
+const openPaymentAccounts = computed(() =>
+  paymentAccounts.value.filter((account) => account.closed === 0)
+);
 
 // Links & Currencies & Projects
 const departments = ref([]);
@@ -943,11 +1070,19 @@ const filterProjects = () => {
     return invDateObj >= start && invDateObj <= end; // Include if within range
   });
 };
+const taxes = ref([]);
+const lockNumber = ref(null);
+const closedto = ref(null);
+const revtrans = ref(null);
 const fetchLinks = async () => {
   try {
     const response = await api.get(`/create_links/vendor`);
     departments.value = response.data.departments;
     currencies.value = response.data.currencies;
+    lockNumber.value = response.data.locknumber == 1 ? true : false;
+    closedto.value = response.data.closedto;
+    revtrans.value = response.data.revtrans;
+    taxes.value = response.data.tax_accounts;
     if (currencies.value) {
       selectedCurrency.value = currencies.value.find(
         (currency) => currency.rn === 1
@@ -973,7 +1108,16 @@ const intnotes = ref("");
 const invNumber = ref("");
 const ordNumber = ref("");
 const poNumber = ref("");
+const shipto = ref({});
 const invId = ref(route.query.id ? `${route.query.id}` : "");
+// Add after the existing refs
+const files = ref(null);
+const existingFiles = ref([]);
+
+// Add after the existing methods
+const handleFileDeletion = (index) => {
+  existingFiles.value.splice(index, 1);
+};
 
 const { formatDate, addToDate } = date;
 const getTodayDate = () => {
@@ -992,7 +1136,7 @@ const lines = ref([
     number: "",
     description: "",
     qty: 1,
-    oh: 0,
+    onhand: "",
     unit: "",
     price: 0,
     discount: 0,
@@ -1016,7 +1160,7 @@ const addLineAt = (index) => {
     number: "",
     description: "",
     qty: 1,
-    oh: 0,
+    onhand: "",
     unit: "",
     price: 0,
     discount: 0,
@@ -1033,9 +1177,7 @@ const addLine = () => {
   addLineAt(lines.value.length - 1);
 };
 const removeLine = (index) => {
-  if (lines.value.length > 1) {
-    lines.value.splice(index, 1);
-  }
+  lines.value.splice(index, 1);
 };
 
 // Handle Enter Key for Lines
@@ -1061,7 +1203,7 @@ const handleLineItemChange = (newValue, index) => {
       console.log(newValue);
       const line = lines.value[index];
       line.description = newValue.partnumber.description || "";
-      line.oh = newValue.partnumber.oh || 0;
+      line.onhand = newValue.partnumber.onhand || "";
       line.unit = newValue.partnumber.unit || "";
       line.price = newValue.partnumber.sellprice || 0;
       line.itemnotes = newValue.partnumber.notes || "";
@@ -1082,7 +1224,14 @@ const handleLineItemChange = (newValue, index) => {
     }
   });
 };
-
+const newNumber = async () => {
+  try {
+    const response = await api.get(`next_number/ap`);
+    invNumber.value = response.data.number;
+  } catch (error) {
+    console.error(error);
+  }
+};
 // Watch Lines for Recalculation
 watch(
   lines,
@@ -1098,6 +1247,17 @@ watch(
   },
   { deep: true }
 );
+
+// Add watcher for invoice date changes
+watch(invDate, () => {
+  calculateTaxes();
+});
+watch(partDialog, () => {
+  if (!partDialog.value) {
+    selectedPartLine.value = null;
+    selectedPartType.value = "";
+  }
+});
 
 // =====================
 // Taxes & Totals Calculation
@@ -1124,7 +1284,27 @@ const calculateTaxes = () => {
         ) {
           const name =
             vendor.value[`${taxAccount}_description`] || "Tax Name Not Found";
-          const taxRate = vendor.value[`${taxAccount}_rate`] || 0;
+
+          // Find the applicable tax rate based on invoice date
+          const applicableTaxes = taxes.value
+            .filter((tax) => tax.accno === taxAccount)
+            .filter((tax) => {
+              // Include if validto is null (currently valid) or greater than invoice date
+              return (
+                !tax.validto || new Date(tax.validto) > new Date(invDate.value)
+              );
+            })
+            .sort((a, b) => {
+              // Sort by validto date, null values last
+              if (!a.validto) return 1;
+              if (!b.validto) return -1;
+              return new Date(a.validto) - new Date(b.validto);
+            });
+
+          // Use the most recent applicable tax rate
+          const taxRate =
+            applicableTaxes.length > 0 ? applicableTaxes[0].rate : 0;
+
           let taxAmount = 0;
           let netAmount = parseFloat(line.extended);
           if (taxIncluded.value) {
@@ -1134,13 +1314,13 @@ const calculateTaxes = () => {
             taxAmount = netAmount * taxRate;
           }
           const existingTax = invoiceTaxes.value.find(
-            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(0)}%`
+            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(2)}%`
           );
           if (existingTax) {
             existingTax.amount += parseFloat(taxAmount.toFixed(2));
           } else {
             invoiceTaxes.value.push({
-              name: `${name} ${(taxRate * 100).toFixed(0)}%`,
+              name: `${name} ${(taxRate * 100).toFixed(2)}%`,
               amount: parseFloat(taxAmount.toFixed(2)),
               acc: taxAccount,
               rate: taxRate,
@@ -1178,10 +1358,19 @@ const total = computed(() => {
   }
   return parseFloat(totalValue.toFixed(2));
 });
+const totalPaid = computed(() => {
+  return payments.value.reduce((acc, payment) => {
+    return acc + (parseFloat(payment.amount) || 0);
+  }, 0);
+});
+const balance = computed(() => {
+  return total.value - totalPaid.value;
+});
 
 // =====================
 // Payments Handling
 // =====================
+const paymentmethod_id = ref(null);
 const payments = ref([
   {
     date: getTodayDate(),
@@ -1197,7 +1386,11 @@ const addPaymentAt = (index) => {
     source: "",
     memo: "",
     amount: 0,
-    account: defaultPaymentAccount.value,
+    account: paymentmethod_id.value
+      ? openPaymentAccounts.value.find(
+          (acc) => acc.id == paymentmethod_id.value
+        )
+      : defaultPaymentAccount.value,
   };
   payments.value.splice(index + 1, 0, newPayment);
   nextTick(() => {
@@ -1250,10 +1443,17 @@ const vendorUpdate = async (newValue) => {
     }
   }
   const paymentAccountAccno = vendor.value?.payment_accno?.split("--")[0] || "";
-  defaultPaymentAccount.value =
-    paymentAccounts.value.find(
-      (account) => account.accno === paymentAccountAccno
-    ) || paymentAccounts.value[0];
+  if (!paymentmethod_id.value) {
+    defaultPaymentAccount.value =
+      paymentAccounts.value.find(
+        (account) => account.accno === paymentAccountAccno
+      ) || paymentAccounts.value[0];
+  } else {
+    defaultPaymentAccount.value =
+      paymentAccounts.value.find(
+        (account) => account.id === paymentmethod_id.value
+      ) || paymentAccounts.value[0];
+  }
   payments.value.forEach(
     (payment) =>
       payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
@@ -1303,7 +1503,7 @@ const loadInvoice = async (invoice) => {
     ]);
   }
   selectedVendor.value = vendors.value.find(
-    (cust) => cust.vendornumber === invoice.vendornumber
+    (ven) => ven.vendornumber === invoice.vendornumber
   );
   if (!selectedVendor.value) {
     Notify.create({
@@ -1315,7 +1515,7 @@ const loadInvoice = async (invoice) => {
   }
   await vendorUpdate(selectedVendor.value);
   recordAccount.value = recordAccounts.value.find(
-    (account) => account.accno === invoice.recordAccount.accno
+    (account) => account.accno == invoice.recordAccount
   );
   if (!recordAccount.value) {
     Notify.create({
@@ -1341,6 +1541,8 @@ const loadInvoice = async (invoice) => {
   invType.value = invoice.type;
   ordNumber.value = invoice.ordNumber;
   invDate.value = invoice.invDate;
+  // Store the original invoice date for closed period check
+  originalInvDate.value = invoice.invDate;
   dueDate.value = invoice.dueDate;
   poNumber.value = invoice.poNumber;
   if (invType.value === "debit_invoice") {
@@ -1359,7 +1561,7 @@ const loadInvoice = async (invoice) => {
       partnumber: line,
       description: line.description,
       qty: line.qty,
-      oh: line.oh,
+      onhand: line.onhand,
       unit: line.unit,
       price: line.price,
       discount: line.discount,
@@ -1370,7 +1572,7 @@ const loadInvoice = async (invoice) => {
       itemnotes: line.itemnotes,
       ordernumber: line.ordernumber,
       serialnumber: line.serialnumber,
-      vendorponumber: line.vendorponumber,
+      customerponumber: line.customerponumber,
       costvendor: line.costvendor,
       package: line.package,
       volume: line.volume,
@@ -1410,9 +1612,27 @@ const loadInvoice = async (invoice) => {
       exchangerate: payment.exchangerate,
     };
   });
+  paymentmethod_id.value = invoice.paymentmethod_id;
+  const shiptoFields = [
+    "name",
+    "address1",
+    "address2",
+    "city",
+    "state",
+    "zipcode",
+    "country",
+    "contact",
+    "phone",
+    "fax",
+    "email",
+  ];
+  shiptoFields.forEach((field) => {
+    shipto.value[field] = invoice.shipto[`${field}`];
+  });
   if (payments.value.length === 0) {
     addPayment();
   }
+  existingFiles.value = invoice.files || [];
 };
 
 // =====================
@@ -1437,13 +1657,21 @@ const printInvoice = async () => {
     );
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${printOptions.value.template}_${invId.value}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+
+    if (printOptions.value.location === "screen") {
+      // Open PDF in a new tab or window
+      window.open(url, "_blank");
+    } else {
+      // Download PDF
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${printOptions.value.template}_${invId.value}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    // Clean up the object URL after a short delay
+    setTimeout(() => window.URL.revokeObjectURL(url), 100);
     loading.value = false;
   } catch (error) {
     Notify.create({
@@ -1456,7 +1684,47 @@ const printInvoice = async () => {
   }
 };
 
-const postInvoice = async () => {
+const deleteInvoice = async () => {
+  try {
+    const confirmed = await confirmDelete({
+      title: t("Confirm Deletion"),
+      message: t(
+        "Are you sure you want to delete this invoice? This action cannot be undone."
+      ),
+    });
+
+    if (confirmed) {
+      await api.delete(`/arap/invoice/vendor/${invId.value}`);
+
+      Notify.create({
+        message: t("Invoice deleted successfully"),
+        color: "positive",
+        position: "center",
+      });
+
+      if (route.query.callback) {
+        const query = { ...route.query, search: 1 };
+        router.push({ path: route.query.callback, query: query });
+      } else {
+        resetForm();
+      }
+    } else {
+      Notify.create({
+        message: t("Invoice Delete canceled"),
+        color: "warning",
+        position: "center",
+      });
+    }
+  } catch (error) {
+    Notify.create({
+      message: t("Unable to delete Invoice") + error,
+      color: "negative",
+      position: "center",
+    });
+    console.error(error);
+  }
+};
+const postInvoice = async (save = false, isNew = false) => {
   if (!selectedVendor.value) {
     Notify.create({
       message: t("Vendor is required."),
@@ -1493,7 +1761,7 @@ const postInvoice = async () => {
     return;
   }
   const invoiceData = {
-    selectedVendor: selectedVendor.value,
+    vendor_id: selectedVendor.value.id,
     shippingPoint: shippingPoint.value,
     shipVia: shipVia.value,
     wayBill: wayBill.value,
@@ -1506,7 +1774,7 @@ const postInvoice = async () => {
     dueDate: dueDate.value,
     poNumber: poNumber.value,
     recordAccount: recordAccount.value,
-    selectedCurrency: selectedCurrency.value,
+    currency: selectedCurrency.value.curr,
     type: invType.value,
     lines: lines.value
       .filter((line) => line.partnumber && line.partnumber.id)
@@ -1514,7 +1782,6 @@ const postInvoice = async () => {
         number: line.partnumber.id,
         description: line.description,
         qty: line.qty,
-        oh: line.oh,
         unit: line.unit,
         price: line.price,
         discount: line.discount,
@@ -1523,7 +1790,7 @@ const postInvoice = async () => {
         itemnotes: line.itemnotes,
         ordernumber: line.ordernumber,
         serialnumber: line.serialnumber,
-        vendorponumber: line.vendorponumber,
+        customerponumber: line.customerponumber,
         costvendor: line.costvendor,
         package: line.package,
         volume: line.volume,
@@ -1532,12 +1799,13 @@ const postInvoice = async () => {
         cost: line.cost,
         project: line.project,
       })),
+    shipto: shipto.value,
     payments: payments.value.map((payment) => ({
       date: payment.date,
       source: payment.source,
       memo: payment.memo,
       amount: payment.amount,
-      account: payment.account ? payment.account.label : "",
+      account: payment.account ? payment.account.accno : "",
       exchangerate: payment.exchangerate,
     })),
   };
@@ -1555,23 +1823,42 @@ const postInvoice = async () => {
     }));
     invoiceData.taxincluded = taxIncluded.value;
   }
-  console.log("Invoice Data:", invoiceData);
+
+  // Convert files to base64
+  const base64Files = await convertFilesToBase64(files.value || []);
+  invoiceData.files = base64Files;
+
+  const idParam = ref(invId.value);
+  if (isNew) {
+    idParam.value = "";
+  }
   try {
     loading.value = true;
     const response = await api.post(
-      `/arap/invoice/vendor/${invId.value}`,
-      invoiceData
+      `/arap/invoice/vendor/${idParam.value}`,
+      invoiceData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
     Notify.create({
       message: "Transaction posted successfully",
       type: "positive",
       position: "top-right",
     });
-    if (route.query.callback) {
+    const id = response.data.id;
+    if (save) {
+      fetchInvoice(id);
+      files.value = null;
+      lastTransactionsRef.value.fetchTransactions();
+    } else if (route.query.callback) {
       const query = { ...route.query, search: 1 };
       router.push({ path: route.query.callback, query: query });
     } else {
       resetForm();
+      lastTransactionsRef.value.fetchTransactions();
     }
   } catch (error) {
     console.log(error);
@@ -1607,7 +1894,7 @@ const resetForm = () => {
       partnumber: null,
       description: "",
       qty: 0,
-      oh: "",
+      onhand: "",
       unit: "",
       price: 0,
       discount: 0,
@@ -1626,6 +1913,8 @@ const resetForm = () => {
   exchangeRate.value = 1;
   invoiceTaxes.value = [];
   taxIncluded.value = false;
+  files.value = null;
+  existingFiles.value = [];
 };
 
 // =====================
@@ -1650,4 +1939,37 @@ onMounted(() => {
   fetchVendors();
   fetchInvoice(route.query.id);
 });
+
+// =====================
+// Email Dialog
+// =====================
+const emailDialog = ref(false);
+const toggleEmailDialog = () => {
+  emailDialog.value = !emailDialog.value;
+};
+
+// Add computed properties to control button visibility
+const canPost = computed(
+  () =>
+    (!closedto.value ||
+      !originalInvDate.value ||
+      originalInvDate.value > closedto.value) &&
+    (!closedto.value || invDate.value > closedto.value)
+);
+
+const canPostAsNew = computed(
+  () => !closedto.value || invDate.value > closedto.value
+);
+
+const canDelete = computed(
+  () =>
+    invId.value &&
+    (!closedto.value ||
+      !originalInvDate.value ||
+      originalInvDate.value > closedto.value) &&
+    revtrans.value != 1
+);
+
+// Add originalInvDate ref to track the original invoice date for existing invoices
+const originalInvDate = ref(null);
 </script>

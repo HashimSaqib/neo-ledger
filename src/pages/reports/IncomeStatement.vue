@@ -1,322 +1,319 @@
 <template>
   <q-page class="q-pa-sm">
     <!-- Search Form Card -->
-    <q-expansion-item
-      :label="t('Report Parameters')"
-      class="q-mb-md"
-      header-class="mainbg maintext"
-      expand-icon-class="maintext"
-      v-model="filtersOpen"
-    >
-      <q-card-section class="mainbg">
-        <q-form @submit.prevent="search" class="q-gutter-y-sm">
-          <!-- Filters Section -->
-          <div class="row q-gutter-sm q-mt-none">
-            <div class="col-12 col-md-3" v-if="departments.length > 0">
-              <s-select
-                v-model="formData.department"
-                :options="departments"
-                :label="t('Department')"
-                option-value="value"
-                option-label="description"
-                outlined
-                dense
-                clearable
-                emit-value
-                map-options
-                search="description"
-              />
+    <div class="container">
+      <q-expansion-item
+        :label="t('Report Parameters')"
+        class="q-mb-md"
+        header-class="container-bg"
+        expand-icon-class="maintext"
+        v-model="filtersOpen"
+      >
+        <q-card-section class="mainbg">
+          <q-form @submit.prevent="search" class="q-gutter-y-sm">
+            <!-- Filters Section -->
+            <div class="row q-gutter-sm q-mt-none">
+              <div class="col-12 col-md-3" v-if="departments.length > 0">
+                <s-select
+                  v-model="formData.department"
+                  :options="departments"
+                  :label="t('Department')"
+                  option-value="value"
+                  option-label="description"
+                  outlined
+                  dense
+                  clearable
+                  emit-value
+                  map-options
+                  search="description"
+                />
+              </div>
+              <div class="col-12 col-md-3" v-if="projects.length > 0">
+                <s-select
+                  v-model="formData.projectnumber"
+                  :options="projects"
+                  option-label="description"
+                  option-value="value"
+                  :label="t('Project')"
+                  outlined
+                  dense
+                  clearable
+                  emit-value
+                  map-options
+                  search="description"
+                />
+              </div>
+              <div class="col-12 col-md-3" v-if="currencies.length > 0">
+                <s-select
+                  v-model="formData.currency"
+                  :options="currencies"
+                  option-value="curr"
+                  option-label="curr"
+                  emit-value
+                  map-options
+                  outlined
+                  dense
+                  :label="t('Currency')"
+                  search="curr"
+                />
+              </div>
+              <div class="col-12 col-md-3">
+                <q-input
+                  v-model="formData.decimalplaces"
+                  type="number"
+                  min="0"
+                  max="4"
+                  :label="t('Decimal Places')"
+                  outlined
+                  dense
+                  class="col-1"
+                />
+              </div>
             </div>
-            <div class="col-12 col-md-3" v-if="projects.length > 0">
-              <s-select
-                v-model="formData.projectnumber"
-                :options="projects"
-                option-label="description"
-                option-value="value"
-                :label="t('Project')"
-                outlined
-                dense
-                clearable
-                emit-value
-                map-options
-                search="description"
-              />
-            </div>
-            <div class="col-12 col-md-3" v-if="currencies.length > 0">
-              <s-select
-                v-model="formData.currency"
-                :options="currencies"
-                option-value="curr"
-                option-label="curr"
-                emit-value
-                map-options
-                outlined
-                dense
-                :label="t('Currency')"
-                search="curr"
-              />
-            </div>
-            <div class="col-12 col-md-3">
-              <q-input
-                v-model="formData.decimalplaces"
-                type="number"
-                min="0"
-                max="4"
-                :label="t('Decimal Places')"
-                outlined
-                dense
-                class="col-1"
-              />
-            </div>
-          </div>
 
-          <!-- Period Type Selection -->
-          <div class="row q-gutter-sm">
-            <div class="col-12">
-              <q-option-group
-                v-model="formData.periodMode"
-                :options="periodModeOptions"
-                inline
-                dense
-                :label="t('Period Type')"
-              />
+            <!-- Period Type Selection -->
+            <div class="row q-gutter-sm">
+              <div class="col-12">
+                <q-option-group
+                  v-model="formData.periodMode"
+                  :options="periodModeOptions"
+                  inline
+                  dense
+                  :label="t('Period Type')"
+                />
+              </div>
             </div>
-          </div>
 
-          <!-- Custom Periods Section with Drag & Drop -->
-          <div class="q-mt-md">
-            <div class="row">
-              <div class="text-h6">{{ t("Custom Periods") }}</div>
-              <q-btn
-                icon="add"
-                :label="t('Add Period')"
-                @click="addPeriod"
+            <!-- Custom Periods Section with Drag & Drop -->
+            <div class="q-mt-md">
+              <div class="row">
+                <div class="text-h6">{{ t("Custom Periods") }}</div>
+                <q-btn
+                  icon="add"
+                  :label="t('Add Period')"
+                  @click="addPeriod"
+                  color="primary"
+                  class="q-ml-sm"
+                />
+              </div>
+              <!-- Draggable component wraps the period list -->
+              <draggable
+                v-model="formData.periods"
+                group="periods"
+                handle=".drag-handle"
+              >
+                <template #item="{ element, index }">
+                  <div class="row q-gutter-sm q-mt-xs items-center">
+                    <!-- Drag handle icon for rearranging -->
+                    <div class="col-auto">
+                      <q-icon
+                        name="drag_indicator"
+                        class="cursor-move drag-handle"
+                        size="sm"
+                      />
+                    </div>
+                    <!-- Current Mode: only year -->
+                    <template v-if="formData.periodMode === 'current'">
+                      <div class="col-12 col-md-3">
+                        <s-select
+                          v-model="element.year"
+                          :options="yearOptions"
+                          outlined
+                          dense
+                          :label="t('Year')"
+                          emit-value
+                          map-options
+                          @update:model-value="() => updatePeriod(element)"
+                          search="label"
+                        />
+                      </div>
+                    </template>
+                    <!-- Monthly Mode: month and year -->
+                    <template v-else-if="formData.periodMode === 'monthly'">
+                      <div class="col-12 col-md-3">
+                        <s-select
+                          v-model="element.month"
+                          :options="monthOptions"
+                          outlined
+                          dense
+                          :label="t('Month')"
+                          emit-value
+                          map-options
+                          @update:model-value="() => updatePeriod(element)"
+                          search="label"
+                        />
+                      </div>
+                      <div class="col-12 col-md-3">
+                        <s-select
+                          v-model="element.year"
+                          :options="yearOptions"
+                          outlined
+                          dense
+                          :label="t('Year')"
+                          emit-value
+                          map-options
+                          @update:model-value="() => updatePeriod(element)"
+                          search="label"
+                        />
+                      </div>
+                    </template>
+                    <!-- Quarterly Mode: quarter and year -->
+                    <template v-else-if="formData.periodMode === 'quarterly'">
+                      <div class="col-12 col-md-3">
+                        <s-select
+                          v-model="element.quarter"
+                          :options="quarterOptions"
+                          outlined
+                          dense
+                          :label="t('Quarter')"
+                          emit-value
+                          map-options
+                          @update:model-value="() => updatePeriod(element)"
+                          search="label"
+                        />
+                      </div>
+                      <div class="col-12 col-md-3">
+                        <s-select
+                          v-model="element.year"
+                          :options="yearOptions"
+                          outlined
+                          dense
+                          :label="t('Year')"
+                          emit-value
+                          map-options
+                          @update:model-value="() => updatePeriod(element)"
+                          search="label"
+                        />
+                      </div>
+                    </template>
+                    <!-- Yearly Mode: only year -->
+                    <template v-else-if="formData.periodMode === 'yearly'">
+                      <div class="col-12 col-md-3">
+                        <s-select
+                          v-model="element.year"
+                          :options="yearOptions"
+                          outlined
+                          dense
+                          :label="t('Year')"
+                          emit-value
+                          map-options
+                          @update:model-value="() => updatePeriod(element)"
+                          search="label"
+                        />
+                      </div>
+                    </template>
+                    <!-- Custom Mode: date pickers for fromdate & todate -->
+                    <template v-else-if="formData.periodMode === 'custom'">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.fromdate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('From Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="element.todate"
+                          type="date"
+                          outlined
+                          dense
+                          :label="t('To Date')"
+                          @update:model-value="() => updatePeriod(element)"
+                        />
+                      </div>
+                      <!-- Hidden input to store the automatic label -->
+                      <div style="display: none">
+                        <q-input v-model="element.label" readonly />
+                      </div>
+                    </template>
+
+                    <!-- Delete Button -->
+                    <div class="col-12 col-md-1">
+                      <q-btn
+                        icon="delete"
+                        color="negative"
+                        flat
+                        round
+                        @click="removePeriod(index)"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </draggable>
+            </div>
+
+            <!-- Accounting Method -->
+            <div class="row items-center q-mb-sm">
+              <div class="col-12 col-md-4">
+                <q-option-group
+                  v-model="formData.method"
+                  :options="methodOptions"
+                  inline
+                  dense
+                  :label="t('Accounting Method')"
+                />
+              </div>
+            </div>
+
+            <!-- Report Formatting -->
+            <div class="row items-center q-mb-sm">
+              <div class="col-12 col-md-4">
+                <q-option-group
+                  v-model="formData.accounttype"
+                  :options="accountTypeOptions"
+                  inline
+                  dense
+                  :label="t('Account Type')"
+                  type="radio"
+                />
+              </div>
+            </div>
+
+            <!-- Display Options -->
+            <div class="row q-gutter-md">
+              <q-checkbox
+                v-model="formData.l_accno"
+                :label="t('Show Account Numbers')"
                 color="primary"
-                class="q-ml-sm"
-              />
-            </div>
-            <!-- Draggable component wraps the period list -->
-            <draggable
-              v-model="formData.periods"
-              group="periods"
-              handle=".drag-handle"
-            >
-              <template #item="{ element, index }">
-                <div class="row q-gutter-sm q-mt-xs items-center">
-                  <!-- Drag handle icon for rearranging -->
-                  <div class="col-auto">
-                    <q-icon
-                      name="drag_indicator"
-                      class="cursor-move drag-handle"
-                      size="sm"
-                    />
-                  </div>
-                  <!-- Current Mode: only year -->
-                  <template v-if="formData.periodMode === 'current'">
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
-                        outlined
-                        dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                  </template>
-                  <!-- Monthly Mode: month and year -->
-                  <template v-else-if="formData.periodMode === 'monthly'">
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.month"
-                        :options="monthOptions"
-                        outlined
-                        dense
-                        :label="t('Month')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
-                        outlined
-                        dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                  </template>
-                  <!-- Quarterly Mode: quarter and year -->
-                  <template v-else-if="formData.periodMode === 'quarterly'">
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.quarter"
-                        :options="quarterOptions"
-                        outlined
-                        dense
-                        :label="t('Quarter')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
-                        outlined
-                        dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                  </template>
-                  <!-- Yearly Mode: only year -->
-                  <template v-else-if="formData.periodMode === 'yearly'">
-                    <div class="col-12 col-md-3">
-                      <s-select
-                        v-model="element.year"
-                        :options="yearOptions"
-                        outlined
-                        dense
-                        :label="t('Year')"
-                        emit-value
-                        map-options
-                        @update:model-value="() => updatePeriod(element)"
-                        search="label"
-                      />
-                    </div>
-                  </template>
-                  <!-- Custom Mode: date pickers for fromdate & todate -->
-                  <template v-else-if="formData.periodMode === 'custom'">
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.fromdate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('From Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="element.todate"
-                        type="date"
-                        outlined
-                        dense
-                        :label="t('To Date')"
-                        @update:model-value="() => updatePeriod(element)"
-                      />
-                    </div>
-                    <!-- Hidden input to store the automatic label -->
-                    <div style="display: none">
-                      <q-input v-model="element.label" readonly />
-                    </div>
-                  </template>
-
-                  <!-- Delete Button -->
-                  <div class="col-12 col-md-1">
-                    <q-btn
-                      icon="delete"
-                      color="negative"
-                      flat
-                      round
-                      @click="removePeriod(index)"
-                    />
-                  </div>
-                </div>
-              </template>
-            </draggable>
-          </div>
-
-          <!-- Accounting Method -->
-          <div class="row items-center q-mb-sm">
-            <div class="col-12 col-md-4">
-              <q-option-group
-                v-model="formData.method"
-                :options="methodOptions"
-                inline
                 dense
-                :label="t('Accounting Method')"
               />
-            </div>
-          </div>
-
-          <!-- Report Formatting -->
-          <div class="row items-center q-mb-sm">
-            <div class="col-12 col-md-4">
-              <q-option-group
+              <q-checkbox
                 v-model="formData.accounttype"
-                :options="accountTypeOptions"
-                inline
+                :label="t('GIFI')"
+                color="primary"
                 dense
-                :label="t('Account Type')"
-                type="radio"
+                true-value="gifi"
+                false-value="standard"
               />
             </div>
-          </div>
 
-          <!-- Display Options -->
-          <div class="row q-gutter-md">
-            <q-checkbox
-              v-model="formData.l_accno"
-              :label="t('Show Account Numbers')"
-              color="primary"
-              dense
-            />
-            <q-checkbox
-              v-model="formData.accounttype"
-              :label="t('GIFI')"
-              color="primary"
-              dense
-              true-value="gifi"
-              false-value="standard"
-            />
-          </div>
-
-          <!-- Submit Button -->
-          <div class="row q-mt-sm">
-            <q-btn
-              type="submit"
-              :label="t('Generate Report')"
-              color="primary"
-              icon="description"
-              :loading="loading"
-            >
-              <template v-slot:loading>
-                <q-spinner-hourglass class="on-left" />
-                {{ t("Generating...") }}
-              </template>
-            </q-btn>
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-expansion-item>
-
+            <!-- Submit Button -->
+            <div class="row q-mt-sm">
+              <q-btn
+                type="submit"
+                :label="t('Generate Report')"
+                color="primary"
+                icon="description"
+                :loading="loading"
+              >
+                <template v-slot:loading>
+                  <q-spinner-hourglass class="on-left" />
+                  {{ t("Generating...") }}
+                </template>
+              </q-btn>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-expansion-item>
+    </div>
     <!-- Report Output -->
-    <q-card
-      v-if="results && Object.keys(results).length"
-      class="shadow-2"
-      ref="reportContent"
-    >
+    <q-card v-if="results && Object.keys(results).length" ref="reportContent">
       <q-card-actions class="q-pa-sm no-print">
-        <q-btn :label="t('Export')" @click="downloadExcel" color="accent" />
-        <q-btn :label="t('Print')" @click="getPDF" color="info" />
+        <s-button type="export-xl" @click="downloadExcel" />
+        <s-button type="export-pdf" @click="downloadPDF" />
         <q-space />
         <q-btn
           :label="t('Expand All')"

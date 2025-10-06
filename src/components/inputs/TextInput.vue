@@ -7,6 +7,9 @@
       @blur="onBlur"
       outlined
       dense
+      :type="type"
+      :autogrow="autogrow"
+      :rows="rows"
       bg-color="input"
       :label="label"
     />
@@ -15,7 +18,6 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { formatAmount, parseAmount } from "src/helpers/utils";
 
 /**
  * Props:
@@ -24,8 +26,8 @@ import { formatAmount, parseAmount } from "src/helpers/utils";
  */
 const props = defineProps({
   modelValue: {
-    type: Number,
-    default: 0,
+    type: String,
+    default: "",
   },
   label: {
     type: String,
@@ -34,6 +36,18 @@ const props = defineProps({
   inlinelabel: {
     type: Boolean,
     default: false,
+  },
+  type: {
+    type: String,
+    default: "text",
+  },
+  autogrow: {
+    type: Boolean,
+    default: false,
+  },
+  rows: {
+    type: Number,
+    default: 1,
   },
 });
 
@@ -55,7 +69,7 @@ const rawValue = ref("");
  * - When editing, we show the raw value the user is typing.
  */
 const displayValue = computed(() => {
-  return isEditing.value ? rawValue.value : formatAmount(props.modelValue);
+  return isEditing.value ? rawValue.value : props.modelValue;
 });
 
 /**
@@ -64,7 +78,7 @@ const displayValue = computed(() => {
 function onFocus() {
   isEditing.value = true;
   // Show the same formatted value for editing
-  rawValue.value = formatAmount(props.modelValue);
+  rawValue.value = props.modelValue;
 }
 
 /**
@@ -72,8 +86,7 @@ function onFocus() {
  */
 function onBlur() {
   isEditing.value = false;
-  const newVal = parseAmount(rawValue.value);
-  emit("update:modelValue", newVal);
+  emit("update:modelValue", rawValue.value);
 }
 
 /**
@@ -84,8 +97,15 @@ function onInput(value) {
 }
 </script>
 
-<style scoped>
-.text-right {
-  text-align: right;
+<style>
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-label {
+  font-weight: 600;
+  color: #65758b;
 }
 </style>
