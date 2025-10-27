@@ -1,18 +1,8 @@
 <template>
   <q-page class="q-pa-sm">
     <div class="row q-mb-sm hide-print">
-      <q-btn
-        :label="t('Export')"
-        @click="downloadExcel"
-        class="q-mr-sm"
-        color="accent"
-      />
-      <q-btn
-        :label="t('Print')"
-        @click="triggerPrint"
-        class="q-mr-sm"
-        color="info"
-      />
+      <s-button type="export-xl" @click="downloadExcel" class="q-mr-sm" />
+      <s-button type="export-pdf" @click="triggerPrint" class="q-mr-sm" />
     </div>
     <q-table
       :rows="results"
@@ -256,7 +246,7 @@
                 color="primary"
                 @click="editDialog = false"
               />
-              <q-btn label="Save" color="primary" type="submit" />
+              <s-button type="save" @click="saveBankAccount" />
             </div>
           </q-form>
         </q-card-section>
@@ -497,6 +487,5 @@ onMounted(() => {
   font-weight: bold;
   background-color: var(--q-maintext);
   color: var(--q-mainbg);
-  font-size: 1.1rem;
 }
 </style>

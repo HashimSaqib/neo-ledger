@@ -31,9 +31,26 @@ export default {
       type: String,
       default: "md",
     },
+    icon: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     buttonClasses() {
+      const directStyleTypes = [
+        "primary",
+        "secondary",
+        "outlined",
+        "destructive",
+      ];
+
+      if (directStyleTypes.includes(this.type)) {
+        return {
+          [`button--${this.type}`]: true,
+        };
+      }
+
       const styleMap = {
         "add-line": "outlined",
         post: "primary",
@@ -57,6 +74,20 @@ export default {
       };
     },
     buttonIcon() {
+      if (this.icon) {
+        return this.icon;
+      }
+
+      const directStyleTypes = [
+        "primary",
+        "secondary",
+        "outlined",
+        "destructive",
+      ];
+      if (directStyleTypes.includes(this.type)) {
+        return null;
+      }
+
       const iconMap = {
         "add-line": "add",
         post: "send",
@@ -72,6 +103,11 @@ export default {
         save: "save",
         search: "search",
         clear: "clear",
+        download: "download",
+        edit: "edit",
+        "view-file": "picture_as_pdf",
+        "more-actions": "more_vert",
+        close: "close",
         default: null,
       };
       return iconMap[this.type] || null;
@@ -79,6 +115,16 @@ export default {
     displayLabel() {
       if (this.label) {
         return this.label;
+      }
+
+      const directStyleTypes = [
+        "primary",
+        "secondary",
+        "outlined",
+        "destructive",
+      ];
+      if (directStyleTypes.includes(this.type)) {
+        return "";
       }
 
       const labelMap = {
@@ -101,13 +147,13 @@ export default {
       return labelMap[this.type] || "";
     },
     isOutline() {
-      return this.type === "add-line";
+      return this.type === "add-line" || this.type === "outlined";
     },
     isFlat() {
       return false;
     },
     isRound() {
-      return this.type === "add-line";
+      return this.type === "add-line" || this.type === "outlined";
     },
   },
 };
@@ -119,7 +165,6 @@ export default {
   border-radius: 10px;
   padding: 0.5rem 1rem;
 
-  // Primary button styles (for post and post-as-new)
   &--primary {
     background-color: #3c83f6;
     border: 1px solid #3c83f6;
@@ -147,7 +192,6 @@ export default {
     }
   }
 
-  // Outlined button styles (for add-line)
   &--outlined {
     color: var(--q-border);
     border: 1px solid var(--q-border);
@@ -164,7 +208,6 @@ export default {
       color: var(--q-maintext);
     }
 
-    // Style the icon with the same color as text
     .icon-color {
       color: var(--q-maintext);
     }
@@ -174,7 +217,6 @@ export default {
     }
   }
 
-  // Secondary button styles (for new-number)
   &--secondary {
     background-color: var(--q-secondarybtn);
     border: 1px solid var(--q-secondarybtn);
@@ -202,7 +244,6 @@ export default {
     }
   }
 
-  // Destructive button styles (for delete)
   &--destructive {
     background-color: #ef4343;
     border: 1px solid #ef4343;

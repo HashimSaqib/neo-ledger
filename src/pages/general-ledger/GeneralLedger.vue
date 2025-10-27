@@ -324,17 +324,24 @@
       <div class="row justify-end"></div>
     </div>
 
-    <!-- Two buttons: Save and Post -->
-    <div class="row q-my-sm q-px-sm q-gutter-x-sm justify-end">
-      <s-button type="delete" v-if="canDelete" @click="deleteTransaction" />
-
-      <s-button type="new-number" v-if="canPostAsNew" @click="newNumber" />
-      <s-button
-        type="post-as-new"
-        v-if="canPostAsNew"
-        @click="submitTransaction(false, true)"
+    <div class="row q-my-sm q-px-sm q-gutter-x-sm justify-between">
+      <q-checkbox
+        v-model="pending"
+        :label="t('Pending')"
+        :true-value="1"
+        :false-value="0"
       />
-      <s-button type="post" v-if="canPost" @click="submitTransaction(true)" />
+      <div class="q-gutter-x-sm">
+        <s-button type="delete" v-if="canDelete" @click="deleteTransaction" />
+
+        <s-button type="new-number" v-if="canPostAsNew" @click="newNumber" />
+        <s-button
+          type="post-as-new"
+          v-if="canPostAsNew"
+          @click="submitTransaction(false, true)"
+        />
+        <s-button type="post" v-if="canPost" @click="submitTransaction(true)" />
+      </div>
     </div>
 
     <div class="q-mt-md q-px-md">
@@ -382,6 +389,7 @@ const initialFormData = {
   id: null,
   files: [],
   offsetAccount: null,
+  pending: 0,
 };
 
 const initialLine = {
@@ -396,7 +404,8 @@ const initialLine = {
 };
 
 const formData = ref({ ...initialFormData });
-// -- Lines state includes showExtra to control visibility of source & memo --
+
+const pending = ref(0);
 const lines = ref([{ ...initialLine }, { ...initialLine }]);
 
 const transactionTitle = computed(() =>
@@ -738,11 +747,11 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
           : formData.value.selectedDepartment
         : undefined,
       files: base64Files,
+      pending: pending.value,
       offset_accno: formData.value.offsetAccount
         ? formData.value.offsetAccount.accno
         : undefined,
     };
-
     let response;
     if (formData.value.id && !isNew) {
       response = await api.put(
@@ -778,6 +787,7 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
       formData.value.offsetAccount = null;
       lines.value = [{ ...initialLine }, { ...initialLine }];
       existingFiles.value = [];
+      pending.value = 0;
       lastTransactionsRef.value.fetchTransactions();
 
       // Remove ID from URL when posting
@@ -823,12 +833,14 @@ const loadTransaction = async (id) => {
         transdate: transactionData.transdate,
         originaldate: transactionData.transdate,
         exchangeRate: transactionData.exchangeRate,
+        pending: transactionData.pending ? 1 : 0,
         offsetAccount: transactionData.offset_accno
           ? accounts.value.find(
               (acc) => acc.accno === transactionData.offset_accno
             )
           : null,
       };
+      pending.value = transactionData.pending ? 1 : 0;
       if (departments.value?.length) {
         formData.value.selectedDepartment = departments.value.find(
           (dpt) => dpt.id === transactionData.department_id
@@ -941,6 +953,7 @@ const resetForm = () => {
   formData.value.offsetAccount = null;
   lines.value = [{ ...initialLine }, { ...initialLine }];
   existingFiles.value = [];
+  pending.value = 0;
 };
 const updateTaxAmount = (val, index) => {
   if (loading.value) return;

@@ -474,11 +474,6 @@ const getMenuLinks = async () => {
           link: "/import/ap_transaction",
           perm: "import.ap_transaction",
         },
-        {
-          title: "Bank Import",
-          link: "/import/bank",
-          perm: "import.bank",
-        },
       ],
     },
     // Merge AI plugin menu items

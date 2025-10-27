@@ -55,7 +55,7 @@ const props = defineProps({
  * Emits:
  * - update:modelValue: standard event for v-model
  */
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "focus", "blur"]);
 
 /**
  * Internal state
@@ -79,6 +79,7 @@ function onFocus() {
   isEditing.value = true;
   // Show the same formatted value for editing
   rawValue.value = props.modelValue;
+  emit("focus");
 }
 
 /**
@@ -87,6 +88,7 @@ function onFocus() {
 function onBlur() {
   isEditing.value = false;
   emit("update:modelValue", rawValue.value);
+  emit("blur");
 }
 
 /**
