@@ -75,7 +75,7 @@
           />
         </div>
         <div class="col-12 col-md-5">
-          <q-input
+          <country-input
             v-model="form.country"
             name="country"
             :label="t('Country')"

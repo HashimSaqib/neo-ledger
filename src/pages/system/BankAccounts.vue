@@ -229,7 +229,7 @@
                 />
               </div>
               <div class="col-6">
-                <q-input
+                <country-input
                   dense
                   outlined
                   v-model="selectedBank.country"

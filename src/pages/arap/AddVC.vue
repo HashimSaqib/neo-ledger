@@ -14,27 +14,28 @@
         </div>
 
         <!-- Section Toggles -->
-        <div class="row q-mb-md q-gutter-md">
+        <div class="row q-mb-md q-gutter-sm">
           <q-checkbox
             v-model="showAdditionalInfo"
             label="Additional Information"
-            class="q-mr-md"
+            dense
           />
           <q-checkbox
             v-model="showContactPerson"
             label="Contact Person"
-            class="q-mr-md"
+            dense
           />
           <q-checkbox
-            v-model="showBankInfo"
-            label="Bank Information"
-            class="q-mr-md"
+            v-model="showBankAccounts"
+            label="Bank Accounts"
+            dense
+            :disable="!isEditMode"
           />
         </div>
 
         <div class="row full-width">
           <!-- First Column - Mandatory Fields -->
-          <div class="col-12 col-md-4 q-mr-xl container-bg q-pa-md">
+          <div class="col-12 col-md-3 container-bg q-pa-md q-pr-sm">
             <text-input
               v-model="form.vcnumber"
               name="vcnumber"
@@ -69,6 +70,14 @@
               class="q-mb-sm"
             />
             <text-input
+              v-model="form.street"
+              name="street"
+              :label="t('Street')"
+              outlined
+              dense
+              class="q-mb-sm"
+            />
+            <text-input
               v-model="form.city"
               name="city"
               :label="t('City')"
@@ -84,7 +93,7 @@
               dense
               class="q-mb-sm"
             />
-            <text-input
+            <country-input
               v-model="form.country"
               name="country"
               :label="t('Country')"
@@ -142,7 +151,7 @@
           <!-- Second Column - Additional Information (when enabled) -->
           <div
             v-show="showAdditionalInfo"
-            class="col-12 col-md-3 container-bg q-pa-md"
+            class="col-12 col-md-3 container-bg q-pa-md q-px-sm"
           >
             <text-input
               v-model="form.state"
@@ -190,32 +199,28 @@
             />
 
             <!-- Account Information -->
-            <div class="row q-mb-sm">
+            <div class="row items-center q-mb-sm">
               <div class="col-4">{{ arap }}</div>
-              <div class="col-8">
-                <q-select
-                  v-model="form.arap_accno"
-                  name="arap_accno"
-                  :options="recordAccounts"
-                  outlined
-                  dense
-                  class=""
-                />
-              </div>
+              <q-select
+                v-model="form.arap_accno"
+                name="arap_accno"
+                :options="recordAccounts"
+                outlined
+                dense
+                class="col-8"
+              />
             </div>
 
-            <div class="row q-mb-sm">
+            <div class="row items-center q-mb-sm">
               <div class="col-4">{{ t("Payment") }}</div>
-              <div class="col-8">
-                <q-select
-                  v-model="form.payment_accno"
-                  name="payment_accno"
-                  :options="paymentAccounts"
-                  outlined
-                  dense
-                  class=""
-                />
-              </div>
+              <q-select
+                v-model="form.payment_accno"
+                name="payment_accno"
+                :options="paymentAccounts"
+                outlined
+                dense
+                class="col-8"
+              />
             </div>
 
             <!-- Additional Fields -->
@@ -309,7 +314,7 @@
           <!-- Third Column - Contact Person (when enabled) -->
           <div
             v-show="showContactPerson"
-            class="col-12 col-md-3 q-ml-xl container-bg q-pa-md"
+            class="col-12 col-md-3 container-bg q-pa-md q-px-sm"
           >
             <text-input
               v-model="form.salutation"
@@ -367,107 +372,60 @@
               />
             </div>
           </div>
-        </div>
 
-        <!-- Bank Information Section (when enabled) -->
-        <div v-show="showBankInfo" class="row q-mt-md q-gutter-x-lg">
-          <div class="col-12 col-md-4 container-bg q-pa-md">
-            <text-input
-              v-model="form.bankname"
-              name="bankname"
-              :label="t('Bank')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bankaddress1"
-              name="bankaddress1"
-              :label="t('Bank Address')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bankaddress2"
-              name="bankaddress2"
-              :label="t('Bank Address 2')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bankcity"
-              name="bankcity"
-              :label="t('Bank City')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bankstate"
-              name="bankstate"
-              :label="t('Bank State/Province')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bankzipcode"
-              name="bankzipcode"
-              :label="t('Bank Zip/Postal Code')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bankcountry"
-              name="bankcountry"
-              :label="t('Bank Country')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-          </div>
+          <!-- Fourth Column - Bank Accounts (when enabled) -->
+          <div
+            v-show="showBankAccounts"
+            class="col-12 col-md-3 container-bg q-pa-md q-pl-sm"
+          >
+            <div class="row items-center justify-between q-mb-sm">
+              <div class="text-subtitle2 text-weight-medium">Bank Accounts</div>
+              <q-btn
+                flat
+                round
+                dense
+                icon="add"
+                size="sm"
+                color="primary"
+                @click="openAddBankDialog"
+              />
+            </div>
 
-          <div class="col-12 col-md-4 container-bg q-pa-md">
-            <text-input
-              v-model="form.iban"
-              name="iban"
-              :label="t('IBAN')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bic"
-              name="bic"
-              :label="t('BIC')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.membernumber"
-              name="membernumber"
-              :label="t('Member Number')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.clearingnumber"
-              name="clearingnumber"
-              :label="t('BC Number')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <q-checkbox
-              v-model="form.remittancevoucher"
-              name="remittancevoucher"
-              :label="t('Remittance Voucher')"
-            />
+            <q-list v-if="bankAccounts.length > 0" bordered separator>
+              <q-item
+                v-for="bank in bankAccounts"
+                :key="bank.id"
+                clickable
+                class="bank-item"
+                @click="editBank(bank)"
+              >
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">
+                    {{ bank.name || "Unnamed Bank" }}
+                  </q-item-label>
+                  <q-item-label>{{ bank.iban || "No IBAN" }}</q-item-label>
+                  <div v-if="bank.is_primary">
+                    <q-item-label caption>Default</q-item-label>
+                  </div>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    icon="edit"
+                    color="grey-7"
+                    size="sm"
+                    @click.stop="editBank(bank)"
+                  />
+                </q-item-section>
+              </q-item>
+            </q-list>
+
+            <div v-else class="text-center q-py-xl text-grey-6">
+              <q-icon name="account_balance" size="3rem" class="q-mb-sm" />
+              <div class="text-body2">No bank accounts</div>
+            </div>
           </div>
         </div>
       </div>
@@ -476,6 +434,18 @@
         <q-spinner-gears size="50px" color="primary" />
       </q-inner-loading>
     </q-form>
+
+    <!-- Bank Account Form Dialog -->
+    <BankAccountForm
+      v-model="showBankFormDialog"
+      :editing-bank="editingBank"
+      :trans-id="componentId"
+      :vc-type="componentType"
+      :require-existing-record="isEditMode"
+      @saved="handleBankAccountSaved"
+      @close="handleBankFormClose"
+    />
+
     <!-- Action Buttons -->
     <div class="row justify-start q-mt-md">
       <q-btn
@@ -495,6 +465,7 @@ import { useRoute, useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
+import BankAccountForm from "src/components/BankAccountForm.vue";
 
 // Define props so the component can work as an embedded component
 const props = defineProps({
@@ -532,7 +503,12 @@ const vcType = computed(() =>
 // Section visibility toggles
 const showAdditionalInfo = ref(false);
 const showContactPerson = ref(false);
-const showBankInfo = ref(false);
+const showBankAccounts = ref(false);
+
+// Bank account management
+const showBankFormDialog = ref(false);
+const bankAccounts = ref([]);
+const editingBank = ref(null);
 
 // Form state with all fields matching original HTML form
 const form = ref({
@@ -542,6 +518,7 @@ const form = ref({
   name: "",
   address1: "",
   address2: "",
+  street: "",
   city: "",
   state: "",
   zipcode: "",
@@ -571,20 +548,6 @@ const form = ref({
   taxnumber: "",
   sic_code: "",
   notes: "",
-  bankname: "",
-  bankaddress1: "",
-  bankaddress2: "",
-  bankcity: "",
-  bankstate: "",
-  bankzipcode: "",
-  bankcountry: "",
-  iban: "",
-  bic: "",
-  membernumber: "",
-  clearingnumber: "",
-  remittancevoucher: false,
-  referencedescription_1: "",
-  referenceconfidential_1: false,
   taxincluded: false,
   // Hidden fields
   discount_accno: "",
@@ -689,17 +652,11 @@ const fetchVc = async (id) => {
     form.value.vcnumber =
       vcType.value === "Vendor" ? data.vendornumber : data.customernumber;
     form.value.id = data.id;
-    form.value.remittancevoucher = data.remittancevoucher === 1;
     form.value.taxincluded = data.taxincluded === 1;
     form.value.addressid = data.addressid;
 
     // Map remaining fields (excluding the ones already handled)
-    const excludedFields = [
-      "taxaccounts",
-      "all_contact",
-      "remittancevoucher",
-      "taxincluded",
-    ];
+    const excludedFields = ["taxaccounts", "all_contact", "taxincluded"];
     Object.keys(form.value).forEach((key) => {
       if (data[key] !== undefined && !excludedFields.includes(key)) {
         form.value[key] = data[key];
@@ -714,6 +671,39 @@ const fetchVc = async (id) => {
       position: "center",
     });
   }
+};
+
+// Bank account management functions
+const fetchBankAccounts = async () => {
+  if (!isEditMode.value || !componentId.value) return;
+
+  try {
+    const response = await api.get(`/bank/${componentType.value}`, {
+      params: { trans_id: componentId.value },
+    });
+    bankAccounts.value = response.data;
+  } catch (error) {
+    console.error("Failed to fetch bank accounts:", error);
+  }
+};
+
+const openAddBankDialog = () => {
+  editingBank.value = null;
+  showBankFormDialog.value = true;
+};
+
+const editBank = (bank) => {
+  console.log("Editing bank:", bank);
+  editingBank.value = bank;
+  showBankFormDialog.value = true;
+};
+
+const handleBankFormClose = () => {
+  editingBank.value = null;
+};
+
+const handleBankAccountSaved = async () => {
+  await fetchBankAccounts();
 };
 
 // Form submission handler
@@ -754,8 +744,7 @@ const submitForm = async () => {
       .map((key) => key.slice(4))
       .join(" ");
 
-    // Convert remittancevoucher and taxincluded to numeric values
-    payload.remittancevoucher = form.value.remittancevoucher ? 1 : 0;
+    // Convert taxincluded to numeric value
     payload.taxincluded = form.value.taxincluded ? 1 : 0;
 
     // Convert complex fields (assuming these have a .label property)
@@ -776,7 +765,8 @@ const submitForm = async () => {
       position: "top-right",
     });
     // Refresh data with the returned id
-    fetchVc(response.data.id);
+    await fetchVc(response.data.id);
+    await fetchBankAccounts();
     emit("saved", { id: response.data.id });
   } catch (error) {
     console.error("Form submission error:", error);
@@ -842,6 +832,17 @@ onMounted(async () => {
   // Only attempt to fetch VC data if there is a valid id
   if (componentId.value) {
     await fetchVc(componentId.value);
+    await fetchBankAccounts();
   }
 });
 </script>
+
+<style scoped>
+.bank-item {
+  transition: all 0.2s ease;
+}
+
+.bank-item:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+</style>

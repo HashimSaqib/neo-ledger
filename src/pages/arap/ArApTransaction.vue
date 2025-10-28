@@ -66,6 +66,44 @@
                   <strong>{{ t("Address") }}</strong> {{ vc.full_address }}
                 </p>
               </div>
+              <div class="row q-mb-sm" v-if="vcBankAccounts.length > 0">
+                <s-select
+                  outlined
+                  v-model="vcBankId"
+                  :options="vcBankAccounts"
+                  :label="t('Bank Account')"
+                  option-label="iban"
+                  option-value="id"
+                  map-options
+                  emit-value
+                  label-color="secondary"
+                  class="col-sm-9 col-12"
+                  bg-color="input"
+                  dense
+                  clearable
+                />
+                <div class="col-sm-auto q-ml-sm flex items-center">
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    icon="add"
+                    size="sm"
+                    color="primary"
+                    @click="openAddBankDialog"
+                  />
+                  <q-btn
+                    flat
+                    round
+                    dense
+                    icon="edit"
+                    size="sm"
+                    color="primary"
+                    @click="openEditBankDialog"
+                    :disable="!vcBankId"
+                  />
+                </div>
+              </div>
               <div class="row">
                 <s-select
                   outlined
@@ -578,6 +616,17 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- Bank Account Form Dialog -->
+    <BankAccountForm
+      v-model="showBankFormDialog"
+      :editing-bank="editingBank"
+      :trans-id="selectedVc?.id"
+      :vc-type="type"
+      :require-existing-record="true"
+      @saved="handleBankAccountSaved"
+      @close="handleBankFormClose"
+    />
   </q-page>
 </template>
 
@@ -596,6 +645,7 @@ import draggable from "vuedraggable";
 import AddVC from "src/pages/arap/AddVC.vue";
 import FileList from "src/components/FileList.vue";
 import LastTransactions from "src/components/LastTransactions.vue";
+import BankAccountForm from "src/components/BankAccountForm.vue";
 
 // Import neoledger configuration
 import neoledgerConfig from "../../../neoledger.json";
@@ -679,6 +729,12 @@ const selectedDepartment = ref();
 const selectedCurrency = ref(null);
 const currencies = ref([]);
 const exchangeRate = ref(1);
+
+// Bank accounts state
+const vcBankAccounts = ref([]);
+const showBankFormDialog = ref(false);
+const editingBank = ref(null);
+const vcBankId = ref(null);
 
 // -------------------------
 // Invoice Details & Calculations
@@ -890,7 +946,13 @@ const getPendingDisabledTooltip = () => {
 const defaultPaymentAccount = ref();
 const paymentmethod_id = ref(null);
 const payments = ref([
-  { date: getTodayDate(), source: "", memo: "", amount: 0, account: "" },
+  {
+    date: getTodayDate(),
+    source: "",
+    memo: "",
+    amount: 0,
+    account: "",
+  },
 ]);
 
 // For "Add Payment" button (appends at the end)
@@ -1242,6 +1304,9 @@ const postInvoice = async () => {
     // Convert files to base64
     invoiceData.files = await convertFilesToBase64(files.value);
   }
+  if (vcBankId.value) {
+    invoiceData.vc_bank_id = vcBankId.value;
+  }
 
   try {
     loading.value = true;
@@ -1461,6 +1526,7 @@ const loadInvoice = async (invoice) => {
       paymentmethod_id.value = invoice.paymentmethod_id;
     }
     pending.value = invoice.pending || 0;
+    vcBankId.value = invoice.vc_bank_id || null;
     // Only process transfer history if AI plugin is available
     if (aiHelpers) {
       transfer_history.value = invoice.history || [];
@@ -1520,6 +1586,53 @@ const vcSaved = async (savedEntity) => {
   selectedVc.value = vcList.value.find((vc) => vc.id == savedEntity.id);
   vcUpdate(selectedVc.value);
   vcDialog.value = false;
+};
+
+// -------------------------
+// Bank Account Management
+// -------------------------
+const openAddBankDialog = () => {
+  if (!selectedVc.value || !selectedVc.value.id) {
+    Notify.create({
+      message: t("Please select a vendor/customer first"),
+      type: "negative",
+    });
+    return;
+  }
+  editingBank.value = null;
+  showBankFormDialog.value = true;
+};
+
+const openEditBankDialog = () => {
+  if (!selectedVc.value || !selectedVc.value.id) {
+    Notify.create({
+      message: t("Please select a vendor/customer first"),
+      type: "negative",
+    });
+    return;
+  }
+  if (!vcBankId.value) {
+    Notify.create({
+      message: t("Please select a bank account to edit"),
+      type: "negative",
+    });
+    return;
+  }
+  editingBank.value = vcBankAccounts.value.find(
+    (bank) => bank.id === vcBankId.value
+  );
+  showBankFormDialog.value = true;
+};
+
+const handleBankFormClose = () => {
+  editingBank.value = null;
+};
+
+const handleBankAccountSaved = async () => {
+  // Refresh bank accounts by updating VC
+  if (selectedVc.value) {
+    await vcUpdate(selectedVc.value);
+  }
 };
 
 // -------------------------
@@ -1590,6 +1703,16 @@ const vcUpdate = async (newValue) => {
     if (fetchedEntity) {
       // Update the full vendor details (vc) and related state
       vc.value = fetchedEntity;
+
+      // Update bank accounts
+      vcBankAccounts.value = fetchedEntity.bank_accounts || [];
+
+      // Set default bank account (is_primary = 1)
+      const defaultBank = vcBankAccounts.value.find(
+        (bank) => bank.is_primary === 1
+      );
+      vcBankId.value = defaultBank ? defaultBank.id : null;
+
       taxAccounts.value = fetchedEntity.taxaccounts
         ? fetchedEntity.taxaccounts.split(" ")
         : [];

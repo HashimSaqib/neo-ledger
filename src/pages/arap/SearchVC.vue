@@ -109,15 +109,12 @@
             outlined
             dense
           />
-          <q-select
+          <country-input
             v-model="formData.country"
             class="lightbg col-6 col-md-3"
             :label="t('Country')"
-            input-class="maintext"
-            label-color="secondary"
             outlined
             dense
-            :options="countryOptions"
           />
         </div>
 
@@ -499,7 +496,6 @@ const vcNumberProperty = computed(() => {
 
 const filtersOpen = ref(true);
 const results = ref([]);
-const countryOptions = ref([]);
 
 // This tracks user toggles for each column
 const selectedColumns = ref({});

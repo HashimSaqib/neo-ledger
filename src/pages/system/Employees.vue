@@ -100,7 +100,7 @@
                 input-class="maintext"
                 label-color="secondary"
               />
-              <q-input
+              <country-input
                 v-model="selectedEmployee.country"
                 :label="t('Country')"
                 outlined

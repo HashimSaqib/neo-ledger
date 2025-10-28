@@ -241,14 +241,13 @@
             />
           </div>
           <div class="col-12 col-md-6">
-            <text-input
+            <country-input
               v-model="form.countryorigin"
               name="countryorigin"
               :label="t('Country of Origin')"
               outlined
               dense
               class="q-mb-sm"
-              label-color="secondary"
             />
             <text-input
               v-model="form.tariff_hscode"
