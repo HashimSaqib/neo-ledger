@@ -24,19 +24,29 @@
             label="Bank Name"
             outlined
             dense
+            class="q-mb-lg"
           />
-          <text-input
+          <bank-input
             v-model="bankForm.iban"
-            name="iban"
-            label="IBAN *"
+            type="iban"
+            label="IBAN"
             outlined
             dense
-            required
           />
-          <text-input
+          <bank-input
+            v-model="bankForm.qriban"
+            type="qriban"
+            label="QR-IBAN"
+            outlined
+            dense
+          />
+          <div class="text-caption text-grey-7">
+            * Either IBAN or QR-IBAN is required
+          </div>
+          <bank-input
             v-model="bankForm.bic"
-            name="bic"
-            label="BIC"
+            type="bic"
+            label="BIC/SWIFT"
             outlined
             dense
           />
@@ -44,9 +54,30 @@
           <!-- Address Information -->
           <div class="text-subtitle2 text-weight-medium q-mt-md">Address</div>
           <text-input
+            v-model="bankForm.street"
+            name="street"
+            label="Street Number"
+            outlined
+            dense
+          />
+          <text-input
             v-model="bankForm.address1"
             name="address1"
-            label="Address"
+            label="Street Name"
+            outlined
+            dense
+          />
+          <text-input
+            v-model="bankForm.address2"
+            name="address2"
+            label="Address 2"
+            outlined
+            dense
+          />
+          <text-input
+            v-model="bankForm.post_office"
+            name="post_office"
+            label="Postal Office"
             outlined
             dense
           />
@@ -140,6 +171,7 @@
 import { ref, watch } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
+import BankInput from "src/components/inputs/BankInput.vue";
 
 const props = defineProps({
   modelValue: {
@@ -174,8 +206,12 @@ const bankForm = ref({
   id: null,
   name: "",
   iban: "",
+  qriban: "",
   bic: "",
+  street: "",
   address1: "",
+  address2: "",
+  post_office: "",
   city: "",
   zipcode: "",
   country: "",
@@ -192,8 +228,12 @@ const resetForm = () => {
     id: null,
     name: "",
     iban: "",
+    qriban: "",
     bic: "",
+    street: "",
     address1: "",
+    address2: "",
+    post_office: "",
     city: "",
     zipcode: "",
     country: "",
@@ -227,8 +267,12 @@ watch(
         id: newBank.id || null,
         name: newBank.name || "",
         iban: newBank.iban || "",
+        qriban: newBank.qriban || "",
         bic: newBank.bic || "",
+        street: newBank.street || "",
         address1: newBank.address1 || "",
+        address2: newBank.address2 || "",
+        post_office: newBank.post_office || "",
         city: newBank.city || "",
         zipcode: newBank.zipcode || "",
         country: newBank.country || "",
@@ -252,10 +296,14 @@ const handleClose = () => {
 };
 
 const handleSave = async () => {
-  // Validate IBAN is required
-  if (!bankForm.value.iban || bankForm.value.iban.trim() === "") {
+  // Validate that at least one of IBAN or QRIBAN is provided
+  const hasIban = bankForm.value.iban && bankForm.value.iban.trim() !== "";
+  const hasQriban =
+    bankForm.value.qriban && bankForm.value.qriban.trim() !== "";
+
+  if (!hasIban && !hasQriban) {
     Notify.create({
-      message: "IBAN is required",
+      message: "Either IBAN or QR-IBAN is required",
       type: "negative",
     });
     return;

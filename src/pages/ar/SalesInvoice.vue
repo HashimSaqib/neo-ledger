@@ -75,8 +75,17 @@
                   label-color="secondary"
                 />
                 <q-input
+                  v-model="shipto.street"
+                  label="Street Number"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
                   v-model="shipto.address1"
-                  label="Address 1"
+                  label="Street Name"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -86,6 +95,15 @@
                 <q-input
                   v-model="shipto.address2"
                   label="Address 2"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  bg-color="input"
+                  label-color="secondary"
+                />
+                <q-input
+                  v-model="shipto.post_office"
+                  label="Postal Office"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -1618,8 +1636,10 @@ const loadInvoice = async (invoice) => {
   paymentmethod_id.value = invoice.paymentmethod_id;
   const shiptoFields = [
     "name",
+    "street",
     "address1",
     "address2",
+    "post_office",
     "city",
     "state",
     "zipcode",

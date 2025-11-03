@@ -174,24 +174,42 @@
               {{ t("Address Information") }}
             </div>
             <div class="row q-col-gutter-sm">
-              <div class="col-12">
+              <div class="col-6">
+                <q-input
+                  dense
+                  outlined
+                  v-model="selectedBank.street"
+                  :label="t('Street Number')"
+                  class="q-pa-xs"
+                />
+              </div>
+              <div class="col-6">
                 <q-input
                   dense
                   outlined
                   v-model="selectedBank.address1"
-                  :label="t('Address Line 1')"
+                  :label="t('Street Name')"
                   class="q-pa-xs"
                 />
               </div>
             </div>
 
             <div class="row q-col-gutter-sm">
-              <div class="col-12">
+              <div class="col-6">
                 <q-input
                   dense
                   outlined
                   v-model="selectedBank.address2"
-                  :label="t('Address Line 2')"
+                  :label="t('Address 2')"
+                  class="q-pa-xs"
+                />
+              </div>
+              <div class="col-6">
+                <q-input
+                  dense
+                  outlined
+                  v-model="selectedBank.post_office"
+                  :label="t('Postal Office')"
                   class="q-pa-xs"
                 />
               </div>

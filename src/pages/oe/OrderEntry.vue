@@ -1840,8 +1840,10 @@ const formatOrderData = () => {
     shipto: vc.value
       ? {
           name: vc.value.name || "",
+          street: vc.value.street || "",
           address1: vc.value.address1 || "",
           address2: vc.value.address2 || "",
+          post_office: vc.value.post_office || "",
           city: vc.value.city || "",
           state: vc.value.state || "",
           zipcode: vc.value.zipcode || "",

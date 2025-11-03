@@ -54,9 +54,17 @@
               class="q-mb-sm"
             />
             <text-input
+              v-model="form.street"
+              name="street"
+              :label="t('Street Number')"
+              outlined
+              dense
+              class="q-mb-sm"
+            />
+            <text-input
               v-model="form.address1"
               name="address1"
-              :label="t('Address')"
+              :label="t('Street Name')"
               outlined
               dense
               class="q-mb-sm"
@@ -70,9 +78,9 @@
               class="q-mb-sm"
             />
             <text-input
-              v-model="form.street"
-              name="street"
-              :label="t('Street')"
+              v-model="form.post_office"
+              name="post_office"
+              :label="t('Postal Office')"
               outlined
               dense
               class="q-mb-sm"
@@ -403,7 +411,13 @@
                   <q-item-label class="text-weight-medium">
                     {{ bank.name || "Unnamed Bank" }}
                   </q-item-label>
-                  <q-item-label>{{ bank.iban || "No IBAN" }}</q-item-label>
+                  <q-item-label v-if="bank.qriban">
+                    {{ bank.qriban }}
+                    <q-badge color="primary" class="q-ml-xs" label="QRIBAN" />
+                  </q-item-label>
+                  <q-item-label v-else>
+                    {{ bank.iban || "No IBAN" }}
+                  </q-item-label>
                   <div v-if="bank.is_primary">
                     <q-item-label caption>Default</q-item-label>
                   </div>
@@ -516,9 +530,10 @@ const form = ref({
   typeofcontact: "company",
   vcnumber: "",
   name: "",
+  street: "",
   address1: "",
   address2: "",
-  street: "",
+  post_office: "",
   city: "",
   state: "",
   zipcode: "",

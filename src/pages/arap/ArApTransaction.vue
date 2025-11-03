@@ -67,21 +67,28 @@
                 </p>
               </div>
               <div class="row q-mb-sm" v-if="vcBankAccounts.length > 0">
-                <s-select
-                  outlined
-                  v-model="vcBankId"
-                  :options="vcBankAccounts"
-                  :label="t('Bank Account')"
-                  option-label="iban"
-                  option-value="id"
-                  map-options
-                  emit-value
-                  label-color="secondary"
-                  class="col-sm-9 col-12"
-                  bg-color="input"
-                  dense
-                  clearable
-                />
+                <div class="col-sm-9 col-12">
+                  <s-select
+                    outlined
+                    v-model="vcBankId"
+                    :options="vcBankAccounts"
+                    :label="t('Bank Account')"
+                    :option-label="getBankAccountLabel"
+                    option-value="id"
+                    map-options
+                    emit-value
+                    label-color="secondary"
+                    bg-color="input"
+                    dense
+                    clearable
+                  />
+                  <q-badge
+                    v-if="selectedBankHasQriban"
+                    color="primary"
+                    class="q-mt-xs"
+                    label="QR-IBAN"
+                  />
+                </div>
                 <div class="col-sm-auto q-ml-sm flex items-center">
                   <q-btn
                     flat
@@ -103,6 +110,17 @@
                     :disable="!vcBankId"
                   />
                 </div>
+              </div>
+              <div class="row q-gutter-sm" v-if="type === 'vendor'">
+                <text-input
+                  outlined
+                  :label="t('DCN')"
+                  v-model="dcn"
+                  class="q-mb-sm col-sm-5 col-12"
+                  bg-color="input"
+                  label-color="secondary"
+                  dense
+                />
               </div>
               <div class="row">
                 <s-select
@@ -231,6 +249,7 @@
                   dense
                 />
               </div>
+
               <div class="row q-gutter-sm">
                 <text-input
                   v-model="invDate"
@@ -736,6 +755,23 @@ const showBankFormDialog = ref(false);
 const editingBank = ref(null);
 const vcBankId = ref(null);
 
+// Method to get the label for bank account (prefer QRIBAN over IBAN)
+const getBankAccountLabel = (bank) => {
+  if (!bank) return "";
+  return bank.qriban || bank.iban || "";
+};
+
+// Computed to check if selected bank has QRIBAN
+const selectedBankHasQriban = computed(() => {
+  if (!vcBankId.value || !vcBankAccounts.value.length) return false;
+  const selectedBank = vcBankAccounts.value.find(
+    (bank) => bank.id === vcBankId.value
+  );
+  return (
+    selectedBank && selectedBank.qriban && selectedBank.qriban.trim() !== ""
+  );
+});
+
 // -------------------------
 // Invoice Details & Calculations
 // -------------------------
@@ -748,6 +784,7 @@ const ordNumber = ref("");
 const invDate = ref(getTodayDate());
 const dueDate = ref(getTodayDate());
 const poNumber = ref("");
+const dcn = ref("");
 const link = ref("");
 
 const taxIncluded = ref(false);
@@ -1178,6 +1215,7 @@ const resetForm = () => {
   invNumber.value = "";
   ordNumber.value = "";
   poNumber.value = "";
+  dcn.value = "";
   taxIncluded.value = false;
   invoiceTaxes.value = [];
   preserveApiTaxes.value = false;
@@ -1260,6 +1298,7 @@ const postInvoice = async () => {
     invDate: invDate.value,
     dueDate: dueDate.value,
     poNumber: poNumber.value,
+    dcnNumber: dcn.value,
     recordAccount: recordAccount.value.accno,
     selectedCurrency: selectedCurrency.value,
     curr: selectedCurrency.value.curr,
@@ -1494,6 +1533,7 @@ const loadInvoice = async (invoice) => {
     invId.value = invoice.id;
     ordNumber.value = "";
     poNumber.value = "";
+    dcn.value = invoice.dcn || "";
     existingFiles.value = invoice.files;
     if (route.query.preview == 1 && invoice.files.length > 0) {
       handleFilePreview(invoice.files[0].link);
@@ -1851,6 +1891,7 @@ watch(
     invNumber.value = "";
     ordNumber.value = "";
     poNumber.value = "";
+    dcn.value = "";
     taxIncluded.value = false;
     invoiceTaxes.value = [];
     preserveApiTaxes.value = false;

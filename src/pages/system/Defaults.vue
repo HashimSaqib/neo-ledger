@@ -26,9 +26,19 @@
         </div>
         <div class="col-12 col-md-5">
           <q-input
+            v-model="form.street"
+            name="street"
+            :label="t('Street Number')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
             v-model="form.address1"
             name="address1"
-            :label="t('Address Line 1')"
+            :label="t('Street Name')"
             outlined
             dense
             class="lightbg input-box"
@@ -38,7 +48,17 @@
           <q-input
             v-model="form.address2"
             name="address2"
-            :label="t('Address Line 2')"
+            :label="t('Address 2')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.post_office"
+            name="post_office"
+            :label="t('Postal Office')"
             outlined
             dense
             class="lightbg input-box"
@@ -681,8 +701,10 @@ const formRef = ref(null);
 const form = ref({
   company: "",
   address: "",
+  street: "",
   address1: "",
   address2: "",
+  post_office: "",
   city: "",
   state: "",
   zip: "",
@@ -1006,8 +1028,10 @@ async function loadDefaults() {
     // Company Info
     form.value.company = data.company_info?.name || "";
     form.value.address = data.company_info?.address?.complete || "";
+    form.value.street = data.company_info?.address?.street || "";
     form.value.address1 = data.company_info?.address?.line1 || "";
     form.value.address2 = data.company_info?.address?.line2 || "";
+    form.value.post_office = data.company_info?.address?.post_office || "";
     form.value.city = data.company_info?.address?.city || "";
     form.value.state = data.company_info?.address?.state || "";
     form.value.zip = data.company_info?.address?.zip || "";
@@ -1122,8 +1146,10 @@ async function submitForm() {
         name: form.value.company,
         address: {
           complete: form.value.address,
+          street: form.value.street,
           line1: form.value.address1,
           line2: form.value.address2,
+          post_office: form.value.post_office,
           city: form.value.city,
           state: form.value.state,
           zip: form.value.zip,

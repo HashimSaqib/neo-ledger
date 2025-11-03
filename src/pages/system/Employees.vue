@@ -61,8 +61,16 @@
                 label-color="secondary"
               />
               <q-input
+                v-model="selectedEmployee.street"
+                :label="t('Street Number')"
+                outlined
+                dense
+                input-class="maintext"
+                label-color="secondary"
+              />
+              <q-input
                 v-model="selectedEmployee.address1"
-                :label="t('Address')"
+                :label="t('Street Name')"
                 outlined
                 dense
                 input-class="maintext"
@@ -71,6 +79,14 @@
               <q-input
                 v-model="selectedEmployee.address2"
                 :label="t('Address 2')"
+                outlined
+                dense
+                input-class="maintext"
+                label-color="secondary"
+              />
+              <q-input
+                v-model="selectedEmployee.post_office"
+                :label="t('Postal Office')"
                 outlined
                 dense
                 input-class="maintext"
@@ -422,8 +438,10 @@ const openAddPopup = () => {
     employeenumber: "",
     name: "",
     address: "",
+    street: "",
     address1: "",
     address2: "",
+    post_office: "",
     city: "",
     state: "",
     zipcode: "",
