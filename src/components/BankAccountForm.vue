@@ -54,16 +54,16 @@
           <!-- Address Information -->
           <div class="text-subtitle2 text-weight-medium q-mt-md">Address</div>
           <text-input
-            v-model="bankForm.street"
-            name="street"
-            label="Street Number"
+            v-model="bankForm.address1"
+            name="address1"
+            label="Street Name"
             outlined
             dense
           />
           <text-input
-            v-model="bankForm.address1"
-            name="address1"
-            label="Street Name"
+            v-model="bankForm.street"
+            name="street"
+            label="Street Number"
             outlined
             dense
           />

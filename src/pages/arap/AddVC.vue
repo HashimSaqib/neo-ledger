@@ -54,17 +54,17 @@
               class="q-mb-sm"
             />
             <text-input
-              v-model="form.street"
-              name="street"
-              :label="t('Street Number')"
+              v-model="form.address1"
+              name="address1"
+              :label="t('Street Name')"
               outlined
               dense
               class="q-mb-sm"
             />
             <text-input
-              v-model="form.address1"
-              name="address1"
-              :label="t('Street Name')"
+              v-model="form.street"
+              name="street"
+              :label="t('Street Number')"
               outlined
               dense
               class="q-mb-sm"

@@ -61,16 +61,16 @@
                 label-color="secondary"
               />
               <q-input
-                v-model="selectedEmployee.street"
-                :label="t('Street Number')"
+                v-model="selectedEmployee.address1"
+                :label="t('Street Name')"
                 outlined
                 dense
                 input-class="maintext"
                 label-color="secondary"
               />
               <q-input
-                v-model="selectedEmployee.address1"
-                :label="t('Street Name')"
+                v-model="selectedEmployee.street"
+                :label="t('Street Number')"
                 outlined
                 dense
                 input-class="maintext"

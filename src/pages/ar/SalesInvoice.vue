@@ -75,8 +75,8 @@
                   label-color="secondary"
                 />
                 <q-input
-                  v-model="shipto.street"
-                  label="Street Number"
+                  v-model="shipto.address1"
+                  label="Street Name"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -84,8 +84,8 @@
                   label-color="secondary"
                 />
                 <q-input
-                  v-model="shipto.address1"
-                  label="Street Name"
+                  v-model="shipto.street"
+                  label="Street Number"
                   outlined
                   dense
                   class="q-mb-sm"

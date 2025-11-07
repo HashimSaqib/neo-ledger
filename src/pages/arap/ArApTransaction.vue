@@ -104,7 +104,7 @@
                     round
                     dense
                     icon="edit"
-                    size="sm"
+                    size="sme"
                     color="primary"
                     @click="openEditBankDialog"
                     :disable="!vcBankId"
@@ -265,6 +265,19 @@
                 <text-input
                   v-model="dueDate"
                   :label="t('Due Date')"
+                  class="lightbg q-mb-sm col-sm-5 col-12"
+                  input-class="maintext"
+                  label-color="secondary"
+                  outlined
+                  dense
+                  type="date"
+                  @change="executionDate = dueDate"
+                />
+              </div>
+              <div class="row q-gutter-sm" v-if="type === 'vendor'">
+                <text-input
+                  v-model="executionDate"
+                  :label="t('Execution Date')"
                   class="lightbg q-mb-sm col-sm-5 col-12"
                   input-class="maintext"
                   label-color="secondary"
@@ -783,6 +796,7 @@ const invId = ref(route.query.id || "");
 const ordNumber = ref("");
 const invDate = ref(getTodayDate());
 const dueDate = ref(getTodayDate());
+const executionDate = ref(getTodayDate());
 const poNumber = ref("");
 const dcn = ref("");
 const link = ref("");
@@ -1216,6 +1230,9 @@ const resetForm = () => {
   ordNumber.value = "";
   poNumber.value = "";
   dcn.value = "";
+  invDate.value = getTodayDate();
+  dueDate.value = getTodayDate();
+  executionDate.value = getTodayDate();
   taxIncluded.value = false;
   invoiceTaxes.value = [];
   preserveApiTaxes.value = false;
@@ -1297,8 +1314,9 @@ const postInvoice = async () => {
     ordNumber: ordNumber.value,
     invDate: invDate.value,
     dueDate: dueDate.value,
+    executionDate: executionDate.value,
     poNumber: poNumber.value,
-    dcnNumber: dcn.value,
+    dcn: dcn.value,
     recordAccount: recordAccount.value.accno,
     selectedCurrency: selectedCurrency.value,
     curr: selectedCurrency.value.curr,
@@ -1514,6 +1532,7 @@ const loadInvoice = async (invoice) => {
     invDate.value = invoice.invDate || "";
     originaldate.value = invoice.invDate || "";
     dueDate.value = invoice.dueDate || "";
+    executionDate.value = invoice.executionDate || invoice.dueDate || "";
     link.value = invoice.file;
     if (invoice.currency) {
       selectedCurrency.value = currencies.value.find(
@@ -1806,6 +1825,7 @@ const vcUpdate = async (newValue) => {
         const terms = fetchedEntity?.terms ?? 0;
         const newDueDate = date.addToDate(invDate.value, { days: terms });
         dueDate.value = date.formatDate(newDueDate, "YYYY-MM-DD");
+        executionDate.value = dueDate.value;
       } else {
         console.warn("Invalid invoice date");
       }
@@ -1892,6 +1912,9 @@ watch(
     ordNumber.value = "";
     poNumber.value = "";
     dcn.value = "";
+    invDate.value = getTodayDate();
+    dueDate.value = getTodayDate();
+    executionDate.value = getTodayDate();
     taxIncluded.value = false;
     invoiceTaxes.value = [];
     preserveApiTaxes.value = false;

@@ -26,9 +26,9 @@
         </div>
         <div class="col-12 col-md-5">
           <q-input
-            v-model="form.street"
-            name="street"
-            :label="t('Street Number')"
+            v-model="form.address1"
+            name="address1"
+            :label="t('Street Name')"
             outlined
             dense
             class="lightbg input-box"
@@ -36,9 +36,9 @@
         </div>
         <div class="col-12 col-md-5">
           <q-input
-            v-model="form.address1"
-            name="address1"
-            :label="t('Street Name')"
+            v-model="form.street"
+            name="street"
+            :label="t('Street Number')"
             outlined
             dense
             class="lightbg input-box"

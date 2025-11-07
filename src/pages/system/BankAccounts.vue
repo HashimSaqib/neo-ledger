@@ -75,31 +75,37 @@
 
             <div class="row q-col-gutter-sm">
               <div class="col-6">
-                <q-input
+                <bank-input
                   dense
                   outlined
                   v-model="selectedBank.iban"
+                  type="iban"
                   :label="t('IBAN')"
                   class="q-pa-xs"
                 />
               </div>
               <div class="col-6">
-                <q-input
+                <bank-input
                   dense
                   outlined
                   v-model="selectedBank.qriban"
+                  type="qriban"
                   :label="t('QR IBAN')"
                   class="q-pa-xs"
                 />
               </div>
             </div>
+            <div class="text-caption text-grey-7 q-pa-xs">
+              * {{ t("Either IBAN or QR-IBAN is required") }}
+            </div>
 
             <div class="row q-col-gutter-sm">
               <div class="col-6">
-                <q-input
+                <bank-input
                   dense
                   outlined
                   v-model="selectedBank.bic"
+                  type="bic"
                   :label="t('BIC/SWIFT')"
                   class="q-pa-xs"
                 />
@@ -178,8 +184,8 @@
                 <q-input
                   dense
                   outlined
-                  v-model="selectedBank.street"
-                  :label="t('Street Number')"
+                  v-model="selectedBank.address1"
+                  :label="t('Street Name')"
                   class="q-pa-xs"
                 />
               </div>
@@ -187,8 +193,8 @@
                 <q-input
                   dense
                   outlined
-                  v-model="selectedBank.address1"
-                  :label="t('Street Name')"
+                  v-model="selectedBank.street"
+                  :label="t('Street Number')"
                   class="q-pa-xs"
                 />
               </div>
@@ -279,6 +285,8 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify, Dialog } from "quasar";
 import { utils, writeFile } from "xlsx";
+import BankInput from "src/components/inputs/BankInput.vue";
+import CountryInput from "src/components/inputs/CountryInput.vue";
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
@@ -389,6 +397,21 @@ async function saveBankAccount() {
   if (!selectedBank.value.name) {
     Notify.create({
       message: t("Bank Name is required!"),
+      color: "negative",
+      position: "center",
+    });
+    return;
+  }
+
+  // Validate that at least one of IBAN or QR-IBAN is provided
+  const hasIban =
+    selectedBank.value.iban && selectedBank.value.iban.trim() !== "";
+  const hasQriban =
+    selectedBank.value.qriban && selectedBank.value.qriban.trim() !== "";
+
+  if (!hasIban && !hasQriban) {
+    Notify.create({
+      message: t("Either IBAN or QR-IBAN is required"),
       color: "negative",
       position: "center",
     });

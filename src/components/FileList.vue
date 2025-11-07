@@ -15,7 +15,13 @@
           :target="preview ? '_self' : '_blank'"
           @click="preview ? handlePreview(file.link) : null"
         >
-          {{ file.name }}
+          <q-icon
+            v-if="report"
+            name="picture_as_pdf"
+            size="sm"
+            color="primary"
+          />
+          <template v-else>{{ file.name }}</template>
         </a>
       </q-item-section>
       <q-item-section side v-if="!report">
