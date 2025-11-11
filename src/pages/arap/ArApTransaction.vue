@@ -559,20 +559,7 @@
           </div>
         </div>
         <!-- Action Buttons -->
-        <div class="row q-my-sm q-px-sm justify-between">
-          <q-checkbox
-            v-model="pending"
-            :label="t('Pending')"
-            true-value="1"
-            false-value="0"
-            :disable="isPendingDisabled"
-          >
-            <q-tooltip
-              v-if="isPendingDisabled && type === 'vendor' && aiHelpers"
-            >
-              {{ getPendingDisabledTooltip() }}
-            </q-tooltip>
-          </q-checkbox>
+        <div class="row q-my-sm q-px-sm justify-end">
           <div>
             <s-button
               type="delete"
@@ -588,6 +575,15 @@
               class="q-mr-md"
               v-if="canPost"
             />
+            <s-button
+              v-if="pending == '1'"
+              type="primary"
+              :label="t('Approve')"
+              icon="check_circle"
+              :disable="isPendingDisabled"
+              @click="approveTransaction"
+            >
+            </s-button>
           </div>
         </div>
 
@@ -1244,6 +1240,12 @@ const resetForm = () => {
   originaldate.value = null;
   pending.value = "0";
 };
+
+const approveTransaction = async () => {
+  pending.value = "0";
+  await postInvoice();
+};
+
 const postInvoice = async () => {
   if (!selectedVc.value) {
     Notify.create({
