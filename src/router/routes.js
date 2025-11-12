@@ -38,6 +38,8 @@ const ListDepartments = () =>
 const ListProjects = () => import("src/pages/projectsjobs/ListProjects.vue");
 const LoginPage = () => import("src/pages/LoginPage.vue");
 const SignUp = () => import("src/pages/Signup.vue");
+const TwoFactorSetup = () => import("src/components/TwoFactorSetup.vue");
+const TwoFactorVerify = () => import("src/components/TwoFactorVerify.vue");
 const ErrorNotFound = () => import("src/pages/ErrorNotFound.vue");
 const Roles = () => import("src/pages/system/Roles.vue");
 const Employees = () => import("src/pages/system/Employees.vue");
@@ -465,6 +467,14 @@ const getRoutes = async () => {
     {
       path: "/signup",
       component: SignUp,
+    },
+    {
+      path: "/2fa/setup",
+      component: TwoFactorSetup,
+    },
+    {
+      path: "/2fa/verify",
+      component: TwoFactorVerify,
     },
     // Catch-all for undefined routes
     {

@@ -4,8 +4,9 @@ import { api } from "src/boot/axios";
 
 export default boot(({ router }) => {
   router.beforeEach(async (to, from, next) => {
-    // Skip auth check for the login and signup routes
-    if (to.path === "/login" || to.path === "/signup") {
+    // Skip auth check for public routes
+    const publicRoutes = ["/login", "/signup", "/2fa/setup", "/2fa/verify"];
+    if (publicRoutes.includes(to.path)) {
       return next();
     }
 

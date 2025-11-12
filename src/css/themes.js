@@ -12,7 +12,7 @@ export const themes = {
     secondary: "#000000",
     secondarybtn: "#E7ECF2",
     lighttext: "#4d4d4d",
-    mutedtext: "#eee",
+    lightbg: "#ffffff",
   },
   dark: {
     menubg: "#0B0F14",
