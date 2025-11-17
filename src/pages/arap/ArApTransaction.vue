@@ -511,16 +511,35 @@
               dense
               @keyup.enter="() => handlePaymentEnter(index)"
             />
-            <fn-input
-              outlined
-              v-model="payment.amount"
-              :label="t('Amount')"
-              class="q-mt-sm"
-              label-color="secondary"
-              bg-color="input"
-              dense
-              @keyup.enter="() => handlePaymentEnter(index)"
-            />
+            <div class="flex items-end q-gutter-xs">
+              <fn-input
+                outlined
+                v-model="payment.amount"
+                :label="t('Amount')"
+                class="q-mt-sm"
+                label-color="secondary"
+                bg-color="input"
+                dense
+                @keyup.enter="() => handlePaymentEnter(index)"
+              />
+              <q-btn
+                v-if="index === payments.length - 1 && remainingBalance !== 0"
+                flat
+                dense
+                round
+                icon="content_copy"
+                color="primary"
+                size="sm"
+                class="q-mb-xs"
+                @click="copyRemainingBalanceToPayment(index)"
+              >
+                <q-tooltip
+                  >{{ t("Copy remaining balance") }} ({{
+                    formatAmount(remainingBalance)
+                  }})</q-tooltip
+                >
+              </q-btn>
+            </div>
             <fn-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
               outlined
@@ -559,6 +578,19 @@
           </div>
         </div>
         <!-- Action Buttons -->
+        <div class="row q-my-sm q-px-sm justify-end">
+          <div v-if="!hidePaymentFile && !isPendingDisabled">
+            <q-checkbox
+              left-label
+              :disable="disablePaymentFile"
+              :label="t('Payment File')"
+              v-model="paymentFile"
+              :true-value="1"
+              :false-value="0"
+              @click="togglePaymentFile"
+            />
+          </div>
+        </div>
         <div class="row q-my-sm q-px-sm justify-end">
           <div>
             <s-button
@@ -990,6 +1022,9 @@ const getPendingDisabledTooltip = () => {
 // -------------------------
 // Payment Management
 // -------------------------
+const paymentFile = ref(0);
+const disablePaymentFile = ref(false);
+const hidePaymentFile = ref(true);
 const defaultPaymentAccount = ref();
 const paymentmethod_id = ref(null);
 const payments = ref([
@@ -1001,6 +1036,18 @@ const payments = ref([
     account: "",
   },
 ]);
+
+const remainingBalance = computed(() => {
+  const totalPayments = payments.value.reduce(
+    (acc, payment) => acc + (parseFloat(payment.amount) || 0),
+    0
+  );
+  return parseFloat((total.value - totalPayments).toFixed(2));
+});
+
+const copyRemainingBalanceToPayment = (index) => {
+  payments.value[index].amount = remainingBalance.value;
+};
 
 // For "Add Payment" button (appends at the end)
 const addPayment = () => {
@@ -1342,6 +1389,7 @@ const postInvoice = async () => {
       account: payment.account.accno,
       exchangerate: payment.exchangerate,
     })),
+    payment_file: paymentFile.value,
   };
 
   if (selectedDepartment.value) {
@@ -1593,6 +1641,10 @@ const loadInvoice = async (invoice) => {
       transfer_history.value = invoice.history || [];
       selectedTransferStation.value = invoice.station_id || null;
       console.log(selectedTransferStation.value);
+      paymentFile.value = invoice.payment_file || 0;
+      paymentFile.value == 1
+        ? (disablePaymentFile.value = true)
+        : (disablePaymentFile.value = false);
     } else {
       transfer_history.value = [];
     }
@@ -1960,6 +2012,7 @@ const openItemAccounts = computed(() =>
 // Load AI plugin components conditionally
 const loadAIPluginComponents = async () => {
   if (neoledgerConfig.ai_plugin) {
+    hidePaymentFile.value = false;
     try {
       const StationTransferModule = await import(
         /* @vite-ignore */ "../../ai_plugin/components/StationTransfer.vue"
