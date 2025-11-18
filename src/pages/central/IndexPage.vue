@@ -259,8 +259,8 @@
                   class="cursor-pointer"
                   @click="navigateToDataset(props.row)"
                 >
-                  <div class="text-weight-medium text-primary">
-                    {{ props.row.db_name }}
+                  <div class="text-weight-medium">
+                    {{ props.row.name }}
                   </div>
                 </q-td>
               </template>
@@ -321,7 +321,7 @@
                   :props="props"
                   :class="
                     props.row.workstations?.has_stations
-                      ? 'cursor-pointer text-primary'
+                      ? 'cursor-pointer '
                       : ''
                   "
                   @click="
@@ -335,7 +335,10 @@
                       -
                     </template>
                     <template v-else>
-                      {{ props.row.workstations.pending_count || 0 }} Invoices
+                      <div class="text-weight-medium">
+                        {{ props.row.workstations.pending_count || 0 }}
+                        Invoice(s)
+                      </div>
                     </template>
                   </div>
                 </q-td>

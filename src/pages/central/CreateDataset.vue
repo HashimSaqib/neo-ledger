@@ -14,6 +14,18 @@
         <!-- Wrap inputs and buttons inside the q-form -->
         <q-form ref="datasetForm" @submit.prevent="createDataset">
           <q-input
+            v-model="companyName"
+            dense
+            label="Company Name"
+            outlined
+            bg-color="input"
+            label-color="secondary"
+            class="q-mb-sm"
+            hide-bottom-space
+            :rules="[(val) => !!val || 'Company Name is required']"
+          />
+
+          <q-input
             v-model="datasetName"
             dense
             label="Dataset Name"
@@ -57,8 +69,8 @@
             <q-btn flat label="Create" color="primary" type="submit" />
           </q-card-actions>
         </q-form>
-      </q-card-section>
-    </q-card>
+      </q-card-section> </q-card
+    >∂
   </q-dialog>
 </template>
 
@@ -92,6 +104,7 @@ watch(localDialog, (newVal) => {
 
 // Internal component state
 const datasetName = ref("");
+const companyName = ref("");
 const chartsOptions = ref([]);
 const templateOptions = ref([]);
 const selectedChart = ref(null);
@@ -136,6 +149,7 @@ const createDataset = () => {
 
   // Emit the created dataset details to the parent component
   emit("create-dataset", {
+    company: companyName.value,
     dataset: datasetName.value,
     chart: selectedChart.value,
     templates: selectedTemplate.value,
