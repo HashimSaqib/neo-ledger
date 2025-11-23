@@ -227,6 +227,9 @@
               hide-bottom-space
               class="col-sm-5 col-12 q-mb-sm"
             />
+            <div v-if="dcn">
+              {{ dcn }}
+            </div>
           </div>
           <!-- New file upload section -->
         </div>
@@ -1128,6 +1131,7 @@ const ordNumber = ref("");
 const poNumber = ref("");
 const shipto = ref({});
 const invId = ref(route.query.id ? `${route.query.id}` : "");
+const dcn = ref("");
 // Add after the existing refs
 const files = ref(null);
 const existingFiles = ref([]);
@@ -1559,6 +1563,7 @@ const loadInvoice = async (invoice) => {
   intnotes.value = invoice.intnotes;
   invNumber.value = invoice.invNumber;
   invId.value = invoice.id;
+  dcn.value = invoice.dcn;
   invType.value = invoice.type;
   ordNumber.value = invoice.ordNumber;
   invDate.value = invoice.invDate;
@@ -1798,6 +1803,7 @@ const postInvoice = async (save = false, isNew = false) => {
     poNumber: poNumber.value,
     recordAccount: recordAccount.value.accno,
     currency: selectedCurrency.value.curr,
+    dcn: dcn.value,
     type: invType.value,
     lines: lines.value
       .filter((line) => line.partnumber && line.partnumber.id)
