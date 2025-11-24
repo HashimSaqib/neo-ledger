@@ -2,14 +2,16 @@
   <q-dialog v-model="localDialog">
     <q-card style="min-width: 50vw; max-width: 50vw">
       <q-card-section class="q-pb-none">
-        <div class="text-h6 q-mt-none">API Keys - {{ datasetName }}</div>
+        <div class="text-h6 q-mt-none">
+          {{ t("API Keys") }} - {{ datasetName }}
+        </div>
       </q-card-section>
 
       <q-card-section class="q-gutter-sm">
         <!-- Header with create button -->
         <div class="row q-mb-md items-center justify-between">
           <q-btn
-            label="Create New API Key"
+            :label="t('Create New API Key')"
             @click="showCreateDialog = true"
             color="primary"
             icon="add"
@@ -42,9 +44,9 @@
             class="flex flex-center column q-py-xl text-grey text-center"
           >
             <q-icon name="vpn_key" size="64px" />
-            <div class="text-h6 q-mt-md">No API Keys Found</div>
+            <div class="text-h6 q-mt-md">{{ t("No API Keys Found") }}</div>
             <div class="text-body2">
-              Create your first API key to get started
+              {{ t("Create your first API key to get started") }}
             </div>
           </div>
 
@@ -66,7 +68,7 @@
                 <q-td :props="props">
                   <q-badge
                     :color="props.row.disabled ? 'negative' : 'positive'"
-                    :label="props.row.disabled ? 'Disabled' : 'Active'"
+                    :label="props.row.disabled ? t('Disabled') : t('Active')"
                   />
                 </q-td>
               </template>
@@ -84,7 +86,7 @@
                   {{
                     props.row.last_used
                       ? formatDate(props.row.last_used)
-                      : "Never"
+                      : t("Never")
                   }}
                 </q-td>
               </template>
@@ -103,7 +105,7 @@
                       :loading="processingKey === props.row.id"
                       size="sm"
                     >
-                      <q-tooltip>Delete API Key</q-tooltip>
+                      <q-tooltip>{{ t("Delete API Key") }}</q-tooltip>
                     </q-btn>
                   </div>
                 </q-td>
@@ -114,7 +116,7 @@
 
         <!-- Close button -->
         <q-card-actions align="right" class="q-mt-md">
-          <q-btn flat label="Close" @click="closeDialog" />
+          <q-btn flat :label="t('Close')" @click="closeDialog" />
         </q-card-actions>
       </q-card-section>
     </q-card>
@@ -124,7 +126,7 @@
   <q-dialog v-model="showCreateDialog">
     <q-card style="min-width: 500px">
       <q-card-section class="q-pb-none">
-        <div class="text-h6">Create New API Key</div>
+        <div class="text-h6">{{ t("Create New API Key") }}</div>
       </q-card-section>
 
       <q-card-section class="q-gutter-sm">
@@ -132,24 +134,25 @@
           <q-input
             v-model="newApiKey.label"
             dense
-            label="API Key Label"
+            :label="t('API Key Label')"
             outlined
             bg-color="input"
             label-color="secondary"
             :rules="[
-              (val) => !!val || 'API Key Label is required',
+              (val) => !!val || t('API Key Label is required'),
               (val) =>
-                val.length >= 3 || 'Label must be at least 3 characters long',
+                val.length >= 3 ||
+                t('Label must be at least 3 characters long'),
             ]"
             class="q-mb-sm"
             hide-bottom-space
           />
 
           <q-card-actions align="right">
-            <q-btn flat label="Cancel" @click="cancelCreate" />
+            <q-btn flat :label="t('Cancel')" @click="cancelCreate" />
             <q-btn
               flat
-              label="Create"
+              :label="t('Create')"
               color="primary"
               type="submit"
               :loading="creating"
@@ -164,12 +167,16 @@
   <q-dialog v-model="showNewKeyDialog">
     <q-card style="min-width: 600px">
       <q-card-section class="q-pb-none">
-        <div class="text-h6">API Key Created Successfully</div>
+        <div class="text-h6">{{ t("API Key Created Successfully") }}</div>
       </q-card-section>
 
       <q-card-section>
         <div class="text-body2 q-mb-md">
-          Please copy your API key now. You won't be able to see it again.
+          {{
+            t(
+              "Please copy your API key now. You won't be able to see it again."
+            )
+          }}
         </div>
 
         <q-input
@@ -188,7 +195,7 @@
               icon="content_copy"
               @click="copyToClipboard"
             >
-              <q-tooltip>Copy to Clipboard</q-tooltip>
+              <q-tooltip>{{ t("Copy to Clipboard") }}</q-tooltip>
             </q-btn>
           </template>
         </q-input>
@@ -197,12 +204,12 @@
           <template v-slot:avatar>
             <q-icon name="warning" color="black" />
           </template>
-          Store this API key securely. It will not be shown again.
+          {{ t("Store this API key securely. It will not be shown again.") }}
         </q-banner>
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat label="Close" @click="closeNewKeyDialog" />
+        <q-btn flat :label="t('Close')" @click="closeNewKeyDialog" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -211,19 +218,21 @@
   <q-dialog v-model="showDeleteDialog">
     <q-card>
       <q-card-section>
-        <div class="text-h6">Delete API Key</div>
+        <div class="text-h6">{{ t("Delete API Key") }}</div>
       </q-card-section>
 
       <q-card-section>
-        Are you sure you want to delete the API key "{{ keyToDelete?.label }}"?
-        This action cannot be undone.
+        {{ t("Are you sure you want to delete the API key") }} "{{
+          keyToDelete?.label
+        }}"?
+        {{ t("This action cannot be undone.") }}
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="showDeleteDialog = false" />
+        <q-btn flat :label="t('Cancel')" @click="showDeleteDialog = false" />
         <q-btn
           flat
-          label="Delete"
+          :label="t('Delete')"
           color="negative"
           @click="confirmDelete"
           :loading="processingKey === keyToDelete?.id"
@@ -234,9 +243,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 // Define props for controlling dialog visibility and dataset info
 const props = defineProps({
@@ -290,35 +302,35 @@ const newApiKey = ref({
 const apiKeyForm = ref(null);
 
 // Table columns
-const columns = [
+const columns = computed(() => [
   {
     name: "label",
-    label: "Label",
+    label: t("Label"),
     field: "label",
     align: "left",
     sortable: true,
   },
   {
     name: "created",
-    label: "Created",
+    label: t("Created"),
     field: "created",
     align: "left",
     sortable: true,
   },
   {
     name: "last_used",
-    label: "Last Used",
+    label: t("Last Used"),
     field: "last_used",
     align: "left",
     sortable: true,
   },
   {
     name: "actions",
-    label: "Actions",
+    label: t("Actions"),
     field: "actions",
     align: "center",
   },
-];
+]);
 
 // Fetch API keys for the specific dataset
 const fetchApiKeys = async () => {
@@ -336,7 +348,7 @@ const fetchApiKeys = async () => {
       apiKeys.value = [];
       error.value = "";
     } else {
-      error.value = err.response?.data?.error || "Failed to fetch API keys";
+      error.value = err.response?.data?.error || t("Failed to fetch API keys");
       console.error("Error fetching API keys:", err);
     }
   } finally {
@@ -348,7 +360,7 @@ const fetchApiKeys = async () => {
 const createApiKey = async () => {
   if (apiKeyForm.value && !apiKeyForm.value.validate()) {
     Notify.create({
-      message: "Please fill in all required fields.",
+      message: t("Please fill in all required fields."),
       color: "warning",
     });
     return;
@@ -372,12 +384,12 @@ const createApiKey = async () => {
     await fetchApiKeys();
 
     Notify.create({
-      message: "API key created successfully",
+      message: t("API key created successfully"),
       color: "positive",
     });
   } catch (err) {
     Notify.create({
-      message: err.response?.data?.error || "Failed to create API key",
+      message: err.response?.data?.error || t("Failed to create API key"),
       color: "negative",
     });
   } finally {
@@ -406,12 +418,12 @@ const confirmDelete = async () => {
     );
 
     Notify.create({
-      message: data.message || "API key deleted successfully",
+      message: data.message || t("API key deleted successfully"),
       color: "positive",
     });
   } catch (err) {
     Notify.create({
-      message: err.response?.data?.error || "Failed to delete API key",
+      message: err.response?.data?.error || t("Failed to delete API key"),
       color: "negative",
     });
   } finally {
@@ -426,12 +438,12 @@ const copyToClipboard = async () => {
   try {
     await navigator.clipboard.writeText(newApiKeyValue.value);
     Notify.create({
-      message: "API key copied to clipboard",
+      message: t("API key copied to clipboard"),
       color: "positive",
     });
   } catch (err) {
     Notify.create({
-      message: "Failed to copy to clipboard",
+      message: t("Failed to copy to clipboard"),
       color: "negative",
     });
   }

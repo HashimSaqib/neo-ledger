@@ -7,7 +7,7 @@
   >
     <q-card style="min-width: 60vw">
       <q-card-section class="q-pb-none">
-        <div class="text-h6 q-mt-none">Create Dataset</div>
+        <div class="text-h6 q-mt-none">{{ t("Create Dataset") }}</div>
       </q-card-section>
 
       <q-card-section class="q-gutter-sm">
@@ -16,27 +16,27 @@
           <q-input
             v-model="companyName"
             dense
-            label="Company Name"
+            :label="t('Company Name')"
             outlined
             bg-color="input"
             label-color="secondary"
             class="q-mb-sm"
             hide-bottom-space
-            :rules="[(val) => !!val || 'Company Name is required']"
+            :rules="[(val) => !!val || t('Company Name is required')]"
           />
 
           <q-input
             v-model="datasetName"
             dense
-            label="Dataset Name"
+            :label="t('Dataset Name')"
             outlined
             bg-color="input"
             label-color="secondary"
             :rules="[
-              (val) => !!val || 'Dataset Name is required',
+              (val) => !!val || t('Dataset Name is required'),
               (val) =>
                 /^[a-z0-9]+$/.test(val) ||
-                'Only lowercase alphabets and numbers allowed',
+                t('Only lowercase alphabets and numbers allowed'),
             ]"
             class="q-mb-sm"
             hide-bottom-space
@@ -45,9 +45,9 @@
           <s-select
             v-model="selectedChart"
             :options="chartsOptions"
-            label="Chart of Accounts"
+            :label="t('Chart of Accounts')"
             outlined
-            :rules="[(val) => !!val || 'Chart of Accounts is required']"
+            :rules="[(val) => !!val || t('Chart of Accounts is required')]"
             class="q-mb-sm"
             hide-bottom-space
           />
@@ -56,17 +56,17 @@
           <s-select
             v-model="selectedTemplate"
             :options="templateOptions"
-            label="Template"
+            :label="t('Template')"
             outlined
-            :rules="[(val) => !!val || 'Template is required']"
+            :rules="[(val) => !!val || t('Template is required')]"
             class="q-mb-sm"
             hide-bottom-space
           />
 
           <!-- Moved submit button inside the form -->
           <q-card-actions align="right">
-            <q-btn flat label="Cancel" @click="cancel" />
-            <q-btn flat label="Create" color="primary" type="submit" />
+            <q-btn flat :label="t('Cancel')" @click="cancel" />
+            <q-btn flat :label="t('Create')" color="primary" type="submit" />
           </q-card-actions>
         </q-form>
       </q-card-section> </q-card
@@ -78,6 +78,9 @@
 import { ref, onMounted, watch } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 // Define props for controlling dialog visibility
 const props = defineProps({
@@ -141,7 +144,7 @@ const createDataset = () => {
   // Check form validity
   if (datasetForm.value && !datasetForm.value.validate()) {
     Notify.create({
-      message: "Please fill in all fields.",
+      message: t("Please fill in all fields."),
       color: "warning",
     });
     return;

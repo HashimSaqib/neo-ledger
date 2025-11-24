@@ -1,7 +1,9 @@
 <template>
   <q-page class="lightbg q-pa-md relative-position">
     <div class="column container">
-      <h5 class="container-title title-margin">Transaction Details</h5>
+      <h5 class="container-title title-margin">
+        {{ t("Transaction Details") }}
+      </h5>
 
       <div class="row q-gutter-sm q-mb-sm">
         <text-input
@@ -141,7 +143,7 @@
           dense
           outlined
           v-model="formData.files"
-          label="Reference Documents"
+          :label="t('Reference Documents')"
           multiple
           append
           use-chips
@@ -772,7 +774,7 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
     }
 
     Notify.create({
-      message: t("Transaction Posted Successfully."),
+      message: t("Transaction Posted Successfully"),
       type: "positive",
       position: "top-right",
     });

@@ -60,14 +60,14 @@
           <div class="row">
             <!-- Shipto Expansion Item -->
             <q-expansion-item
-              label="Shipto"
+              :label="t('Shipto')"
               dense
               class="q-mt-none q-mb-sm col-7 line-bg"
             >
               <div class="q-pa-sm">
                 <q-input
                   v-model="shipto.name"
-                  label="Name"
+                  :label="t('Name')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -76,7 +76,7 @@
                 />
                 <q-input
                   v-model="shipto.address1"
-                  label="Street Name"
+                  :label="t('Street Name')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -85,7 +85,7 @@
                 />
                 <q-input
                   v-model="shipto.street"
-                  label="Street Number"
+                  :label="t('Street Number')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -94,7 +94,7 @@
                 />
                 <q-input
                   v-model="shipto.address2"
-                  label="Address 2"
+                  :label="t('Address 2')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -103,7 +103,7 @@
                 />
                 <q-input
                   v-model="shipto.post_office"
-                  label="Postal Office"
+                  :label="t('Postal Office')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -112,7 +112,7 @@
                 />
                 <q-input
                   v-model="shipto.city"
-                  label="City"
+                  :label="t('City')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -121,7 +121,7 @@
                 />
                 <q-input
                   v-model="shipto.state"
-                  label="State"
+                  :label="t('State')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -130,7 +130,7 @@
                 />
                 <q-input
                   v-model="shipto.zip"
-                  label="Zip"
+                  :label="t('Zip')"
                   outlined
                   dense
                   class="q-mb-sm"
@@ -276,7 +276,7 @@
               dense
               outlined
               v-model="files"
-              label="Reference Documents"
+              :label="t('Reference Documents')"
               multiple
               append
               use-chips

@@ -12,19 +12,20 @@
       <q-card v-if="selectedInvoices.length" class="q-mb-md shadow-2">
         <q-card-section class="row items-center">
           <div class="col">
-            <div class="text-h6">Selected Invoices</div>
+            <div class="text-h6">{{ t("Selected Invoices") }}</div>
             <div class="text-body2">
-              {{ selectedInvoices.length }} invoice(s) selected
+              {{ selectedInvoices.length }} {{ t("invoice(s)") }}
+              {{ t("selected") }}
             </div>
           </div>
           <div class="col text-right">
-            <div class="text-subtitle1">Total Amount</div>
+            <div class="text-subtitle1">{{ t("Total Amount") }}</div>
             <div class="text-h6">{{ formatAmount(selectedTotal) }}</div>
           </div>
           <div class="col-auto q-ml-md">
             <q-btn
               color="primary"
-              label="Consolidate Selected"
+              :label="t('Consolidate Selected')"
               @click="confirmConsolidation"
               :disable="selectedInvoices.length < 2"
               class="q-mr-sm"
@@ -134,7 +135,7 @@
     <div v-else class="q-pa-lg text-center">
       <q-icon name="inventory_2" size="4rem" color="grey-5" />
       <p class="text-h6 q-mt-md text-grey-7">
-        No invoices available for consolidation.
+        {{ t("No invoices available for consolidation") }}
       </p>
     </div>
 
@@ -142,17 +143,17 @@
     <q-dialog v-model="confirmDialog" persistent>
       <q-card style="min-width: 400px" class="shadow-3">
         <q-card-section class="row items-center">
-          <div class="text-h6">Confirm Consolidation</div>
+          <div class="text-h6">{{ t("Confirm Consolidation") }}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
           <p>
-            Are you sure you want to consolidate
+            {{ t("Are you sure you want to consolidate") }}
             {{ selectedInvoices.length }} invoices?
           </p>
           <p class="text-bold text-primary">
-            Total amount: {{ formatAmount(selectedTotal) }}
+            {{ t("Total amount") }}: {{ formatAmount(selectedTotal) }}
           </p>
         </q-card-section>
         <q-card-actions align="right">
@@ -199,15 +200,20 @@ const selectedTotal = computed(() => {
 // Table columns
 const columns = [
   { name: "select", label: "", field: "select", align: "left" },
-  { name: "transdate", label: "Date", field: "transdate", align: "left" },
-  { name: "invnumber", label: "Invoice #", field: "invnumber", align: "left" },
+  { name: "transdate", label: t("Date"), field: "transdate", align: "left" },
+  {
+    name: "invnumber",
+    label: t("Invoice #"),
+    field: "invnumber",
+    align: "left",
+  },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
   },
-  { name: "amount", label: "Amount", field: "amount", align: "right" },
+  { name: "amount", label: t("Amount"), field: "amount", align: "right" },
 ];
 
 // Methods

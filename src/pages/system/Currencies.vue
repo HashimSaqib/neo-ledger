@@ -12,7 +12,7 @@
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn
-            label="Edit"
+            :label="t('Edit')"
             color="primary"
             @click="openEditPopup(props.row)"
             flat
@@ -22,7 +22,7 @@
       </template>
     </q-table>
     <q-btn
-      label="Add Currency"
+      :label="t('Add Currency')"
       color="primary"
       @click="openAddPopup"
       size="sm"
@@ -33,11 +33,13 @@
     <q-dialog v-model="editDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">{{ isEditMode ? "Edit" : "Add" }} Currency</div>
+          <div class="text-h6">
+            {{ isEditMode ? t("Edit") : t("Add") }} {{ t("Currency") }}
+          </div>
 
           <q-input
             v-model="selectedCurrency.curr"
-            label="Currency"
+            :label="t('Currency')"
             outlined
             dense
             class="q-my-md"
@@ -46,7 +48,7 @@
           />
           <q-input
             v-model="selectedCurrency.prec"
-            label="Precision"
+            :label="t('Precision')"
             outlined
             dense
             type="number"
@@ -57,8 +59,13 @@
         </q-card-section>
 
         <q-card-actions align="right" class="q-mt-none q-pt-none">
-          <q-btn flat label="Cancel" color="negative" v-close-popup />
-          <q-btn flat label="Save" color="positive" @click="saveCurrency" />
+          <q-btn flat :label="t('Cancel')" color="negative" v-close-popup />
+          <q-btn
+            flat
+            :label="t('Save')"
+            color="positive"
+            @click="saveCurrency"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -66,22 +73,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject } from "vue";
+import { ref, onMounted, inject, computed } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
-updateTitle("Currencies");
+updateTitle(t("Currencies"));
 const currencies = ref([]);
 const editDialog = ref(false);
 const isEditMode = ref(false);
 const selectedCurrency = ref({ curr: "", prec: 0, rn: 0 });
 
-const columns = [
-  { name: "curr", label: "Currency", field: "curr", align: "left" },
-  { name: "prec", label: "Precision", field: "prec", align: "left" },
-  { name: "rn", label: "RN", field: "rn", align: "left" },
-  { name: "actions", label: "Actions", align: "right" },
-];
+const columns = computed(() => [
+  { name: "curr", label: t("Currency"), field: "curr", align: "left" },
+  { name: "prec", label: t("Precision"), field: "prec", align: "left" },
+  { name: "rn", label: t("RN"), field: "rn", align: "left" },
+  { name: "actions", label: t("Actions"), align: "right" },
+]);
 
 const getCurrencies = async () => {
   try {
@@ -89,7 +99,7 @@ const getCurrencies = async () => {
     currencies.value = response.data;
   } catch (error) {
     Notify.create({
-      message: error.response?.data?.message || "Can't fetch currencies",
+      message: error.response?.data?.message || t("Can't fetch currencies"),
       type: "negative",
       position: "center",
     });
@@ -121,7 +131,9 @@ const saveCurrency = async () => {
         }
       );
       Notify.create({
-        message: `Currency ${selectedCurrency.value.curr} updated successfully!`,
+        message: t("Currency {0} updated successfully!", [
+          selectedCurrency.value.curr,
+        ]),
         type: "positive",
         position: "top-right",
       });
@@ -132,7 +144,9 @@ const saveCurrency = async () => {
         prec: selectedCurrency.value.prec,
       });
       Notify.create({
-        message: `Currency ${selectedCurrency.value.curr} added successfully!`,
+        message: t("Currency {0} added successfully!", [
+          selectedCurrency.value.curr,
+        ]),
         type: "positive",
         position: "top-right",
       });
@@ -141,7 +155,7 @@ const saveCurrency = async () => {
     getCurrencies(); // Refresh the table data
   } catch (error) {
     Notify.create({
-      message: error.response?.data?.message || "An error occurred",
+      message: error.response?.data?.message || t("An error occurred"),
       type: "negative",
       position: "center",
     });

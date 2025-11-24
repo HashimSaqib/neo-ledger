@@ -693,8 +693,8 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 
 const updateTitle = inject("updateTitle");
-updateTitle("Company Defaults");
 const { t } = useI18n();
+updateTitle("Company Defaults");
 
 const formRef = ref(null);
 

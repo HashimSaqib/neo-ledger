@@ -3,11 +3,11 @@
     <h1>Datasets</h1>
 
     <!-- Loading Spinner -->
-    <div v-if="loading" class="spinner">Loading...</div>
+    <div v-if="loading" class="spinner">{{ t("Loading...") }}</div>
 
     <!-- Error Message -->
     <div v-if="error" class="error">
-      Error fetching datasets. Please try again later.
+      {{ t("Error fetching datasets. Please try again later.") }}
     </div>
 
     <!-- Datasets Grid -->
@@ -29,7 +29,8 @@
         </div>
         <p class="dataset-description">{{ dataset.description }}</p>
         <p class="dataset-access">
-          <strong>Access:</strong> <em>{{ dataset.access_level }}</em>
+          <strong>{{ t("Access") }}:</strong>
+          <em>{{ dataset.access_level }}</em>
         </p>
 
         <!-- Additional details for owner/admin -->
@@ -40,7 +41,7 @@
           class="admin-details"
         >
           <div class="users" v-if="dataset.users && dataset.users.length">
-            <h3>Users</h3>
+            <h3>{{ t("Users") }}</h3>
             <ul>
               <li v-for="user in dataset.users" :key="user.email">
                 {{ user.email }} - {{ user.access_level }}
@@ -49,7 +50,7 @@
           </div>
           <!-- Improved Roles Display -->
           <div class="roles" v-if="dataset.roles && dataset.roles.length">
-            <h3>Roles</h3>
+            <h3>{{ t("Roles") }}</h3>
             <div class="roles-list">
               <div
                 v-for="role in dataset.roles"
@@ -74,7 +75,7 @@
                 </q-chip>
                 <!-- Edit button for each role -->
                 <q-btn
-                  label="Edit"
+                  :label="t('Edit')"
                   color="primary"
                   flat
                   size="sm"
@@ -85,7 +86,7 @@
           </div>
           <!-- Button to add a new role -->
           <q-btn
-            label="Add Role"
+            :label="t('Add Role')"
             color="primary"
             size="sm"
             @click="openAddRolePopup(dataset)"
@@ -104,13 +105,13 @@
           <!-- Now using description (you can adjust field names as needed) -->
           <q-input
             v-model="selectedRole.description"
-            label="Description"
+            :label="t('Description')"
             outlined
             dense
             class="q-my-md"
           />
           <div class="q-my-md">
-            <div class="text-subtitle2">Access Controls</div>
+            <div class="text-subtitle2">{{ t("Access Controls") }}</div>
             <!-- Render hierarchical checkboxes based on groupedAcs -->
             <div
               v-for="group in groupedAcs"
@@ -141,12 +142,12 @@
         <q-card-actions align="right" class="q-mt-none q-pt-none">
           <q-btn
             flat
-            label="Cancel"
+            :label="t('Cancel')"
             color="negative"
             v-close-popup
             @click="cancelRole"
           />
-          <q-btn flat label="Save" color="positive" @click="saveRole" />
+          <q-btn flat :label="t('Save')" color="positive" @click="saveRole" />
         </q-card-actions>
       </q-card>
     </q-dialog>

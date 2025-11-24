@@ -295,24 +295,24 @@ const departments = ref([]);
 const taxAccounts = ref([]);
 
 const baseColumns = ref([
-  { name: "id", label: "ID", field: "id", default: false, align: "left" },
+  { name: "id", label: t("ID"), field: "id", default: false, align: "left" },
   {
     name: "invnumber",
-    label: "Invoice Number",
+    label: t("Invoice Number"),
     field: "invnumber",
     default: true,
     align: "left",
   },
   {
     name: "transdate",
-    label: "Date",
+    label: t("Date"),
     field: "transdate",
     default: true,
     align: "left",
   },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     default: true,
     sortable: true,
@@ -334,36 +334,36 @@ const baseColumns = ref([
   },
   {
     name: "address",
-    label: "Address",
+    label: t("Address"),
     field: "address",
     default: false,
     align: "left",
   },
   {
     name: "country",
-    label: "Country",
+    label: t("Country"),
     field: "country",
     default: false,
     align: "left",
   },
   {
     name: "taxnumber",
-    label: "Tax Number",
+    label: t("Tax Number"),
     field: "taxnumber",
     default: false,
     align: "left",
   },
   {
     name: "netamount",
-    label: "Amount",
+    label: t("Amount"),
     field: "netamount",
     default: true,
     align: "right",
   },
-  { name: "tax", label: "Tax", field: "tax", default: true, align: "right" },
+  { name: "tax", label: t("Tax"), field: "tax", default: true, align: "right" },
   {
     name: "total",
-    label: "Total",
+    label: t("Total"),
     field: "total",
     default: true,
     align: "right",
@@ -682,7 +682,7 @@ const downloadExcel = () => {
         return formatAmount(group.totals[col.name]);
       }
       if (col.name === "description") {
-        return "Account Total";
+        return t("Account Total");
       }
       return "";
     });
@@ -696,7 +696,7 @@ const downloadExcel = () => {
       return formatAmount(grandTotals.value[col.name]);
     }
     if (col.name === "description") {
-      return "Grand Total";
+      return t("Grand Total");
     }
     return "";
   });
@@ -763,7 +763,7 @@ const downloadPDF = () => {
         return formatAmount(group.totals[col.name]);
       }
       if (col.name === "description") {
-        return "Account Total";
+        return t("Account Total");
       }
       return "";
     });
@@ -793,7 +793,7 @@ const downloadPDF = () => {
       return formatAmount(grandTotals.value[col.name]);
     }
     if (col.name === "description") {
-      return "Grand Total";
+      return t("Grand Total");
     }
     return "";
   });

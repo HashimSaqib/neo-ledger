@@ -86,7 +86,7 @@
                     v-if="selectedBankHasQriban"
                     color="primary"
                     class="q-mt-xs"
-                    label="QR-IBAN"
+                    :label="t('QR-IBAN')"
                   />
                 </div>
                 <div class="col-sm-auto q-ml-sm flex items-center">
@@ -198,7 +198,7 @@
                   dense
                   outlined
                   v-model="files"
-                  label="Reference Documents"
+                  :label="t('Reference Documents')"
                   multiple
                   append
                   use-chips

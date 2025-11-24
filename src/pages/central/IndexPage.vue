@@ -12,9 +12,9 @@
           round
           icon="refresh"
           @click="getDatasets"
-          aria-label="Refresh Datasets"
+          :aria-label="t('Refresh Datasets')"
         >
-          <q-tooltip>Refresh</q-tooltip>
+          <q-tooltip>{{ t("Refresh") }}</q-tooltip>
         </q-btn>
 
         <!-- Logout Button -->
@@ -96,7 +96,7 @@
           dismissible
           @dismiss="error = false"
         >
-          Error fetching datasets. Please try again later.
+          {{ t("Error fetching datasets. Please try again later.") }}
         </q-banner>
 
         <!-- Search and Create Dataset Bar -->
@@ -110,7 +110,7 @@
                 v-model="searchQuery"
                 dense
                 outlined
-                placeholder="Search datasets..."
+                :placeholder="t('Search datasets...')"
                 clearable
               >
                 <template v-slot:prepend>
@@ -120,7 +120,7 @@
             </div>
             <q-btn
               v-if="allowDbCreation"
-              label="Create New Dataset"
+              :label="t('Create New Dataset')"
               @click="showDatasetDialog = true"
               color="primary"
               icon="add"
@@ -138,7 +138,7 @@
             <q-card-section class="q-pb-none">
               <div class="text-h6 flex items-center">
                 <q-icon name="move_to_inbox" class="q-mr-sm" />
-                Pending Invites ({{ receivedInvites.length }})
+                {{ t("Pending Invites") }} ({{ receivedInvites.length }})
               </div>
             </q-card-section>
 
@@ -189,14 +189,14 @@
                         <q-btn
                           color="positive"
                           flat
-                          label="Accept"
+                          :label="t('Accept')"
                           @click="acceptInvite(invite.id)"
                           :loading="processingInvite === invite.id"
                         />
                         <q-btn
                           color="negative"
                           flat
-                          label="Decline"
+                          :label="t('Decline')"
                           @click="declineInvite(invite.id)"
                           :loading="processingInvite === invite.id"
                         />
@@ -216,8 +216,10 @@
             class="flex flex-center column q-py-xl text-grey text-center"
           >
             <q-icon name="search_off" size="64px" />
-            <div class="text-h6 q-mt-md">No datasets found</div>
-            <div class="text-body2">Try adjusting your search query</div>
+            <div class="text-h6 q-mt-md">{{ t("No datasets found") }}</div>
+            <div class="text-body2">
+              {{ t("Try adjusting your search query") }}
+            </div>
           </div>
         </div>
         <div>
@@ -337,7 +339,7 @@
                     <template v-else>
                       <div class="text-weight-medium">
                         {{ props.row.workstations.pending_count || 0 }}
-                        Invoice(s)
+                        {{ t("Invoice(s)") }}
                       </div>
                     </template>
                   </div>
@@ -374,7 +376,8 @@
           >
             <q-card-section class="row items-center q-pb-none">
               <div class="text-h6">
-                Manage Dataset: {{ selectedDatasetForManage.db_name }}
+                {{ t("Manage Dataset") }}:
+                {{ selectedDatasetForManage.db_name }}
               </div>
               <q-space />
               <q-btn
@@ -395,9 +398,9 @@
                       <q-item-section avatar>
                         <q-icon name="delete_forever" color="negative" />
                       </q-item-section>
-                      <q-item-section class="text-negative"
-                        >Delete Dataset</q-item-section
-                      >
+                      <q-item-section class="text-negative">{{
+                        t("Delete Dataset")
+                      }}</q-item-section>
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -427,7 +430,7 @@
                           ? selectedDatasetForManage.users.length
                           : 0
                       }}
-                      Users
+                      {{ t("Users") }}
                     </q-badge>
                     <q-badge color="primary">
                       {{
@@ -435,7 +438,7 @@
                           ? selectedDatasetForManage.roles.length
                           : 0
                       }}
-                      Roles
+                      {{ t("Roles") }}
                     </q-badge>
                   </div>
                 </div>
@@ -445,7 +448,7 @@
                     flat
                     color="primary"
                     icon="person_add"
-                    label="Invite User"
+                    :label="t('Invite User')"
                     @click.stop="openInviteDialog(selectedDatasetForManage)"
                   />
                   <q-btn
@@ -453,7 +456,7 @@
                     flat
                     color="primary"
                     icon="vpn_key"
-                    label="API Keys"
+                    :label="t('API Keys')"
                     @click.stop="openApiKeysDialog(selectedDatasetForManage)"
                   />
                 </div>
@@ -468,12 +471,12 @@
                 indicator-color="primary"
                 align="left"
               >
-                <q-tab name="users" icon="group" label="Users" />
-                <q-tab name="roles" icon="security" label="Roles" />
+                <q-tab name="users" icon="group" :label="t('Users')" />
+                <q-tab name="roles" icon="security" :label="t('Roles')" />
                 <q-tab
                   name="invites"
                   icon="mail"
-                  label="Invites"
+                  :label="t('Invites')"
                   :alert="
                     getDatasetInvites(selectedDatasetForManage.id).length > 0
                   "
@@ -481,13 +484,13 @@
                 <q-tab
                   name="connections"
                   icon="cloud_upload"
-                  label="Connections"
+                  :label="t('Connections')"
                   v-if="selectedDatasetForManage.access_level == 'owner'"
                 />
                 <q-tab
                   name="backup"
                   icon="cloud_download"
-                  label="Backup"
+                  :label="t('Backup')"
                   v-if="selectedDatasetForManage.access_level == 'owner'"
                 />
               </q-tabs>
@@ -568,7 +571,9 @@
                   </div>
                   <div v-else class="text-center q-pa-xl text-grey-7">
                     <q-icon name="people_alt" size="64px" />
-                    <div class="text-h6 q-mt-md">No users available</div>
+                    <div class="text-h6 q-mt-md">
+                      {{ t("No users available") }}
+                    </div>
                   </div>
                 </q-tab-panel>
 
@@ -639,7 +644,7 @@
 
                     <div class="q-mt-md text-right">
                       <q-btn
-                        label="Add Role"
+                        :label="t('Add Role')"
                         color="primary"
                         icon="add"
                         @click.stop="openAddRolePopup(selectedDatasetForManage)"
@@ -648,15 +653,17 @@
                   </div>
                   <div v-else class="text-center q-pa-xl text-grey-7">
                     <q-icon name="security" size="64px" />
-                    <div class="text-h6 q-mt-md">No roles available</div>
-                    <q-btn
-                      class="q-mt-md"
-                      label="Add First Role"
-                      color="primary"
-                      icon="add"
-                      @click.stop="openAddRolePopup(selectedDatasetForManage)"
-                    />
+                    <div class="text-h6 q-mt-md">
+                      {{ t("No roles available") }}
+                    </div>
                   </div>
+                  <q-btn
+                    class="q-mt-md"
+                    :label="t('Add First Role')"
+                    color="primary"
+                    icon="add"
+                    @click.stop="openAddRolePopup(selectedDatasetForManage)"
+                  />
                 </q-tab-panel>
 
                 <!-- Invites Panel -->
@@ -673,10 +680,12 @@
                     class="text-center q-pa-xl text-grey-7"
                   >
                     <q-icon name="mail" size="64px" />
-                    <div class="text-h6 q-mt-md">No pending invites</div>
+                    <div class="text-h6 q-mt-md">
+                      {{ t("No pending invites") }}
+                    </div>
                     <q-btn
                       class="q-mt-md"
-                      label="Invite User"
+                      :label="t('Invite User')"
                       color="primary"
                       icon="person_add"
                       @click.stop="openInviteDialog(selectedDatasetForManage)"
@@ -718,7 +727,7 @@
                             @click="cancelInvite(invite.id)"
                             :loading="processingInvite === invite.id"
                           >
-                            <q-tooltip>Cancel Invite</q-tooltip>
+                            <q-tooltip>{{ t("Cancel Invite") }}</q-tooltip>
                           </q-btn>
                         </q-item-section>
                       </q-item>
@@ -726,7 +735,7 @@
 
                     <div class="q-mt-md text-right">
                       <q-btn
-                        label="Invite Another User"
+                        :label="t('Invite Another User')"
                         color="primary"
                         icon="person_add"
                         @click.stop="openInviteDialog(selectedDatasetForManage)"
@@ -749,14 +758,14 @@
                   <div class="text-center">
                     <q-btn
                       color="primary"
-                      label="Download Database"
+                      :label="t('Download Database')"
                       icon="cloud_download"
                       class="q-mr-sm"
                       @click="downloadDb(selectedDatasetForManage)"
                     />
                     <q-btn
                       color="accent"
-                      label="Download Templates"
+                      :label="t('Download Templates')"
                       icon="folder_zip"
                       @click="downloadTemplates(selectedDatasetForManage)"
                     />
@@ -789,11 +798,11 @@
             <q-card-section class="scroll" style="max-height: 80vh">
               <q-input
                 v-model="selectedRole.name"
-                label="Role Name"
+                :label="t('Role Name')"
                 outlined
                 dense
                 class="q-mb-md"
-                :rules="[(val) => !!val || 'Role name is required']"
+                :rules="[(val) => !!val || t('Role name is required')]"
               >
                 <template v-slot:prepend>
                   <q-icon name="badge" />
@@ -802,7 +811,7 @@
 
               <div class="q-my-md">
                 <div class="text-subtitle1 q-mb-sm text-primary">
-                  Access Controls
+                  {{ t("Access Controls") }}
                 </div>
                 <q-separator class="q-mb-sm" />
 
@@ -837,13 +846,13 @@
             <q-card-actions align="right" class="q-pa-md">
               <q-btn
                 flat
-                label="Cancel"
+                :label="t('Cancel')"
                 color="grey"
                 v-close-popup
                 @click="cancelRole"
               />
               <q-btn
-                label="Save"
+                :label="t('Save')"
                 color="primary"
                 @click="saveRole"
                 :loading="saving"
@@ -880,7 +889,7 @@
 
               <q-input
                 v-model="inviteData.recipient_email"
-                label="Email Address"
+                :label="t('Email Address')"
                 type="email"
                 outlined
                 dense
@@ -888,10 +897,10 @@
                 class="q-my-md"
                 lazy-rules
                 :rules="[
-                  (val) => !!val || 'Email is required',
+                  (val) => !!val || t('Email is required'),
                   (val) =>
                     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ||
-                    'Invalid email format',
+                    t('Invalid email format'),
                 ]"
               >
                 <template v-slot:prepend>
@@ -902,10 +911,10 @@
               <q-select
                 v-model="inviteData.access_level"
                 :options="[
-                  { label: 'Admin', value: 'admin' },
-                  { label: 'User', value: 'user' },
+                  { label: t('Admin'), value: 'admin' },
+                  { label: t('User'), value: 'user' },
                 ]"
-                label="Access Level"
+                :label="t('Access Level')"
                 outlined
                 dense
                 class="q-my-md"
@@ -923,7 +932,7 @@
                 "
                 v-model="inviteData.role_id"
                 :options="roleOptions"
-                label="Role"
+                :label="t('Role')"
                 outlined
                 dense
                 class="q-my-md"
@@ -947,13 +956,13 @@
             <q-card-actions align="right" class="q-pa-md">
               <q-btn
                 flat
-                label="Cancel"
+                :label="t('Cancel')"
                 color="grey"
                 v-close-popup
                 @click="cancelInviteDialog"
               />
               <q-btn
-                label="Send Invite"
+                :label="t('Send Invite')"
                 color="primary"
                 icon="send"
                 @click="sendInvite"
@@ -995,10 +1004,10 @@
               <q-select
                 v-model="userEditData.access_level"
                 :options="[
-                  { label: 'Admin', value: 'admin' },
-                  { label: 'User', value: 'user' },
+                  { label: t('Admin'), value: 'admin' },
+                  { label: t('User'), value: 'user' },
                 ]"
-                label="Access Level"
+                :label="t('Access Level')"
                 outlined
                 dense
                 class="q-my-md"
@@ -1017,7 +1026,7 @@
                 "
                 v-model="userEditData.role_id"
                 :options="roleOptionsForEdit"
-                label="Role"
+                :label="t('Role')"
                 outlined
                 dense
                 class="q-my-md"
@@ -1031,7 +1040,7 @@
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
-                      No roles available
+                      {{ t("No roles available") }}
                     </q-item-section>
                   </q-item>
                 </template>
@@ -1041,13 +1050,13 @@
             <q-card-actions align="right" class="q-pa-md">
               <q-btn
                 flat
-                label="Cancel"
+                :label="t('Cancel')"
                 color="grey"
                 v-close-popup
                 @click="cancelEditUserDialog"
               />
               <q-btn
-                label="Save Changes"
+                :label="t('Save Changes')"
                 color="primary"
                 icon="save"
                 @click="saveUserAccess"
@@ -1063,26 +1072,26 @@
             <q-card-section class="bg-negative text-white">
               <div class="text-h6">
                 <q-icon name="warning" class="q-mr-sm" />
-                Remove User Access
+                {{ t("Remove User Access") }}
               </div>
             </q-card-section>
 
             <q-card-section class="q-pt-md">
               <p>
-                Are you sure you want to remove access for
-                <strong>{{ selectedUser?.email }}</strong> from
+                {{ t("Are you sure you want to remove access for") }}
+                <strong>{{ selectedUser?.email }}</strong> {{ t("from") }}
                 <strong>{{ selectedDatasetForUserEdit?.db_name }}</strong
                 >?
               </p>
               <p class="text-caption text-negative">
-                This action cannot be undone.
+                {{ t("This action cannot be undone.") }}
               </p>
             </q-card-section>
 
             <q-card-actions align="right" class="q-pa-md">
-              <q-btn flat label="Cancel" color="primary" v-close-popup />
+              <q-btn flat :label="t('Cancel')" color="primary" v-close-popup />
               <q-btn
-                label="Remove Access"
+                :label="t('Remove Access')"
                 color="negative"
                 @click="removeUserAccess"
                 :loading="removingAccess"
@@ -1097,24 +1106,29 @@
             <q-card-section class="bg-negative text-white">
               <div class="text-h6">
                 <q-icon name="delete_forever" class="q-mr-sm" />
-                Delete Dataset
+                {{ t("Delete Dataset") }}
               </div>
             </q-card-section>
 
             <q-card-section class="q-pt-md">
               <p class="text-subtitle2 q-mb-md">
-                Are you sure you want to delete
+                {{ t("Are you sure you want to delete") }}
                 <strong>{{ datasetToDelete?.db_name }}</strong
                 >?
               </p>
               <p class="q-mb-sm">
-                This action will permanently delete the dataset and all
-                templates and
-                <strong>cannot</strong> be undone. Only the owner can perform
-                this operation.
+                {{
+                  t(
+                    "This action will permanently delete the dataset and all templates and cannot be undone. Only the owner can perform this operation."
+                  )
+                }}
               </p>
               <p class="text-body2 text-negative q-mb-md">
-                Please enter your password to confirm this irreversible action.
+                {{
+                  t(
+                    "Please enter your password to confirm this irreversible action."
+                  )
+                }}
               </p>
 
               <q-input
@@ -1123,7 +1137,7 @@
                 dense
                 input-class="maintext"
                 label-color="negative"
-                label="Password"
+                :label="t('Password')"
                 class="q-mb-md"
                 outlined
                 autocomplete="current-password"
@@ -1133,14 +1147,14 @@
             <q-card-actions align="right" class="q-pa-md">
               <q-btn
                 flat
-                label="Cancel"
+                :label="t('Cancel')"
                 color="primary"
                 v-close-popup
                 @click="cancelDelete"
               />
               <q-btn
                 color="negative"
-                label="DELETE DATASET"
+                :label="t('DELETE DATASET')"
                 @click="confirmDelete"
                 :loading="deletingDataset"
               />
@@ -1228,7 +1242,7 @@ const handleDelete = async (dataset) => {
     );
     deletePw.value = "";
     Notify.create({
-      message: "Dataset succesfully deleted.",
+      message: t("Dataset succesfully deleted."),
       position: "center",
       color: "positive",
     });
@@ -1371,20 +1385,20 @@ const savingUserAccess = ref(false);
 const removingAccess = ref(false);
 
 // Theme and language settings
-const languages = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-];
+const languages = computed(() => [
+  { value: "en", label: t("English") },
+  { value: "de", label: t("Deutsch") },
+]);
 
 const selectedLanguage = ref(
-  languages.find((lang) => lang.value === i18n.global.locale.value) ||
-    languages[0]
+  languages.value.find((lang) => lang.value === i18n.global.locale.value) ||
+    languages.value[0]
 );
 
 // Columns for Roles table
 const roleColumns = [
-  { name: "name", label: "Name", field: "name", align: "left" },
-  { name: "acs", label: "Permissions", field: "acs", align: "left" },
+  { name: "name", label: t("Name"), field: "name", align: "left" },
+  { name: "acs", label: t("Permissions"), field: "acs", align: "left" },
   { name: "actions", label: "", field: "actions", align: "right" },
 ];
 
@@ -1393,21 +1407,21 @@ const datasetColumns = computed(() => {
   const columns = [
     {
       name: "name",
-      label: "Name",
+      label: t("Name"),
       field: "db_name",
       align: "left",
       sortable: true,
     },
     {
       name: "access_level",
-      label: "Access Level",
+      label: t("Access Level"),
       field: "access_level",
       align: "left",
       sortable: true,
     },
     {
       name: "users",
-      label: "Users",
+      label: t("Users"),
       field: "users",
       align: "center",
       sortable: true,
@@ -1417,7 +1431,7 @@ const datasetColumns = computed(() => {
   if (neoledgerConfig.ai_plugin) {
     columns.push({
       name: "pending_count",
-      label: "Pending",
+      label: t("Pending"),
       field: "pending_count",
       align: "center",
       sortable: true,
@@ -1426,7 +1440,7 @@ const datasetColumns = computed(() => {
 
   columns.push({
     name: "actions",
-    label: "Actions",
+    label: t("Actions"),
     field: "actions",
     align: "center",
     style: "width: 120px",
@@ -1437,17 +1451,17 @@ const datasetColumns = computed(() => {
 
 // Columns for Users table
 const userColumns = [
-  { name: "email", label: "Email", field: "email", align: "left" },
+  { name: "email", label: t("Email"), field: "email", align: "left" },
   {
     name: "access_level",
-    label: "Access Level",
+    label: t("Access Level"),
     field: "access_level",
     align: "left",
   },
-  { name: "role", label: "Role", field: "role", align: "left" },
+  { name: "role", label: t("Role"), field: "role", align: "left" },
   {
     name: "actions",
-    label: "Actions",
+    label: t("Actions"),
     field: "actions",
     align: "right",
   },
@@ -1655,7 +1669,7 @@ const getInvites = async () => {
   } catch (err) {
     console.error("Error fetching invites:", err);
     Notify.create({
-      message: "Failed to load invites",
+      message: t("Failed to load invites"),
       type: "negative",
       position: "center",
     });
@@ -1675,7 +1689,7 @@ const acceptInvite = async (inviteId) => {
     );
 
     Notify.create({
-      message: "Invite accepted successfully",
+      message: t("Invite accepted successfully"),
       type: "positive",
       position: "top-right",
     });
@@ -1684,7 +1698,7 @@ const acceptInvite = async (inviteId) => {
   } catch (err) {
     console.error("Error accepting invite:", err);
     Notify.create({
-      message: err.response?.data?.message || "Failed to accept invite",
+      message: err.response?.data?.message || t("Failed to accept invite"),
       type: "negative",
       position: "center",
     });
@@ -1705,14 +1719,14 @@ const declineInvite = async (inviteId) => {
     );
 
     Notify.create({
-      message: "Invite declined",
+      message: t("Invite declined"),
       type: "positive",
       position: "top-right",
     });
   } catch (err) {
     console.error("Error declining invite:", err);
     Notify.create({
-      message: err.response?.data?.message || "Failed to decline invite",
+      message: err.response?.data?.message || t("Failed to decline invite"),
       type: "negative",
       position: "center",
     });
@@ -1733,14 +1747,14 @@ const cancelInvite = async (inviteId) => {
     );
 
     Notify.create({
-      message: "Invite canceled",
+      message: t("Invite canceled"),
       type: "positive",
       position: "top-right",
     });
   } catch (err) {
     console.error("Error canceling invite:", err);
     Notify.create({
-      message: err.response?.data?.message || "Failed to cancel invite",
+      message: err.response?.data?.message || t("Failed to cancel invite"),
       type: "negative",
       position: "center",
     });
@@ -1779,7 +1793,7 @@ const sendInvite = async () => {
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteData.value.recipient_email)
   ) {
     Notify.create({
-      message: "Please enter a valid email address",
+      message: t("Please enter a valid email address"),
       type: "negative",
       position: "center",
     });
@@ -1801,7 +1815,7 @@ const sendInvite = async () => {
     );
 
     Notify.create({
-      message: "Invite sent successfully",
+      message: t("Invite sent successfully"),
       type: "positive",
       position: "top-right",
     });
@@ -1813,7 +1827,7 @@ const sendInvite = async () => {
   } catch (err) {
     console.error("Error sending invite:", err);
     Notify.create({
-      message: err.response?.data?.message || "Failed to send invite",
+      message: err.response?.data?.message || t("Failed to send invite"),
       type: "negative",
       position: "center",
     });
@@ -1847,7 +1861,7 @@ const cancelEditUserDialog = () => {
 const confirmRemoveAccess = (dataset, user) => {
   if (user.access_level === "owner") {
     Notify.create({
-      message: "Cannot remove owner access",
+      message: t("Cannot remove owner access"),
       type: "warning",
       position: "center",
     });
@@ -1879,7 +1893,7 @@ const saveUserAccess = async () => {
     );
 
     Notify.create({
-      message: "User access updated successfully",
+      message: t("User access updated successfully"),
       type: "positive",
       position: "top-right",
     });
@@ -1909,7 +1923,7 @@ const saveUserAccess = async () => {
   } catch (err) {
     console.error("Error updating user access:", err);
     Notify.create({
-      message: err.response?.data?.message || "Failed to update user access",
+      message: err.response?.data?.message || t("Failed to update user access"),
       type: "negative",
       position: "center",
     });
@@ -1938,7 +1952,7 @@ const removeUserAccess = async () => {
     );
 
     Notify.create({
-      message: "User access removed successfully",
+      message: t("User access removed successfully"),
       type: "positive",
       position: "top-right",
     });
@@ -2005,7 +2019,7 @@ const cancelRole = () => {
 const saveRole = async () => {
   if (!selectedRole.value.name.trim()) {
     Notify.create({
-      message: "Role name is required",
+      message: t("Role name is required"),
       type: "negative",
       position: "center",
     });
@@ -2026,7 +2040,7 @@ const saveRole = async () => {
         payload
       );
       Notify.create({
-        message: "Role updated successfully",
+        message: t("Role updated successfully"),
         type: "positive",
         position: "top-right",
       });
@@ -2036,7 +2050,7 @@ const saveRole = async () => {
         payload
       );
       Notify.create({
-        message: "Role added successfully",
+        message: t("Role added successfully"),
         type: "positive",
         position: "top-right",
       });
@@ -2046,7 +2060,7 @@ const saveRole = async () => {
     getDatasets();
   } catch (error) {
     Notify.create({
-      message: error.response?.data?.message || "An error occurred",
+      message: error.response?.data?.message || t("An error occurred"),
       type: "negative",
       position: "center",
     });

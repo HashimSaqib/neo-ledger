@@ -1,11 +1,11 @@
 <template>
-  <q-btn-dropdown label="Language" color="primary" size="sm">
+  <q-btn-dropdown :label="t('Language')" color="primary" size="sm">
     <q-list>
       <q-item clickable v-ripple @click="switchLanguage('en')">
-        <q-item-section>English</q-item-section>
+        <q-item-section>{{ t("English") }}</q-item-section>
       </q-item>
       <q-item clickable v-ripple @click="switchLanguage('de')">
-        <q-item-section>Deutsch</q-item-section>
+        <q-item-section>{{ t("Deutsch") }}</q-item-section>
       </q-item>
     </q-list>
   </q-btn-dropdown>
@@ -13,10 +13,11 @@
 
 <script setup>
 import { useQuasar } from "quasar";
-import { i18n } from "src/boot/i18n";
+import { i18n, useI18n } from "src/boot/i18n";
 import { loadLanguagePack } from "src/boot/i18n";
 
 const $q = useQuasar();
+const { t } = useI18n();
 
 function switchLanguage(lang) {
   // Map locale codes to match available locales

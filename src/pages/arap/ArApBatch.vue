@@ -335,63 +335,63 @@ const loading = ref(false);
 const columns = ref([
   {
     name: "transdate",
-    label: "Date",
+    label: t("Date"),
     field: "transdate",
     align: "left",
     sortable: true,
   },
   {
     name: "invnumber",
-    label: "Invoice",
+    label: t("Invoice"),
     field: "invnumber",
     align: "left",
     sortable: true,
   },
   {
     name: "emailed",
-    label: "Emailed",
+    label: t("Emailed"),
     field: "emailed",
     align: "left",
     sortable: true,
   },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
     sortable: true,
   },
   {
     name: "name",
-    label: "Name",
+    label: t("Name"),
     field: "name",
     align: "left",
     sortable: true,
   },
   {
     name: "vcnumber",
-    label: "Number",
+    label: t("Number"),
     field: "vcnumber",
     align: "left",
     sortable: true,
   },
   {
     name: "email",
-    label: "Email",
+    label: t("Email"),
     field: "email",
     align: "left",
     sortable: true,
   },
   {
     name: "city",
-    label: "City",
+    label: t("City"),
     field: "city",
     align: "left",
     sortable: true,
   },
   {
     name: "amount",
-    label: "Amount",
+    label: t("Amount"),
     field: "amount",
     align: "right",
     sortable: true,
@@ -406,7 +406,8 @@ const fetchCustomers = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching " + type.value,
+      message:
+        error.response?.data?.message || t("Error fetching") + " " + type.value,
       type: "negative",
       position: "center",
     });
@@ -475,7 +476,7 @@ const search = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error performing search",
+      message: error.response?.data?.message || t("Error performing search"),
       type: "negative",
       position: "center",
     });
@@ -566,7 +567,7 @@ const openEmailDialog = () => {
 
   if (rowsToEmail.length === 0) {
     Notify.create({
-      message: t("No transactions to email"),
+      message: t("No transactions to email."),
       position: "center",
       color: "negative",
     });
@@ -588,7 +589,7 @@ const openEmailDialog = () => {
       })
       .join(", ");
     Notify.create({
-      message: t(`Missing email address for: ${invoiceList}`),
+      message: t(`Missing email address for: ${invoiceList}.`),
       position: "center",
       color: "negative",
       timeout: 5000,

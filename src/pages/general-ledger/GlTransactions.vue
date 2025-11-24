@@ -448,7 +448,7 @@ const baseColumns = ref([
   {
     name: "id",
     align: "left",
-    label: "ID",
+    label: t("ID"),
     field: "id",
     sortable: true,
     slot: true,
@@ -457,7 +457,7 @@ const baseColumns = ref([
   {
     name: "transdate",
     align: "left",
-    label: "Date",
+    label: t("Date"),
     field: "transdate",
     sortable: true,
     default: true,
@@ -465,7 +465,7 @@ const baseColumns = ref([
   {
     name: "reference",
     align: "left",
-    label: "Reference",
+    label: t("Reference"),
     field: "reference",
     sortable: true,
     default: true,
@@ -473,7 +473,7 @@ const baseColumns = ref([
   {
     name: "description",
     align: "left",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     sortable: true,
     default: true,
@@ -481,7 +481,7 @@ const baseColumns = ref([
   {
     name: "files",
     align: "left",
-    label: "Files",
+    label: t("Files"),
     field: "files",
     sortable: true,
     default: true,
@@ -489,7 +489,7 @@ const baseColumns = ref([
   {
     name: "name",
     align: "left",
-    label: "Company Name",
+    label: t("Company Name"),
     field: "name",
     sortable: true,
     default: false,
@@ -497,7 +497,7 @@ const baseColumns = ref([
   {
     name: "vcnumber",
     align: "left",
-    label: "Company Number",
+    label: t("Company Number"),
     field: "vcnumber",
     sortable: true,
     default: false,
@@ -505,7 +505,7 @@ const baseColumns = ref([
   {
     name: "address",
     align: "left",
-    label: "Address",
+    label: t("Address"),
     field: "address",
     sortable: true,
     default: false,
@@ -513,7 +513,7 @@ const baseColumns = ref([
   {
     name: "department",
     align: "left",
-    label: "Department",
+    label: t("Department"),
     field: "department",
     sortable: true,
     default: false,
@@ -521,7 +521,7 @@ const baseColumns = ref([
   {
     name: "project",
     align: "left",
-    label: "Project",
+    label: t("Project"),
     field: "project_description",
     sortable: true,
     default: false,
@@ -529,7 +529,7 @@ const baseColumns = ref([
   {
     name: "debit",
     align: "right",
-    label: "Debit",
+    label: t("Debit"),
     field: "debit",
     sortable: true,
     default: true,
@@ -537,7 +537,7 @@ const baseColumns = ref([
   {
     name: "credit",
     align: "right",
-    label: "Credit",
+    label: t("Credit"),
     field: "credit",
     sortable: true,
     default: true,
@@ -545,7 +545,7 @@ const baseColumns = ref([
   {
     name: "taxAcc",
     align: "left",
-    label: "Tax Acc",
+    label: t("Tax Acc"),
     field: (row) => formatTaxAcc(row),
     sortable: false,
     default: true,
@@ -553,7 +553,7 @@ const baseColumns = ref([
   {
     name: "taxAmount",
     align: "right",
-    label: "Tax Amount",
+    label: t("Tax Amount"),
     field: (row) => Number(row.linetaxamount) || 0,
     sortable: true,
     default: true,
@@ -561,7 +561,7 @@ const baseColumns = ref([
   {
     name: "source",
     align: "left",
-    label: "Source",
+    label: t("Source"),
     field: "source",
     sortable: true,
     default: false,
@@ -569,7 +569,7 @@ const baseColumns = ref([
   {
     name: "memo",
     align: "left",
-    label: "Memo",
+    label: t("Memo"),
     field: "memo",
     sortable: true,
     default: false,
@@ -577,7 +577,7 @@ const baseColumns = ref([
   {
     name: "accno",
     align: "left",
-    label: "Account",
+    label: t("Account"),
     field: "accno",
     sortable: true,
     default: false,
@@ -585,7 +585,7 @@ const baseColumns = ref([
   {
     name: "gifi_accno",
     align: "left",
-    label: "GIFI",
+    label: t("GIFI"),
     field: "gifi_accno",
     sortable: true,
     default: false,
@@ -593,7 +593,7 @@ const baseColumns = ref([
   {
     name: "contra",
     align: "left",
-    label: "Contra",
+    label: t("Contra"),
     field: "contra",
     sortable: true,
     default: false,
@@ -601,7 +601,7 @@ const baseColumns = ref([
   {
     name: "created",
     align: "left",
-    label: "Created",
+    label: t("Created"),
     field: "created",
     sortable: true,
     default: false,
@@ -609,7 +609,7 @@ const baseColumns = ref([
   {
     name: "updated",
     align: "left",
-    label: "Updated",
+    label: t("Updated"),
     field: "updated",
     sortable: true,
     default: false,
@@ -696,7 +696,7 @@ const displayColumns = computed(() => {
     cols.push({
       name: "balance",
       align: "right",
-      label: "Balance",
+      label: t("Balance"),
       field: "balance",
       sortable: false,
       default: true,

@@ -61,9 +61,11 @@
 <script setup>
 import { ref, onMounted, inject, computed } from "vue";
 import { api } from "src/boot/axios";
-
-const createLink = inject("createLink");
+import { useI18n } from "vue-i18n";
 import { formatAmount } from "src/helpers/utils";
+
+const { t } = useI18n();
+const createLink = inject("createLink");
 const props = defineProps({
   type: {
     type: String,
@@ -91,105 +93,105 @@ const columns = computed(() => {
     return [
       {
         name: "reference",
-        label: "Reference",
+        label: t("Reference"),
         field: "reference",
         align: "left",
       },
       {
         name: "description",
-        label: "Description",
+        label: t("Description"),
         field: "description",
         align: "left",
       },
       {
         name: "transdate",
-        label: "Transaction Date",
+        label: t("Transaction Date"),
         field: "transdate",
         align: "left",
       },
-      { name: "notes", label: "Notes", field: "notes", align: "left" },
+      { name: "notes", label: t("Notes"), field: "notes", align: "left" },
       {
         name: "department",
-        label: "Department",
+        label: t("Department"),
         field: "department",
         align: "left",
       },
-      { name: "curr", label: "Currency", field: "curr", align: "left" },
+      { name: "curr", label: t("Currency"), field: "curr", align: "left" },
       {
         name: "exchangerate",
-        label: "Exchange Rate",
+        label: t("Exchange Rate"),
         field: "exchangerate",
         align: "right",
       },
-      { name: "amount", label: "Amount", field: "amount", align: "right" },
+      { name: "amount", label: t("Amount"), field: "amount", align: "right" },
     ];
   } else if (props.type === "ar" || props.type === "ap") {
     return [
       {
         name: "invnumber",
-        label: "Invoice Number",
+        label: t("Invoice Number"),
         field: "invnumber",
         align: "left",
       },
-      { name: "name", label: "Name", field: "name", align: "left" },
+      { name: "name", label: t("Name"), field: "name", align: "left" },
 
       {
         name: "description",
-        label: "Description",
+        label: t("Description"),
         field: "description",
         align: "left",
       },
       {
         name: "transdate",
-        label: "Transaction Date",
+        label: t("Transaction Date"),
         field: "transdate",
         align: "left",
       },
       {
         name: "department",
-        label: "Department",
+        label: t("Department"),
         field: "department",
         align: "left",
       },
       {
         name: "amount",
-        label: "Total Amount",
+        label: t("Total Amount"),
         field: "amount",
         align: "right",
       },
-      { name: "paid", label: "Paid", field: "paid", align: "right" },
+      { name: "paid", label: t("Paid"), field: "paid", align: "right" },
     ];
   } else if (props.type === "oe") {
     return [
       {
         name: props.oe_type === "quotation" ? "quonumber" : "ordnumber",
-        label: "Number",
+        label: t("Number"),
         field: props.oe_type === "quotation" ? "quonumber" : "ordnumber",
         align: "left",
       },
-      { name: "name", label: "Name", field: "name", align: "left" },
+      { name: "name", label: t("Name"), field: "name", align: "left" },
 
       {
         name: "description",
-        label: "Description",
+        label: t("Description"),
         field: "description",
         align: "left",
       },
       {
         name: "transdate",
-        label: "Transaction Date",
+        label: t("Transaction Date"),
         field: "transdate",
         align: "left",
       },
       {
         name: "department",
-        label: "Department",
+        label: t("Department"),
         field: "department",
         align: "left",
       },
       {
         name: "amount",
-        label: "Total Amount",
+        label: t("Total Amount"),
         field: "amount",
         align: "right",
       },

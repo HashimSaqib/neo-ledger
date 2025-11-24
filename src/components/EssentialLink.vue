@@ -29,7 +29,7 @@
         </q-item-section>
         <q-item-section>
           <q-item-label class="menu-link">
-            {{ props.title }}
+            {{ t(props.title) }}
           </q-item-label>
         </q-item-section>
       </div>
@@ -60,7 +60,7 @@
             class="row items-center"
           >
             <q-item-section class="menu-link">
-              {{ sublink.title }}
+              {{ t(sublink.title) }}
             </q-item-section>
           </div>
         </q-item>

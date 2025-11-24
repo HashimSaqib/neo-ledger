@@ -161,7 +161,7 @@
             />
             <q-toggle
               v-model="formData.l_quonumber"
-              label="Quotations"
+              :label="t('Quotations')"
               class="q-mr-md"
             />
           </div>
@@ -170,13 +170,13 @@
         <div class="row q-gutter-x-md" v-if="isAnyTransactionTypeSelected">
           <q-checkbox
             v-model="formData.open"
-            label="Open"
+            :label="t('Open')"
             val="Y"
             class="q-mr-md"
           />
           <q-checkbox
             v-model="formData.closed"
-            label="Closed"
+            :label="t('Closed')"
             val="Y"
             class="q-mr-md"
           />
@@ -184,18 +184,22 @@
           <div class="col-12">
             <q-checkbox
               v-model="formData.l_amount"
-              label="Amount"
+              :label="t('Amount')"
               class="q-mr-md"
             />
-            <q-checkbox v-model="formData.l_tax" label="Tax" class="q-mr-md" />
+            <q-checkbox
+              v-model="formData.l_tax"
+              :label="t('Tax')"
+              class="q-mr-md"
+            />
             <q-checkbox
               v-model="formData.l_total"
-              label="Total"
+              :label="t('Total')"
               class="q-mr-md"
             />
             <q-checkbox
               v-model="formData.l_subtotal"
-              label="Subtotal"
+              :label="t('Subtotal')"
               class="q-mr-md"
             />
           </div>
@@ -282,170 +286,182 @@ const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 const route = useRoute();
 
-const allColumns = [
-  { name: "id", label: "ID", field: "id", default: false },
-  { name: "type", label: "Type", field: "type", default: false },
+const allColumns = computed(() => [
+  { name: "id", label: t("ID"), field: "id", default: false },
+  { name: "type", label: t("Type"), field: "type", default: false },
   {
     name: "customernumber",
-    label: "Customer Number",
+    label: t("Customer Number"),
     field: "customernumber",
     default: false,
   },
   {
     name: "vendornumber",
-    label: "Vendor Number",
+    label: t("Vendor Number"),
     field: "vendornumber",
     default: true,
   },
-  { name: "name", label: "Name", field: "name", default: true },
-  { name: "address", label: "Address", field: "address", default: true },
+  { name: "name", label: t("Name"), field: "name", default: true },
+  { name: "address", label: t("Address"), field: "address", default: true },
   {
     name: "salutation",
-    label: "Salutation",
+    label: t("Salutation"),
     field: "salutation",
     default: false,
   },
-  { name: "contact", label: "Contact", field: "contact", default: false },
-  { name: "title", label: "Title", field: "title", default: false },
-  { name: "gender", label: "Gender", field: "gender", default: false },
+  { name: "contact", label: t("Contact"), field: "contact", default: false },
+  { name: "title", label: t("Title"), field: "title", default: false },
+  { name: "gender", label: t("Gender"), field: "gender", default: false },
   {
     name: "occupation",
-    label: "Occupation",
+    label: t("Occupation"),
     field: "occupation",
     default: false,
   },
-  { name: "email", label: "E-mail", field: "email", default: true },
-  { name: "cc", label: "Cc", field: "cc", default: false },
-  { name: "bcc", label: "Bcc", field: "bcc", default: false },
-  { name: "city", label: "City", field: "city", default: false },
-  { name: "state", label: "State/Province", field: "state", default: false },
+  { name: "email", label: t("E-mail"), field: "email", default: true },
+  { name: "cc", label: t("Cc"), field: "cc", default: false },
+  { name: "bcc", label: t("Bcc"), field: "bcc", default: false },
+  { name: "city", label: t("City"), field: "city", default: false },
+  { name: "state", label: t("State/Province"), field: "state", default: false },
   {
     name: "zipcode",
-    label: "Zip/Postal Code",
+    label: t("Zip/Postal Code"),
     field: "zipcode",
     default: false,
   },
-  { name: "country", label: "Country", field: "country", default: false },
-  { name: "phone", label: "Phone", field: "phone", default: true },
-  { name: "fax", label: "Fax", field: "fax", default: false },
-  { name: "notes", label: "Notes", field: "notes", default: false },
-  { name: "discount", label: "Discount", field: "discount", default: false },
-  { name: "threshold", label: "Threshold", field: "threshold", default: false },
-  { name: "accounts", label: "Accounts", field: "accounts", default: false },
+  { name: "country", label: t("Country"), field: "country", default: false },
+  { name: "phone", label: t("Phone"), field: "phone", default: true },
+  { name: "fax", label: t("Fax"), field: "fax", default: false },
+  { name: "notes", label: t("Notes"), field: "notes", default: false },
+  { name: "discount", label: t("Discount"), field: "discount", default: false },
+  {
+    name: "threshold",
+    label: t("Threshold"),
+    field: "threshold",
+    default: false,
+  },
+  { name: "accounts", label: t("Accounts"), field: "accounts", default: false },
   {
     name: "paymentmethod",
-    label: "Payment Method",
+    label: t("Payment Method"),
     field: "paymentmethod",
     default: false,
   },
   {
     name: "taxnumber",
-    label: "Tax Number",
+    label: t("Tax Number"),
     field: "taxnumber",
     default: false,
   },
   {
     name: "salesperson",
-    label: "Salesperson",
+    label: t("Salesperson"),
     field: "salesperson",
     default: false,
   },
   {
     name: "pricegroup",
-    label: "Pricegroup",
+    label: t("Pricegroup"),
     field: "pricegroup",
     default: false,
   },
-  { name: "sic", label: "SIC", field: "sic", default: false },
-  { name: "bank", label: "Bank", field: "bank", default: false },
-  { name: "iban", label: "IBAN", field: "iban", default: false },
-  { name: "bic", label: "BIC", field: "bic", default: false },
+  { name: "sic", label: t("SIC"), field: "sic", default: false },
+  { name: "bank", label: t("Bank"), field: "bank", default: false },
+  { name: "iban", label: t("IBAN"), field: "iban", default: false },
+  { name: "bic", label: t("BIC"), field: "bic", default: false },
   {
     name: "membernumber",
-    label: "Member Number",
+    label: t("Member Number"),
     field: "membernumber",
     default: false,
   },
-  { name: "bcnumber", label: "BC Number", field: "bcnumber", default: false },
+  {
+    name: "bcnumber",
+    label: t("BC Number"),
+    field: "bcnumber",
+    default: false,
+  },
   {
     name: "typeofbusiness",
-    label: "Type of Business",
+    label: t("Type of Business"),
     field: "typeofbusiness",
     default: false,
   },
   {
     name: "creditlimit",
-    label: "Credit Limit",
+    label: t("Credit Limit"),
     field: "creditlimit",
     default: false,
   },
   {
     name: "outstanding",
-    label: "Outstanding",
+    label: t("Outstanding"),
     field: "outstanding",
     default: false,
   },
   {
     name: "availablecredit",
-    label: "Available Credit",
+    label: t("Available Credit"),
     field: "availablecredit",
     default: false,
   },
-  { name: "terms", label: "Terms", field: "terms", default: false },
-  { name: "language", label: "Language", field: "language", default: false },
+  { name: "terms", label: t("Terms"), field: "terms", default: false },
+  { name: "language", label: t("Language"), field: "language", default: false },
   {
     name: "remittancevoucher",
-    label: "Remittance Voucher",
+    label: t("Remittance Voucher"),
     field: "remittancevoucher",
     default: false,
   },
-  { name: "startdate", label: "Startdate", field: "startdate", default: false },
-  { name: "enddate", label: "Enddate", field: "enddate", default: false },
-];
+  {
+    name: "startdate",
+    label: t("Startdate"),
+    field: "startdate",
+    default: false,
+  },
+  { name: "enddate", label: t("Enddate"), field: "enddate", default: false },
+]);
 
 // Ensure alignment & sortability for all columns
-allColumns.forEach((col) => {
-  col.align = col.align || "left";
-  col.sortable = true;
-});
+// Note: allColumns is now computed, so alignment/sortability is set in the computed definition
 
 // This ref will contain only the relevant columns for the current vcType (customer/vendor).
 const baseColumns = ref([]);
 
 // "invnumber" column is added if l_transnumber or l_invnumber toggles are on.
-const invnumberColumn = {
+const invnumberColumn = computed(() => ({
   name: "invnumber",
-  label: "Invoice",
+  label: t("Invoice"),
   field: "invnumber",
   align: "left",
   sortable: true,
-};
+}));
 
 // Amount columns appear if toggled & any transaction is selected
-const fixedColumns = [
+const fixedColumns = computed(() => [
   {
     name: "amount",
-    label: "Amount",
+    label: t("Amount"),
     field: "netamount",
     align: "left",
     sortable: true,
   },
-  { name: "tax", label: "Tax", field: "tax", align: "left", sortable: true },
+  { name: "tax", label: t("Tax"), field: "tax", align: "left", sortable: true },
   {
     name: "total",
-    label: "Total",
+    label: t("Total"),
     field: "amount",
     align: "left",
     sortable: true,
   },
   {
     name: "subtotal",
-    label: "Subtotal",
+    label: t("Subtotal"),
     field: "subtotal",
     align: "left",
     sortable: true,
   },
-];
+]);
 
 // ----------------------------------------------------
 //  Tracking form data & toggles
@@ -791,18 +807,18 @@ function updateVCSettings() {
     transactionLabel.value.ordNumber = "Purchase Orders";
 
     // Filter out "customer"/"customernumber" from baseColumns
-    baseColumns.value = allColumns.filter(
+    baseColumns.value = allColumns.value.filter(
       (c) => c.name !== "customer" && c.name !== "customernumber"
     );
   } else {
-    nameLabel.value = "Customer";
-    numberLabel.value = "Customer Number";
-    transactionLabel.value.transNumber = "AR Transactions";
-    transactionLabel.value.invNumber = "Sales Invoices";
-    transactionLabel.value.ordNumber = "Sales Orders";
+    nameLabel.value = t("Customer");
+    numberLabel.value = t("Customer Number");
+    transactionLabel.value.transNumber = t("AR Transactions");
+    transactionLabel.value.invNumber = t("Sales Invoices");
+    transactionLabel.value.ordNumber = t("Sales Orders");
 
     // Filter out "vendor"/"vendornumber" from baseColumns
-    baseColumns.value = allColumns.filter(
+    baseColumns.value = allColumns.value.filter(
       (c) => c.name !== "vendor" && c.name !== "vendornumber"
     );
   }

@@ -8,24 +8,24 @@
         <div class="text-h5 q-mt-sm">
           {{
             dataset.connections[0].type === "dropbox"
-              ? "Dropbox"
-              : "Google Drive"
+              ? t("Dropbox")
+              : t("Google Drive")
           }}
-          Connection Active
+          {{ t("Connection Active") }}
         </div>
 
         <div
           v-if="dataset.connections[0].drive_id"
           class="text-subtitle1 q-mt-sm"
         >
-          Using Shared Drive
+          {{ t("Using Shared Drive") }}
         </div>
 
         <!-- Get Drives button for active connections -->
         <q-btn
           v-if="allDrive && dataset.connections[0].type === 'google_drive'"
           dense
-          label="Get Drives"
+          :label="t('Get Drives')"
           color="secondary"
           icon="storage"
           class="q-mt-md"
@@ -35,7 +35,7 @@
 
         <!-- Display drives list -->
         <div v-if="drives.length > 0" class="q-mt-md">
-          <div class="text-subtitle1">Available Drives:</div>
+          <div class="text-subtitle1">{{ t("Available Drives") }}:</div>
 
           <div v-if="driveError" class="text-negative q-mb-sm">
             <q-icon name="warning" /> {{ driveError }}
@@ -55,7 +55,7 @@
 
           <q-btn
             dense
-            label="Attach Drive"
+            :label="t('Attach Drive')"
             color="primary"
             class="q-mt-md"
             :disable="!selectedDrive"
@@ -71,16 +71,16 @@
         class="q-pa-md"
       >
         <q-icon name="error_outline" color="red" size="3em" />
-        <div class="text-h5 q-mt-sm">Connection Disabled</div>
+        <div class="text-h5 q-mt-sm">{{ t("Connection Disabled") }}</div>
         <div class="q-mt-sm text-subtitle2">
-          Error: {{ dataset.connections[0].error }}
+          {{ t("Error") }}: {{ dataset.connections[0].error }}
         </div>
         <q-btn
           dense
-          :label="`Reconnect ${
+          :label="`${t('Reconnect')} ${
             dataset.connections[0].type === 'dropbox'
-              ? 'Dropbox'
-              : 'Google Drive'
+              ? t('Dropbox')
+              : t('Google Drive')
           }`"
           color="primary"
           icon="folder"
@@ -109,7 +109,7 @@
     <div v-else class="q-pa-md">
       <q-btn
         dense
-        label="Connect Dropbox"
+        :label="t('Connect Dropbox')"
         color="primary"
         icon="folder"
         :href="`https://www.dropbox.com/oauth2/authorize?client_id=${dropboxKey}&response_type=code&state=${
@@ -122,7 +122,7 @@
       />
       <q-btn
         dense
-        label="Connect Google Drive"
+        :label="t('Connect Google Drive')"
         color="primary"
         icon="folder"
         :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&access_type=offline&prompt=consent&response_type=code&scope=${
@@ -143,6 +143,9 @@
 <script setup>
 import { ref } from "vue";
 import { api } from "src/boot/axios";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps({
   dataset: {
@@ -196,13 +199,14 @@ const getDrives = async () => {
       if (driveExists) {
         selectedDrive.value = existingDriveId;
       } else {
-        driveError.value =
-          "Previously selected drive not found in available drives";
+        driveError.value = t(
+          "Previously selected drive not found in available drives"
+        );
       }
     }
   } catch (error) {
     console.error("Error fetching drives:", error);
-    driveError.value = "Failed to fetch drives";
+    driveError.value = t("Failed to fetch drives");
   } finally {
     loading.value = false;
   }

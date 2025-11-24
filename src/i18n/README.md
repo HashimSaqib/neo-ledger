@@ -2,31 +2,6 @@
 
 The application uses PO files for managing translations. This is a standard format supported by most translation tools.
 
-## Basic Usage
-
-Use the `$t()` function in templates:
-
-```vue
-<template>
-  <h1>{{ $t("Welcome") }}</h1>
-  <button>{{ $t("Login") }}</button>
-</template>
-```
-
-Or the `t()` function with the Composition API:
-
-```vue
-<script setup>
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
-</script>
-
-<template>
-  <h1>{{ t("Welcome") }}</h1>
-</template>
-```
-
 ## Workflow
 
 After adding new translatable strings, run:
@@ -35,7 +10,7 @@ After adding new translatable strings, run:
 npm run i18n:sync
 ```
 
-This command extracts strings from source files, updates PO files, and compiles them to JSON.
+This extracts strings from source files, updates PO files, and compiles them to JSON.
 
 To translate strings, edit the PO files in `src/i18n/locales/{locale}/messages.po`:
 
@@ -46,13 +21,11 @@ msgstr "Willkomme"
 
 ## Development
 
-Run the watch command in a separate terminal during development:
+Can Run watch in a separate terminal during development to automatiocally compile PO files to JSON when they're modified
 
 ```bash
 npm run i18n:watch
 ```
-
-This automatically compiles PO files to JSON when they're modified.
 
 ## Commands
 
@@ -61,12 +34,6 @@ This automatically compiles PO files to JSON when they're modified.
 | `npm run i18n:sync`    | Extract, update, and compile all translations |
 | `npm run i18n:watch`   | Auto-compile PO files on save                 |
 | `npm run i18n:compile` | Compile PO files to JSON only                 |
-
-Legacy commands:
-
-- `npm run i18n:extract` - Extract strings only
-- `npm run i18n:update` - Update PO files only
-- `npm run i18n:all` - Alias for i18n:sync
 
 ## File Structure
 
@@ -157,27 +124,9 @@ msgid "Login"
 msgstr "Aamälde"
 ```
 
-## Troubleshooting
-
-**Translations not appearing**
-
-Ensure the JSON files are compiled. Run `npm run i18n:sync` and restart the dev server.
-
-**Strings not extracted**
-
-Check that `$t()` or `t()` is used correctly. The extraction patterns are defined in `scripts/i18n-sync.js`.
-
-**Language not switching**
-
-Verify the locale is imported in `src/boot/i18n.js` and the corresponding JSON file exists.
-
-**Watch process not detecting changes**
-
-Restart the watch process with `npm run i18n:watch`.
-
 ## Notes
 
-- JSON files are ignored by git (see `.gitignore`)
+- JSON files are ignored by git
 - PO files should be committed to version control
 - The POT file is regenerated on each sync
 - Untranslated strings fall back to the source text

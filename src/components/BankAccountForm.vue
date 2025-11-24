@@ -7,7 +7,7 @@
     <q-card style="min-width: 500px; max-width: 600px">
       <q-card-section class="row items-center">
         <div class="text-h6 text-weight-medium col">
-          {{ editingBank ? "Edit Bank Account" : "Add Bank Account" }}
+          {{ editingBank ? t("Edit Bank Account") : t("Add Bank Account") }}
         </div>
         <q-btn icon="close" flat round dense @click="handleClose" />
       </q-card-section>
@@ -17,11 +17,13 @@
       <q-card-section>
         <q-form @submit.prevent="handleSave" class="q-gutter-md">
           <!-- Basic Information -->
-          <div class="text-subtitle2 text-weight-medium">Basic Information</div>
+          <div class="text-subtitle2 text-weight-medium">
+            {{ t("Basic Information") }}
+          </div>
           <text-input
             v-model="bankForm.name"
             name="bank_name"
-            label="Bank Name"
+            :label="t('Bank Name')"
             outlined
             dense
             class="q-mb-lg"
@@ -29,62 +31,64 @@
           <bank-input
             v-model="bankForm.iban"
             type="iban"
-            label="IBAN"
+            :label="t('IBAN')"
             outlined
             dense
           />
           <bank-input
             v-model="bankForm.qriban"
             type="qriban"
-            label="QR-IBAN"
+            :label="t('QR-IBAN')"
             outlined
             dense
           />
           <div class="text-caption text-grey-7">
-            * Either IBAN or QR-IBAN is required
+            {{ t("* Either IBAN or QR-IBAN is required") }}
           </div>
           <bank-input
             v-model="bankForm.bic"
             type="bic"
-            label="BIC/SWIFT"
+            :label="t('BIC/SWIFT')"
             outlined
             dense
           />
 
           <!-- Address Information -->
-          <div class="text-subtitle2 text-weight-medium q-mt-md">Address</div>
+          <div class="text-subtitle2 text-weight-medium q-mt-md">
+            {{ t("Address") }}
+          </div>
           <text-input
             v-model="bankForm.address1"
             name="address1"
-            label="Street Name"
+            :label="t('Street Name')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.street"
             name="street"
-            label="Street Number"
+            :label="t('Street Number')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.address2"
             name="address2"
-            label="Address 2"
+            :label="t('Address 2')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.post_office"
             name="post_office"
-            label="Postal Office"
+            :label="t('Postal Office')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.city"
             name="city"
-            label="City"
+            :label="t('City')"
             outlined
             dense
           />
@@ -92,7 +96,7 @@
             <text-input
               v-model="bankForm.zipcode"
               name="zipcode"
-              label="Zip/Postal Code"
+              :label="t('Zip/Postal Code')"
               outlined
               dense
               class="col-5 q-mr-sm"
@@ -100,7 +104,7 @@
             <country-input
               v-model="bankForm.country"
               name="country"
-              label="Country"
+              :label="t('Country')"
               outlined
               dense
               class="col-6"
@@ -109,33 +113,33 @@
 
           <!-- Additional Information -->
           <div class="text-subtitle2 text-weight-medium q-mt-md">
-            Additional Information
+            {{ t("Additional Information") }}
           </div>
           <text-input
             v-model="bankForm.dcn"
             name="dcn"
-            label="DCN"
+            :label="t('DCN')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.rvc"
             name="rvc"
-            label="RVC"
+            :label="t('RVC')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.membernumber"
             name="membernumber"
-            label="Member Number"
+            :label="t('Member Number')"
             outlined
             dense
           />
           <text-input
             v-model="bankForm.clearingnumber"
             name="clearingnumber"
-            label="BC Number"
+            :label="t('BC Number')"
             outlined
             dense
           />
@@ -143,7 +147,7 @@
           <!-- Default Setting -->
           <q-checkbox
             v-model="bankForm.is_primary"
-            label="Set as Default Bank Account"
+            :label="t('Set as Default Bank Account')"
             :true-value="1"
             :false-value="0"
           />
@@ -153,9 +157,9 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" color="grey-7" @click="handleClose" />
+        <q-btn flat :label="t('Cancel')" color="grey-7" @click="handleClose" />
         <q-btn
-          label="Save"
+          :label="t('Save')"
           color="primary"
           unelevated
           @click="handleSave"
@@ -171,7 +175,10 @@
 import { ref, watch } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
+import { useI18n } from "vue-i18n";
 import BankInput from "src/components/inputs/BankInput.vue";
+
+const { t } = useI18n();
 
 const props = defineProps({
   modelValue: {
@@ -303,7 +310,7 @@ const handleSave = async () => {
 
   if (!hasIban && !hasQriban) {
     Notify.create({
-      message: "Either IBAN or QR-IBAN is required",
+      message: t("Either IBAN or QR-IBAN is required"),
       type: "negative",
     });
     return;
@@ -312,7 +319,7 @@ const handleSave = async () => {
   // Check if we need an existing record
   if (props.requireExistingRecord && !props.transId) {
     Notify.create({
-      message: "Please save the customer/vendor first",
+      message: t("Please save the customer/vendor first"),
       type: "negative",
     });
     return;
@@ -331,7 +338,7 @@ const handleSave = async () => {
     await api.post(`/vc/${props.vcType}/bank`, payload);
 
     Notify.create({
-      message: "Bank account saved successfully",
+      message: t("Bank account saved successfully"),
       type: "positive",
     });
 
@@ -342,7 +349,7 @@ const handleSave = async () => {
   } catch (error) {
     console.error("Failed to save bank account:", error);
     Notify.create({
-      message: "Failed to save bank account",
+      message: t("Failed to save bank account"),
       type: "negative",
     });
   } finally {
