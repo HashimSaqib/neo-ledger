@@ -35,3 +35,6 @@ yarn-error.log*
 
 neoledger.json
 /src/ai_plugin
+
+# i18n generated files
+src/i18n/locales/*/messages.json

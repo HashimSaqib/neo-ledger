@@ -12,13 +12,21 @@
 </template>
 
 <script setup>
+import { useQuasar } from "quasar";
 import { i18n } from "src/boot/i18n";
-
 import { loadLanguagePack } from "src/boot/i18n";
 
+const $q = useQuasar();
+
 function switchLanguage(lang) {
-  if (i18n.global.locale.value !== lang) {
-    loadLanguagePack(lang);
+  // Map locale codes to match available locales
+  const localeMap = {
+    de: "de-CH",
+  };
+  const mappedLang = localeMap[lang] || lang;
+
+  if (i18n.global.locale.value !== mappedLang) {
+    loadLanguagePack(lang, $q);
   }
 }
 </script>

@@ -1,0 +1,5582 @@
+# Neo Ledger Translation Template
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Neo Ledger 0.0.1\n"
+"POT-Creation-Date: 2025-11-24 13:22:53+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "%"
+msgstr ""
+
+#: src/layouts/MainLayout.vue
+msgid ", title);\nprovide("
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "6-digit code"
+msgstr ""
+
+#: src/ai_plugin/components/AiPrompt.vue
+msgid "AI Processing Information"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "AI Prompt"
+msgstr ""
+
+#: src/ai_plugin/components/AiPrompt.vue
+msgid "AI Prompt Used"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "AI Prompts"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "AP"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "AP Amount"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "AP Payment"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "AP Record"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "AP Transactions"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "AR"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "AR Amount"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "AR Payment"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "AR Record"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "AR Transactions"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Acc No"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Acc No - Description"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Taxes.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Account Details"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Account Holder"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Account Mapping"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Account No"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Account Number"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account Number *"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Account Number From"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Account Number To"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account Number missing!"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Account Payable"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Account Payable Template"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/PaymentsReport.vue
+msgid "Account Total"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Account Type"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account Type *"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account Type missing!"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account deleted successfully"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account deletion canceled"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Account is required"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Account is required for General Ledger template"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+msgid "Account is required."
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Account saved successfully"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Accounting Method"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/ArApTransactions.vue
+msgid "Accounts"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/system/YearEnd.vue
+msgid "Accrual"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Action completed successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+msgid "Action failed"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Actions"
+msgstr ""
+
+#: src/pages/system/Audit.vue
+msgid "Activate Audit Trail"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Active"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Add Account"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Add Approval Rule"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Add Condition"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Add Customer"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Add Date"
+msgstr ""
+
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Add Department"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Add Employee"
+msgstr ""
+
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Add Line"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Add New"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Add New GIFI"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/goodservices/AddPart.vue
+msgid "Add Part"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Add Period"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Add Project"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Add Rule"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/goodservices/AddPart.vue
+msgid "Add Service"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Add Services"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Add Station"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Add Transaction"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Add Users"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Add Vendor"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Added"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/AddPart.vue
+msgid "Additional Details"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Additional Info"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Additional Information"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/system/Defaults.vue
+msgid "Address"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Address 1"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "Address 2"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Address Information"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Admin Email"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "All"
+msgstr ""
+
+#: src/pages/reports/TrialBalance.vue
+msgid "All Accounts"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "All Columns"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "All Items"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "All Taxes"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Allow GL?"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Already have an account? Login"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/UserStations.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Amount"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Amount Based"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Amount From"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Amount To"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Amount ≤"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Roles.vue
+#: src/pages/system/Taxes.vue
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "An error occurred"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "An error occurred during import"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "An error occurred during validation"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "An error occurred while fetching matches"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "An error occurred while saving"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "An error occurred while uploading files. Please try again."
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "An unexpected error occurred"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Annual Interest"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Applied Rule Information"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Apply Rules to All"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Approval Rule"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Approve"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Approve All"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Approve all transactions"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Approve transactions up to"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Approve transactions up to this amount"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "April"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Are you sure you want to cancel this job?"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Are you sure you want to cancel this processing?"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Are you sure you want to delete the rule"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Are you sure you want to delete this order?"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Are you sure you want to delete this station?"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Are you sure?"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "As Of"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/BalanceSheet.vue
+msgid "As of Date"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Asset"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Assets"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Assigned Invoices"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Assigned to"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "At least one line item is required."
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "At least two lines are required to post a transaction."
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Attachment"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Attachment (PDF)"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Audit"
+msgstr ""
+
+#: src/pages/system/Audit.vue
+msgid "Audit settings saved successfully"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "August"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Average Cost"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/Import.vue
+msgid "BCC"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/pages/Import.vue
+#: src/pages/system/Employees.vue
+msgid "BIC"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "BIC missing"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "BIC/SWIFT"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Back"
+msgstr ""
+
+#: src/components/TwoFactorVerify.vue
+msgid "Back to login"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Backup codes copied to clipboard"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/cash/Reconciliation.vue
+msgid "Balance"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/reports/BalanceSheet.vue
+msgid "Balance Sheet"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/pages/system/Employees.vue
+msgid "Bank"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Bank Account"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Bank Account / IBAN"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Bank Account Selection"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/system/BankAccounts.vue
+msgid "Bank Accounts"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Bank Address"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Bank Address 1"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/Employees.vue
+msgid "Bank Address 2"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Bank Adjustment"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/Employees.vue
+msgid "Bank City"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Bank Code"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/Employees.vue
+msgid "Bank Country"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Bank Details"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Bank ID"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+msgid "Bank Import"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Bank Information"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/BankAccounts.vue
+msgid "Bank Name"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Bank Name *"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Bank Name is required!"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Bank Payments"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Bank State"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Bank State/Province"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Bank Transaction Code"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Bank Transactions"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Bank Zip/Postal Code"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Bank Zipcode"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Bank account saved successfully"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Bank account selected"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Bank account updated successfully"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Bank selection is required"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Banking Information"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Barcode"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Basic Information"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Batch"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Batch Email"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Batch Email Invoices"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Batch Jobs"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Batch Name"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Batch Number"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Batch Print"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Batch Print Invoices"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Batch Print Reminders"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Bcc"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Beginning Balance"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Bin"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Booking Date"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Business Number"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/UserStations.vue
+#: src/components/EmailOptions.vue
+#: src/pages/Import.vue
+msgid "CC"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "COGS"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Cancel"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Cancel Job"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Cancel Processing"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Cannot select: Invalid DCN for QR-IBAN"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Cannot select: No bank account"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Cannot set account for more than one of AR, AP or IC"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Cannot set multiple options for AP"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Cannot set multiple options for AR"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/arap/TaxReport.vue
+#: src/pages/system/YearEnd.vue
+msgid "Cash"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Cash Discount"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Cash Over/Short"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Category"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Cc"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Chart Of Accounts"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Chart Type"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/system/Defaults.vue
+msgid "Check Inventory"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "City"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+msgid "Clear"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Clear All"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Clear selection"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Clearing Account"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Clearing No."
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "Clearing Number"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Click on a variable to insert it into the focused field"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Close"
+msgstr ""
+
+#: src/pages/system/Audit.vue
+msgid "Close Books up to"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Taxes.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Closed"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Collapse All"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Column 1"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Column 2"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Company"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/system/Defaults.vue
+msgid "Company Name"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Company Name Missing"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/components/OnboardingCard.vue
+msgid "Completed"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Configure Defaults"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Configure workstation settings"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Configure workstations for automated processing."
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Configure your accounting structure and account hierarchy"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Confirm"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Confirm Delete"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Confirm Deletion"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Consolidate Invoices"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/VcHistory.vue
+msgid "Contact"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Contact Information"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Contact Title"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Contact your administrator to get access to workstations"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Contains"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Content"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Continue"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Contra"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Copy All Codes"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Copy remaining balance"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Copy to clipboard"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Cost"
+msgstr ""
+
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Cost Center"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Counterparty"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Counterparty IBAN"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Counterparty Name"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "Country"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Country of Origin"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Create"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Create Account"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Create Departments"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Create New Rule"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Create Projects"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Create Rule"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Create With Template"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Create a rule based on transaction criteria"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Create functionality will be implemented"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/system/Batch.vue
+msgid "Created"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Created Date"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Created Date From"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Created Date To"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Created From"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Created To"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Credit"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Credit Invoice"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Credit Limit"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Credit Transaction"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Currencies"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Currency"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Currency is required"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Currency is required."
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Current"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Current Earnings"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Current Station"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Current Status Distribution"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Current Users"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Custom"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Custom Periods"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Custom prompt for AI processing "
+msgstr ""
+
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Customer"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/arap/VcHistory.vue
+msgid "Customer History"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Customer Invoice"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/TaxReport.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/system/Defaults.vue
+msgid "Customer Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Customer Payments"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Customer Search"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Customer Transaction"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Customer Transactions"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+msgid "Customer Upload"
+msgstr ""
+
+#: src/pages/ar/SalesInvoice.vue
+msgid "Customer is required."
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Customers"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "DCN"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "DOB"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Daily"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Dashboard"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Data imported successfully"
+msgstr ""
+
+#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue
+msgid "Dataset List"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/BalanceSheet.vue
+msgid "Date"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Date Due"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/reports/TrialBalance.vue
+msgid "Date From"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/components/MainDashboard.vue
+msgid "Date Range"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/reports/TrialBalance.vue
+msgid "Date To"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Dates"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Debit"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Debit Invoice"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Debit Transaction"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "December"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Decimal Places"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Default"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Default Accounts"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Default Columns"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Default Station"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Defaults"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Defaults saved successfully"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Delete"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Delete Rule"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Delivery Date"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/reports/AllTaxes.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Department"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Departments"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Taxes.vue
+#: src/pages/system/YearEnd.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Description"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Detail"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Detail View"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Difference"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Discount"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Discount (%)"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Discount Terms"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Dismiss"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+msgid "Document List"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Document Management"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Download"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Download File"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Drag & Drop Files Here"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Drawing"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Drop-down"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue
+msgid "Due"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/cash/Payments.vue
+msgid "Due Date"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Due Date (yyyy-mm-dd)"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Duration"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/Employees.vue
+msgid "E-mail"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Early Payment Discount given"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Early Payment Discount received"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Edit"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Edit Account"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Edit Bank Account"
+msgstr ""
+
+#: src/pages/system/department/ListDepartments.vue
+msgid "Edit Department"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Edit GIFI"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Edit Project"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Edit Rule"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Edit Vendor"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Edit With Template"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Edit an existing rule"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Edit functionality will be implemented"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "Either IBAN or QR-IBAN is required"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/Import.vue
+#: src/pages/LoginPage.vue
+#: src/pages/Signup.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+msgid "Email"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Email Invoices"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Email Reminders"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Email batch created successfully"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Emailed"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Emails to Process"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/system/Employees.vue
+msgid "Employee"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/Employees.vue
+msgid "Employee Number"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Employee added successfully!"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Employees.vue
+msgid "End Date"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "End Date (yyyy-mm-dd)"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "End to End ID"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Ends with"
+msgstr ""
+
+#: src/pages/system/Audit.vue
+msgid "Enforce Transaction Reversal for all Dates"
+msgstr ""
+
+#: src/components/TwoFactorVerify.vue
+msgid "Enter 6-digit code"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Enter OTP"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Enter the 6-digit code from your app"
+msgstr ""
+
+#: src/components/TwoFactorVerify.vue
+msgid "Enter the code from your authenticator app"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Equals"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Equity"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Error"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Error Information"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/pages/system/Batch.vue
+msgid "Error Message"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Error Type"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Error adding user to station"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Error creating email batch"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Error creating print batch"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Error deleting order"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Error deleting station"
+msgstr ""
+
+#: src/pages/cash/Payments.vue
+msgid "Error fetching data"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Error fetching history"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Error fetching station details"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Error fetching users"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Error generating new number"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Error loading order"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Error loading prompts"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Error loading rule data"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Error parsing files"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Error posting order"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Error posting order as new"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Error removing user from station"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Error saving Part/Service"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Error saving defaults"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Error saving order"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Error saving prompt"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Error saving station"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Error structuring transactions"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Error updating status"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Exch"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Exchange Rate"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Execution Date"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Exhcnage Rate"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Expand All"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Expense"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Expenses"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Expires"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/TrialTransactions.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Export"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Export PAIN.001"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Export PDF"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Export XL"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Exported"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Extended"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/pages/system/Batch.vue
+msgid "Failed"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Failed Emails"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Failed items errors:"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Failed to apply rules: "
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Failed to approve transactions: "
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+#: src/components/TwoFactorSetup.vue
+msgid "Failed to copy"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Failed to create transactions"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Failed to create transactions: "
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Failed to delete GIFI"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Failed to delete account"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Failed to delete rule"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to download invoice"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Failed to download order"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Failed to export PAIN.001"
+msgstr ""
+
+#: src/ai_plugin/components/AiPrompt.vue
+msgid "Failed to fetch AI processing information"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Failed to fetch GIFI details"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Failed to fetch GIFI details. Please try again."
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Failed to fetch account details"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Failed to fetch account details. Please try again."
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to fetch accounts"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Failed to fetch bank account details"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Failed to fetch bank account details. Please try again."
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Failed to fetch bank accounts"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Failed to fetch bank payments"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Failed to fetch bank transactions"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to fetch currencies"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Failed to fetch info"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/goodservices/AddPart.vue
+msgid "Failed to fetch links"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Failed to fetch matches"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+msgid "Failed to fetch parent accounts"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Failed to fetch project details"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Failed to fetch rule information"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Failed to fetch rules"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to fetch vcList"
+msgstr ""
+
+#: src/pages/system/YearEnd.vue
+msgid "Failed to fetch year end accounts"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Failed to import transactions to database"
+msgstr ""
+
+#: src/pages/system/Audit.vue
+msgid "Failed to load audit settings"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+msgid "Failed to load details"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Failed to load email details"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to load invoice: "
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Failed to load item data"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+msgid "Failed to load jobs"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Failed to load processing records"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Failed to load prompt and response data"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Failed to load required data"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Failed to load vc data"
+msgstr ""
+
+#: src/pages/system/YearEnd.vue
+msgid "Failed to process year end"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Failed to save GIFI"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Failed to save account"
+msgstr ""
+
+#: src/pages/system/Audit.vue
+msgid "Failed to save audit settings"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+msgid "Failed to save bank account"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Failed to save rule"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Failed to submit transaction."
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Failed to transfer invoice"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Failed to update bank account: "
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Failed to update payment status: "
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Failed to update payment statuses: "
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Failed to update task status"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to update vc details: "
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/Defaults.vue
+msgid "Fax"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "February"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Field"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "File"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "File Information"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "File Limit Exceeded"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "File Link"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "File Name"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "File Type"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Files"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Financial Information"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Finished"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+msgid "First Name"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Force Warehouse"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Foreign Exchange Gain/Loss"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Found"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/reports/AllTaxes.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "From Date"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Full Report"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "G.W."
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "GIFI"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "GIFI deleted successfully"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "GIFI deletion canceled"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "GIFI saved successfully"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "GL Reference Number"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Gender"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "General"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+msgid "General Ledger"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "General Ledger Template"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Generate Report"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Generate XML file for bank payment processing"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Generating..."
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Getting Started"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Goods & Services"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/PaymentsReport.vue
+msgid "Grand Total"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Greater than"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Greater than or equal"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "HS Code"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+msgid "HTML"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Header "
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Heading"
+msgstr ""
+
+#: src/pages/reports/TrialBalance.vue
+msgid "Headings"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Headings Only"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Hide Closed Accounts"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Home Mobile"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Home Phone"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/components/CmptImport.vue
+#: src/pages/Import.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Employees.vue
+msgid "IBAN"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "IBAN missing"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "ID"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Ignore Difference"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Import"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Import Data"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Import Results"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Import to Database"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Inactive"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Include FX Transactions"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Include in drop-down menus:"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Income"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Income Statement"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Inline"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+msgid "Inline (HTML)"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Insert Rows"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts a description text."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts a parts group text."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts an item text."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the business name."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the current currency symbol/code."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the current date based on system date format."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the day (two-digit)."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the first day of the month."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the last day of the month."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the month (two-digit)."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the name from the corresponding field."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the phone number (digits only)."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Inserts the two-digit year (or full year if using yyyy)."
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Internal Notes"
+msgstr ""
+
+#: src/pages/system/chart/Gifi.vue
+msgid "Invalid GIFI account number"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Invalid account ID"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Invalid invite code - using public signup"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+#: src/components/TwoFactorVerify.vue
+msgid "Invalid session. Please login again."
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Invalid shortcut key"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Inventory"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/AddPart.vue
+msgid "Inventory Details"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Invite Code"
+msgstr ""
+
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Invoice"
+msgstr ""
+
+#: src/pages/cash/Payments.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+msgid "Invoice #"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Invoice Date"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Invoice Date (yyyy-mm-dd)"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+msgid "Invoice Delete canceled"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "Invoice Description QR"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Invoice Header"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Invoice ID is required"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/UserStations.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Invoice Number"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+msgid "Invoice deleted successfully"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Invoice transferred successfully"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Item Description"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Item Notes"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Item Number"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Items"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "January"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Job Name"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Job/Project Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Journal"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "July"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "June"
+msgstr ""
+
+#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue
+#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue
+msgid "Language"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Last 14 Days"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Last 5 Transactions"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Last 7 Days"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Last 90 Days"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Last Cost"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Last Month"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+msgid "Last Name"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Last Numbers"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Last Year"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Late Payment Fee"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Less than"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Less than or equal"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Level"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "Level Updated"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Liabilities"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Liability"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Line Account"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Line Accounts"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Line Amount"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/pages/Import.vue
+msgid "Line Description"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Line Details"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Line Item"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Line Item Account"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Line Items"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Line Project"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Line Tax"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Line Tax Account"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Line Tax Amount"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Lineitem"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Lines to add"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "List Accounts"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "List Price"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Load Transactions"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Loading users..."
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Loading workstations..."
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue
+msgid "Lock"
+msgstr ""
+
+#: src/pages/LoginPage.vue
+#: src/pages/system/Employees.vue
+msgid "Login"
+msgstr ""
+
+#: src/components/TwoFactorVerify.vue
+msgid "Login successful"
+msgstr ""
+
+#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue
+#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue
+msgid "Logout"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Lot"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Make"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Make and Model"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Manage Bank Transaction Rules"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Manage Rules"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+#: src/components/OnboardingList.vue
+msgid "Manage Stations"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Manage Users for"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Mandatory Fields"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Manufacturing"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "March"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Mark As Sent"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Mark As Unsent"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Mark as Completed"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Mark as Created"
+msgstr ""
+
+#: src/components/OnboardingCard.vue
+msgid "Mark as Done"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Mark as Exported"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Mark as Uploaded"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Match Transactions"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Matched By"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Maximum 5 files allowed"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Maximum Amount"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "May"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Member No."
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "Member Number"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Memo"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Message"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Microfiche"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Missing IBAN"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+msgid "Mobile"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Model"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Module"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Month"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Monthly"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Monthly Expenses"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Monthly Sales"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+msgid "My Workstations"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "N.W."
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "N/A"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/Employees.vue
+msgid "Name"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Name is required"
+msgstr ""
+
+#: src/layouts/MainLayout.vue
+msgid "Neo Ledger"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Net Amount"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Net Income/(Loss)"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "New Status"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "New number generated"
+msgstr ""
+
+#: src/ai_plugin/components/AiPrompt.vue
+msgid "No AI processing information available for this transaction"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "No Country"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "No DCN"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "No Files"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "No IBAN"
+msgstr ""
+
+#: src/pages/arap/SearchVC.vue
+msgid "No Results Found"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "No Street"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "No Town"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "No bank accounts found"
+msgstr ""
+
+#: src/pages/reports/AllTaxes.vue
+msgid "No data available"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "No data to import"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "No data to validate"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "No description available"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "No email data available"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "No invoices assigned to this station"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "No matches found"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "No matching IBAN found. Please select manually."
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "No order to delete"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "No prompt available"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "No response available"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "No results found"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "No stations found"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "No transactions found"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "No transactions selected"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "No transactions to email"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "No transactions to import"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "No transactions to print"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "No transactions to update"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "No users assigned to this station"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "No users found matching your search"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "No validation rules defined for this import type"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "No workstations assigned to you"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Non-tracking Item Expense"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Non-tracking Item Income"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Non-tracking Item Tax"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Non-tracking Items"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "None"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Not Emailed"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/system/Employees.vue
+msgid "Notes"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "November"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Number"
+msgstr ""
+
+#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue
+msgid "Number Format"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "OH"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "OK"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "OTP sent to your email"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+msgid "Occupation"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "October"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Offset Account"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "On Hand"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "On Hold"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "One Level Down"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+msgid "One Level Up"
+msgstr ""
+
+#: src/components/OnboardingCard.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Open"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Operator"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Or enter this code manually:"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Order ID is required"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Order Information"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Order Number"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Order deleted successfully"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Order posted as new successfully"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Order posted successfully"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Order saved successfully"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Orders & Quotations"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Organize your business by departments"
+msgstr ""
+
+#: src/ai_plugin/components/AiPrompt.vue
+msgid "Original AI Response"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Outstanding"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "PAIN.001 file exported successfully"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+msgid "PO Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "POS"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Packaging"
+msgstr ""
+
+#: src/pages/ar/SalesInvoice.vue
+msgid "Packing List"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue
+msgid "Paid"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Paid Early"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Paid Late"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Parent"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Parent Account"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Parse Files"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Parsed Transactions"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/system/Defaults.vue
+msgid "Part Number"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Part/Service saved successfully"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/Import.vue
+msgid "Parts"
+msgstr ""
+
+#: src/pages/LoginPage.vue
+#: src/pages/Signup.vue
+#: src/pages/system/Employees.vue
+msgid "Password"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Payment"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/cash/Payments.vue
+msgid "Payment Account"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/cash/PaymentsReport.vue
+msgid "Payment Accounts"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Payment Amount"
+msgstr ""
+
+#: src/pages/cash/Payments.vue
+msgid "Payment Date"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Payment Date (yyyy-mm-dd)"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Payment Details"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Payment Exchange Rate"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Payment File"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Payment ID"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Payment Memo"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Payment Source"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Payment Status"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Payment status updated successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Payment statuses updated successfully"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Payments"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Pending"
+msgstr ""
+
+#: src/ai_plugin/helpers.js
+msgid "Pending is disabled due to station restrictions"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Period Type"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/system/Defaults.vue
+msgid "Phone"
+msgstr ""
+
+#: src/pages/ar/SalesInvoice.vue
+msgid "Pick List"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Please correct the errors in the form"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Please fill in all required fields"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Please fill in the required fields"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please fix the following issues:"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please select a bank account"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please select a bank account and payments to export"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Please select a bank account for this group"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Please select a bank account to edit"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Please select a prompt type"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Please select a station and ensure invoice ID is available"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please select a status"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please select a status and payments to update"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Please select a vendor/customer first"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please select at least one payment"
+msgstr ""
+
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Please select at least one transaction"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Please select files first"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Please select files to upload."
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Please select payments to update"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Please try again"
+msgstr ""
+
+#: src/pages/cash/Payments.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Post"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "Postal Office"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Posted successfully"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+msgid "Postings"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Precision"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Price"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/TrialTransactions.vue
+#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Print"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Print Full Report"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Print Headings Only"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Print batch created successfully"
+msgstr ""
+
+#: src/pages/system/YearEnd.vue
+msgid "Process Year End"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+msgid "Processed At"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Processing Details"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Processing Information"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Processing..."
+msgstr ""
+
+#: src/pages/system/department/ListDepartments.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Profit Center"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Progress"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Project"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+msgid "Project Number"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Project added successfully!"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "Project updated successfully!"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Projects"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Prompt & Response"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Prompt Type"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Prompt saved successfully"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/oe/OrderEntry.vue
+msgid "Purchase Order"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Purchase Order Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Purchase Order Reports"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Purchase Orders"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Purpose/Description"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "QR IBAN"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Qty"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Quantity"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Quarter"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Quarterly"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Quotation"
+msgstr ""
+
+#: src/pages/oe/OrderReports.vue
+msgid "Quotation Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Quotation Reports"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Quotations"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "RFQ Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "RFQ Reports"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "ROP"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "RVC"
+msgstr ""
+
+#: src/pages/system/Taxes.vue
+msgid "Rate (%)"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Receipts"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Received Date"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Reconciliation"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Reconciliation Date"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Reconciliation Report (Cleared Only)"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Reconciliation saved"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Record Account"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Record In"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/pages/Import.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/system/YearEnd.vue
+msgid "Reference"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Reference Documents"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Reference ID"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "References"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Refresh"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Remaining"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Reminder"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Remittance Voucher"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Report Parameters"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Reporting Method (Cash)"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+msgid "Reports"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Request For Quotation"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Request for Quotation"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Request for Quotations"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Required Only"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Restart"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Restocking Charge"
+msgstr ""
+
+#: src/pages/system/YearEnd.vue
+msgid "Retained Earnings Account"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Retry Processing"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/Roles.vue
+msgid "Role"
+msgstr ""
+
+#: src/pages/system/Roles.vue
+msgid "Role added successfully!"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Round"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Rule Conditions"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Rule Configuration"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Rule Name"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Rule Template"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Rule Type"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Rule created and applied successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Rule created but failed to apply to transaction"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Rule created successfully"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "Rule deleted successfully"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Rule name is required"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Rule updated successfully"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "SIC"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "SIC Code"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "SSN"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Sale"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Sales"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+msgid "Sales Invoice"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Sales Invoice/AR Transaction Number"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Sales Invoices"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/oe/OrderEntry.vue
+msgid "Sales Order"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Sales Order Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Sales Order Reports"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Sales Orders"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "Sales Quotation"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Sales Quotation Number"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+msgid "Salutation"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Audit.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/Taxes.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "Save"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Save Prompt"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Save Reconciliation"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Save Station"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Save failed"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Save these backup codes"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Scan with your authenticator app"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Screen"
+msgstr ""
+
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/reports/TrialBalance.vue
+msgid "Search"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/reports/AllTaxes.vue
+msgid "Search Params"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Search Payments"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Search Transactions"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Search users..."
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Searching for matches..."
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Secret copied to clipboard"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Select All"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Select Bank Account"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Select CMPT Files"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Select Columns"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Select Station to Transfer To"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Selected Files"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Selected Payments"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Selected bank account is missing BIC"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Selected bank account is missing IBAN"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/AddPart.vue
+msgid "Sell Price"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+msgid "Send"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+msgid "Send Email"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Send OTP"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Sender"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "September"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Serial No."
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+msgid "Serial Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Services"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Set Up Bank Accounts"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Set Up Chart of Accounts"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Set Up Two-Factor Authentication"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Set up bank accounts."
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Set up services for sale invoices."
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Set up system defaults."
+msgstr ""
+
+#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue
+msgid "Settings"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Ship Via"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Shipping Point"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Show Account Numbers"
+msgstr ""
+
+#: src/pages/cash/PaymentsReport.vue
+msgid "Show FX Transactions"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Sign Up"
+msgstr ""
+
+#: src/pages/LoginPage.vue
+msgid "Sign in to continue to your account"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Sign up to get started"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Signup is not allowed"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Signup requires a valid invite code"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Signup successful!"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Sort Names by Number"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Source"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Split Ledger"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Spreadsheet not available"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+msgid "Spreadsheet not properly initialized"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Standard"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Employees.vue
+#: src/pages/system/Employees.vue
+msgid "Start Date"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Start Date (yyyy-mm-dd)"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Started"
+msgstr ""
+
+#: src/ai_plugin/components/RuleCreationDialog.vue
+msgid "Starts with"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "State"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "State/Province"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Statement Balance"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Statement IDs"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Station Name"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Station added successfully!"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Station deleted successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Station name is required"
+msgstr ""
+
+#: src/ai_plugin/helpers.js
+msgid "Station restrictions apply"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Station updated successfully!"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+msgid "Stations"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/pages/system/Batch.vue
+msgid "Status"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+msgid "Status updated successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "Storage Location"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "Street Name"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue
+msgid "Street Number"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+msgid "Structured Bank Info"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Structured Remittance"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/UserStations.vue
+#: src/components/EmailOptions.vue
+msgid "Subject"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Subtotal"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Success"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "Successful Emails"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Successfully Imported"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/reports/AllTaxes.vue
+msgid "Summary"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Summary Account:"
+msgstr ""
+
+#: src/pages/cash/Reconciliation.vue
+msgid "Summary View"
+msgstr ""
+
+#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue
+msgid "Switch Database"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "System"
+msgstr ""
+
+#: src/components/EmailOptions.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue
+msgid "TEX"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Task marked as completed"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Tax"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Tax Accno"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/pages/Import.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Tax Account"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/TaxReport.vue
+msgid "Tax Accounts"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Tax Amount"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Tax Collected"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Tax Included"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue
+msgid "Tax Name Not Found"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/Taxes.vue
+msgid "Tax Number"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Tax Number / SSN"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Tax Paid"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Tax collected"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Tax paid"
+msgstr ""
+
+#: src/pages/system/Taxes.vue
+msgid "Tax updated successfully!"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Taxes"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Template Type"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Template type not yet implemented"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Templates"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Terms"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Terms (days)"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "The total debit and credit amounts must be balanced."
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "This action cannot be undone."
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "This field is required"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/AddVC.vue
+msgid "Threshold"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Title"
+msgstr ""
+
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/reports/AllTaxes.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "To Date"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Tool Number"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+#: src/pages/reports/AllTaxes.vue
+#: src/pages/system/Batch.vue
+msgid "Total"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Total Amount"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Total Assets"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Total Equity"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Total Expenses"
+msgstr ""
+
+#: src/pages/reports/IncomeStatement.vue
+msgid "Total Income"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Total Liabilities"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+msgid "Total Liabilities + Equity"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Total Processed"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Total Transactions"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Total expenses for the selected period"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "Total sales for the selected period"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/cash/Reconciliation.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Totals"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "Track income and expenses by project"
+msgstr ""
+
+#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Tracking"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Tracking Item Income"
+msgstr ""
+
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Tracking Item Tax"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Trans Date (yyyy-mm-dd)"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Transaction Date"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Transaction Date From"
+msgstr ""
+
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Transaction Date To"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Transaction Delete canceled"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Transaction Details"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Transaction Header"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Transaction ID"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Transaction Posted Successfully."
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+msgid "Transaction Template"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Transaction deleted successfully"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Transaction error: "
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Transaction posted successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Transactions approved successfully"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "Transactions for"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Transfer History"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Transfer Notes (Optional)"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Transferred by"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Transition Account"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Trial Balance"
+msgstr ""
+
+#: src/components/TwoFactorVerify.vue
+msgid "Two-Factor Authentication"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Type"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Type Indicator"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/system/Defaults.vue
+msgid "Type of Contact"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+msgid "Unable to delete Invoice"
+msgstr ""
+
+#: src/pages/general-ledger/GeneralLedger.vue
+msgid "Unable to delete Transaction"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "Unable to delete transaction"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/AddPart.vue
+#: src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue
+msgid "Unit"
+msgstr ""
+
+#: src/ai_plugin/components/StationTransfer.vue
+msgid "Unknown Station"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "Unknown Vendor"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Update"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Update Payment Status"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Update Status"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Update status for"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Update status for selected payments"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+#: src/pages/goodservices/AddPart.vue
+msgid "Updated"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Updated Date From"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+msgid "Updated Date To"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Updated From"
+msgstr ""
+
+#: src/pages/general-ledger/GlTransactions.vue
+msgid "Updated To"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Upload Failed"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Upload Successful"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Upload up to 5"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Uploaded"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Uploaded Files:"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "Uploading..."
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "User added to station successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "User removed from station successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "Users"
+msgstr ""
+
+#: src/pages/oe/OrderEntry.vue
+msgid "VC is required."
+msgstr ""
+
+#: src/pages/system/Taxes.vue
+msgid "Valid To"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Validate Data"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/pages/Import.vue
+msgid "Validation Errors"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Validation successful"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Value Date"
+msgstr ""
+
+#: src/ai_plugin/components/TemplateBuilder.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankTransactions.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue
+#: src/pages/general-ledger/GlTransactions.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Vendor"
+msgstr ""
+
+#: src/pages/system/AiPrompts.vue
+msgid "Vendor Bill"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/pages/arap/VcHistory.vue
+msgid "Vendor History"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Vendor ID"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/pages/ap/VendorInvoice.vue
+msgid "Vendor Invoice"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Vendor Invoice/AP Transaction Number"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+msgid "Vendor Invoices"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Vendor Name"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/TaxReport.vue
+#: src/pages/oe/OrderReports.vue
+#: src/pages/system/Defaults.vue
+msgid "Vendor Number"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Vendor Payments"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Vendor Search"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Vendor Transaction"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Vendor Transactions"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+msgid "Vendor Upload"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+msgid "Vendor is required."
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Vendor updated successfully"
+msgstr ""
+
+#: src/layouts/Menu.js
+#: src/layouts/Menu.js
+#: src/pages/Import.vue
+#: src/pages/Import.vue
+#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Vendors"
+msgstr ""
+
+#: src/components/TwoFactorSetup.vue
+msgid "Verify & Enable 2FA"
+msgstr ""
+
+#: src/pages/Signup.vue
+msgid "Verify & Sign Up"
+msgstr ""
+
+#: src/components/TwoFactorVerify.vue
+msgid "Verify Code"
+msgstr ""
+
+#: src/pages/system/Batch.vue
+msgid "View"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "View Applied Rule"
+msgstr ""
+
+#: src/components/MainDashboard.vue
+msgid "View By"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "View Conditions"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "View Details"
+msgstr ""
+
+#: src/pages/arap/ArApTransaction.vue
+msgid "View Document"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "View Email Details"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "View Failed Transactions"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "View File"
+msgstr ""
+
+#: src/ai_plugin/components/CmptImport.vue
+msgid "View Files"
+msgstr ""
+
+#: src/ai_plugin/pages/DocumentList.vue
+msgid "View Prompt & Response"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "View Template"
+msgstr ""
+
+#: src/ai_plugin/components/RuleManagerDialog.vue
+msgid "View, edit, and delete existing bank transaction rules"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+msgid "Volume"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Voucher Number"
+msgstr ""
+
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Warehouse"
+msgstr ""
+
+#: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue
+msgid "Way Bill"
+msgstr ""
+
+#: src/pages/Import.vue
+#: src/pages/arap/ArApTransactions.vue
+#: src/pages/oe/OrderReports.vue
+msgid "Waybill"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Website"
+msgstr ""
+
+#: src/pages/goodservices/AddPart.vue
+msgid "Weight (kg)"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "Weight Unit"
+msgstr ""
+
+#: src/pages/LoginPage.vue
+msgid "Welcome Back"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Work Fax"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Work Mobile"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+msgid "Work Phone"
+msgstr ""
+
+#: src/pages/system/Defaults.vue
+msgid "XeLatex"
+msgstr ""
+
+#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Year"
+msgstr ""
+
+#: src/layouts/Menu.js
+msgid "Year End"
+msgstr ""
+
+#: src/pages/system/YearEnd.vue
+msgid "Year End Date"
+msgstr ""
+
+#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue
+msgid "Yearly"
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/system/chart/ListAccounts.vue
+msgid "Yes"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "You can only upload a maximum of 5 files per section."
+msgstr ""
+
+#: src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue
+msgid "ZIP/Postal Code"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue
+#: src/pages/system/Employees.vue
+msgid "Zip/Postal Code"
+msgstr ""
+
+#: src/pages/Import.vue
+msgid "Zipcode"
+msgstr ""
+
+#: src/pages/system/department/ListDepartments.vue
+msgid "added successfully!"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "customer"
+msgstr ""
+
+#: src/pages/system/department/ListDepartments.vue
+msgid "deleted successfully!"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "documents"
+msgstr ""
+
+#: src/ai_plugin/pages/UserStations.vue
+msgid "invoices"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "of"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "or click to browse"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "potential match(es)"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "selected"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "selected payments"
+msgstr ""
+
+#: src/components/OnboardingList.vue
+msgid "tasks completed"
+msgstr ""
+
+#: src/pages/system/Employees.vue
+#: src/pages/system/Roles.vue
+#: src/pages/system/department/ListDepartments.vue
+msgid "updated successfully!"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "users"
+msgstr ""
+
+#: src/ai_plugin/pages/UploadDocument.vue
+msgid "vendor"
+msgstr ""
+

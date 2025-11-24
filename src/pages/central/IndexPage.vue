@@ -1556,7 +1556,7 @@ const toggleDarkMode = () => {
 // Switch language
 function switchLanguage(lang) {
   if (i18n.global.locale.value !== lang.value) {
-    loadLanguagePack(lang.value);
+    loadLanguagePack(lang.value, $q);
     selectedLanguage.value = lang;
   }
 }

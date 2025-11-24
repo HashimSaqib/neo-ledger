@@ -9,7 +9,13 @@
   "scripts": {
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "i18n:sync": "node scripts/i18n-sync.js",
+    "i18n:watch": "node scripts/i18n-watch.js",
+    "i18n:extract": "node scripts/i18n-extract.js",
+    "i18n:update": "node scripts/i18n-update.js",
+    "i18n:compile": "node scripts/i18n-compile.js",
+    "i18n:all": "npm run i18n:extract && npm run i18n:update && npm run i18n:compile"
   },
   "dependencies": {
     "@jspreadsheet-ce/vue": "^5.0.1",
@@ -30,6 +36,7 @@
   "devDependencies": {
     "@quasar/app-vite": "^2.0.0-beta.12",
     "autoprefixer": "^10.4.2",
+    "gettext-parser": "^8.0.0",
     "postcss": "^8.4.14",
     "vite-bundle-visualizer": "^1.2.1"
   },

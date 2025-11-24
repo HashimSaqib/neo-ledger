@@ -124,7 +124,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { Cookies, LocalStorage } from "quasar";
+import { Cookies, LocalStorage, useQuasar } from "quasar";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 import axios from "axios";
@@ -135,6 +135,7 @@ defineOptions({
 });
 
 const router = useRouter();
+const $q = useQuasar();
 const languages = [
   { value: "en", label: "English" },
   { value: "de", label: "Deutsch" },
@@ -147,7 +148,7 @@ const selectedLanguage = ref(
 
 function switchLanguage(lang) {
   if (i18n.global.locale.value !== lang.value) {
-    loadLanguagePack(lang.value);
+    loadLanguagePack(lang.value, $q);
   }
 }
 
