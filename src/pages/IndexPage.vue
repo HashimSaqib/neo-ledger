@@ -1,15 +1,22 @@
 <template>
-  <q-page class="flex flex-col lightbg q-pa-md">
-    <MainDashboard />
+  <q-page class="lightbg">
+    <div v-if="showOnboarding" class="onboarding-wrapper">
+      <OnboardingList :client="client" @completed="showOnboarding = false" />
+    </div>
+    <div v-else class="q-pa-md">
+      <MainDashboard />
+    </div>
   </q-page>
 </template>
 
 <script setup>
-import { onMounted, inject } from "vue";
+import { onMounted, inject, ref } from "vue";
 import { useRoute } from "vue-router";
 import MainDashboard from "src/components/MainDashboard.vue";
+import OnboardingList from "src/components/OnboardingList.vue";
 import { LocalStorage } from "quasar";
 import { api } from "src/boot/axios";
+
 defineOptions({
   name: "IndexPage",
 });
@@ -17,6 +24,8 @@ defineOptions({
 const route = useRoute();
 const client = route.params.client || "default";
 const filterMenu = inject("filterMenu");
+const showOnboarding = ref(route.query.onboarding === "1");
+
 onMounted(async () => {
   try {
     const response = await api.get("get_acs");
@@ -28,3 +37,11 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.onboarding-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+</style>

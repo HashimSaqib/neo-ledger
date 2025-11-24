@@ -2121,7 +2121,8 @@ const openManageDialog = (dataset) => {
 
 // Navigate to the dataset details in a new tab
 const navigateToDataset = (dataset) => {
-  window.open(`/client/${dataset.db_name}`, "_blank");
+  const onboardingParam = dataset.onboarding === 1 ? "?onboarding=1" : "";
+  window.open(`/client/${dataset.db_name}${onboardingParam}`, "_blank");
 };
 const navigateToStation = (dataset) => {
   window.open(`/client/${dataset.db_name}/stations/user`, "_blank");
