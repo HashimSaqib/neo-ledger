@@ -13,8 +13,8 @@
 
 <script setup>
 import { useQuasar } from "quasar";
-import { i18n, useI18n } from "src/boot/i18n";
-import { loadLanguagePack } from "src/boot/i18n";
+import { useI18n } from "vue-i18n";
+import { i18n, loadLanguagePack } from "src/boot/i18n";
 
 const $q = useQuasar();
 const { t } = useI18n();
