@@ -430,8 +430,8 @@ import FileList from "src/components/FileList.vue";
 const route = useRoute();
 const updateTitle = inject("updateTitle");
 const triggerPrint = inject("triggerPrint");
-updateTitle(t("General Ledger"));
 const { t } = useI18n();
+updateTitle(t("General Ledger"));
 
 // Form data and UI flags
 const formData = ref({});
@@ -444,11 +444,12 @@ const splitLedger = ref(false);
 const appliedSplitLedger = ref(splitLedger.value);
 
 // Define base columns
+// Store translation keys (not translated strings) so they can be saved/loaded properly
 const baseColumns = ref([
   {
     name: "id",
     align: "left",
-    label: t("ID"),
+    label: "ID",
     field: "id",
     sortable: true,
     slot: true,
@@ -457,7 +458,7 @@ const baseColumns = ref([
   {
     name: "transdate",
     align: "left",
-    label: t("Date"),
+    label: "Date",
     field: "transdate",
     sortable: true,
     default: true,
@@ -465,7 +466,7 @@ const baseColumns = ref([
   {
     name: "reference",
     align: "left",
-    label: t("Reference"),
+    label: "Reference",
     field: "reference",
     sortable: true,
     default: true,
@@ -473,7 +474,7 @@ const baseColumns = ref([
   {
     name: "description",
     align: "left",
-    label: t("Description"),
+    label: "Description",
     field: "description",
     sortable: true,
     default: true,
@@ -481,7 +482,7 @@ const baseColumns = ref([
   {
     name: "files",
     align: "left",
-    label: t("Files"),
+    label: "Files",
     field: "files",
     sortable: true,
     default: true,
@@ -489,7 +490,7 @@ const baseColumns = ref([
   {
     name: "name",
     align: "left",
-    label: t("Company Name"),
+    label: "Company Name",
     field: "name",
     sortable: true,
     default: false,
@@ -497,7 +498,7 @@ const baseColumns = ref([
   {
     name: "vcnumber",
     align: "left",
-    label: t("Company Number"),
+    label: "Company Number",
     field: "vcnumber",
     sortable: true,
     default: false,
@@ -505,7 +506,7 @@ const baseColumns = ref([
   {
     name: "address",
     align: "left",
-    label: t("Address"),
+    label: "Address",
     field: "address",
     sortable: true,
     default: false,
@@ -513,7 +514,7 @@ const baseColumns = ref([
   {
     name: "department",
     align: "left",
-    label: t("Department"),
+    label: "Department",
     field: "department",
     sortable: true,
     default: false,
@@ -521,7 +522,7 @@ const baseColumns = ref([
   {
     name: "project",
     align: "left",
-    label: t("Project"),
+    label: "Project",
     field: "project_description",
     sortable: true,
     default: false,
@@ -529,7 +530,7 @@ const baseColumns = ref([
   {
     name: "debit",
     align: "right",
-    label: t("Debit"),
+    label: "Debit",
     field: "debit",
     sortable: true,
     default: true,
@@ -537,7 +538,7 @@ const baseColumns = ref([
   {
     name: "credit",
     align: "right",
-    label: t("Credit"),
+    label: "Credit",
     field: "credit",
     sortable: true,
     default: true,
@@ -545,7 +546,7 @@ const baseColumns = ref([
   {
     name: "taxAcc",
     align: "left",
-    label: t("Tax Acc"),
+    label: "Tax Acc",
     field: (row) => formatTaxAcc(row),
     sortable: false,
     default: true,
@@ -553,7 +554,7 @@ const baseColumns = ref([
   {
     name: "taxAmount",
     align: "right",
-    label: t("Tax Amount"),
+    label: "Tax Amount",
     field: (row) => Number(row.linetaxamount) || 0,
     sortable: true,
     default: true,
@@ -561,7 +562,7 @@ const baseColumns = ref([
   {
     name: "source",
     align: "left",
-    label: t("Source"),
+    label: "Source",
     field: "source",
     sortable: true,
     default: false,
@@ -569,7 +570,7 @@ const baseColumns = ref([
   {
     name: "memo",
     align: "left",
-    label: t("Memo"),
+    label: "Memo",
     field: "memo",
     sortable: true,
     default: false,
@@ -577,7 +578,7 @@ const baseColumns = ref([
   {
     name: "accno",
     align: "left",
-    label: t("Account"),
+    label: "Account",
     field: "accno",
     sortable: true,
     default: false,
@@ -585,7 +586,7 @@ const baseColumns = ref([
   {
     name: "gifi_accno",
     align: "left",
-    label: t("GIFI"),
+    label: "GIFI",
     field: "gifi_accno",
     sortable: true,
     default: false,
@@ -593,7 +594,7 @@ const baseColumns = ref([
   {
     name: "contra",
     align: "left",
-    label: t("Contra"),
+    label: "Contra",
     field: "contra",
     sortable: true,
     default: false,
@@ -601,7 +602,7 @@ const baseColumns = ref([
   {
     name: "created",
     align: "left",
-    label: t("Created"),
+    label: "Created",
     field: "created",
     sortable: true,
     default: false,
@@ -609,7 +610,7 @@ const baseColumns = ref([
   {
     name: "updated",
     align: "left",
-    label: t("Updated"),
+    label: "Updated",
     field: "updated",
     sortable: true,
     default: false,
