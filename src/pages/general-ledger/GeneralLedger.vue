@@ -412,8 +412,8 @@ const lines = ref([{ ...initialLine }, { ...initialLine }]);
 
 const transactionTitle = computed(() =>
   formData.value.id
-    ? "Update General Ledger Transaction"
-    : "Add General Ledger Transaction"
+    ? t("Update General Ledger Transaction")
+    : t("Add General Ledger Transaction")
 );
 updateTitle(transactionTitle.value);
 

@@ -668,7 +668,7 @@ import draggable from "vuedraggable";
 // =====================================================
 
 const updateTitle = inject("updateTitle");
-updateTitle("Income Statement");
+updateTitle(t("Income Statement"));
 const printToggle = inject("printToggle");
 const { t } = useI18n();
 const route = useRoute();
@@ -715,10 +715,10 @@ const yearOptions = Array.from({ length: 5 }, (_, i) => {
 });
 
 const quarterOptions = [
-  { label: "Q1", value: "Q1" },
-  { label: "Q2", value: "Q2" },
-  { label: "Q3", value: "Q3" },
-  { label: "Q4", value: "Q4" },
+  { label: t("Q1"), value: "Q1" },
+  { label: t("Q2"), value: "Q2" },
+  { label: t("Q3"), value: "Q3" },
+  { label: t("Q4"), value: "Q4" },
 ];
 
 const departments = ref([]);

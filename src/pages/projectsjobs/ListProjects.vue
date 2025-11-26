@@ -106,7 +106,7 @@ import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 const updateTitle = inject("updateTitle");
-updateTitle("Projects");
+updateTitle(t("Projects"));
 const { t } = useI18n();
 
 // State variables

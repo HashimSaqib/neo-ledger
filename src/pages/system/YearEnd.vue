@@ -85,7 +85,7 @@ import { Notify } from "quasar";
 import LastTransactions from "src/components/LastTransactions.vue";
 
 const updateTitle = inject("updateTitle");
-updateTitle("Year End");
+updateTitle(t("Year End"));
 
 const { t } = useI18n();
 

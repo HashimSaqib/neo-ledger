@@ -383,7 +383,7 @@ const { t } = useI18n();
 
 // Set page title using the injected updateTitle function
 const updateTitle = inject("updateTitle");
-updateTitle("Employees");
+updateTitle(t("Employees"));
 
 const employees = ref([]);
 const editDialog = ref(false);

@@ -12,21 +12,21 @@
           <q-input
             v-model="formData.partnumber"
             class="lightbg col-6 col-md-3"
-            label="Number"
+            :label="t('Number')"
             outlined
             dense
           />
           <q-input
             v-model="formData.description"
             class="lightbg col-6 col-md-3"
-            label="Description"
+            :label="t('Description')"
             outlined
             dense
           />
           <q-input
             v-model="formData.serialnumber"
             class="lightbg col-6 col-md-3"
-            label="Serial Number"
+            :label="t('Serial Number')"
             outlined
             dense
           />
@@ -35,49 +35,49 @@
             <q-input
               v-model="formData.lot"
               class="lightbg col-6 col-md-3"
-              label="Lot"
+              :label="t('Lot')"
               outlined
               dense
             />
             <q-input
               v-model="formData.make"
               class="lightbg col-6 col-md-3"
-              label="Make"
+              :label="t('Make')"
               outlined
               dense
             />
             <q-input
               v-model="formData.model"
               class="lightbg col-6 col-md-3"
-              label="Model"
+              :label="t('Model')"
               outlined
               dense
             />
             <q-input
               v-model="formData.drawing"
               class="lightbg col-6 col-md-3"
-              label="Drawing"
+              :label="t('Drawing')"
               outlined
               dense
             />
             <q-input
               v-model="formData.toolnumber"
               class="lightbg col-6 col-md-3"
-              label="Tool Number"
+              :label="t('Tool Number')"
               outlined
               dense
             />
             <q-input
               v-model="formData.microfiche"
               class="lightbg col-6 col-md-3"
-              label="Microfiche"
+              :label="t('Microfiche')"
               outlined
               dense
             />
             <q-input
               v-model="formData.barcode"
               class="lightbg col-6 col-md-3"
-              label="Barcode"
+              :label="t('Barcode')"
               outlined
               dense
             />
@@ -86,7 +86,7 @@
 
         <!-- Item Status Section -->
         <div class="q-mt-sm">
-          <div class="text-subtitle1">Item Status</div>
+          <div class="text-subtitle1">{{ t("Item Status") }}</div>
           <q-option-group
             v-model="formData.itemstatus"
             :options="itemStatusOptions"
@@ -98,42 +98,42 @@
         <!-- Transaction Filters (common) -->
         <div class="row q-mt-sm">
           <div class="col-12">
-            <div class="text-subtitle1">Transaction Filters</div>
+            <div class="text-subtitle1">{{ t("Transaction Filters") }}</div>
           </div>
           <div class="col-12 row q-col-gutter-md">
             <q-toggle
               v-model="formData.sold"
-              label="Sales Invoices"
+              :label="t('Sales Invoices')"
               :true-value="1"
               :false-value="0"
             />
             <q-toggle
               v-model="formData.ordered"
-              label="Sales Orders"
+              :label="t('Sales Orders')"
               :true-value="1"
               :false-value="0"
             />
             <q-toggle
               v-model="formData.quoted"
-              label="Quotations"
+              :label="t('Quotations')"
               :true-value="1"
               :false-value="0"
             />
             <q-toggle
               v-model="formData.bought"
-              label="Vendor Invoices"
+              :label="t('Vendor Invoices')"
               :true-value="1"
               :false-value="0"
             />
             <q-toggle
               v-model="formData.onorder"
-              label="Purchase Orders"
+              :label="t('Purchase Orders')"
               :true-value="1"
               :false-value="0"
             />
             <q-toggle
               v-model="formData.rfq"
-              label="RFQ"
+              :label="t('RFQ')"
               :true-value="1"
               :false-value="0"
             />
@@ -153,7 +153,7 @@
             <q-input
               v-model="formData.transdatefrom"
               type="date"
-              label="Transaction Date From"
+              :label="t('Transaction Date From')"
               outlined
               dense
               class="col-6 col-md-3"
@@ -161,7 +161,7 @@
             <q-input
               v-model="formData.transdateto"
               type="date"
-              label="Transaction Date To"
+              :label="t('Transaction Date To')"
               outlined
               dense
               class="col-6 col-md-3"
@@ -169,7 +169,7 @@
             <q-select
               v-model="formData.month"
               :options="monthOptions"
-              label="Period: Month"
+              :label="t('Period: Month')"
               outlined
               dense
               class="col-6 col-md-3"
@@ -177,7 +177,7 @@
             <q-select
               v-model="formData.year"
               :options="yearOptions"
-              label="Period: Year"
+              :label="t('Period: Year')"
               outlined
               dense
               class="col-6 col-md-3"
@@ -188,7 +188,7 @@
                 :options="intervalOptions"
                 type="radio"
                 inline
-                label="Interval"
+                :label="t('Interval')"
               />
             </div>
           </div>
@@ -201,12 +201,12 @@
                 :options="methodOptions"
                 type="radio"
                 inline
-                label="Method"
+                :label="t('Method')"
               />
             </div>
             <div class="col">
-              <q-checkbox v-model="formData.open" label="Open" />
-              <q-checkbox v-model="formData.closed" label="Closed" />
+              <q-checkbox v-model="formData.open" :label="t('Open')" />
+              <q-checkbox v-model="formData.closed" :label="t('Closed')" />
             </div>
             <div class="col">
               <q-option-group
@@ -214,7 +214,7 @@
                 :options="summaryOptions"
                 type="radio"
                 inline
-                label="Report Detail"
+                :label="t('Report Detail')"
               />
             </div>
           </div>
@@ -222,61 +222,90 @@
 
         <!-- Column Selection for Report -->
         <div class="q-py-md">
-          <div class="text-subtitle1">Include in Report</div>
+          <div class="text-subtitle1">{{ t("Include in Report") }}</div>
           <div class="row">
             <!-- The checkboxes here correspond to fields in the unified columns list -->
-            <q-checkbox v-model="formData.l_runningnumber" label="No." />
-            <q-checkbox v-model="formData.l_id" label="ID" />
-            <q-checkbox v-model="formData.l_partnumber" label="Number" />
-            <q-checkbox v-model="formData.l_description" label="Description" />
-            <q-checkbox v-model="formData.l_onhand" label="Qty" />
-            <q-checkbox v-model="formData.l_unit" label="Unit" />
-            <q-checkbox v-model="formData.l_priceupdate" label="Updated" />
-            <q-checkbox v-model="formData.l_lot" label="Lot" />
-            <q-checkbox v-model="formData.l_expires" label="Expires" />
+            <q-checkbox v-model="formData.l_runningnumber" :label="t('No.')" />
+            <q-checkbox v-model="formData.l_id" :label="t('ID')" />
+            <q-checkbox v-model="formData.l_partnumber" :label="t('Number')" />
+            <q-checkbox
+              v-model="formData.l_description"
+              :label="t('Description')"
+            />
+            <q-checkbox v-model="formData.l_onhand" :label="t('Qty')" />
+            <q-checkbox v-model="formData.l_unit" :label="t('Unit')" />
+            <q-checkbox
+              v-model="formData.l_priceupdate"
+              :label="t('Updated')"
+            />
+            <q-checkbox v-model="formData.l_lot" :label="t('Lot')" />
+            <q-checkbox v-model="formData.l_expires" :label="t('Expires')" />
             <q-checkbox
               v-model="formData.l_checkinventory"
-              label="Check Inventory"
+              :label="t('Check Inventory')"
             />
-            <q-checkbox v-model="formData.l_cost" label="Cost" />
-            <q-checkbox v-model="formData.l_sellprice" label="Sell Price" />
-            <q-checkbox v-model="formData.l_listprice" label="List Price" />
-            <q-checkbox v-model="formData.l_lastcost" label="Last Cost" />
-            <q-checkbox v-model="formData.l_avgcost" label="Average Cost" />
-            <q-checkbox v-model="formData.l_linetotal" label="Extended" />
-            <q-checkbox v-model="formData.l_markup" label="Markup" />
-            <q-checkbox v-model="formData.l_bin" label="Bin" />
-            <q-checkbox v-model="formData.l_rop" label="ROP" />
-            <q-checkbox v-model="formData.l_weight" label="Weight" />
-            <q-checkbox v-model="formData.l_notes" label="Notes" />
-            <q-checkbox v-model="formData.l_image" label="Image" />
-            <q-checkbox v-model="formData.l_drawing" label="Drawing" />
-            <q-checkbox v-model="formData.l_toolnumber" label="Tool Number" />
-            <q-checkbox v-model="formData.l_microfiche" label="Microfiche" />
-            <q-checkbox v-model="formData.l_make" label="Make" />
-            <q-checkbox v-model="formData.l_model" label="Model" />
-            <q-checkbox v-model="formData.l_account" label="Accounts" />
-            <q-checkbox v-model="formData.l_name" label="Name" />
-            <q-checkbox v-model="formData.l_curr" label="Currency" />
-            <q-checkbox v-model="formData.l_employee" label="Employee" />
+            <q-checkbox v-model="formData.l_cost" :label="t('Cost')" />
+            <q-checkbox
+              v-model="formData.l_sellprice"
+              :label="t('Sell Price')"
+            />
+            <q-checkbox
+              v-model="formData.l_listprice"
+              :label="t('List Price')"
+            />
+            <q-checkbox v-model="formData.l_lastcost" :label="t('Last Cost')" />
+            <q-checkbox
+              v-model="formData.l_avgcost"
+              :label="t('Average Cost')"
+            />
+            <q-checkbox v-model="formData.l_linetotal" :label="t('Extended')" />
+            <q-checkbox v-model="formData.l_markup" :label="t('Markup')" />
+            <q-checkbox v-model="formData.l_bin" :label="t('Bin')" />
+            <q-checkbox v-model="formData.l_rop" :label="t('ROP')" />
+            <q-checkbox v-model="formData.l_weight" :label="t('Weight')" />
+            <q-checkbox v-model="formData.l_notes" :label="t('Notes')" />
+            <q-checkbox v-model="formData.l_image" :label="t('Image')" />
+            <q-checkbox v-model="formData.l_drawing" :label="t('Drawing')" />
+            <q-checkbox
+              v-model="formData.l_toolnumber"
+              :label="t('Tool Number')"
+            />
+            <q-checkbox
+              v-model="formData.l_microfiche"
+              :label="t('Microfiche')"
+            />
+            <q-checkbox v-model="formData.l_make" :label="t('Make')" />
+            <q-checkbox v-model="formData.l_model" :label="t('Model')" />
+            <q-checkbox v-model="formData.l_account" :label="t('Accounts')" />
+            <q-checkbox v-model="formData.l_name" :label="t('Name')" />
+            <q-checkbox v-model="formData.l_curr" :label="t('Currency')" />
+            <q-checkbox v-model="formData.l_employee" :label="t('Employee')" />
             <q-checkbox
               v-model="formData.l_serialnumber"
-              label="Serial Number"
+              :label="t('Serial Number')"
             />
             <q-checkbox
               v-model="formData.l_countryorigin"
-              label="Country of Origin"
+              :label="t('Country of Origin')"
             />
-            <q-checkbox v-model="formData.l_tariff_hscode" label="HS Code" />
-            <q-checkbox v-model="formData.l_barcode" label="Barcode" />
-            <q-checkbox v-model="formData.l_subtotal" label="Subtotal" />
+            <q-checkbox
+              v-model="formData.l_tariff_hscode"
+              :label="t('HS Code')"
+            />
+            <q-checkbox v-model="formData.l_barcode" :label="t('Barcode')" />
+            <q-checkbox v-model="formData.l_subtotal" :label="t('Subtotal')" />
           </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="row q-mt-sm">
-          <q-btn type="submit" label="Search" color="primary" class="q-mr-sm" />
-          <q-btn label="Clear" @click="clearForm" />
+          <q-btn
+            type="submit"
+            :label="t('Search')"
+            color="primary"
+            class="q-mr-sm"
+          />
+          <q-btn :label="t('Clear')" @click="clearForm" />
         </div>
       </q-expansion-item>
     </q-form>
@@ -429,63 +458,63 @@ const formData = ref({
 });
 
 // Options for radio groups and selects
-const itemStatusOptions = [
-  { label: "Active", value: "active" },
-  { label: "On Hand", value: "onhand" },
-  { label: "Short", value: "short" },
-  { label: "Obsolete", value: "obsolete" },
-  { label: "Orphaned", value: "orphaned" },
-];
+const itemStatusOptions = computed(() => [
+  { label: t("Active"), value: "active" },
+  { label: t("On Hand"), value: "onhand" },
+  { label: t("Short"), value: "short" },
+  { label: t("Obsolete"), value: "obsolete" },
+  { label: t("Orphaned"), value: "orphaned" },
+]);
 
-const monthOptions = [
-  { label: "January", value: "01" },
-  { label: "February", value: "02" },
-  { label: "March", value: "03" },
-  { label: "April", value: "04" },
-  { label: "May", value: "05" },
-  { label: "June", value: "06" },
-  { label: "July", value: "07" },
-  { label: "August", value: "08" },
-  { label: "September", value: "09" },
-  { label: "October", value: "10" },
-  { label: "November", value: "11" },
-  { label: "December", value: "12" },
-];
+const monthOptions = computed(() => [
+  { label: t("January"), value: "01" },
+  { label: t("February"), value: "02" },
+  { label: t("March"), value: "03" },
+  { label: t("April"), value: "04" },
+  { label: t("May"), value: "05" },
+  { label: t("June"), value: "06" },
+  { label: t("July"), value: "07" },
+  { label: t("August"), value: "08" },
+  { label: t("September"), value: "09" },
+  { label: t("October"), value: "10" },
+  { label: t("November"), value: "11" },
+  { label: t("December"), value: "12" },
+]);
 
 const yearOptions = [
   { label: "2025", value: "2025" },
   // add more years as needed
 ];
 
-const intervalOptions = [
-  { label: "Current", value: "0" },
-  { label: "Month", value: "1" },
-  { label: "Quarter", value: "3" },
-  { label: "Year", value: "12" },
-];
+const intervalOptions = computed(() => [
+  { label: t("Current"), value: "0" },
+  { label: t("Month"), value: "1" },
+  { label: t("Quarter"), value: "3" },
+  { label: t("Year"), value: "12" },
+]);
 
-const methodOptions = [
-  { label: "Accrual", value: "accrual" },
-  { label: "Cash", value: "cash" },
-];
+const methodOptions = computed(() => [
+  { label: t("Accrual"), value: "accrual" },
+  { label: t("Cash"), value: "cash" },
+]);
 
-const summaryOptions = [
-  { label: "Summary", value: "summary" },
-  { label: "Detail", value: "detail" },
-];
+const summaryOptions = computed(() => [
+  { label: t("Summary"), value: "summary" },
+  { label: t("Detail"), value: "detail" },
+]);
 
 // Unified master list of columns (all possible fields)
-const baseColumns = [
+const baseColumns = computed(() => [
   {
     name: "runningnumber",
-    label: "No.",
+    label: t("No."),
     field: "runningnumber",
     align: "left",
   },
-  { name: "id", label: "ID", field: "id", align: "left" },
+  { name: "id", label: t("ID"), field: "id", align: "left" },
   {
     name: "partnumber",
-    label: "Number",
+    label: t("Number"),
     field: "partnumber",
     align: "left",
     sortable: true,
@@ -493,113 +522,128 @@ const baseColumns = [
 
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
     sortable: true,
   },
   {
     name: "notes",
-    label: "Notes",
+    label: t("Notes"),
     field: "notes",
     align: "left",
     sortable: true,
   },
   {
     name: "onhand",
-    label: "Qty",
+    label: t("Qty"),
     field: "onhand",
     align: "right",
     sortable: true,
   },
-  { name: "unit", label: "Unit", field: "unit", align: "left" },
+  { name: "unit", label: t("Unit"), field: "unit", align: "left" },
   {
     name: "priceupdate",
-    label: "Updated",
+    label: t("Updated"),
     field: "priceupdate",
     align: "left",
   },
-  { name: "lot", label: "Lot", field: "lot", align: "left" },
-  { name: "expires", label: "Expires", field: "expires", align: "left" },
+  { name: "lot", label: t("Lot"), field: "lot", align: "left" },
+  { name: "expires", label: t("Expires"), field: "expires", align: "left" },
   {
     name: "checkinventory",
-    label: "Check Inventory",
+    label: t("Check Inventory"),
     field: "checkinventory",
     align: "left",
   },
   {
     name: "cost",
-    label: "Cost",
+    label: t("Cost"),
     field: "cost",
     align: "right",
     sortable: true,
   },
   {
     name: "sellprice",
-    label: "Sell Price",
+    label: t("Sell Price"),
     field: "sellprice",
     align: "right",
     sortable: true,
   },
   {
     name: "listprice",
-    label: "List Price",
+    label: t("List Price"),
     field: "listprice",
     align: "right",
     sortable: true,
   },
-  { name: "lastcost", label: "Last Cost", field: "lastcost", align: "right" },
-  { name: "avgcost", label: "Average Cost", field: "avgcost", align: "right" },
-  { name: "linetotal", label: "Extended", field: "linetotal", align: "right" },
-  { name: "markup", label: "Markup", field: "markup", align: "right" },
-  { name: "bin", label: "Bin", field: "bin", align: "left" },
-  { name: "rop", label: "ROP", field: "rop", align: "left" },
-  { name: "weight", label: "Weight", field: "weight", align: "left" },
+  {
+    name: "lastcost",
+    label: t("Last Cost"),
+    field: "lastcost",
+    align: "right",
+  },
+  {
+    name: "avgcost",
+    label: t("Average Cost"),
+    field: "avgcost",
+    align: "right",
+  },
+  {
+    name: "linetotal",
+    label: t("Extended"),
+    field: "linetotal",
+    align: "right",
+  },
+  { name: "markup", label: t("Markup"), field: "markup", align: "right" },
+  { name: "bin", label: t("Bin"), field: "bin", align: "left" },
+  { name: "rop", label: t("ROP"), field: "rop", align: "left" },
+  { name: "weight", label: t("Weight"), field: "weight", align: "left" },
 
-  { name: "image", label: "Image", field: "image", align: "left" },
-  { name: "drawing", label: "Drawing", field: "drawing", align: "left" },
+  { name: "image", label: t("Image"), field: "image", align: "left" },
+  { name: "drawing", label: t("Drawing"), field: "drawing", align: "left" },
   {
     name: "toolnumber",
-    label: "Tool Number",
+    label: t("Tool Number"),
     field: "toolnumber",
     align: "left",
   },
   {
     name: "microfiche",
-    label: "Microfiche",
+    label: t("Microfiche"),
     field: "microfiche",
     align: "left",
   },
-  { name: "make", label: "Make", field: "make", align: "left" },
-  { name: "model", label: "Model", field: "model", align: "left" },
-  { name: "account", label: "Accounts", field: "account", align: "left" },
-  { name: "name", label: "Name", field: "name", align: "left" },
-  { name: "curr", label: "Currency", field: "curr", align: "left" },
-  { name: "employee", label: "Employee", field: "employee", align: "left" },
+  { name: "make", label: t("Make"), field: "make", align: "left" },
+  { name: "model", label: t("Model"), field: "model", align: "left" },
+  { name: "account", label: t("Accounts"), field: "account", align: "left" },
+  { name: "name", label: t("Name"), field: "name", align: "left" },
+  { name: "curr", label: t("Currency"), field: "curr", align: "left" },
+  { name: "employee", label: t("Employee"), field: "employee", align: "left" },
   {
     name: "serialnumber",
-    label: "Serial Number",
+    label: t("Serial Number"),
     field: "serialnumber",
     align: "left",
   },
   {
     name: "countryorigin",
-    label: "Country of Origin",
+    label: t("Country of Origin"),
     field: "countryorigin",
     align: "left",
   },
   {
     name: "tariff_hscode",
-    label: "HS Code",
+    label: t("HS Code"),
     field: "tariff_hscode",
     align: "left",
   },
-  { name: "barcode", label: "Barcode", field: "barcode", align: "left" },
-  { name: "subtotal", label: "Subtotal", field: "subtotal", align: "right" },
-];
+  { name: "barcode", label: t("Barcode"), field: "barcode", align: "left" },
+  { name: "subtotal", label: t("Subtotal"), field: "subtotal", align: "right" },
+]);
 const finalColumns = computed(() => {
   // 1. Filter out any columns the user has not toggled on.
-  let cols = baseColumns.filter(
+  let cols = baseColumns.value.filter(
     (col) => formData.value["l_" + col.name] === true
   );
 
@@ -632,7 +676,7 @@ const finalColumns = computed(() => {
     if (lastCostIndex !== -1) {
       cols.splice(lastCostIndex + 1, 0, {
         name: "invnumber",
-        label: "Invoice",
+        label: t("Invoice"),
         field: "invnumber",
         align: "left",
         sortable: true,
@@ -655,13 +699,13 @@ const finalColumns = computed(() => {
         0,
         {
           name: "income",
-          label: "Income",
+          label: t("Income"),
           field: "income",
           align: "right",
         },
         {
           name: "expense",
-          label: "Expense",
+          label: t("Expense"),
           field: "expense",
           align: "right",
         }
@@ -694,7 +738,7 @@ function search() {
     .catch((err) => {
       console.error(err);
       Notify.create({
-        message: err.response?.data?.message || "Error performing search",
+        message: err.response?.data?.message || t("Error performing search"),
         type: "negative",
         position: "center",
       });

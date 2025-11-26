@@ -6,7 +6,7 @@
         <q-btn
           flat
           icon="arrow_back"
-          label="Back to Transactions"
+          :label="t('Back to Transactions')"
           @click="goBack"
         />
       </div>
@@ -14,7 +14,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="text-center q-pa-lg">
       <q-spinner-dots size="50px" color="primary" />
-      <div class="text-grey-6 q-mt-md">Loading transaction details...</div>
+      <div class="text-grey-6 q-mt-md">{{ t("Loading transaction details...") }}</div>
     </div>
 
     <!-- Error State -->
@@ -22,7 +22,7 @@
       <q-icon name="error" size="50px" color="negative" />
       <div class="text-negative q-mt-md">{{ error }}</div>
       <q-btn
-        label="Retry"
+        :label="t('Retry')"
         color="primary"
         class="q-mt-md"
         @click="fetchTransactionDetails"
@@ -34,7 +34,7 @@
       <!-- GL Transaction Details -->
       <q-card class="q-mb-md">
         <q-card-section>
-          <div class="text-h6">GL Transaction Details</div>
+          <div class="text-h6">{{ t("GL Transaction Details") }}</div>
           <q-table
             :rows="glTransactions"
             :columns="glColumns"
@@ -61,13 +61,13 @@
       <!-- GL Account Selection Form -->
       <q-card class="q-mb-md">
         <q-card-section>
-          <div class="text-h6 q-mb-md">Account Selection & Filters</div>
+          <div class="text-h6 q-mb-md">{{ t("Account Selection & Filters") }}</div>
           <div class="row q-gutter-md">
             <div class="col-md-3">
               <s-select
                 v-model="selectedGlAccount"
                 :options="chartAccounts"
-                label="GL Account"
+                :label="t('GL Account')"
                 option-value="id"
                 option-label="descrip"
                 emit-value
@@ -80,7 +80,7 @@
             <div class="col-md-2">
               <q-input
                 v-model="fromDate"
-                label="From Date"
+                :label="t('From Date')"
                 type="date"
                 dense
                 bg-color="input"
@@ -90,7 +90,7 @@
             <div class="col-md-2">
               <q-input
                 v-model="toDate"
-                label="To Date"
+                :label="t('To Date')"
                 type="date"
                 dense
                 bg-color="input"
@@ -102,10 +102,10 @@
                 dense
                 v-model="arapType"
                 :options="[
-                  { label: 'AR', value: 'ar' },
-                  { label: 'AP', value: 'ap' },
+                  { label: t('AR'), value: 'ar' },
+                  { label: t('AP'), value: 'ap' },
                 ]"
-                label="AR or AP"
+                :label="t('AR or AP')"
                 emit-value
                 map-options
                 outlined
@@ -115,7 +115,7 @@
             <div class="col-md-3">
               <q-input
                 v-model="iban"
-                label="IBAN"
+                :label="t('IBAN')"
                 dense
                 bg-color="input"
                 outlined
@@ -124,7 +124,7 @@
             <div class="col-md-2">
               <q-btn
                 color="primary"
-                label="Load Transactions"
+                :label="t('Load Transactions')"
                 @click="loadOutstandingTransactions"
                 :loading="loadingOutstanding"
               />
@@ -134,7 +134,7 @@
             <div class="col-md-2">
               <q-btn
                 color="primary"
-                label="Select All"
+                :label="t('Select All')"
                 @click="selectAll"
                 :disabled="!outstandingTransactions.length"
               />
@@ -142,7 +142,7 @@
             <div class="col-md-2">
               <q-btn
                 color="black"
-                label="Deselect All"
+                :label="t('Deselect All')"
                 @click="deselectAll"
                 :disabled="!outstandingTransactions.length"
               />
@@ -155,7 +155,7 @@
       <q-card v-if="outstandingTransactions.length" class="q-mb-md">
         <q-card-section>
           <div class="text-h6">
-            Outstanding {{ arapType.toUpperCase() }} Transactions
+            {{ t("Outstanding") }} {{ arapType.toUpperCase() }} {{ t("Transactions") }}
           </div>
           <q-table
             :rows="outstandingTransactions"
@@ -197,28 +197,28 @@
       <div class="q-gutter-md">
         <q-btn
           color="primary"
-          label="Book Selected Transactions"
+          :label="t('Book Selected Transactions')"
           :disabled="!hasValidSelection"
           @click="proceedToConfirmation"
         />
-        <q-btn color="black" label="Cancel" @click="goBack" />
+        <q-btn color="black" :label="t('Cancel')" @click="goBack" />
       </div>
 
       <!-- Selection Summary -->
       <q-card v-if="selectedTransactions.length" class="q-mt-md">
         <q-card-section>
-          <div class="text-h6">Selection Summary</div>
+          <div class="text-h6">{{ t("Selection Summary") }}</div>
           <div class="q-mt-sm">
             <div>
-              <strong>Selected Transactions:</strong>
+              <strong>{{ t("Selected Transactions") }}:</strong>
               {{ selectedTransactions.length }}
             </div>
             <div>
-              <strong>Total Amount:</strong>
+              <strong>{{ t("Total Amount") }}:</strong>
               {{ formatAmount(totalSelectedAmount) }}
             </div>
             <div>
-              <strong>Search Amount:</strong> {{ formatAmount(searchAmount) }}
+              <strong>{{ t("Search Amount") }}:</strong> {{ formatAmount(searchAmount) }}
             </div>
           </div>
         </q-card-section>
@@ -233,10 +233,12 @@ import { useRoute, useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 import { formatAmount } from "src/helpers/utils";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
+const { t } = useI18n();
 
 // Reactive data
 const loading = ref(false);
@@ -253,46 +255,46 @@ const searchAmount = ref(0);
 const iban = ref("");
 
 // Table columns
-const glColumns = [
-  { name: "reference", label: "Reference", field: "reference", align: "left" },
-  { name: "transdate", label: "Date", field: "transdate", align: "left" },
-  { name: "accno", label: "Account", field: "accno", align: "left" },
+const glColumns = computed(() => [
+  { name: "reference", label: t("Reference"), field: "reference", align: "left" },
+  { name: "transdate", label: t("Date"), field: "transdate", align: "left" },
+  { name: "accno", label: t("Account"), field: "accno", align: "left" },
   {
     name: "account_description",
-    label: "Description",
+    label: t("Description"),
     field: "account_description",
     align: "left",
   },
   {
     name: "description",
-    label: "GL Description",
+    label: t("GL Description"),
     field: "description",
     align: "left",
   },
-  { name: "source", label: "Source", field: "source", align: "left" },
-  { name: "memo", label: "Memo", field: "memo", align: "left" },
-  { name: "curr", label: "Currency", field: "curr", align: "left" },
-  { name: "debit", label: "Debit", field: "debit", align: "right" },
-  { name: "credit", label: "Credit", field: "credit", align: "right" },
-];
+  { name: "source", label: t("Source"), field: "source", align: "left" },
+  { name: "memo", label: t("Memo"), field: "memo", align: "left" },
+  { name: "curr", label: t("Currency"), field: "curr", align: "left" },
+  { name: "debit", label: t("Debit"), field: "debit", align: "right" },
+  { name: "credit", label: t("Credit"), field: "credit", align: "right" },
+]);
 
-const outstandingColumns = [
-  { name: "select", label: "Select", field: "select", align: "center" },
-  { name: "invnumber", label: "Invoice#", field: "invnumber", align: "left" },
-  { name: "transdate", label: "Date", field: "transdate", align: "left" },
+const outstandingColumns = computed(() => [
+  { name: "select", label: t("Select"), field: "select", align: "center" },
+  { name: "invnumber", label: t("Invoice#"), field: "invnumber", align: "left" },
+  { name: "transdate", label: t("Date"), field: "transdate", align: "left" },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
   },
-  { name: "ordnumber", label: "Order#", field: "ordnumber", align: "left" },
-  { name: "name", label: "Customer/Vendor", field: "name", align: "left" },
-  { name: "curr", label: "Currency", field: "curr", align: "left" },
-  { name: "amount", label: "Amount", field: "amount", align: "right" },
-  { name: "paid", label: "Paid", field: "paid", align: "right" },
-  { name: "due", label: "Due", field: "due", align: "right" },
-];
+  { name: "ordnumber", label: t("Order#"), field: "ordnumber", align: "left" },
+  { name: "name", label: t("Customer/Vendor"), field: "name", align: "left" },
+  { name: "curr", label: t("Currency"), field: "curr", align: "left" },
+  { name: "amount", label: t("Amount"), field: "amount", align: "right" },
+  { name: "paid", label: t("Paid"), field: "paid", align: "right" },
+  { name: "due", label: t("Due"), field: "due", align: "right" },
+]);
 
 // Computed properties
 const selectedTransactions = computed(() => {
@@ -336,13 +338,13 @@ const fetchTransactionDetails = async () => {
       loadOutstandingTransactions();
     } else {
       error.value =
-        response.data.error || "Failed to fetch transaction details";
+        response.data.error || t("Failed to fetch transaction details");
     }
   } catch (err) {
     console.error("Error fetching transaction details:", err);
     error.value =
       err.response?.data?.error ||
-      "An error occurred while fetching transaction details";
+      t("An error occurred while fetching transaction details");
   } finally {
     loading.value = false;
   }
@@ -377,14 +379,14 @@ const loadOutstandingTransactions = async () => {
       $q.notify({
         type: "negative",
         message:
-          response.data.error || "Failed to load outstanding transactions",
+          response.data.error || t("Failed to load outstanding transactions"),
       });
     }
   } catch (err) {
     console.error("Error loading outstanding transactions:", err);
     $q.notify({
       type: "negative",
-      message: "An error occurred while loading outstanding transactions",
+      message: t("An error occurred while loading outstanding transactions"),
     });
   } finally {
     loadingOutstanding.value = false;

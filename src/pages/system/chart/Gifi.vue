@@ -85,7 +85,7 @@
                 v-if="selectedGifi.accno"
                 @click.prevent="deleteGifi(selectedGifi.accno)"
               />
-              <q-btn label="Save" color="primary" type="submit" />
+              <q-btn :label="t('Save')" color="primary" type="submit" />
             </div>
           </q-form>
         </q-card-section>

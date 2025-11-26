@@ -27,7 +27,7 @@
           />
           <q-checkbox
             v-model="showBankAccounts"
-            label="Bank Accounts"
+            :label="t('Bank Accounts')"
             dense
             :disable="!isEditMode"
           />
@@ -387,7 +387,7 @@
             class="col-12 col-md-3 container-bg q-pa-md q-pl-sm"
           >
             <div class="row items-center justify-between q-mb-sm">
-              <div class="text-subtitle2 text-weight-medium">Bank Accounts</div>
+              <div class="text-subtitle2 text-weight-medium">{{ t("Bank Accounts") }}</div>
               <q-btn
                 flat
                 round
@@ -438,7 +438,7 @@
 
             <div v-else class="text-center q-py-xl text-grey-6">
               <q-icon name="account_balance" size="3rem" class="q-mb-sm" />
-              <div class="text-body2">No bank accounts</div>
+              <div class="text-body2">{{ t("No bank accounts") }}</div>
             </div>
           </div>
         </div>

@@ -270,7 +270,9 @@ const emailDialog = ref(false);
 const printDialog = ref(false);
 const emailData = ref({
   adminemail: "",
-  jobtype: `Reminder Email ${new Date().toISOString().split("T")[0]}`,
+  jobtype: t("Reminder Email {date}", {
+    date: new Date().toISOString().split("T")[0],
+  }),
   attachment: "tex",
   inline: false,
   message: "",
@@ -290,7 +292,9 @@ const formatOptions = [
 ];
 
 const printData = ref({
-  jobtype: `Reminder Print ${new Date().toISOString().split("T")[0]}`,
+  jobtype: t("Reminder Print {date}", {
+    date: new Date().toISOString().split("T")[0],
+  }),
   attachment: "tex",
   adminemail: "",
 });
@@ -392,9 +396,9 @@ const bulkUpdate = async (direction) => {
       }
     });
     Notify.create({
-      message: t(
-        `Levels Updated (${direction === "up" ? "Increased" : "Decreased"})`
-      ),
+      message: t("Levels Updated ({direction})", {
+        direction: direction === "up" ? t("Increased") : t("Decreased"),
+      }),
       position: "center",
       color: "positive",
     });
@@ -570,7 +574,7 @@ const openEmailDialog = () => {
       })
       .join(", ");
     Notify.create({
-      message: t(`Missing email address for: ${invoiceList}`),
+      message: t("Missing email address for: {invoiceList}", { invoiceList }),
       position: "center",
       color: "negative",
       timeout: 5000,

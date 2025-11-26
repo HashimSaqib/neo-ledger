@@ -265,7 +265,7 @@
 
           <!-- Form Action: Only Save button -->
           <div class="row justify-end q-mt-sm">
-            <q-btn label="Save" color="primary" type="submit" />
+            <q-btn :label="t('Save')" color="primary" type="submit" />
           </div>
         </q-form>
       </q-card-section>
@@ -279,7 +279,7 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 const updateTitle = inject("updateTitle");
-updateTitle("Add Chart");
+updateTitle(t("Add Chart"));
 const { t } = useI18n();
 
 // Initialize a reactive object with default values for a new account

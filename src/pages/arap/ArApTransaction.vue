@@ -735,18 +735,18 @@ const db = ref("");
 if (type.value === "customer") {
   db.value = "ar";
   if (reverse.value == "reverse") {
-    updateTitle("Credit Note");
+    updateTitle(t("Credit Note"));
     transactionType.value = "credit_note";
   } else {
-    updateTitle("AR Transaction");
+    updateTitle(t("AR Transaction"));
   }
 } else {
   db.value = "ap";
   if (reverse.value == "reverse") {
-    updateTitle("Debit Note");
+    updateTitle(t("Debit Note"));
     transactionType.value = "debit_note";
   } else {
-    updateTitle("AP Transaction");
+    updateTitle(t("AP Transaction"));
   }
 }
 
@@ -1527,10 +1527,10 @@ const loadInvoice = async (invoice) => {
   try {
     transactionType.value = invoice.type;
     if (transactionType.value === "credit_note") {
-      updateTitle("Credit Note");
+      updateTitle(t("Credit Note"));
     }
     if (transactionType.value === "debit_note") {
-      updateTitle("Debit Note");
+      updateTitle(t("Debit Note"));
     }
     const vcId = invoice[`${type.value}_id`];
     let vcToSelect = vcList.value.find((vc) => vc.id === vcId);

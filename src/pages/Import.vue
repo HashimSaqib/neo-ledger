@@ -79,17 +79,13 @@
         </q-expansion-item>
       </div>
       <div class="q-mt-none q-gutter-x-sm">
-        <h6 class="q-my-none">Shortcuts</h6>
+        <h6 class="q-my-none">{{ t("Shortcuts") }}</h6>
         <p>
-          All shortcut Use Ctrl + Shift as the base key. For dropdowns, use
-          arrow key or search and press enter to select. Value will be copied to
-          the cell and clipboard.
+          {{ t("All shortcut Use Ctrl + Shift as the base key. For dropdowns, use arrow key or search and press enter to select. Value will be copied to the cell and clipboard.") }}
           <br />
-          <span class="text-weight-bold">Ctrl + Shift + N</span> - Next Number
-          (GL Number, Invoice Number or Customer/Vendor Number)
+          <span class="text-weight-bold">Ctrl + Shift + N</span> - {{ t("Next Number (GL Number, Invoice Number or Customer/Vendor Number)") }}
           <br />
-          <span class="text-weight-bold">Ctrl + Shift + T</span> - Today's Date
-          in yyyy-mm-dd.
+          <span class="text-weight-bold">Ctrl + Shift + T</span> - {{ t("Today's Date in yyyy-mm-dd.") }}
           <br />
         </p>
       </div>
@@ -302,14 +298,14 @@ const updateTitle = inject("updateTitle");
 const spreadsheet = ref(null);
 
 const pageTitles = {
-  gl: "Import General Ledger",
-  customer: "Import Customers",
-  vendor: "Import Vendors",
-  ar_invoice: "Import Customer Invoices",
-  ap_invoice: "Import Vendor Invoices",
-  ar_transaction: "Import Customer Transactions",
-  ap_transaction: "Import Vendor Transactions",
-  default: "Import",
+  gl: t("Import General Ledger"),
+  customer: t("Import Customers"),
+  vendor: t("Import Vendors"),
+  ar_invoice: t("Import Customer Invoices"),
+  ap_invoice: t("Import Vendor Invoices"),
+  ar_transaction: t("Import Customer Transactions"),
+  ap_transaction: t("Import Vendor Transactions"),
+  default: t("Import"),
 };
 
 updateTitle(pageTitles[route.params.type] || pageTitles.default);
@@ -1248,46 +1244,46 @@ const formatDate = (dateString) => {
 
 const coreValidationRules = {
   accountExists: (value) => {
-    if (!value) return { valid: false, message: "Account number is required" };
+    if (!value) return { valid: false, message: t("Account number is required") };
     const valid = repositories.accounts.value.some(
       (account) => account.accno === value
     );
     return {
       valid,
-      message: valid ? "" : `Invalid account number: ${value}`,
+      message: valid ? "" : t("Invalid account number: {value}", { value }),
     };
   },
 
   partExists: (value) => {
-    if (!value) return { valid: false, message: "Part number is required" };
+    if (!value) return { valid: false, message: t("Part number is required") };
     const valid = repositories.parts.value.some(
       (part) => part.partnumber === value
     );
     return {
       valid,
-      message: valid ? "" : `Invalid part number: ${value}`,
+      message: valid ? "" : t("Invalid part number: {value}", { value }),
     };
   },
 
   customerExists: (value) => {
-    if (!value) return { valid: false, message: "Customer number is required" };
+    if (!value) return { valid: false, message: t("Customer number is required") };
     const valid = repositories.customers.value.some(
       (customer) => customer.customernumber === value
     );
     return {
       valid,
-      message: valid ? "" : `Invalid customer number: ${value}`,
+      message: valid ? "" : t("Invalid customer number: {value}", { value }),
     };
   },
 
   vendorExists: (value) => {
-    if (!value) return { valid: false, message: "Vendor number is required" };
+    if (!value) return { valid: false, message: t("Vendor number is required") };
     const valid = repositories.vendors.value.some(
       (vendor) => vendor.vendornumber === value
     );
     return {
       valid,
-      message: valid ? "" : `Invalid vendor number: ${value}`,
+      message: valid ? "" : t("Invalid vendor number: {value}", { value }),
     };
   },
 
@@ -1298,29 +1294,29 @@ const coreValidationRules = {
     );
     return {
       valid,
-      message: valid ? "" : `Invalid project number: ${value}`,
+      message: valid ? "" : t("Invalid project number: {value}", { value }),
     };
   },
 
   currencyExists: (value) => {
-    if (!value) return { valid: false, message: "Currency is required" };
+    if (!value) return { valid: false, message: t("Currency is required") };
     const valid = repositories.currencies.value.some(
       (curr) => curr.curr === value
     );
     return {
       valid,
-      message: valid ? "" : `Invalid currency: ${value}`,
+      message: valid ? "" : t("Invalid currency: {value}", { value }),
     };
   },
 
   validExchangeRate: (currency, rate) => {
     if (!currency)
-      return { valid: false, message: "Currency must be provided first" };
+      return { valid: false, message: t("Currency must be provided first") };
 
     const currencyObj = repositories.currencies.value.find(
       (curr) => curr.curr === currency
     );
-    if (!currencyObj) return { valid: false, message: "Currency not found" };
+    if (!currencyObj) return { valid: false, message: t("Currency not found") };
 
     if (currencyObj.rn === 1) return { valid: true, message: "" };
 
@@ -1330,7 +1326,7 @@ const coreValidationRules = {
       valid: validRate,
       message: validRate
         ? ""
-        : `Exchange rate required for currency ${currency}`,
+        : t("Exchange rate required for currency {currency}", { currency }),
     };
   },
 
@@ -1338,7 +1334,7 @@ const coreValidationRules = {
     const valid = value !== undefined && value !== null && value.trim() !== "";
     return {
       valid,
-      message: valid ? "" : `${fieldName} is required`,
+      message: valid ? "" : t("{fieldName} is required", { fieldName }),
     };
   },
 
@@ -1348,15 +1344,15 @@ const coreValidationRules = {
     const valid = emailRegex.test(value);
     return {
       valid,
-      message: valid ? "" : `Invalid email format: ${value}`,
+      message: valid ? "" : t("Invalid email format: {value}", { value }),
     };
   },
 };
 
 const entityValidationRules = [
   {
-    field: "name",
-    rule: (value) => coreValidationRules.requiredField(value, "Name"),
+        field: "name",
+        rule: (value) => coreValidationRules.requiredField(value, t("Name")),
   },
   {
     field: "email",
@@ -1383,7 +1379,7 @@ const entityValidationRules = [
         valid: formattedDate !== "",
         message:
           formattedDate === ""
-            ? "Invalid date format. Use yyyy-mm-dd format."
+            ? t("Invalid date format. Use yyyy-mm-dd format.")
             : "",
       };
     },
@@ -1397,7 +1393,7 @@ const entityValidationRules = [
         valid: formattedDate !== "",
         message:
           formattedDate === ""
-            ? "Invalid date format. Use yyyy-mm-dd format."
+            ? t("Invalid date format. Use yyyy-mm-dd format.")
             : "",
       };
     },
@@ -1432,7 +1428,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1526,7 +1522,7 @@ const validationConfigs = {
       {
         field: "invnumber",
         rule: (value) =>
-          coreValidationRules.requiredField(value, "Invoice Number"),
+          coreValidationRules.requiredField(value, t("Invoice Number")),
       },
       {
         field: "line_number",
@@ -1540,7 +1536,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1553,7 +1549,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1568,7 +1564,7 @@ const validationConfigs = {
           const num = parseNumber(value);
           return {
             valid: num > 0,
-            message: num <= 0 ? "Quantity must be greater than 0" : "",
+            message: num <= 0 ? t("Quantity must be greater than 0") : "",
           };
         },
       },
@@ -1578,7 +1574,7 @@ const validationConfigs = {
           const num = parseNumber(value);
           return {
             valid: num >= 0,
-            message: num < 0 ? "Sell price cannot be negative" : "",
+            message: num < 0 ? t("Sell price cannot be negative") : "",
           };
         },
       },
@@ -1593,7 +1589,7 @@ const validationConfigs = {
       {
         field: "invnumber",
         rule: (value) =>
-          coreValidationRules.requiredField(value, "Invoice Number"),
+          coreValidationRules.requiredField(value, t("Invoice Number")),
       },
       {
         field: "line_number",
@@ -1607,7 +1603,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1620,7 +1616,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1635,7 +1631,7 @@ const validationConfigs = {
           const num = parseNumber(value);
           return {
             valid: num > 0,
-            message: num <= 0 ? "Quantity must be greater than 0" : "",
+            message: num <= 0 ? t("Quantity must be greater than 0") : "",
           };
         },
       },
@@ -1645,7 +1641,7 @@ const validationConfigs = {
           const num = parseNumber(value);
           return {
             valid: num >= 0,
-            message: num < 0 ? "Sell price cannot be negative" : "",
+            message: num < 0 ? t("Sell price cannot be negative") : "",
           };
         },
       },
@@ -1660,7 +1656,7 @@ const validationConfigs = {
       {
         field: "invnumber",
         rule: (value) =>
-          coreValidationRules.requiredField(value, "Invoice Number"),
+          coreValidationRules.requiredField(value, t("Invoice Number")),
       },
       {
         field: "invdate",
@@ -1670,7 +1666,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1683,7 +1679,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1726,7 +1722,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1753,7 +1749,7 @@ const validationConfigs = {
       {
         field: "invnumber",
         rule: (value) =>
-          coreValidationRules.requiredField(value, "Invoice Number"),
+          coreValidationRules.requiredField(value, t("Invoice Number")),
       },
       {
         field: "invdate",
@@ -1763,7 +1759,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1776,7 +1772,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1819,7 +1815,7 @@ const validationConfigs = {
             valid: formattedDate !== "",
             message:
               formattedDate === ""
-                ? "Invalid date format. Use yyyy-mm-dd format."
+                ? t("Invalid date format. Use yyyy-mm-dd format.")
                 : "",
           };
         },
@@ -1961,7 +1957,7 @@ const validateData = () => {
 
           if (!result.valid) {
             highlightCell(sheet, fieldIndex, realRowIndex);
-            errors.push(`${result.message} at row ${realRowIndex + 1}`);
+            errors.push(t("{message} at row {row}", { message: result.message, row: realRowIndex + 1 }));
           }
         });
       }
@@ -2413,9 +2409,7 @@ const importData = async () => {
 
         Notify.create({
           color: "warning",
-          message: t(
-            `Partial import: ${successCount} items imported, ${failureCount} items failed`
-          ),
+          message: t("Partial import: {successCount} items imported, {failureCount} items failed", { successCount, failureCount }),
           icon: "warning",
           position: "center",
           timeout: 5000,

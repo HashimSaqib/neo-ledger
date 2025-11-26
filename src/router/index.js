@@ -41,7 +41,7 @@ export default route(async function () {
       } else {
         Notify.create({
           type: "negative",
-          message: "You do not have permission to access this page.",
+          message: i18n.global.t("You do not have permission to access this page."),
         });
         next(false);
       }
@@ -53,7 +53,7 @@ export default route(async function () {
       } else {
         Notify.create({
           type: "negative",
-          message: "Permission denied",
+          message: i18n.global.t("Permission denied"),
           position: "center",
         });
         next(false);

@@ -591,7 +591,7 @@ const search = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error performing search",
+      message: error.response?.data?.message || t("Error performing search"),
       type: "negative",
       position: "center",
     });
@@ -828,7 +828,8 @@ const create_links = async () => {
   } catch (error) {
     console.error("Error fetching initial data:", error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching initial data",
+      message:
+        error.response?.data?.message || t("Error fetching initial data"),
       type: "negative",
       position: "center",
     });

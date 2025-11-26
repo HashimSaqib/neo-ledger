@@ -694,7 +694,7 @@ import { useI18n } from "vue-i18n";
 
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
-updateTitle("Company Defaults");
+updateTitle(t("Company Defaults"));
 
 const formRef = ref(null);
 

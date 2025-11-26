@@ -496,7 +496,7 @@ const totals = ref({});
 const loading = ref(false);
 
 const baseColumns = ref([
-  { name: "id", label: "ID", field: "id", default: false },
+  { name: "id", label: t("ID"), field: "id", default: false },
   {
     name: "invnumber",
     label: t("Invoice Number"),
@@ -836,7 +836,7 @@ const fetchAccounts = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching accounts",
+      message: error.response?.data?.message || t("Error fetching accounts"),
       type: "negative",
       position: "center",
     });
@@ -852,7 +852,7 @@ const fetchCustomers = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching " + type.value,
+      message: error.response?.data?.message || t("Error fetching") + " " + type.value,
       type: "negative",
       position: "center",
     });
@@ -962,7 +962,7 @@ const search = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error performing search",
+      message: error.response?.data?.message || t("Error performing search"),
       type: "negative",
       position: "center",
     });

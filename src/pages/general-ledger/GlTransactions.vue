@@ -430,7 +430,7 @@ import FileList from "src/components/FileList.vue";
 const route = useRoute();
 const updateTitle = inject("updateTitle");
 const triggerPrint = inject("triggerPrint");
-updateTitle("General Ledger");
+updateTitle(t("General Ledger"));
 const { t } = useI18n();
 
 // Form data and UI flags

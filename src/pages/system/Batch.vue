@@ -176,7 +176,7 @@
           <span class="q-ml-sm">{{ confirmMessage }}</span>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat :label="t('Cancel')" color="primary" v-close-popup />
           <q-btn
             flat
             :label="getActionLabel(confirmAction)"
@@ -198,7 +198,7 @@ import { Notify, date } from "quasar";
 
 // Inject the update title function
 const updateTitle = inject("updateTitle");
-updateTitle("Email Batch Jobs");
+updateTitle(t("Email Batch Jobs"));
 
 const { t } = useI18n();
 const { formatDate } = date;

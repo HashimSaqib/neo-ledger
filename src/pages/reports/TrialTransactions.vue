@@ -102,7 +102,7 @@ import FileList from "src/components/FileList.vue";
 const { t } = useI18n();
 /* Update Page Title & Inject Print Function */
 const updateTitle = inject("updateTitle");
-updateTitle("Transactions");
+updateTitle(t("Transactions"));
 const triggerPrint = inject("triggerPrint");
 
 /* Reactive State & Form Data */

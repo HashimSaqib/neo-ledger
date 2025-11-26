@@ -8,7 +8,7 @@
           dense
           v-model="selectedTemplate"
           :options="templates"
-          label="Select Template"
+          :label="t('Select Template')"
           option-label="label"
           option-value="value"
           emit-value
@@ -23,7 +23,7 @@
         <q-btn
           color="primary"
           icon="add"
-          label="Upload New Template"
+          :label="t('Upload New Template')"
           class="full-width"
           @click="showUploadDialog = true"
         />
@@ -52,7 +52,7 @@
           <div class="row q-gutter-sm" v-if="isTextType">
             <q-btn
               @click="toggleReadOnly"
-              :label="isReadOnly ? 'Edit Mode' : 'View Mode'"
+              :label="isReadOnly ? t('Edit Mode') : t('View Mode')"
               :color="isReadOnly ? 'positive' : 'warning'"
               :icon="isReadOnly ? 'edit' : 'visibility'"
               dense
@@ -61,7 +61,7 @@
             />
             <q-btn
               @click="saveTemplateContent"
-              label="Save Changes"
+              :label="t('Save Changes')"
               color="primary"
               icon="save"
               dense
@@ -69,7 +69,7 @@
               :disable="isReadOnly"
             >
               <q-tooltip v-if="isReadOnly" class="bg-negative">
-                Switch to Edit Mode to save changes
+                {{ t("Switch to Edit Mode to save changes") }}
               </q-tooltip>
             </q-btn>
           </div>
@@ -101,8 +101,8 @@
                 <q-tooltip>
                   {{
                     include.exists
-                      ? "Click to load this file"
-                      : "File not found in templates"
+                      ? t("Click to load this file")
+                      : t("File not found in templates")
                   }}
                 </q-tooltip>
               </q-chip>
@@ -118,7 +118,7 @@
         <!-- PDF View -->
         <template v-if="templateType === 'pdf'">
           <div class="relative-position" style="height: 75vh">
-            <q-inner-loading :showing="fileLoading" label="Loading PDF..." />
+            <q-inner-loading :showing="fileLoading" :label="t('Loading PDF...')" />
             <iframe
               width="100%"
               height="100%"
@@ -132,7 +132,7 @@
           <!-- Replacement Upload for PDF -->
           <div class="q-mt-sm">
             <q-btn
-              label="Replace PDF"
+              :label="t('Replace PDF')"
               color="primary"
               icon="upload"
               @click="promptFileReplacement('pdf')"
@@ -143,7 +143,7 @@
         <!-- Image View -->
         <template v-else-if="isImageType">
           <div class="relative-position" style="overflow: auto">
-            <q-inner-loading :showing="fileLoading" label="Loading Image..." />
+            <q-inner-loading :showing="fileLoading" :label="t('Loading Image...')" />
             <img
               style="max-width: 100%; height: auto"
               @load="fileLoading = false"
@@ -167,7 +167,7 @@
           <div class="relative-position" style="height: 75vh">
             <q-inner-loading
               :showing="editorLoading"
-              label="Initializing Editor..."
+              :label="t('Initializing Editor...')"
             />
             <div ref="editorContainer" class="full-height" />
           </div>
@@ -182,8 +182,8 @@
           <span class="text-caption lighttext">
             {{
               isReadOnly
-                ? "View mode - toggle edit mode to make changes"
-                : "Edit mode - changes can be saved"
+                ? t("View mode - toggle edit mode to make changes")
+                : t("Edit mode - changes can be saved")
             }}
           </span>
         </div>
@@ -194,7 +194,7 @@
     <q-dialog v-model="showUploadDialog">
       <q-card style="min-width: 400px">
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Upload New Template</div>
+          <div class="text-h6">{{ t("Upload New Template") }}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
@@ -202,7 +202,7 @@
         <q-card-section>
           <q-file
             v-model="newTemplateFile"
-            label="Select File"
+            :label="t('Select File')"
             outlined
             accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.svg,.html,.tex"
             @update:model-value="validateNewFile"
@@ -217,25 +217,25 @@
 
           <q-input
             v-model="newTemplateName"
-            label="Template Name (optional)"
-            hint="If empty, the original file name will be used"
+            :label="t('Template Name (optional)')"
+            :hint="t('If empty, the original file name will be used')"
             class="q-mt-sm"
             outlined
           />
 
           <div v-if="fileExistsWarning" class="text-negative q-mt-sm">
             <q-icon name="warning" />
-            A file with this name already exists. Uploading will replace it.
+            {{ t("A file with this name already exists. Uploading will replace it.") }}
           </div>
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="grey-7" v-close-popup />
+          <q-btn flat :label="t('Cancel')" color="grey-7" v-close-popup />
           <q-btn
             :loading="uploading"
             :disable="!newTemplateFile"
             flat
-            label="Upload"
+            :label="t('Upload')"
             color="primary"
             @click="uploadNewTemplate"
           />
@@ -260,10 +260,10 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="grey-7" v-close-popup />
+          <q-btn flat :label="t('Cancel')" color="grey-7" v-close-popup />
           <q-btn
             flat
-            label="Replace"
+            :label="t('Replace')"
             color="negative"
             @click="confirmReplacement"
             v-close-popup
@@ -284,9 +284,11 @@ import {
 } from "vue";
 import { api } from "src/boot/axios";
 import { useQuasar } from "quasar";
+import { useI18n } from "vue-i18n";
 
 /** Quasar + Refs **/
 const $q = useQuasar();
+const { t } = useI18n();
 const rootRef = ref(null);
 const editorContainer = ref(null);
 const fileInput = ref(null);
@@ -848,7 +850,7 @@ const initializeEditor = async () => {
     console.error("Could not load Monaco editor:", error);
     editorLoading.value = false;
     $q.notify({
-      message: "Failed to load code editor. Please refresh and try again.",
+      message: t("Failed to load code editor. Please refresh and try again."),
       color: "negative",
       position: "center",
     });
@@ -875,7 +877,7 @@ const initializeEditor = async () => {
     console.error("Error initializing editor:", error);
     editorLoading.value = false;
     $q.notify({
-      message: "Failed to initialize editor. Please try again.",
+      message: t("Failed to initialize editor. Please try again."),
       color: "negative",
       position: "center",
     });
@@ -1096,7 +1098,7 @@ const saveTemplateContent = async () => {
     selectedTemplate.value = currentTemplate;
 
     $q.notify({
-      message: "Template saved successfully",
+      message: t("Template saved successfully"),
       color: "positive",
       position: "top-right",
     });
@@ -1271,7 +1273,7 @@ const uploadReplacementFile = async (event) => {
 
   // Ask for confirmation before replacing
   showConfirmDialog.value = true;
-  confirmMessage.value = `Are you sure you want to replace the current ${currentFileType.value} file?`;
+  confirmMessage.value = t("Are you sure you want to replace the current {fileType} file?", { fileType: currentFileType.value });
 
   // Store the pending action
   pendingAction.value = async () => {
@@ -1303,7 +1305,7 @@ const uploadReplacementFile = async (event) => {
       selectedTemplate.value = currentTemplate;
 
       $q.notify({
-        message: "File replaced successfully",
+        message: t("File replaced successfully"),
         color: "positive",
         position: "top-right",
       });

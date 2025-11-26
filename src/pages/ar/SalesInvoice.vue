@@ -952,9 +952,9 @@ const partSaved = async () => {
 // Title & Invoice Type Setup
 // =====================
 
-updateTitle("Customer Invoice");
+updateTitle(t("Customer Invoice"));
 if (route.params.type === "credit_invoice") {
-  updateTitle("Credit Invoice");
+  updateTitle(t("Credit Invoice"));
 }
 const invType = ref(
   route.params.type === "credit_invoice" ? "credit_invoice" : "invoice"
@@ -1572,7 +1572,7 @@ const loadInvoice = async (invoice) => {
   dueDate.value = invoice.dueDate;
   poNumber.value = invoice.poNumber;
   if (invType.value === "credit_invoice") {
-    updateTitle("Credit Invoice");
+    updateTitle(t("Credit Invoice"));
   }
   if (invoice.currency) {
     selectedCurrency.value = currencies.value.find(
@@ -1873,7 +1873,7 @@ const postInvoice = async (save = false, isNew = false) => {
       }
     );
     Notify.create({
-      message: "Transaction posted successfully",
+      message: t("Transaction posted successfully"),
       type: "positive",
       position: "top-right",
     });

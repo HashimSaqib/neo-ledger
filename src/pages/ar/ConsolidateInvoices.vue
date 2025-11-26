@@ -3,7 +3,9 @@
     <!-- Loading state -->
     <div v-if="loading" class="full-width flex justify-center q-pa-lg">
       <q-spinner color="primary" size="3em" />
-      <span class="q-ml-sm text-primary text-h6">Loading invoices...</span>
+      <span class="q-ml-sm text-primary text-h6">{{
+        t("Loading invoices...")
+      }}</span>
     </div>
 
     <!-- Main content when data is loaded -->
@@ -157,7 +159,7 @@
           </p>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat :label="t('Cancel')" color="primary" v-close-popup />
           <q-btn
             flat
             label="Consolidate"
@@ -179,7 +181,7 @@ import { formatAmount } from "src/helpers/utils";
 import { useQuasar, Notify } from "quasar";
 
 const updateTitle = inject("updateTitle");
-updateTitle("Consolidate Invoices");
+updateTitle(t("Consolidate Invoices"));
 const { t } = useI18n();
 const $q = useQuasar();
 
@@ -292,7 +294,7 @@ const confirmConsolidation = () => {
   if (selectedInvoices.value.length < 2) {
     Notify.create({
       type: "warning",
-      message: "Select at least 2 invoices to consolidate",
+      message: t("Select at least 2 invoices to consolidate"),
       position: "top",
     });
     return;
@@ -308,7 +310,9 @@ const handleConsolidateSelected = async () => {
 
     Notify.create({
       type: "positive",
-      message: `Successfully consolidated ${selectedInvoices.value.length} invoices`,
+      message: t("Successfully consolidated {count} invoices", {
+        count: selectedInvoices.value.length,
+      }),
       position: "center",
     });
 

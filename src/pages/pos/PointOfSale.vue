@@ -362,7 +362,7 @@ import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 const updateTitle = inject("updateTitle");
-updateTitle("Add POS Invoice");
+updateTitle(t("Add POS Invoice"));
 const { t } = useI18n();
 
 const route = useRoute();
@@ -659,7 +659,7 @@ const postInvoice = async () => {
   // Validation
   if (!selectedCustomer.value) {
     Notify.create({
-      message: "Customer is required.",
+      message: t("Customer is required."),
       type: "negative",
       position: "center",
     });
@@ -668,7 +668,7 @@ const postInvoice = async () => {
 
   if (!salesAccount.value) {
     Notify.create({
-      message: "Account is required.",
+      message: t("Account is required."),
       type: "negative",
       position: "center",
     });
@@ -677,7 +677,7 @@ const postInvoice = async () => {
 
   if (!selectedCurrency.value) {
     Notify.create({
-      message: "Currency is required.",
+      message: t("Currency is required."),
       type: "negative",
       position: "center",
     });
@@ -689,7 +689,7 @@ const postInvoice = async () => {
     !lines.value.some((line) => line.partnumber)
   ) {
     Notify.create({
-      message: "At least one line item is required.",
+      message: t("At least one line item is required."),
       type: "negative",
       position: "center",
     });
@@ -761,7 +761,7 @@ const postInvoice = async () => {
 
     // Notify the user of success
     Notify.create({
-      message: "Transaction posted successfully",
+      message: t("Transaction posted successfully"),
       type: "positive",
       position: "top-right",
     });
@@ -780,7 +780,7 @@ const postInvoice = async () => {
 const fetchInvoice = async (id) => {
   if (id) {
     try {
-      updateTitle("Edit POS Invoice");
+      updateTitle(t("Edit POS Invoice"));
       const response = await api.get(`/ar/invoice/${id}`);
       console.log(response.data);
       loadInvoice(response.data);

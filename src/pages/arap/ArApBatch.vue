@@ -589,7 +589,7 @@ const openEmailDialog = () => {
       })
       .join(", ");
     Notify.create({
-      message: t(`Missing email address for: ${invoiceList}.`),
+      message: t("Missing email address for: {invoiceList}.", { invoiceList }),
       position: "center",
       color: "negative",
       timeout: 5000,
@@ -600,7 +600,7 @@ const openEmailDialog = () => {
   // Set default jobtype with today's date
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
-  emailData.value.jobtype = `Invoice Batch ${formattedDate}`;
+  emailData.value.jobtype = t("Invoice Batch {date}", { date: formattedDate });
 
   emailDialog.value = true;
 };
@@ -670,7 +670,9 @@ const openPrintDialog = () => {
   // Set default jobtype with today's date
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
-  printData.value.jobtype = `Invoice Batch Print ${formattedDate}`;
+  printData.value.jobtype = t("Invoice Batch Print {date}", {
+    date: formattedDate,
+  });
 
   printDialog.value = true;
 };

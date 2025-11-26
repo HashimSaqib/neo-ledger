@@ -11,7 +11,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="text-center q-pa-lg">
       <q-spinner-dots size="50px" color="primary" />
-      <div class="text-grey-6 q-mt-md">Loading transactions...</div>
+      <div class="text-grey-6 q-mt-md">{{ t("Loading transactions...") }}</div>
     </div>
 
     <!-- Error State -->
@@ -95,7 +95,7 @@ const summary = ref({
 const columns = [
   {
     name: "transdate",
-    label: "Transaction Date",
+    label: t("Transaction Date"),
     field: "transdate",
     align: "left",
     sortable: true,
@@ -210,7 +210,7 @@ const viewTransactionDetail = (transaction) => {
 
 // Lifecycle
 onMounted(() => {
-  updateTitle("Bank Adjustment");
+  updateTitle(t("Bank Adjustment"));
   fetchTransactions();
 });
 </script>

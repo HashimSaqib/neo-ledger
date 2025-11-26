@@ -3,11 +3,11 @@
   <q-page class="q-pa-md">
     <div class="row q-mb-md">
       <div class="col">
-        <div class="text-h4">Final Step: Clearing Account Adjustment</div>
+        <div class="text-h4">{{ t("Final Step: Clearing Account Adjustment") }}</div>
         <q-btn
           flat
           icon="arrow_back"
-          label="Back to Details"
+          :label="t('Back to Details')"
           @click="goBack"
           class="q-mt-sm"
         />
@@ -17,7 +17,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="text-center q-pa-lg">
       <q-spinner-dots size="50px" color="primary" />
-      <div class="text-grey-6 q-mt-md">Loading confirmation details...</div>
+      <div class="text-grey-6 q-mt-md">{{ t("Loading confirmation details...") }}</div>
     </div>
 
     <!-- Error State -->
@@ -25,7 +25,7 @@
       <q-icon name="error" size="50px" color="negative" />
       <div class="text-negative q-mt-md">{{ error }}</div>
       <q-btn
-        label="Retry"
+        :label="t('Retry')"
         color="primary"
         class="q-mt-md"
         @click="fetchConfirmationData"
@@ -40,17 +40,17 @@
           <q-icon name="warning" />
         </template>
         <div class="text-weight-bold">
-          Review carefully - this action cannot be undone
+          {{ t("Review carefully - this action cannot be undone") }}
         </div>
         <div class="text-caption">
-          This will permanently modify your accounting records
+          {{ t("This will permanently modify your accounting records") }}
         </div>
       </q-banner>
 
       <!-- GL Transaction Details -->
       <q-card class="q-mb-md">
         <q-card-section>
-          <div class="text-h6">Clearing Account Transaction</div>
+          <div class="text-h6">{{ t("Clearing Account Transaction") }}</div>
           <q-table
             :rows="glDetails"
             :columns="glColumns"
@@ -77,7 +77,7 @@
       <!-- Selected Transactions -->
       <q-card v-if="selectedTransactions.length" class="q-mb-md">
         <q-card-section>
-          <div class="text-h6">Transactions to be Adjusted</div>
+          <div class="text-h6">{{ t("Transactions to be Adjusted") }}</div>
           <q-table
             :rows="selectedTransactions"
             :columns="selectedColumns"
@@ -97,7 +97,7 @@
           <!-- Totals Row -->
           <q-separator class="q-mt-md" />
           <div class="row q-pa-sm bg-grey-2">
-            <div class="col text-weight-bold">Total:</div>
+            <div class="col text-weight-bold">{{ t("Total") }}:</div>
             <div class="col-2 text-right text-weight-bold">
               {{ formatAmount(totalAmount) }}
             </div>
@@ -108,7 +108,7 @@
       <!-- Selected GL Account -->
       <q-card v-if="glAccountDetails.accno" class="q-mb-md">
         <q-card-section>
-          <div class="text-h6">Selected GL Account</div>
+          <div class="text-h6">{{ t("Selected GL Account") }}</div>
           <q-table
             :rows="[glAccountDetails]"
             :columns="glAccountColumns"
@@ -124,21 +124,20 @@
       <!-- Summary Card -->
       <q-card class="q-mb-md">
         <q-card-section class="bg-grey-2">
-          <div class="text-h6">Transaction Summary</div>
+          <div class="text-h6">{{ t("Transaction Summary") }}</div>
           <div class="q-mt-sm">
             <div v-if="selectedTransactions.length">
-              <strong>{{ selectedTransactions.length }}</strong> transactions
-              will be adjusted
+              <strong>{{ selectedTransactions.length }}</strong> {{ t("transactions will be adjusted") }}
             </div>
             <div v-if="glAccountDetails.accno">
-              GL account will be changed to:
+              {{ t("GL account will be changed to") }}:
               <strong
                 >{{ glAccountDetails.accno }} -
                 {{ glAccountDetails.description }}</strong
               >
             </div>
             <div v-if="totalAmount > 0">
-              Total adjustment amount:
+              {{ t("Total adjustment amount") }}:
               <strong>{{ formatAmount(totalAmount) }}</strong>
             </div>
           </div>
@@ -149,14 +148,14 @@
       <div class="q-gutter-md">
         <q-btn
           color="primary"
-          label="Just Do It"
+          :label="t('Just Do It')"
           icon="check"
           :loading="processing"
           @click="confirmProcessing"
         />
         <q-btn
           color="grey"
-          label="Back"
+          :label="t('Back')"
           icon="arrow_back"
           @click="goBack"
           :disabled="processing"
@@ -168,17 +167,16 @@
     <q-dialog v-model="showConfirmDialog" persistent>
       <q-card>
         <q-card-section>
-          <div class="text-h6">Confirm Processing</div>
+          <div class="text-h6">{{ t("Confirm Processing") }}</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          Are you sure you want to process this adjustment? This action cannot
-          be undone.
+          {{ t("Are you sure you want to process this adjustment? This action cannot be undone.") }}
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" v-close-popup />
+          <q-btn flat :label="t('Cancel')" v-close-popup />
           <q-btn
             flat
-            label="Yes, Process"
+            :label="t('Yes, Process')"
             color="primary"
             @click="processAdjustment"
             v-close-popup
@@ -195,10 +193,12 @@ import { useRoute, useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 import { formatAmount } from "src/helpers/utils";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
+const { t } = useI18n();
 
 // Reactive data
 const loading = ref(false);
@@ -211,51 +211,51 @@ const showConfirmDialog = ref(false);
 
 // Table columns
 const glColumns = [
-  { name: "id", label: "ID", field: "id", align: "left" },
-  { name: "reference", label: "Reference", field: "reference", align: "left" },
-  { name: "transdate", label: "Date", field: "transdate", align: "left" },
-  { name: "accno", label: "Account", field: "accno", align: "left" },
+  { name: "id", label: t("ID"), field: "id", align: "left" },
+  { name: "reference", label: t("Reference"), field: "reference", align: "left" },
+  { name: "transdate", label: t("Date"), field: "transdate", align: "left" },
+  { name: "accno", label: t("Account"), field: "accno", align: "left" },
   {
     name: "account_description",
-    label: "Account Description",
+    label: t("Account Description"),
     field: "account_description",
     align: "left",
   },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
   },
-  { name: "source", label: "Source", field: "source", align: "left" },
-  { name: "memo", label: "Memo", field: "memo", align: "left" },
-  { name: "debit", label: "Debit", field: "debit", align: "right" },
-  { name: "credit", label: "Credit", field: "credit", align: "right" },
+  { name: "source", label: t("Source"), field: "source", align: "left" },
+  { name: "memo", label: t("Memo"), field: "memo", align: "left" },
+  { name: "debit", label: t("Debit"), field: "debit", align: "right" },
+  { name: "credit", label: t("Credit"), field: "credit", align: "right" },
 ];
 
 const selectedColumns = [
-  { name: "invnumber", label: "Invoice", field: "invnumber", align: "left" },
+  { name: "invnumber", label: t("Invoice"), field: "invnumber", align: "left" },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
   },
   {
     name: "ordnumber",
-    label: "Order Number",
+    label: t("Order Number"),
     field: "ordnumber",
     align: "left",
   },
-  { name: "transdate", label: "Date", field: "transdate", align: "left" },
-  { name: "amount", label: "Amount", field: "amount", align: "right" },
+  { name: "transdate", label: t("Date"), field: "transdate", align: "left" },
+  { name: "amount", label: t("Amount"), field: "amount", align: "right" },
 ];
 
 const glAccountColumns = [
-  { name: "accno", label: "Account", field: "accno", align: "left" },
+  { name: "accno", label: t("Account"), field: "accno", align: "left" },
   {
     name: "description",
-    label: "Description",
+    label: t("Description"),
     field: "description",
     align: "left",
   },
@@ -288,13 +288,13 @@ const fetchConfirmationData = async () => {
       selectedTransactions.value = data.selected_transactions || [];
       glAccountDetails.value = data.gl_account_details || {};
     } else {
-      error.value = response.data.error || "Failed to fetch confirmation data";
+      error.value = response.data.error || t("Failed to fetch confirmation data");
     }
   } catch (err) {
     console.error("Error fetching confirmation data:", err);
     error.value =
       err.response?.data?.error ||
-      "An error occurred while fetching confirmation data";
+      t("An error occurred while fetching confirmation data");
   } finally {
     loading.value = false;
   }
@@ -318,7 +318,7 @@ const processAdjustment = async () => {
     if (response.data.success) {
       $q.notify({
         type: "positive",
-        message: response.data.message || "Adjustment processed successfully!",
+        message: response.data.message || t("Adjustment processed successfully!"),
         timeout: 3000,
       });
 
@@ -327,7 +327,7 @@ const processAdjustment = async () => {
     } else {
       $q.notify({
         type: "negative",
-        message: response.data.error || "Processing failed",
+        message: response.data.error || t("Processing failed"),
         timeout: 5000,
       });
     }
@@ -337,7 +337,7 @@ const processAdjustment = async () => {
       type: "negative",
       message:
         err.response?.data?.error ||
-        "An error occurred while processing the adjustment",
+        t("An error occurred while processing the adjustment"),
       timeout: 5000,
     });
   } finally {

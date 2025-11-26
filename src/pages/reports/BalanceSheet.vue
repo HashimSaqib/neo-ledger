@@ -727,7 +727,7 @@ import { utils, writeFile } from "xlsx";
 import draggable from "vuedraggable";
 
 const updateTitle = inject("updateTitle");
-updateTitle("Balance Sheet");
+updateTitle(t("Balance Sheet"));
 const printToggle = inject("printToggle");
 const { t } = useI18n();
 const route = useRoute();

@@ -952,9 +952,9 @@ const partSaved = async () => {
 // Title & Invoice Type Setup
 // =====================
 
-updateTitle("Vendor Invoice");
+updateTitle(t("Vendor Invoice"));
 if (route.params.type === "debit_invoice") {
-  updateTitle("Debit Invoice");
+  updateTitle(t("Debit Invoice"));
 }
 const invType = ref(
   route.params.type === "debit_invoice" ? "debit_invoice" : "invoice"
@@ -1564,7 +1564,7 @@ const loadInvoice = async (invoice) => {
   dueDate.value = invoice.dueDate;
   poNumber.value = invoice.poNumber;
   if (invType.value === "debit_invoice") {
-    updateTitle("Debit Invoice");
+    updateTitle(t("Debit Invoice"));
   }
   if (invoice.currency) {
     selectedCurrency.value = currencies.value.find(
@@ -1864,7 +1864,7 @@ const postInvoice = async (save = false, isNew = false) => {
       }
     );
     Notify.create({
-      message: "Transaction posted successfully",
+      message: t("Transaction posted successfully"),
       type: "positive",
       position: "top-right",
     });

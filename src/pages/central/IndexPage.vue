@@ -304,7 +304,7 @@
                       icon="add"
                       @click.stop="openInviteDialog(props.row)"
                     >
-                      <q-tooltip>Invite User</q-tooltip>
+                      <q-tooltip>{{ t("Invite User") }}</q-tooltip>
                     </q-btn>
                   </div>
                 </q-td>
@@ -359,7 +359,7 @@
                     @click.stop="openManageDialog(props.row)"
                     size="sm"
                   >
-                    <q-tooltip>Manage Dataset</q-tooltip>
+                    <q-tooltip>{{ t("Manage Dataset") }}</q-tooltip>
                   </q-btn>
                   <span v-else>-</span>
                 </q-td>
@@ -636,7 +636,7 @@
                               )
                             "
                           >
-                            <q-tooltip>Edit</q-tooltip>
+                            <q-tooltip>{{ t("Edit") }}</q-tooltip>
                           </q-btn>
                         </q-td>
                       </template>
@@ -1325,7 +1325,7 @@ const handleLogoUpload = async (event, id) => {
     });
 
     Notify.create({
-      message: "Logo Uploaded sucessfully.",
+      message: t("Logo Uploaded successfully."),
       position: "center",
       color: "positive",
     });

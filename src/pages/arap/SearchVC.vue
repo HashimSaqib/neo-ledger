@@ -497,12 +497,12 @@ const formData = ref({
 });
 
 // Dynamic labels
-const nameLabel = ref("Customer");
-const numberLabel = ref("Customer Number");
+const nameLabel = ref(t("Customer"));
+const numberLabel = ref(t("Customer Number"));
 const transactionLabel = ref({
-  transNumber: "AR Transactions",
-  invNumber: "Sales Invoices",
-  ordNumber: "Sales Orders",
+  transNumber: t("AR Transactions"),
+  invNumber: t("Sales Invoices"),
+  ordNumber: t("Sales Orders"),
 });
 
 // If we’re in vendor mode, we use vendornumber; otherwise customernumber
@@ -800,11 +800,11 @@ function getinvPath(row) {
 function updateVCSettings() {
   // Switch out labeling
   if (vcType.value === "vendor") {
-    nameLabel.value = "Vendor";
-    numberLabel.value = "Vendor Number";
-    transactionLabel.value.transNumber = "AP Transactions";
-    transactionLabel.value.invNumber = "Vendor Invoices";
-    transactionLabel.value.ordNumber = "Purchase Orders";
+    nameLabel.value = t("Vendor");
+    numberLabel.value = t("Vendor Number");
+    transactionLabel.value.transNumber = t("AP Transactions");
+    transactionLabel.value.invNumber = t("Vendor Invoices");
+    transactionLabel.value.ordNumber = t("Purchase Orders");
 
     // Filter out "customer"/"customernumber" from baseColumns
     baseColumns.value = allColumns.value.filter(
@@ -833,7 +833,7 @@ function updateVCSettings() {
 onMounted(async () => {
   if (updateTitle) {
     updateTitle(
-      vcType.value === "vendor" ? "Search Vendors" : "Search Customers"
+      vcType.value === "vendor" ? t("Search Vendors") : t("Search Customers")
     );
   }
   await fetchLinks();
@@ -847,7 +847,7 @@ watch(
     updateVCSettings();
     if (updateTitle) {
       updateTitle(
-        vcType.value === "vendor" ? "Search Vendors" : "Search Customers"
+        vcType.value === "vendor" ? t("Search Vendors") : t("Search Customers")
       );
     }
   }

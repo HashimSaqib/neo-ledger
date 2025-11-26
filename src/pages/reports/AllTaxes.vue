@@ -314,7 +314,7 @@ import FileList from "src/components/FileList.vue";
 // Injection and Initial Setup
 // =====================================================
 const updateTitle = inject("updateTitle");
-updateTitle("All Taxes Report");
+updateTitle(t("All Taxes Report"));
 const { t } = useI18n();
 const route = useRoute();
 const createLink = inject("createLink");
@@ -347,7 +347,7 @@ const columns = [
   },
   {
     name: "invnumber",
-    label: "Invoice Number",
+    label: t("Invoice Number"),
     field: "invnumber",
     align: "left",
     sortable: true,
@@ -518,7 +518,7 @@ const groupedResults = computed(() => {
           id: `subtotal-${Math.random()}`,
           isSubtotal: true,
           transdate: "",
-          invnumber: "Tax Group Subtotal",
+          invnumber: t("Tax Group Subtotal"),
           name: "",
           amount: taxGroupData.subtotal.amount,
           tax: taxGroupData.subtotal.tax,

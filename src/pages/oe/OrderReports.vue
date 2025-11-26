@@ -358,7 +358,7 @@ const totals = ref({});
 const loading = ref(false);
 
 const baseColumns = ref([
-  { name: "id", label: "ID", field: "id", default: false },
+  { name: "id", label: t("ID"), field: "id", default: false },
   {
     name: "ordnumber",
     label: "Order Number",
@@ -623,7 +623,7 @@ const fetchCustomers = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error fetching " + vc.value,
+      message: error.response?.data?.message || t("Error fetching") + " " + vc.value,
       type: "negative",
       position: "center",
     });
@@ -708,7 +708,7 @@ const search = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || "Error performing search",
+      message: error.response?.data?.message || t("Error performing search"),
       type: "negative",
       position: "center",
     });

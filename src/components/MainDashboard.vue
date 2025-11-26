@@ -295,7 +295,7 @@ const fetchCurrencies = async () => {
     console.error("Error fetching currencies:", error);
     $q.notify({
       type: "negative",
-      message: "Failed to fetch currencies",
+      message: t("Failed to fetch currencies"),
     });
   }
 };
@@ -317,7 +317,7 @@ const fetchData = async () => {
     console.error("Error fetching metrics data:", error);
     $q.notify({
       type: "negative",
-      message: "Failed to fetch metrics data",
+      message: t("Failed to fetch metrics data"),
     });
   } finally {
     loading.value = false;

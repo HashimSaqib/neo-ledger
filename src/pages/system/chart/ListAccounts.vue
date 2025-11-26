@@ -426,8 +426,8 @@
                 @click.prevent="deleteAccount(selectedAccount.id)"
               />
 
-              <q-btn label="Save" color="primary" type="submit" />
-              <q-btn label="Save As New" @click.prevent="saveAccount(true)" />
+              <q-btn :label="t('Save')" color="primary" type="submit" />
+              <q-btn :label="t('Save As New')" @click.prevent="saveAccount(true)" />
             </div>
           </q-form>
         </q-card-section>

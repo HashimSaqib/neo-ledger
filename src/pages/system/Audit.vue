@@ -39,7 +39,7 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 const updateTitle = inject("updateTitle");
-updateTitle("Audit");
+updateTitle(t("Audit"));
 
 const { t } = useI18n();
 

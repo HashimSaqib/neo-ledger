@@ -212,7 +212,7 @@ import { api } from "src/boot/axios";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 const updateTitle = inject("updateTitle");
-updateTitle("Reconciliation");
+updateTitle(t("Reconciliation"));
 
 const { t } = useI18n();
 const $q = useQuasar();

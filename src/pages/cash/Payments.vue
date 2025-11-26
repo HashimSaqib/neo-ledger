@@ -477,7 +477,7 @@ const create_links = async () => {
   } catch (error) {
     console.error("Error fetching initial data:", error);
     $q.notify({
-      message: error.response?.data?.message || "Error fetching initial data",
+      message: error.response?.data?.message || t("Error fetching initial data"),
       type: "negative",
       position: "center",
     });

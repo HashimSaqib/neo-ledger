@@ -41,6 +41,9 @@
 <script setup>
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps({
   files: {
@@ -72,7 +75,7 @@ const handleDelete = async (file, index) => {
     // Use the provided module prop to construct the endpoint.
     await api.delete(`files/${props.module}/${file.id}`);
     Notify.create({
-      message: "File deleted successfully.",
+      message: t("File deleted successfully."),
       type: "positive",
       position: "top-right",
     });
@@ -81,7 +84,7 @@ const handleDelete = async (file, index) => {
   } catch (error) {
     console.error("Failed to delete file:", error);
     Notify.create({
-      message: "Failed to delete file.",
+      message: t("Failed to delete file."),
       type: "negative",
       position: "center",
     });
