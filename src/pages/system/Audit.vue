@@ -38,10 +38,9 @@ import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Audit"));
-
-const { t } = useI18n();
 
 // Form values
 const revtrans = ref(false);

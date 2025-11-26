@@ -278,9 +278,9 @@ import { ref, inject, onMounted } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Add Chart"));
-const { t } = useI18n();
 
 // Initialize a reactive object with default values for a new account
 const selectedAccount = ref({

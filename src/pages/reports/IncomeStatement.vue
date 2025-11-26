@@ -667,10 +667,10 @@ import draggable from "vuedraggable";
 // Injection and Initial Setup
 // =====================================================
 
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Income Statement"));
 const printToggle = inject("printToggle");
-const { t } = useI18n();
 const route = useRoute();
 const now = new Date();
 const currentYear = String(now.getFullYear());

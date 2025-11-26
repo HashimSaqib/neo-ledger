@@ -197,10 +197,9 @@ import { useI18n } from "vue-i18n";
 import { Notify, date } from "quasar";
 
 // Inject the update title function
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Email Batch Jobs"));
-
-const { t } = useI18n();
 const { formatDate } = date;
 
 // State variables

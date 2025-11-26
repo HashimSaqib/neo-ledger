@@ -84,10 +84,9 @@ import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 import LastTransactions from "src/components/LastTransactions.vue";
 
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Year End"));
-
-const { t } = useI18n();
 
 // Form values
 const todate = ref(null);

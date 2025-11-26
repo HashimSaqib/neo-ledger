@@ -211,10 +211,9 @@ import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Reconciliation"));
-
-const { t } = useI18n();
 const $q = useQuasar();
 
 const filtersOpen = ref(true);

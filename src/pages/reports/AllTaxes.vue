@@ -313,9 +313,9 @@ import FileList from "src/components/FileList.vue";
 // =====================================================
 // Injection and Initial Setup
 // =====================================================
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("All Taxes Report"));
-const { t } = useI18n();
 const route = useRoute();
 const createLink = inject("createLink");
 const title = inject("title");

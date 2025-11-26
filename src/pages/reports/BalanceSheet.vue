@@ -726,10 +726,10 @@ import { formatAmount, roundAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
 import draggable from "vuedraggable";
 
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Balance Sheet"));
 const printToggle = inject("printToggle");
-const { t } = useI18n();
 const route = useRoute();
 const now = new Date();
 const currentYear = String(now.getFullYear());

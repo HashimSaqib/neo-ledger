@@ -361,9 +361,9 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Add POS Invoice"));
-const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
