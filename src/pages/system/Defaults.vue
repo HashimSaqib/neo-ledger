@@ -292,6 +292,7 @@
           dense
           class="lightbg input-box col-12 col-md-5"
           search="label"
+          option-label="label"
           account
         />
         <s-select
@@ -304,6 +305,7 @@
           search="label"
           class="lightbg input-box col-12 col-md-5"
           account
+          option-label="label"
         />
         <s-select
           v-model="form.expense_account"
@@ -315,6 +317,7 @@
           class="lightbg input-box col-12 col-md-5"
           search="label"
           account
+          option-label="label"
         />
         <s-select
           v-model="form.fx_gain_loss_account"
@@ -326,6 +329,7 @@
           class="lightbg input-box col-12 col-md-5"
           search="label"
           account
+          option-label="label"
         />
         <s-select
           v-model="form.cash_over_short_account"
@@ -337,6 +341,7 @@
           class="lightbg input-box col-12 col-md-5"
           search="label"
           account
+          option-label="label"
         />
         <s-select
           v-model="form.ar_account"
@@ -348,6 +353,7 @@
           class="lightbg input-box col-12 col-md-5"
           search="label"
           account
+          option-label="label"
         />
         <s-select
           v-model="form.ap_account"
@@ -359,6 +365,7 @@
           class="lightbg input-box col-12 col-md-5"
           search="label"
           account
+          option-label="label"
         />
         <q-input
           v-model="form.clearing"
