@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Neo Ledger 0.0.1\n"
-"POT-Creation-Date: 2025-11-26 08:37:35+0000\n"
+"POT-Creation-Date: 2025-11-26 16:20:21+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -183,7 +183,6 @@ msgstr ""
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 #: src/pages/system/BankAccounts.vue
@@ -515,7 +514,6 @@ msgstr ""
 #: src/pages/arap/SearchVC.vue
 #: src/pages/arap/SearchVC.vue
 #: src/pages/arap/TaxReport.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 #: src/pages/system/Defaults.vue
@@ -672,6 +670,10 @@ msgstr ""
 
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 msgid "An error occurred while loading outstanding transactions"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "An error occurred while matching"
 msgstr ""
 
 #: src/pages/cash/adjustments/Confirmation.vue
@@ -844,6 +846,10 @@ msgstr ""
 #: src/pages/arap/VcHistory.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "August"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Available"
 msgstr ""
 
 #: src/pages/arap/SearchVC.vue
@@ -1397,7 +1403,6 @@ msgstr ""
 
 #: src/pages/central/CreateDataset.vue
 #: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/system/Defaults.vue
 msgid "Company Name"
 msgstr ""
@@ -1408,10 +1413,6 @@ msgstr ""
 
 #: src/pages/central/CreateDataset.vue
 msgid "Company Name is required"
-msgstr ""
-
-#: src/pages/general-ledger/GlTransactions.vue
-msgid "Company Number"
 msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
@@ -1526,7 +1527,6 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -1658,7 +1658,6 @@ msgstr ""
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/pages/central/ApiKeys.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/system/Batch.vue
 msgid "Created"
 msgstr ""
@@ -1690,7 +1689,6 @@ msgstr ""
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 msgid "Credit"
 msgstr ""
 
@@ -1954,7 +1952,6 @@ msgstr ""
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/BalanceSheet.vue
@@ -1995,7 +1992,6 @@ msgstr ""
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 msgid "Debit"
 msgstr ""
 
@@ -2113,7 +2109,6 @@ msgstr ""
 #: src/pages/cash/PaymentsReport.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 #: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/oe/OrderReports.vue
 #: src/pages/reports/AllTaxes.vue
@@ -2172,7 +2167,6 @@ msgstr ""
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/goodservices/AddPart.vue
 #: src/pages/goodservices/SearchPart.vue
@@ -2253,6 +2247,10 @@ msgstr ""
 
 #: src/components/OnboardingList.vue
 msgid "Dismiss"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Distributed"
 msgstr ""
 
 #: src/ai_plugin/configs.js
@@ -3053,6 +3051,10 @@ msgstr ""
 msgid "Failed to load vc data"
 msgstr ""
 
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Failed to match transactions"
+msgstr ""
+
 #: src/pages/system/YearEnd.vue
 msgid "Failed to process year end"
 msgstr ""
@@ -3170,7 +3172,6 @@ msgstr ""
 
 #: src/ai_plugin/pages/UserStations.vue
 #: src/pages/arap/ArApTransactions.vue
-#: src/pages/general-ledger/GlTransactions.vue
 msgid "Files"
 msgstr ""
 
@@ -3228,7 +3229,6 @@ msgid "G.W."
 msgstr ""
 
 #: src/layouts/Menu.js
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/IncomeStatement.vue
 #: src/pages/system/chart/AddAccount.vue
@@ -3403,7 +3403,6 @@ msgstr ""
 #: src/pages/arap/SearchVC.vue
 #: src/pages/arap/TaxReport.vue
 #: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 #: src/pages/oe/OrderReports.vue
@@ -3479,6 +3478,10 @@ msgstr ""
 
 #: src/pages/cash/Reconciliation.vue
 msgid "Include FX Transactions"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Include Other Transactions"
 msgstr ""
 
 #: src/pages/goodservices/SearchPart.vue
@@ -4165,6 +4168,10 @@ msgstr ""
 msgid "Match Transactions"
 msgstr ""
 
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Matched"
+msgstr ""
+
 #: src/ai_plugin/components/MatchTransactionDialog.vue
 msgid "Matched By"
 msgstr ""
@@ -4205,7 +4212,6 @@ msgstr ""
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/oe/OrderReports.vue
@@ -4432,6 +4438,11 @@ msgstr ""
 
 #: src/pages/central/IndexPage.vue
 msgid "No pending invites"
+msgstr ""
+
+#: src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue
+msgid "No projects found"
 msgstr ""
 
 #: src/ai_plugin/pages/DocumentList.vue
@@ -5044,6 +5055,7 @@ msgstr ""
 msgid "Please try again"
 msgstr ""
 
+#: src/ai_plugin/components/MatchTransactionDialog.vue
 #: src/components/Button.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/pos/PointOfSale.vue
@@ -5154,7 +5166,6 @@ msgstr ""
 #: src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/reports/BalanceSheet.vue
@@ -5372,7 +5383,6 @@ msgstr ""
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/system/YearEnd.vue
 msgid "Reference"
@@ -5986,6 +5996,10 @@ msgstr ""
 msgid "Show FX Transactions"
 msgstr ""
 
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Show Filtered Only"
+msgstr ""
+
 #: src/pages/Signup.vue
 msgid "Sign Up"
 msgstr ""
@@ -6026,7 +6040,6 @@ msgstr ""
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
@@ -6267,10 +6280,6 @@ msgstr ""
 msgid "Tax"
 msgstr ""
 
-#: src/pages/general-ledger/GlTransactions.vue
-msgid "Tax Acc"
-msgstr ""
-
 #: src/pages/general-ledger/GeneralLedger.vue
 msgid "Tax Accno"
 msgstr ""
@@ -6291,7 +6300,6 @@ msgstr ""
 #: src/pages/Import.vue
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
 msgid "Tax Amount"
 msgstr ""
 
@@ -6466,6 +6474,10 @@ msgstr ""
 msgid "Total Assets"
 msgstr ""
 
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Total Distributed"
+msgstr ""
+
 #: src/pages/reports/BalanceSheet.vue
 msgid "Total Equity"
 msgstr ""
@@ -6488,6 +6500,10 @@ msgstr ""
 
 #: src/ai_plugin/components/CmptImport.vue
 msgid "Total Processed"
+msgstr ""
+
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Total Remaining"
 msgstr ""
 
 #: src/ai_plugin/components/CmptImport.vue
@@ -6631,6 +6647,10 @@ msgstr ""
 msgid "Transactions for"
 msgstr ""
 
+#: src/ai_plugin/components/MatchTransactionDialog.vue
+msgid "Transactions matched successfully"
+msgstr ""
+
 #: src/pages/cash/adjustments/Confirmation.vue
 msgid "Transactions to be Adjusted"
 msgstr ""
@@ -6746,7 +6766,6 @@ msgid "Update status for selected payments"
 msgstr ""
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
-#: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/goodservices/AddPart.vue
 #: src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
@@ -7003,6 +7022,7 @@ msgid "View Conditions"
 msgstr ""
 
 #: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/pages/BankTransactions.vue
 msgid "View Details"
 msgstr ""
 
