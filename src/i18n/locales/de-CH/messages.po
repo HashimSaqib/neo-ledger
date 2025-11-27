@@ -5,13 +5,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Neo Ledger 0.0.1\n"
-"POT-Creation-Date: 2025-11-26 16:20:21+0000\n"
+"POT-Creation-Date: 2025-11-27 08:18:07+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de-CH\n"
 "Language-Team: Swiss German\n"
-"PO-Revision-Date: 2025-11-26 00:00+0000\n"
+"PO-Revision-Date: 2025-11-27 00:00+0000\n"
 
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
@@ -36,7 +36,9 @@ msgstr "6-stelliger Code"
 
 #: src/pages/system/Templates.vue
 msgid "A file with this name already exists. Uploading will replace it."
-msgstr "Eine Datei mit diesem Namen existiert bereits. Das Hochladen wird sie ersetzen."
+msgstr ""
+"Eine Datei mit diesem Namen existiert bereits. Das Hochladen wird sie "
+"ersetzen."
 
 #: src/ai_plugin/components/AiPrompt.vue
 msgid "AI Processing Information"
@@ -591,7 +593,10 @@ msgid ""
 "All shortcut Use Ctrl + Shift as the base key. For dropdowns, use arrow key "
 "or search and press enter to select. Value will be copied to the cell and "
 "clipboard."
-msgstr "Alle Tastenkürzel verwenden Strg + Umschalt als Basis. Für Dropdowns verwenden Sie die Pfeiltasten oder Suche und drücken Sie Enter zur Auswahl. Der Wert wird in die Zelle und Zwischenablage kopiert."
+msgstr ""
+"Alle Tastenkürzel verwenden Strg + Umschalt als Basis. Für Dropdowns "
+"verwenden Sie die Pfeiltasten oder Suche und drücken Sie Enter zur Auswahl. "
+"Der Wert wird in die Zelle und Zwischenablage kopiert."
 
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -697,7 +702,9 @@ msgstr "Ein Fehler ist beim Speichern aufgetreten"
 #: src/ai_plugin/pages/UploadDocument.vue
 #: src/ai_plugin/pages/UploadDocument.vue
 msgid "An error occurred while uploading files. Please try again."
-msgstr "Ein Fehler ist beim Hochladen der Dateien aufgetreten. Bitte versuchen Sie es erneut."
+msgstr ""
+"Ein Fehler ist beim Hochladen der Dateien aufgetreten. Bitte versuchen Sie "
+"es erneut."
 
 #: src/pages/goodservices/AddPart.vue
 msgid "An unexpected error occurred"
@@ -783,7 +790,9 @@ msgstr "Sind Sie sicher, dass Sie diese Station löschen möchten?"
 msgid ""
 "Are you sure you want to process this adjustment? This action cannot be "
 "undone."
-msgstr "Sind Sie sicher, dass Sie diese Korrektur verarbeiten möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+msgstr ""
+"Sind Sie sicher, dass Sie diese Korrektur verarbeiten möchten? Diese Aktion "
+"kann nicht rückgängig gemacht werden."
 
 #: src/pages/central/IndexPage.vue
 msgid "Are you sure you want to remove access for"
@@ -1243,7 +1252,9 @@ msgstr "Auswahl nicht möglich: Kein Bankkonto"
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Cannot set account for more than one of AR, AP or IC"
-msgstr "Konto kann nicht für mehr als eines von Debitoren, Kreditoren oder Inventar gesetzt werden"
+msgstr ""
+"Konto kann nicht für mehr als eines von Debitoren, Kreditoren oder Inventar "
+"gesetzt werden"
 
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -1524,7 +1535,9 @@ msgstr "Kontakt Titel"
 
 #: src/ai_plugin/pages/UserStations.vue
 msgid "Contact your administrator to get access to workstations"
-msgstr "Kontaktieren Sie Ihren Administrator, um Zugriff auf Arbeitsplätze zu erhalten"
+msgstr ""
+"Kontaktieren Sie Ihren Administrator, um Zugriff auf Arbeitsplätze zu "
+"erhalten"
 
 #: src/ai_plugin/components/RuleCreationDialog.vue
 msgid "Contains"
@@ -2621,7 +2634,9 @@ msgstr "Fehler beim Abrufen der Daten"
 #: src/pages/central/IndexPage.vue
 #: src/pages/system/Roles.vue
 msgid "Error fetching datasets. Please try again later."
-msgstr "Fehler beim Abrufen der Datensätze. Bitte versuchen Sie es später noch einmal."
+msgstr ""
+"Fehler beim Abrufen der Datensätze. Bitte versuchen Sie es später noch "
+"einmal."
 
 #: src/pages/arap/VcHistory.vue
 msgid "Error fetching history"
@@ -2926,7 +2941,9 @@ msgstr "Bankkontodetails konnten nicht abgerufen werden"
 
 #: src/pages/system/BankAccounts.vue
 msgid "Failed to fetch bank account details. Please try again."
-msgstr "Bankkontodetails konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
+msgstr ""
+"Bankkontodetails konnten nicht abgerufen werden. Bitte versuchen Sie es "
+"erneut."
 
 #: src/pages/system/BankAccounts.vue
 msgid "Failed to fetch bank accounts"
@@ -3013,7 +3030,9 @@ msgstr "Revisionseinstellungen konnten nicht geladen werden"
 
 #: src/pages/system/Templates.vue
 msgid "Failed to load code editor. Please refresh and try again."
-msgstr "Code-Editor konnte nicht geladen werden. Bitte laden Sie die Seite neu und versuchen Sie es erneut."
+msgstr ""
+"Code-Editor konnte nicht geladen werden. Bitte laden Sie die Seite neu und "
+"versuchen Sie es erneut."
 
 #: src/pages/system/Batch.vue
 #: src/pages/system/Batch.vue
@@ -4189,8 +4208,8 @@ msgid "Matched By"
 msgstr "Abgeglichen durch"
 
 #: src/ai_plugin/pages/UploadDocument.vue
-msgid "Maximum 5 files allowed"
-msgstr "Maximal 5 Dateien erlaubt"
+msgid "Maximum 20 files allowed"
+msgstr "Maximal 20 Dateien erlaubt"
 
 #: src/ai_plugin/pages/ManageStations.vue
 msgid "Maximum Amount"
@@ -5026,7 +5045,9 @@ msgstr "Bitte wählen Sie einen Prompt-Typ aus"
 
 #: src/ai_plugin/components/StationTransfer.vue
 msgid "Please select a station and ensure invoice ID is available"
-msgstr "Bitte wählen Sie eine Station aus und stellen Sie sicher, dass die Rechnungs-ID verfügbar ist"
+msgstr ""
+"Bitte wählen Sie eine Station aus und stellen Sie sicher, dass die "
+"Rechnungs-ID verfügbar ist"
 
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Please select a status"
@@ -6823,8 +6844,8 @@ msgid "Upload Successful"
 msgstr "Upload erfolgreich"
 
 #: src/ai_plugin/pages/UploadDocument.vue
-msgid "Upload up to 5"
-msgstr "Bis zu 5 hochladen"
+msgid "Upload up to 20"
+msgstr "Bis zu 20 hochladen"
 
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
@@ -7181,7 +7202,7 @@ msgstr "Ja, Verarbeiten"
 
 #: src/ai_plugin/pages/UploadDocument.vue
 msgid "You can only upload a maximum of 5 files per section."
-msgstr "Sie können nur maximal 5 Dateien pro Abschnitt hochladen."
+msgstr ""
 
 #: src/router/index.js
 msgid "You do not have permission to access this page."
