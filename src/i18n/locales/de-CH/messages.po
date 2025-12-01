@@ -1,7 +1,7 @@
 # English translations for Neo Ledger
 # Copyright (C) 2025 Neo Ledger
 # This file is distributed under the same license as the Neo Ledger package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Neo Ledger 0.0.1\n"

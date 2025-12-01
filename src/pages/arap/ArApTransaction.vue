@@ -439,15 +439,29 @@
                 </div>
               </div>
               <div
-                class="row justify-end maintext"
+                class="row justify-end maintext items-center q-gutter-sm q-mb-xs"
                 v-for="tax in invoiceTaxes"
-                :key="tax.name"
+                :key="tax.acc"
               >
-                <div class="q-mr-xl">
-                  <p class="q-my-xs">{{ tax.name }}</p>
+                <div class="col-auto">
+                  <q-checkbox
+                    v-model="tax.checked"
+                    dense
+                    size="sm"
+                    :disabled="lineTax"
+                    @update:model-value="calculateTaxes"
+                  />
                 </div>
-                <div>
-                  <p class="q-my-xs">{{ formatAmount(tax.amount) }}</p>
+                <div class="col-3">
+                  <fn-input
+                    v-model="tax.amount"
+                    class="text-right"
+                    bg-color="input"
+                    dense
+                    outlined
+                    :disabled="!tax.checked || lineTax"
+                    :label="tax.name"
+                  />
                 </div>
               </div>
               <div class="row justify-end">
@@ -902,10 +916,7 @@ const onLineTaxAccountChange = (index) => {
 const calculateTaxes = () => {
   if (initialLoad.value) return;
   if (!lineTax.value && preserveApiTaxes.value) return;
-  if (!vc.value || !taxAccounts.value.length) {
-    invoiceTaxes.value = [];
-    return;
-  }
+
   if (lineTax.value) {
     const taxAgg = {};
     lines.value.forEach((line) => {
@@ -933,22 +944,28 @@ const calculateTaxes = () => {
         amount: parseFloat(taxAgg[accNo].amount.toFixed(2)),
         acc: taxAcc ? taxAcc.accno : "",
         rate: taxAgg[accNo].rate,
+        checked: true,
       };
     });
   } else {
-    invoiceTaxes.value = taxAccounts.value.map((taxAcc) => {
-      const name = vc.value[`${taxAcc}_description`] || t("Tax Name Not Found");
-      const taxRate = parseFloat(vc.value[`${taxAcc}_rate`] || 0);
-      const netAmount = subtotal.value;
-      const taxAmount = taxIncluded.value
-        ? netAmount - (netAmount / (taxRate * 100 + 100)) * 100
-        : netAmount * taxRate;
-      return {
-        name: `${name} ${(taxRate * 100).toFixed(0)}%`,
-        amount: parseFloat(taxAmount.toFixed(2)),
-        acc: taxAcc,
-        rate: taxRate,
-      };
+    if (!invoiceTaxes.value.length) return;
+
+    const totalLines = lines.value.reduce(
+      (acc, line) => acc + (parseFloat(line.amount) || 0),
+      0
+    );
+
+    invoiceTaxes.value.forEach((tax) => {
+      let taxAmount = 0;
+      if (tax.checked) {
+        const rate = tax.rate || 0;
+        if (taxIncluded.value) {
+          taxAmount = totalLines - totalLines / (1 + rate);
+        } else {
+          taxAmount = totalLines * rate;
+        }
+      }
+      tax.amount = parseFloat(taxAmount.toFixed(2));
     });
   }
 };
@@ -959,20 +976,18 @@ const subtotal = computed(() => {
     0
   );
   if (taxIncluded.value) {
-    const totalTaxes = invoiceTaxes.value.reduce(
-      (acc, tax) => acc + (parseFloat(tax.amount) || 0),
-      0
-    );
+    const totalTaxes = invoiceTaxes.value
+      .filter((t) => lineTax.value || t.checked)
+      .reduce((acc, tax) => acc + (parseFloat(tax.amount) || 0), 0);
     totalValue -= totalTaxes;
   }
   return parseFloat(totalValue.toFixed(2));
 });
 
 const total = computed(() => {
-  const totalTaxes = invoiceTaxes.value.reduce(
-    (acc, tax) => acc + (parseFloat(tax.amount) || 0),
-    0
-  );
+  const totalTaxes = invoiceTaxes.value
+    .filter((t) => lineTax.value || t.checked)
+    .reduce((acc, tax) => acc + (parseFloat(tax.amount) || 0), 0);
   let totalValue = lines.value.reduce(
     (acc, line) => acc + (parseFloat(line.amount) || 0),
     0
@@ -1399,8 +1414,11 @@ const postInvoice = async () => {
   if (selectedCurrency.value.rn !== 1) {
     invoiceData.exchangerate = exchangeRate.value;
   }
-  if (invoiceTaxes.value.length > 0) {
-    invoiceData.taxes = invoiceTaxes.value.map((tax) => ({
+  const taxesToSend = invoiceTaxes.value.filter(
+    (t) => lineTax.value || t.checked
+  );
+  if (taxesToSend.length > 0) {
+    invoiceData.taxes = taxesToSend.map((tax) => ({
       accno: tax.acc,
       amount: tax.amount,
       rate: tax.rate,
@@ -1544,12 +1562,28 @@ const loadInvoice = async (invoice) => {
 
     if (invoice.taxes && invoice.taxes.length > 0) {
       taxIncluded.value = Boolean(invoice.taxincluded);
-      invoiceTaxes.value = invoice.taxes.map((tx) => ({
-        name: tx.name || `${tx.accno} ${(tx.rate * 100).toFixed(0)}%`,
-        amount: parseFloat(tx.amount),
-        acc: tx.accno,
-        rate: parseFloat(tx.rate),
-      }));
+      const loadedTaxes = invoice.taxes;
+
+      if (!lineTax.value) {
+        invoiceTaxes.value.forEach((tax) => {
+          const match = loadedTaxes.find((t) => t.accno == tax.acc);
+          if (match) {
+            tax.checked = true;
+            tax.amount = parseFloat(match.amount);
+          } else {
+            tax.checked = false;
+            tax.amount = 0;
+          }
+        });
+      } else {
+        invoiceTaxes.value = invoice.taxes.map((tx) => ({
+          name: tx.name || `${tx.accno} ${(tx.rate * 100).toFixed(0)}%`,
+          amount: parseFloat(tx.amount),
+          acc: tx.accno,
+          rate: parseFloat(tx.rate),
+          checked: true,
+        }));
+      }
       preserveApiTaxes.value = true;
     } else {
       calculateTaxes();
@@ -1832,6 +1866,23 @@ const vcUpdate = async (newValue) => {
 
       taxAccountList.value = filterValidTaxes(invDate.value);
       console.log(taxAccountList.value);
+
+      if (!lineTax.value) {
+        invoiceTaxes.value = taxAccountList.value.map((taxAcc) => {
+          const name =
+            fetchedEntity[`${taxAcc.accno}_description`] ||
+            taxAcc.label ||
+            t("Tax Name Not Found");
+          return {
+            name: `${name} ${(taxAcc.rate * 100).toFixed(0)}%`,
+            amount: 0,
+            acc: taxAcc.accno,
+            rate: taxAcc.rate,
+            checked: false,
+          };
+        });
+      }
+
       intnotes.value = fetchedEntity.intnotes;
 
       const recordAccountAccno = fetchedEntity?.AR?.split("--")[0] ?? "";
