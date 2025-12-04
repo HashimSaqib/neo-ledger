@@ -1,22 +1,17 @@
-# English translations for Neo Ledger
-# Copyright (C) 2025 Neo Ledger
-# This file is distributed under the same license as the Neo Ledger package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Neo Ledger 0.0.1\n"
 "POT-Creation-Date: 2025-11-27 08:18:07+0000\n"
+"PO-Revision-Date: 2025-11-27 00:00+0000\n"
+"Language-Team: Swiss German\n"
+"Language: de-CH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de-CH\n"
-"Language-Team: Swiss German\n"
-"PO-Revision-Date: 2025-11-27 00:00+0000\n"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "%"
 msgstr "%"
 
@@ -58,8 +53,7 @@ msgstr "KI-Prompts"
 
 #: src/pages/arap/AddVC.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -82,8 +76,7 @@ msgstr "Kreditoreneintrag"
 msgid "AP Transaction"
 msgstr "Kreditorenbuchung"
 
-#: src/layouts/Menu.js
-#: src/pages/arap/SearchVC.vue
+#: src/layouts/Menu.js src/pages/arap/SearchVC.vue
 msgid "AP Transactions"
 msgstr "Kreditorenbuchungen"
 
@@ -99,8 +92,7 @@ msgstr "API-Schlüssel Bezeichnung"
 msgid "API Key Label is required"
 msgstr "API-Schlüssel Bezeichnung ist erforderlich"
 
-#: src/pages/central/ApiKeys.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/ApiKeys.vue src/pages/central/IndexPage.vue
 msgid "API Keys"
 msgstr "API-Schlüssel"
 
@@ -118,8 +110,7 @@ msgstr "API-Schlüssel erfolgreich gelöscht"
 
 #: src/pages/arap/AddVC.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -142,9 +133,7 @@ msgstr "Debitoreneintrag"
 msgid "AR Transaction"
 msgstr "Debitorenbuchung"
 
-#: src/layouts/Menu.js
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/layouts/Menu.js src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
 msgid "AR Transactions"
 msgstr "Debitorenbuchungen"
 
@@ -168,37 +157,26 @@ msgstr "Akzeptieren"
 msgid "Access"
 msgstr "Zugriff"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Roles.vue
+#: src/pages/central/IndexPage.vue src/pages/system/Roles.vue
 msgid "Access Controls"
 msgstr "Zugriffsrechte"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Access Level"
 msgstr "Zugriffsebene"
 
-#: src/ai_plugin/components/TemplateBuilder.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/cash/Payments.vue
+#: src/ai_plugin/components/TemplateBuilder.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/cash/Payments.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Taxes.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/general-ledger/GeneralLedger.vue src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Taxes.vue src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Account"
 msgstr "Konto"
@@ -228,8 +206,7 @@ msgstr "Konto-Nr."
 msgid "Account Number"
 msgstr "Kontonummer"
 
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/Gifi.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Account Number *"
 msgstr "Kontonummer *"
@@ -242,8 +219,7 @@ msgstr "Kontonummer von"
 msgid "Account Number To"
 msgstr "Kontonummer bis"
 
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/Gifi.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/Gifi.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Account Number missing!"
 msgstr "Kontonummer fehlt!"
@@ -260,15 +236,12 @@ msgstr "Kreditoren-Vorlage"
 msgid "Account Selection & Filters"
 msgstr "Kontenauswahl & Filter"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/pages/arap/TaxReport.vue src/pages/arap/TaxReport.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/PaymentsReport.vue
 msgid "Account Total"
 msgstr "Konto Total"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Account Type"
 msgstr "Kontotyp"
 
@@ -298,8 +271,7 @@ msgstr "Konto ist erforderlich"
 msgid "Account is required for General Ledger template"
 msgstr "Konto ist für Hauptbuch-Vorlage erforderlich"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Account is required."
 msgstr "Konto ist erforderlich."
@@ -317,17 +289,13 @@ msgstr "Konto erfolgreich gespeichert"
 msgid "Accounting Method"
 msgstr "Buchungsmethode"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/Import.vue src/pages/Import.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Accounts"
 msgstr "Konten"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/TaxReport.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/system/YearEnd.vue
 msgid "Accrual"
 msgstr "Vereinbart"
@@ -336,24 +304,18 @@ msgstr "Vereinbart"
 msgid "Action completed successfully"
 msgstr "Aktion erfolgreich abgeschlossen"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
 msgid "Action failed"
 msgstr "Aktion fehlgeschlagen"
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/central/ApiKeys.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Currencies.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/arap/ArReminder.vue
+#: src/pages/central/ApiKeys.vue src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Batch.vue src/pages/system/Currencies.vue
 #: src/pages/system/Employees.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Actions"
@@ -369,8 +331,7 @@ msgstr "Änderungsprotokoll aktivieren"
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/central/ApiKeys.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/central/ApiKeys.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Active"
 msgstr "Aktiv"
@@ -428,8 +389,7 @@ msgstr "Erste Rolle hinzufügen"
 msgid "Add General Ledger Transaction"
 msgstr "Buchung im Hauptbuch erfassen"
 
-#: src/components/Button.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/components/Button.vue src/pages/pos/PointOfSale.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Add Line"
 msgstr "Zeile hinzufügen"
@@ -446,8 +406,7 @@ msgstr "Neuen GIFI erfassen"
 msgid "Add POS Invoice"
 msgstr "Kassenzettel erfassen"
 
-#: src/components/Button.vue
-#: src/layouts/Menu.js
+#: src/components/Button.vue src/layouts/Menu.js
 #: src/pages/goodservices/AddPart.vue
 msgid "Add Part"
 msgstr "Ware erfassen"
@@ -461,8 +420,7 @@ msgstr "Periode hinzufügen"
 msgid "Add Project"
 msgstr "Projekt erfassen"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Roles.vue
+#: src/pages/central/IndexPage.vue src/pages/system/Roles.vue
 msgid "Add Role"
 msgstr "Rolle erfassen"
 
@@ -470,8 +428,7 @@ msgstr "Rolle erfassen"
 msgid "Add Rule"
 msgstr "Regel hinzufügen"
 
-#: src/components/Button.vue
-#: src/layouts/Menu.js
+#: src/components/Button.vue src/layouts/Menu.js
 #: src/pages/goodservices/AddPart.vue
 msgid "Add Service"
 msgstr "Dienstleistung erfassen"
@@ -500,8 +457,7 @@ msgstr "Lieferant erfassen"
 msgid "Added"
 msgstr "Hinzugefügt"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/AddPart.vue
 msgid "Additional Details"
 msgstr "Zusätzliche Details"
 
@@ -509,23 +465,16 @@ msgstr "Zusätzliche Details"
 msgid "Additional Info"
 msgstr "Zusatzinfo"
 
-#: src/ai_plugin/pages/BankTransactions.vue
-#: src/components/BankAccountForm.vue
+#: src/ai_plugin/pages/BankTransactions.vue src/components/BankAccountForm.vue
 msgid "Additional Information"
 msgstr "Zusätzliche Informationen"
 
-#: src/ai_plugin/pages/UserStations.vue
-#: src/components/BankAccountForm.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
-#: src/pages/system/Defaults.vue
+#: src/ai_plugin/pages/UserStations.vue src/components/BankAccountForm.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue src/pages/system/Defaults.vue
 msgid "Address"
 msgstr "Adresse"
 
@@ -533,14 +482,10 @@ msgstr "Adresse"
 msgid "Address 1"
 msgstr "Adresse 1"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
+#: src/components/BankAccountForm.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue src/pages/system/Employees.vue
 msgid "Address 2"
 msgstr "Adresse 2"
 
@@ -552,15 +497,12 @@ msgstr "Adressinformationen"
 msgid "Adjustment processed successfully!"
 msgstr "Korrektur erfolgreich verarbeitet!"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Admin"
 msgstr "Admin"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/ArReminder.vue
 msgid "Admin Email"
 msgstr "Admin E-Mail"
 
@@ -611,28 +553,19 @@ msgstr "Haben Sie bereits ein Konto? Anmelden"
 #: src/ai_plugin/components/MatchTransactionDialog.vue
 #: src/ai_plugin/components/RuleCreationDialog.vue
 #: src/ai_plugin/components/RuleCreationDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/UserStations.vue
-#: src/components/LastTransactions.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/ConsolidateInvoices.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/Payments.vue
+#: src/ai_plugin/pages/UserStations.vue src/components/LastTransactions.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/ConsolidateInvoices.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue src/pages/cash/Payments.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/cash/adjustments/Confirmation.vue src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Amount"
 msgstr "Betrag"
@@ -653,12 +586,9 @@ msgstr "Betrag bis"
 msgid "Amount ≤"
 msgstr "Betrag ≤"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Roles.vue
-#: src/pages/system/Taxes.vue
-#: src/pages/system/department/ListDepartments.vue
+#: src/pages/central/IndexPage.vue src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Currencies.vue src/pages/system/Roles.vue
+#: src/pages/system/Taxes.vue src/pages/system/department/ListDepartments.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
@@ -727,8 +657,7 @@ msgstr "Regeln auf alle anwenden"
 msgid "Approval Rule"
 msgstr "Genehmigungsregel"
 
-#: src/ai_plugin/pages/BankTransactions.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/ai_plugin/pages/BankTransactions.vue src/pages/arap/ArApTransaction.vue
 msgid "Approve"
 msgstr "Genehmigen"
 
@@ -749,8 +678,7 @@ msgstr "Buchungen genehmigen bis"
 msgid "Approve transactions up to this amount"
 msgstr "Buchungen bis zu diesem Betrag genehmigen"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "April"
 msgstr "April"
 
@@ -806,8 +734,7 @@ msgstr "Sind Sie sicher?"
 msgid "As Of"
 msgstr "Per"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/BalanceSheet.vue
 msgid "As of Date"
 msgstr "Stichtag"
 
@@ -829,34 +756,30 @@ msgstr "Zugewiesene Rechnungen"
 msgid "Assigned to"
 msgstr "Zugewiesen an"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "At least one line item is required."
 msgstr "Mindestens eine Zeile ist erforderlich."
 
 #: src/pages/general-ledger/GeneralLedger.vue
 msgid "At least two lines are required to post a transaction."
-msgstr "Mindestens zwei Zeilen sind erforderlich, um eine Buchung zu erfassen."
+msgstr ""
+"Mindestens zwei Zeilen sind erforderlich, um eine Buchung zu erfassen."
 
 #: src/pages/central/DatasetConnections.vue
 msgid "Attach Drive"
 msgstr "Laufwerk verbinden"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
 msgid "Attachment"
 msgstr "Anhang"
 
-#: src/components/EmailOptions.vue
-#: src/pages/arap/ArReminder.vue
+#: src/components/EmailOptions.vue src/pages/arap/ArReminder.vue
 msgid "Attachment (PDF)"
 msgstr "Anhang (PDF)"
 
-#: src/layouts/Menu.js
-#: src/pages/system/Audit.vue
+#: src/layouts/Menu.js src/pages/system/Audit.vue
 msgid "Audit"
 msgstr "Revision"
 
@@ -864,8 +787,7 @@ msgstr "Revision"
 msgid "Audit settings saved successfully"
 msgstr "Revisionseinstellungen erfolgreich gespeichert"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "August"
 msgstr "August"
 
@@ -881,26 +803,21 @@ msgstr "Verfügbarer Kredit"
 msgid "Available Drives"
 msgstr "Verfügbare Laufwerke"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Average Cost"
 msgstr "Durchschnittskosten"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/arap/SearchVC.vue
+#: src/components/BankAccountForm.vue src/pages/arap/SearchVC.vue
 msgid "BC Number"
 msgstr "BC Nummer"
 
-#: src/components/EmailOptions.vue
-#: src/pages/Import.vue
+#: src/components/EmailOptions.vue src/pages/Import.vue
 msgid "BCC"
 msgstr "BCC"
 
-#: src/ai_plugin/components/CmptImport.vue
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/Employees.vue
+#: src/ai_plugin/components/CmptImport.vue src/pages/Import.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/Employees.vue
 msgid "BIC"
 msgstr "BIC"
 
@@ -908,14 +825,12 @@ msgstr "BIC"
 msgid "BIC missing"
 msgstr "BIC fehlt"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/BankAccounts.vue
 msgid "BIC/SWIFT"
 msgstr "BIC/SWIFT"
 
-#: src/pages/Signup.vue
-#: src/pages/cash/adjustments/Confirmation.vue
+#: src/pages/Signup.vue src/pages/cash/adjustments/Confirmation.vue
 msgid "Back"
 msgstr "Zurück"
 
@@ -939,27 +854,23 @@ msgstr "Datensicherung"
 msgid "Backup codes copied to clipboard"
 msgstr "Backup-Codes in die Zwischenablage kopiert"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/ai_plugin/pages/BankPayments.vue src/pages/cash/Reconciliation.vue
 #: src/pages/general-ledger/GlTransactions.vue
 msgid "Balance"
 msgstr "Saldo"
 
-#: src/layouts/Menu.js
-#: src/pages/reports/BalanceSheet.vue
+#: src/layouts/Menu.js src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/BalanceSheet.vue
 msgid "Balance Sheet"
 msgstr "Bilanz"
 
 #: src/ai_plugin/components/CmptImport.vue
-#: src/ai_plugin/components/RuleCreationDialog.vue
-#: src/pages/arap/SearchVC.vue
+#: src/ai_plugin/components/RuleCreationDialog.vue src/pages/arap/SearchVC.vue
 #: src/pages/system/Employees.vue
 msgid "Bank"
 msgstr "Bank"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/pages/arap/ArApTransaction.vue
 msgid "Bank Account"
 msgstr "Bankkonto"
@@ -972,9 +883,7 @@ msgstr "Bankkonto / IBAN"
 msgid "Bank Account Selection"
 msgstr "Bankkonto-Auswahl"
 
-#: src/layouts/Menu.js
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/AddVC.vue
+#: src/layouts/Menu.js src/pages/arap/AddVC.vue src/pages/arap/AddVC.vue
 #: src/pages/system/BankAccounts.vue
 msgid "Bank Accounts"
 msgstr "Bankkonten"
@@ -987,18 +896,15 @@ msgstr "Bankadresse"
 msgid "Bank Address 1"
 msgstr "Bankadresse 1"
 
-#: src/pages/Import.vue
-#: src/pages/system/Employees.vue
+#: src/pages/Import.vue src/pages/system/Employees.vue
 msgid "Bank Address 2"
 msgstr "Bankadresse 2"
 
-#: src/layouts/Menu.js
-#: src/pages/cash/adjustments/BankAdjustment.vue
+#: src/layouts/Menu.js src/pages/cash/adjustments/BankAdjustment.vue
 msgid "Bank Adjustment"
 msgstr "Bankkorrektur"
 
-#: src/pages/Import.vue
-#: src/pages/system/Employees.vue
+#: src/pages/Import.vue src/pages/system/Employees.vue
 msgid "Bank City"
 msgstr "Bank Ort"
 
@@ -1008,8 +914,7 @@ msgstr "Bank Ort"
 msgid "Bank Code"
 msgstr "Bankleitzahl"
 
-#: src/pages/Import.vue
-#: src/pages/system/Employees.vue
+#: src/pages/Import.vue src/pages/system/Employees.vue
 msgid "Bank Country"
 msgstr "Bank Land"
 
@@ -1029,8 +934,7 @@ msgstr "Bankimport"
 msgid "Bank Information"
 msgstr "Bankinformationen"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
+#: src/components/BankAccountForm.vue src/pages/Import.vue
 #: src/pages/system/BankAccounts.vue
 msgid "Bank Name"
 msgstr "Bankname"
@@ -1043,8 +947,7 @@ msgstr "Bankname *"
 msgid "Bank Name is required!"
 msgstr "Bankname ist erforderlich!"
 
-#: src/ai_plugin/configs.js
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/configs.js src/ai_plugin/pages/BankPayments.vue
 msgid "Bank Payments"
 msgstr "Bankzahlungen"
 
@@ -1060,8 +963,7 @@ msgstr "Bank Kanton"
 msgid "Bank Transaction Code"
 msgstr "Bank-Transaktionscode"
 
-#: src/ai_plugin/configs.js
-#: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/configs.js src/ai_plugin/pages/BankTransactions.vue
 msgid "Bank Transactions"
 msgstr "Bankbuchungen"
 
@@ -1073,8 +975,7 @@ msgstr "Bank PLZ"
 msgid "Bank Zipcode"
 msgstr "Bank PLZ"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/system/BankAccounts.vue
 msgid "Bank account saved successfully"
 msgstr "Bankkonto erfolgreich gespeichert"
 
@@ -1094,15 +995,12 @@ msgstr "Bankauswahl ist erforderlich"
 msgid "Banking Information"
 msgstr "Bankinformationen"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Barcode"
 msgstr "Barcode"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
+#: src/components/BankAccountForm.vue src/pages/Import.vue
 msgid "Basic Information"
 msgstr "Basisinformationen"
 
@@ -1122,10 +1020,8 @@ msgstr "Rechnungen per E-Mail senden (Stapel)"
 msgid "Batch Jobs"
 msgstr "Stapelverarbeitungen"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/ArReminder.vue
 msgid "Batch Name"
 msgstr "Stapelname"
 
@@ -1145,8 +1041,7 @@ msgstr "Rechnungen drucken (Stapel)"
 msgid "Batch Print Reminders"
 msgstr "Mahnungen drucken (Stapel)"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "Bcc"
 msgstr "Bcc"
 
@@ -1154,8 +1049,7 @@ msgstr "Bcc"
 msgid "Beginning Balance"
 msgstr "Anfangssaldo"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Bin"
 msgstr "Lagerort"
@@ -1173,54 +1067,36 @@ msgstr "Buchungsdatum"
 msgid "Business Number"
 msgstr "Unternehmensnummer"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/UserStations.vue
-#: src/components/EmailOptions.vue
-#: src/pages/Import.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/UserStations.vue
+#: src/components/EmailOptions.vue src/pages/Import.vue
 msgid "CC"
 msgstr "CC"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/goodservices/AddPart.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "COGS"
 msgstr "Wareneinsatz"
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/components/BankAccountForm.vue
-#: src/pages/ar/ConsolidateInvoices.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/ManageStations.vue src/components/BankAccountForm.vue
+#: src/pages/ar/ConsolidateInvoices.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 #: src/pages/arap/ArReminder.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/central/ApiKeys.vue
-#: src/pages/central/ApiKeys.vue
-#: src/pages/central/CreateDataset.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Roles.vue
-#: src/pages/system/Templates.vue
-#: src/pages/system/Templates.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/pages/cash/adjustments/Confirmation.vue src/pages/central/ApiKeys.vue
+#: src/pages/central/ApiKeys.vue src/pages/central/CreateDataset.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue src/pages/system/Currencies.vue
+#: src/pages/system/Employees.vue src/pages/system/Roles.vue
+#: src/pages/system/Templates.vue src/pages/system/Templates.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -1266,10 +1142,8 @@ msgstr "Mehrere Optionen für Kreditoren können nicht gesetzt werden"
 msgid "Cannot set multiple options for AR"
 msgstr "Mehrere Optionen für Debitoren können nicht gesetzt werden"
 
-#: src/layouts/Menu.js
-#: src/pages/arap/TaxReport.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/system/YearEnd.vue
+#: src/layouts/Menu.js src/pages/arap/TaxReport.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/system/YearEnd.vue
 msgid "Cash"
 msgstr "Bar / Vereinnahmt"
 
@@ -1285,13 +1159,11 @@ msgstr "Kassendifferenz"
 msgid "Category"
 msgstr "Kategorie"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "Cc"
 msgstr "Cc"
 
-#: src/layouts/Menu.js
-#: src/pages/system/chart/ListAccounts.vue
+#: src/layouts/Menu.js src/pages/system/chart/ListAccounts.vue
 msgid "Chart Of Accounts"
 msgstr "Kontenplan"
 
@@ -1308,32 +1180,22 @@ msgstr "Kontenplan"
 msgid "Chart of Accounts is required"
 msgstr "Kontenplan ist erforderlich"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/system/Defaults.vue
 msgid "Check Inventory"
 msgstr "Inventar prüfen"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
+#: src/components/BankAccountForm.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue src/pages/system/Employees.vue
 msgid "City"
 msgstr "Ort"
 
-#: src/ai_plugin/components/CmptImport.vue
-#: src/components/Button.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/ai_plugin/components/CmptImport.vue src/components/Button.vue
+#: src/pages/cash/Payments.vue src/pages/cash/PaymentsReport.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Clear"
 msgstr "Leeren"
@@ -1358,8 +1220,7 @@ msgstr "Verrechnungskonto-Buchung"
 msgid "Clearing No."
 msgstr "Clearing-Nr."
 
-#: src/pages/Import.vue
-#: src/pages/system/BankAccounts.vue
+#: src/pages/Import.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/BankAccounts.vue
 msgid "Clearing Number"
 msgstr "Clearing-Nummer"
@@ -1367,19 +1228,18 @@ msgstr "Clearing-Nummer"
 #: src/ai_plugin/components/TemplateBuilder.vue
 #: src/ai_plugin/components/TemplateBuilder.vue
 msgid "Click on a variable to insert it into the focused field"
-msgstr "Klicken Sie auf eine Variable, um sie in das fokussierte Feld einzufügen"
+msgstr ""
+"Klicken Sie auf eine Variable, um sie in das fokussierte Feld einzufügen"
 
 #: src/pages/system/Templates.vue
 msgid "Click to load this file"
 msgstr "Klicken, um diese Datei zu laden"
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/central/ApiKeys.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/central/ApiKeys.vue
 #: src/pages/central/ApiKeys.vue
 msgid "Close"
 msgstr "Schliessen"
@@ -1388,23 +1248,17 @@ msgstr "Schliessen"
 msgid "Close Books up to"
 msgstr "Bücher abschliessen bis"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderReports.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Taxes.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/oe/OrderReports.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Taxes.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Closed"
 msgstr "Geschlossen"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Collapse All"
 msgstr "Alle einklappen"
 
@@ -1425,8 +1279,7 @@ msgid "Company Defaults"
 msgstr "Firmeneinstellungen"
 
 #: src/pages/central/CreateDataset.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/system/Defaults.vue
 msgid "Company Name"
 msgstr "Firmenname"
 
@@ -1438,12 +1291,9 @@ msgstr "Firmenname fehlt"
 msgid "Company Name is required"
 msgstr "Firmenname ist erforderlich"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
 #: src/components/OnboardingCard.vue
 msgid "Completed"
 msgstr "Abgeschlossen"
@@ -1476,11 +1326,9 @@ msgstr "Konsolidierung bestätigen"
 msgid "Confirm Delete"
 msgstr "Löschen bestätigen"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/system/chart/Gifi.vue
+#: src/pages/general-ledger/GeneralLedger.vue src/pages/system/chart/Gifi.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Confirm Deletion"
 msgstr "Löschen bestätigen"
@@ -1509,8 +1357,7 @@ msgstr "Verbindung deaktiviert"
 msgid "Connections"
 msgstr "Verbindungen"
 
-#: src/layouts/Menu.js
-#: src/pages/ar/ConsolidateInvoices.vue
+#: src/layouts/Menu.js src/pages/ar/ConsolidateInvoices.vue
 msgid "Consolidate Invoices"
 msgstr "Rechnungen konsolidieren"
 
@@ -1518,10 +1365,8 @@ msgstr "Rechnungen konsolidieren"
 msgid "Consolidate Selected"
 msgstr "Ausgewählte konsolidieren"
 
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/Import.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/VcHistory.vue
 msgid "Contact"
 msgstr "Kontakt"
 
@@ -1543,8 +1388,7 @@ msgstr ""
 msgid "Contains"
 msgstr "Enthält"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/UserStations.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/UserStations.vue
 msgid "Content"
 msgstr "Inhalt"
 
@@ -1574,10 +1418,8 @@ msgstr "In die Zwischenablage kopieren"
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Cost"
 msgstr "Kosten"
@@ -1602,28 +1444,21 @@ msgstr "Gegenpartei IBAN"
 msgid "Counterparty Name"
 msgstr "Gegenpartei Name"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
+#: src/components/BankAccountForm.vue src/pages/Import.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue src/pages/system/Employees.vue
 msgid "Country"
 msgstr "Land"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Country of Origin"
 msgstr "Herkunftsland"
 
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/BankTransactions.vue
-#: src/pages/central/ApiKeys.vue
+#: src/ai_plugin/pages/BankTransactions.vue src/pages/central/ApiKeys.vue
 #: src/pages/central/CreateDataset.vue
 msgid "Create"
 msgstr "Erstellen"
@@ -1640,8 +1475,7 @@ msgstr "Datensatz erstellen"
 msgid "Create Departments"
 msgstr "Abteilungen erstellen"
 
-#: src/pages/central/ApiKeys.vue
-#: src/pages/central/ApiKeys.vue
+#: src/pages/central/ApiKeys.vue src/pages/central/ApiKeys.vue
 msgid "Create New API Key"
 msgstr "Neuen API-Schlüssel erstellen"
 
@@ -1679,16 +1513,13 @@ msgid "Create your first API key to get started"
 msgstr "Erstellen Sie Ihren ersten API-Schlüssel, um zu beginnen"
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/central/ApiKeys.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/pages/central/ApiKeys.vue
 #: src/pages/system/Batch.vue
 msgid "Created"
 msgstr "Erstellt"
 
-#: src/ai_plugin/pages/UserStations.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/ai_plugin/pages/UserStations.vue src/pages/arap/ArApTransactions.vue
 msgid "Created Date"
 msgstr "Erstellungsdatum"
 
@@ -1708,8 +1539,7 @@ msgstr "Erstellt von"
 msgid "Created To"
 msgstr "Erstellt bis"
 
-#: src/pages/Import.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/pages/Import.vue src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
@@ -1717,25 +1547,19 @@ msgstr "Erstellt bis"
 msgid "Credit"
 msgstr "Haben"
 
-#: src/layouts/Menu.js
-#: src/pages/ar/SalesInvoice.vue
+#: src/layouts/Menu.js src/pages/ar/SalesInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
 msgid "Credit Invoice"
 msgstr "Gutschrift"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/AddVC.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/SearchVC.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Credit Limit"
 msgstr "Kreditlimite"
 
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransaction.vue
 msgid "Credit Note"
 msgstr "Gutschrift"
 
@@ -1743,50 +1567,35 @@ msgstr "Gutschrift"
 msgid "Credit Transaction"
 msgstr "Haben-Buchung"
 
-#: src/layouts/Menu.js
-#: src/pages/system/Currencies.vue
+#: src/layouts/Menu.js src/pages/system/Currencies.vue
 msgid "Currencies"
 msgstr "Währungen"
 
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/cash/Payments.vue
+#: src/components/LastTransactions.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue src/pages/cash/Payments.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
-#: src/pages/reports/IncomeStatement.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Currencies.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
+#: src/pages/reports/IncomeStatement.vue src/pages/system/Currencies.vue
+#: src/pages/system/Currencies.vue src/pages/system/Currencies.vue
 msgid "Currency"
 msgstr "Währung"
 
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/Import.vue src/pages/arap/ArApTransaction.vue
 msgid "Currency is required"
 msgstr "Währung ist erforderlich"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Currency is required."
 msgstr "Währung ist erforderlich."
 
@@ -1798,10 +1607,8 @@ msgstr "Währung muss zuerst angegeben werden"
 msgid "Currency not found"
 msgstr "Währung nicht gefunden"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 #: src/pages/reports/IncomeStatement.vue
 msgid "Current"
 msgstr "Aktuell"
@@ -1822,8 +1629,7 @@ msgstr "Aktuelle Statusverteilung"
 msgid "Current Users"
 msgstr "Aktuelle Benutzer"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
@@ -1835,42 +1641,29 @@ msgstr "Benutzerdefinierte Perioden"
 msgid "Custom prompt for AI processing "
 msgstr "Benutzerdefinierter Prompt für KI-Verarbeitung "
 
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/AddVC.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/ArReminder.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/Payments.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/pos/PointOfSale.vue
 #: src/pages/projectsjobs/ListProjects.vue
 #: src/pages/projectsjobs/ListProjects.vue
 msgid "Customer"
 msgstr "Kunde"
 
-#: src/layouts/Menu.js
-#: src/pages/arap/VcHistory.vue
+#: src/layouts/Menu.js src/pages/arap/VcHistory.vue
 msgid "Customer History"
 msgstr "Kundenhistorie"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/ai_plugin/pages/DocumentList.vue src/pages/ar/SalesInvoice.vue
 msgid "Customer Invoice"
 msgstr "Kundenrechnung"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/oe/OrderReports.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/oe/OrderReports.vue
 #: src/pages/system/Defaults.vue
 msgid "Customer Number"
 msgstr "Kundennummer"
@@ -1895,8 +1688,7 @@ msgstr "Kundenbuchungen"
 msgid "Customer Upload"
 msgstr "Kunden-Upload"
 
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/pos/PointOfSale.vue
 msgid "Customer is required."
 msgstr "Kunde ist erforderlich."
 
@@ -1908,20 +1700,14 @@ msgstr "Kundennummer ist erforderlich"
 msgid "Customer/Vendor"
 msgstr "Kunde/Lieferant"
 
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/oe/OrderReports.vue
+#: src/layouts/Menu.js src/layouts/Menu.js src/pages/Import.vue
+#: src/pages/Import.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/oe/OrderReports.vue
 msgid "Customers"
 msgstr "Kunden"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
 msgid "DCN"
 msgstr "ESR"
 
@@ -1945,8 +1731,7 @@ msgstr "Dashboard"
 msgid "Data imported successfully"
 msgstr "Daten erfolgreich importiert"
 
-#: src/components/SettingsPanel.vue
-#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue src/components/SettingsPanel.vue
 msgid "Dataset List"
 msgstr "Datensatz-Liste"
 
@@ -1962,24 +1747,17 @@ msgstr "Datensatz-Name ist erforderlich"
 msgid "Dataset succesfully deleted."
 msgstr "Datensatz erfolgreich gelöscht."
 
-#: src/ai_plugin/components/CmptImport.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/ConsolidateInvoices.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/ai_plugin/components/CmptImport.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/ConsolidateInvoices.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/BalanceSheet.vue
+#: src/pages/general-ledger/GeneralLedger.vue src/pages/oe/OrderEntry.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/BalanceSheet.vue
 msgid "Date"
 msgstr "Datum"
@@ -1997,8 +1775,7 @@ msgstr "Datum von"
 msgid "Date Paid"
 msgstr "Zahlungsdatum"
 
-#: src/ai_plugin/components/CmptImport.vue
-#: src/components/MainDashboard.vue
+#: src/ai_plugin/components/CmptImport.vue src/components/MainDashboard.vue
 msgid "Date Range"
 msgstr "Datumsbereich"
 
@@ -2011,8 +1788,7 @@ msgstr "Datum bis"
 msgid "Dates"
 msgstr "Daten"
 
-#: src/pages/Import.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/pages/Import.vue src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
@@ -2020,14 +1796,12 @@ msgstr "Daten"
 msgid "Debit"
 msgstr "Soll"
 
-#: src/layouts/Menu.js
-#: src/pages/ap/VendorInvoice.vue
+#: src/layouts/Menu.js src/pages/ap/VendorInvoice.vue
 #: src/pages/ap/VendorInvoice.vue
 msgid "Debit Invoice"
 msgstr "Lastschriftrechnung"
 
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransaction.vue
 msgid "Debit Note"
 msgstr "Lastschrift"
 
@@ -2035,8 +1809,7 @@ msgstr "Lastschrift"
 msgid "Debit Transaction"
 msgstr "Soll-Buchung"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "December"
 msgstr "Dezember"
 
@@ -2054,8 +1827,7 @@ msgstr "Verringert"
 
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/UserStations.vue
+#: src/ai_plugin/pages/ManageStations.vue src/ai_plugin/pages/UserStations.vue
 msgid "Default"
 msgstr "Standard"
 
@@ -2081,24 +1853,19 @@ msgstr "Einstellungen erfolgreich gespeichert"
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
 #: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/components/Button.vue
-#: src/pages/central/ApiKeys.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/chart/Gifi.vue
+#: src/ai_plugin/pages/ManageStations.vue src/components/Button.vue
+#: src/pages/central/ApiKeys.vue src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue src/pages/system/chart/Gifi.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/pages/central/ApiKeys.vue
-#: src/pages/central/ApiKeys.vue
+#: src/pages/central/ApiKeys.vue src/pages/central/ApiKeys.vue
 msgid "Delete API Key"
 msgstr "API-Schlüssel löschen"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Delete Dataset"
 msgstr "Datensatz löschen"
 
@@ -2107,47 +1874,32 @@ msgstr "Datensatz löschen"
 msgid "Delete Rule"
 msgstr "Regel löschen"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Delivery Date"
 msgstr "Lieferdatum"
 
 #: src/ai_plugin/components/TemplateBuilder.vue
 #: src/ai_plugin/components/TemplateBuilder.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/components/LastTransactions.vue src/components/LastTransactions.vue
+#: src/components/LastTransactions.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/TaxReport.vue
+#: src/pages/cash/Payments.vue src/pages/cash/PaymentsReport.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/oe/OrderReports.vue
-#: src/pages/reports/AllTaxes.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue src/pages/reports/AllTaxes.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 #: src/pages/system/department/ListDepartments.vue
 #: src/pages/system/department/ListDepartments.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Department"
 msgstr "Abteilung"
 
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/layouts/Menu.js src/pages/Import.vue src/pages/Import.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Departments"
 msgstr "Abteilungen"
@@ -2155,36 +1907,22 @@ msgstr "Abteilungen"
 #: src/ai_plugin/components/RuleCreationDialog.vue
 #: src/ai_plugin/components/TemplateBuilder.vue
 #: src/ai_plugin/components/TemplateBuilder.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/ConsolidateInvoices.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/ai_plugin/pages/ManageStations.vue src/components/LastTransactions.vue
+#: src/components/LastTransactions.vue src/components/LastTransactions.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/ConsolidateInvoices.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/TaxReport.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/cash/Payments.vue src/pages/cash/PaymentsReport.vue
 #: src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
@@ -2193,27 +1931,17 @@ msgstr "Abteilungen"
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 #: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/oe/OrderReports.vue
-#: src/pages/pos/PointOfSale.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderEntry.vue src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderEntry.vue src/pages/oe/OrderReports.vue
+#: src/pages/pos/PointOfSale.vue src/pages/pos/PointOfSale.vue
 #: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Roles.vue
-#: src/pages/system/Taxes.vue
-#: src/pages/system/YearEnd.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/Gifi.vue
+#: src/pages/projectsjobs/ListProjects.vue src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Roles.vue src/pages/system/Taxes.vue
+#: src/pages/system/YearEnd.vue src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/Gifi.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/department/ListDepartments.vue
@@ -2225,8 +1953,7 @@ msgstr "Beschreibung"
 msgid "Deselect All"
 msgstr "Alle abwählen"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/TaxReport.vue src/pages/arap/VcHistory.vue
 #: src/pages/goodservices/SearchPart.vue
 #: src/pages/system/department/ListDepartments.vue
 #: src/pages/system/department/ListDepartments.vue
@@ -2237,8 +1964,7 @@ msgstr "Einzelheiten"
 msgid "Detail View"
 msgstr "Detailansicht"
 
-#: src/components/LanguageSwitcher.vue
-#: src/pages/central/IndexPage.vue
+#: src/components/LanguageSwitcher.vue src/pages/central/IndexPage.vue
 msgid "Deutsch"
 msgstr "Deutsch"
 
@@ -2250,13 +1976,9 @@ msgstr "Differenz"
 msgid "Disabled"
 msgstr "Deaktiviert"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Discount"
@@ -2282,15 +2004,12 @@ msgstr "Verteilt"
 msgid "Document List"
 msgstr "Dokumentenliste"
 
-#: src/ai_plugin/configs.js
-#: src/ai_plugin/pages/UploadDocument.vue
+#: src/ai_plugin/configs.js src/ai_plugin/pages/UploadDocument.vue
 msgid "Document Management"
 msgstr "Dokumentenverwaltung"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/ai_plugin/pages/DocumentList.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/oe/OrderEntry.vue
 msgid "Download"
 msgstr "Herunterladen"
 
@@ -2310,10 +2029,8 @@ msgstr "Vorlagen herunterladen"
 msgid "Drag & Drop Files Here"
 msgstr "Dateien hierher ziehen"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Drawing"
 msgstr "Zeichnung"
 
@@ -2327,25 +2044,20 @@ msgid "Dropbox"
 msgstr "Dropbox"
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/cash/Payments.vue
+#: src/pages/arap/ArReminder.vue src/pages/cash/Payments.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 msgid "Due"
 msgstr "Fällig"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransactions.vue
 #: src/pages/cash/Payments.vue
 msgid "Due Date"
 msgstr "Fälligkeitsdatum"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Due Date (yyyy-mm-dd)"
 msgstr "Fälligkeitsdatum (JJJJ-MM-TT)"
 
@@ -2353,12 +2065,9 @@ msgstr "Fälligkeitsdatum (JJJJ-MM-TT)"
 msgid "Duration"
 msgstr "Dauer"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Employees.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue src/pages/system/Employees.vue
 msgid "E-mail"
 msgstr "E-Mail"
 
@@ -2372,14 +2081,10 @@ msgstr "Erhaltener Skonto"
 
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Roles.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/central/IndexPage.vue
+#: src/pages/goodservices/AddPart.vue src/pages/projectsjobs/ListProjects.vue
+#: src/pages/system/Currencies.vue src/pages/system/Currencies.vue
+#: src/pages/system/Employees.vue src/pages/system/Roles.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -2388,8 +2093,7 @@ msgstr "Bearbeiten"
 msgid "Edit Account"
 msgstr "Konto bearbeiten"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/system/BankAccounts.vue
 msgid "Edit Bank Account"
 msgstr "Bankkonto bearbeiten"
 
@@ -2439,23 +2143,16 @@ msgstr "Bearbeitungsfunktion wird implementiert"
 msgid "Edit mode - changes can be saved"
 msgstr "Bearbeitungsmodus - Änderungen können gespeichert werden"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/BankAccounts.vue
 msgid "Either IBAN or QR-IBAN is required"
 msgstr "Entweder IBAN oder QR-IBAN ist erforderlich"
 
-#: src/components/Button.vue
-#: src/components/EmailOptions.vue
-#: src/pages/Import.vue
-#: src/pages/LoginPage.vue
-#: src/pages/Signup.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
+#: src/components/Button.vue src/components/EmailOptions.vue
+#: src/pages/Import.vue src/pages/LoginPage.vue src/pages/Signup.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue src/pages/central/IndexPage.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
 msgid "Email"
 msgstr "E-Mail"
 
@@ -2475,8 +2172,7 @@ msgstr "Rechnungen mailen"
 msgid "Email Reminders"
 msgstr "Mahnungen mailen"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 msgid "Email batch created successfully"
 msgstr "E-Mail-Stapel erfolgreich erstellt"
 
@@ -2484,8 +2180,7 @@ msgstr "E-Mail-Stapel erfolgreich erstellt"
 msgid "Email is required"
 msgstr "E-Mail ist erforderlich"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApBatch.vue
 msgid "Emailed"
 msgstr "Gemailt"
 
@@ -2493,15 +2188,12 @@ msgstr "Gemailt"
 msgid "Emails to Process"
 msgstr "Zu verarbeitende E-Mails"
 
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/system/Employees.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/system/Employees.vue
 msgid "Employee"
 msgstr "Mitarbeiter"
 
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
+#: src/pages/system/Defaults.vue src/pages/system/Employees.vue
 #: src/pages/system/Employees.vue
 msgid "Employee Number"
 msgstr "Mitarbeiternummer"
@@ -2514,10 +2206,8 @@ msgstr "Mitarbeiter erfolgreich hinzugefügt!"
 msgid "Employees"
 msgstr "Mitarbeiter"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/Employees.vue
+#: src/pages/arap/AddVC.vue src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue src/pages/system/Employees.vue
 msgid "End Date"
 msgstr "Enddatum"
 
@@ -2542,8 +2232,7 @@ msgstr "Endet mit"
 msgid "Enforce Transaction Reversal for all Dates"
 msgstr "Stornierung für alle Daten erzwingen"
 
-#: src/components/LanguageSwitcher.vue
-#: src/pages/central/IndexPage.vue
+#: src/components/LanguageSwitcher.vue src/pages/central/IndexPage.vue
 msgid "English"
 msgstr "Englisch"
 
@@ -2569,15 +2258,13 @@ msgstr "Geben Sie den Code aus Ihrer Authenticator-App ein"
 msgid "Equals"
 msgstr "Gleicht"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Equity"
 msgstr "Eigenkapital"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
 #: src/pages/central/DatasetConnections.vue
 msgid "Error"
 msgstr "Fehler"
@@ -2586,8 +2273,7 @@ msgstr "Fehler"
 msgid "Error Information"
 msgstr "Fehlerinformation"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/pages/system/Batch.vue
+#: src/ai_plugin/pages/DocumentList.vue src/pages/system/Batch.vue
 msgid "Error Message"
 msgstr "Fehlermeldung"
 
@@ -2599,13 +2285,11 @@ msgstr "Fehlertyp"
 msgid "Error adding user to station"
 msgstr "Fehler beim Hinzufügen des Benutzers zur Station"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 msgid "Error creating email batch"
 msgstr "Fehler beim Erstellen des E-Mail-Stapels"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 msgid "Error creating print batch"
 msgstr "Fehler beim Erstellen des Druckstapels"
 
@@ -2617,8 +2301,7 @@ msgstr "Fehler beim Löschen des Auftrags"
 msgid "Error deleting station"
 msgstr "Fehler beim Löschen der Station"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Error fetching"
 msgstr "Fehler beim Abrufen"
@@ -2631,8 +2314,7 @@ msgstr "Fehler beim Abrufen der Konten"
 msgid "Error fetching data"
 msgstr "Fehler beim Abrufen der Daten"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Roles.vue
+#: src/pages/central/IndexPage.vue src/pages/system/Roles.vue
 msgid "Error fetching datasets. Please try again later."
 msgstr ""
 "Fehler beim Abrufen der Datensätze. Bitte versuchen Sie es später noch "
@@ -2642,8 +2324,7 @@ msgstr ""
 msgid "Error fetching history"
 msgstr "Fehler beim Abrufen des Verlaufs"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/Payments.vue
 msgid "Error fetching initial data"
 msgstr "Fehler beim Abrufen der Anfangsdaten"
 
@@ -2675,10 +2356,8 @@ msgstr "Fehler beim Laden der Regeldaten"
 msgid "Error parsing files"
 msgstr "Fehler beim Parsen der Dateien"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/TaxReport.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Error performing search"
 msgstr "Fehler beim Durchführen der Suche"
@@ -2723,27 +2402,20 @@ msgstr "Fehler beim Strukturieren der Transaktionen"
 msgid "Error updating status"
 msgstr "Fehler beim Aktualisieren des Status"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Exch"
 msgstr "Kurs"
 
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/components/LastTransactions.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/general-ledger/GeneralLedger.vue src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Exchange Rate"
 msgstr "Wechselkurs"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/ai_plugin/pages/BankPayments.vue src/pages/arap/ArApTransaction.vue
 msgid "Execution Date"
 msgstr "Ausführungsdatum"
 
@@ -2751,15 +2423,12 @@ msgstr "Ausführungsdatum"
 msgid "Exhcnage Rate"
 msgstr "Wechselkurs"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Expand All"
 msgstr "Alle ausklappen"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/system/Defaults.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -2771,18 +2440,14 @@ msgstr "Aufwand"
 msgid "Expenses"
 msgstr "Aufwände"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Expires"
 msgstr "Läuft ab"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/TrialTransactions.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/TrialTransactions.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/ListAccounts.vue
 msgid "Export"
 msgstr "Exportieren"
 
@@ -2790,37 +2455,28 @@ msgstr "Exportieren"
 msgid "Export PAIN.001"
 msgstr "PAIN.001 exportieren"
 
-#: src/components/Button.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/PaymentsReport.vue
-#: src/pages/oe/OrderReports.vue
+#: src/components/Button.vue src/pages/arap/TaxReport.vue
+#: src/pages/cash/PaymentsReport.vue src/pages/oe/OrderReports.vue
 msgid "Export PDF"
 msgstr "PDF exportieren"
 
-#: src/components/Button.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/PaymentsReport.vue
-#: src/pages/oe/OrderReports.vue
+#: src/components/Button.vue src/pages/arap/TaxReport.vue
+#: src/pages/cash/PaymentsReport.vue src/pages/oe/OrderReports.vue
 msgid "Export XL"
 msgstr "Excel exportieren"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Exported"
 msgstr "Exportiert"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Extended"
 msgstr "Summe"
 
-#: src/ai_plugin/components/CmptImport.vue
-#: src/pages/system/Batch.vue
+#: src/ai_plugin/components/CmptImport.vue src/pages/system/Batch.vue
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
@@ -2848,8 +2504,7 @@ msgstr "Transaktionen konnten nicht genehmigt werden: "
 msgid "Failed to cancel invite"
 msgstr "Einladung konnte nicht zurückgezogen werden"
 
-#: src/components/TwoFactorSetup.vue
-#: src/components/TwoFactorSetup.vue
+#: src/components/TwoFactorSetup.vue src/components/TwoFactorSetup.vue
 msgid "Failed to copy"
 msgstr "Kopieren fehlgeschlagen"
 
@@ -2893,8 +2548,7 @@ msgstr "Datei konnte nicht gelöscht werden."
 msgid "Failed to delete rule"
 msgstr "Regel konnte nicht gelöscht werden"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
 msgid "Failed to download invoice"
 msgstr "Rechnung konnte nicht heruntergeladen werden"
@@ -2921,7 +2575,8 @@ msgstr "GIFI-Details konnten nicht abgerufen werden"
 
 #: src/pages/system/chart/Gifi.vue
 msgid "Failed to fetch GIFI details. Please try again."
-msgstr "GIFI-Details konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
+msgstr ""
+"GIFI-Details konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
 
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Failed to fetch account details"
@@ -2929,7 +2584,8 @@ msgstr "Kontodetails konnten nicht abgerufen werden"
 
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Failed to fetch account details. Please try again."
-msgstr "Kontodetails konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
+msgstr ""
+"Kontodetails konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
 
 #: src/pages/arap/ArApTransaction.vue
 msgid "Failed to fetch accounts"
@@ -2961,8 +2617,7 @@ msgstr "Banktransaktionen konnten nicht abgerufen werden"
 msgid "Failed to fetch confirmation data"
 msgstr "Bestätigungsdaten konnten nicht abgerufen werden"
 
-#: src/components/MainDashboard.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/components/MainDashboard.vue src/pages/arap/ArApTransaction.vue
 msgid "Failed to fetch currencies"
 msgstr "Währungen konnten nicht abgerufen werden"
 
@@ -2974,8 +2629,7 @@ msgstr "Laufwerke konnten nicht abgerufen werden"
 msgid "Failed to fetch info"
 msgstr "Infos konnten nicht abgerufen werden"
 
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/SearchVC.vue
 #: src/pages/goodservices/AddPart.vue
 msgid "Failed to fetch links"
 msgstr "Links konnten nicht abgerufen werden"
@@ -3022,7 +2676,8 @@ msgstr "Transaktionen konnten nicht in die Datenbank importiert werden"
 
 #: src/pages/system/Templates.vue
 msgid "Failed to initialize editor. Please try again."
-msgstr "Editor konnte nicht initialisiert werden. Bitte versuchen Sie es erneut."
+msgstr ""
+"Editor konnte nicht initialisiert werden. Bitte versuchen Sie es erneut."
 
 #: src/pages/system/Audit.vue
 msgid "Failed to load audit settings"
@@ -3034,13 +2689,11 @@ msgstr ""
 "Code-Editor konnte nicht geladen werden. Bitte laden Sie die Seite neu und "
 "versuchen Sie es erneut."
 
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
 msgid "Failed to load details"
 msgstr "Details konnten nicht geladen werden"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/UserStations.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/UserStations.vue
 msgid "Failed to load email details"
 msgstr "E-Mail-Details konnten nicht geladen werden"
 
@@ -3056,8 +2709,7 @@ msgstr "Rechnung konnte nicht geladen werden: "
 msgid "Failed to load item data"
 msgstr "Artikeldaten konnten nicht geladen werden"
 
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
 msgid "Failed to load jobs"
 msgstr "Jobs konnten nicht geladen werden"
 
@@ -3065,8 +2717,7 @@ msgstr "Jobs konnten nicht geladen werden"
 msgid "Failed to load outstanding transactions"
 msgstr "Offene Posten konnten nicht geladen werden"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
 msgid "Failed to load processing records"
 msgstr "Verarbeitungsdaten konnten nicht geladen werden"
 
@@ -3103,8 +2754,7 @@ msgstr "Konto konnte nicht gespeichert werden"
 msgid "Failed to save audit settings"
 msgstr "Revisionseinstellungen konnten nicht gespeichert werden"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/system/BankAccounts.vue
 msgid "Failed to save bank account"
 msgstr "Bankkonto konnte nicht gespeichert werden"
 
@@ -3148,15 +2798,12 @@ msgstr "Benutzerzugriff konnte nicht aktualisiert werden"
 msgid "Failed to update vc details: "
 msgstr "Kreditoren/Debitoren-Details konnten nicht aktualisiert werden: "
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 #: src/pages/system/Defaults.vue
 msgid "Fax"
 msgstr "Fax"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "February"
 msgstr "Februar"
 
@@ -3180,8 +2827,7 @@ msgstr "Dateilimit überschritten"
 msgid "File Link"
 msgstr "Dateilink"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/DocumentList.vue
 msgid "File Name"
 msgstr "Dateiname"
 
@@ -3201,8 +2847,7 @@ msgstr "Datei in Vorlagen nicht gefunden"
 msgid "File replaced successfully"
 msgstr "Datei erfolgreich ersetzt"
 
-#: src/ai_plugin/pages/UserStations.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/ai_plugin/pages/UserStations.vue src/pages/arap/ArApTransactions.vue
 msgid "Files"
 msgstr "Dateien"
 
@@ -3218,8 +2863,7 @@ msgstr "Finanzinformationen"
 msgid "Finished"
 msgstr "Abgeschlossen"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue
 msgid "First Name"
 msgstr "Vorname"
 
@@ -3239,13 +2883,10 @@ msgstr "Format"
 msgid "Found"
 msgstr "Gefunden"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/reports/AllTaxes.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/AllTaxes.vue src/pages/reports/IncomeStatement.vue
 msgid "From Date"
 msgstr "Von Datum"
 
@@ -3253,18 +2894,14 @@ msgstr "Von Datum"
 msgid "Full Report"
 msgstr "Vollständiger Bericht"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "G.W."
 msgstr "Bruttogewicht"
 
-#: src/layouts/Menu.js
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/layouts/Menu.js src/pages/reports/BalanceSheet.vue
+#: src/pages/reports/IncomeStatement.vue src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "GIFI"
 msgstr "GIFI"
@@ -3301,8 +2938,7 @@ msgstr "Hauptbuch-Buchungsdetails"
 msgid "GL account will be changed to"
 msgstr "Hauptbuchkonto wird geändert auf"
 
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/SearchVC.vue
 msgid "Gender"
 msgstr "Geschlecht"
 
@@ -3310,10 +2946,8 @@ msgstr "Geschlecht"
 msgid "General"
 msgstr "Allgemein"
 
-#: src/ai_plugin/components/TemplateBuilder.vue
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/pages/general-ledger/GlTransactions.vue
+#: src/ai_plugin/components/TemplateBuilder.vue src/layouts/Menu.js
+#: src/layouts/Menu.js src/pages/general-ledger/GlTransactions.vue
 msgid "General Ledger"
 msgstr "Hauptbuch"
 
@@ -3321,8 +2955,7 @@ msgstr "Hauptbuch"
 msgid "General Ledger Template"
 msgstr "Hauptbuch-Vorlage"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Generate Report"
 msgstr "Bericht erstellen"
 
@@ -3330,8 +2963,7 @@ msgstr "Bericht erstellen"
 msgid "Generate XML file for bank payment processing"
 msgstr "XML-Datei für Bankzahlungsverarbeitung erstellen"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Generating..."
 msgstr "Wird erstellt..."
 
@@ -3356,10 +2988,8 @@ msgstr "Waren & Dienstleistungen"
 msgid "Google Drive"
 msgstr "Google Drive"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/pages/arap/TaxReport.vue src/pages/arap/TaxReport.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/PaymentsReport.vue
 msgid "Grand Total"
 msgstr "Gesamtsumme"
 
@@ -3371,16 +3001,13 @@ msgstr "Grösser als"
 msgid "Greater than or equal"
 msgstr "Grösser oder gleich"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "HS Code"
 msgstr "Zolltarifnummer"
 
-#: src/components/EmailOptions.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/components/EmailOptions.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 #: src/pages/arap/ArReminder.vue
 msgid "HTML"
 msgstr "HTML"
@@ -3415,13 +3042,10 @@ msgid "Home Phone"
 msgstr "Telefon (Privat)"
 
 #: src/ai_plugin/components/CmptImport.vue
-#: src/ai_plugin/components/CmptImport.vue
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
+#: src/ai_plugin/components/CmptImport.vue src/components/BankAccountForm.vue
+#: src/pages/Import.vue src/pages/arap/SearchVC.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/Employees.vue
 msgid "IBAN"
 msgstr "IBAN"
@@ -3430,14 +3054,10 @@ msgstr "IBAN"
 msgid "IBAN missing"
 msgstr "IBAN fehlt"
 
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderReports.vue
-#: src/pages/system/Batch.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/adjustments/Confirmation.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderReports.vue src/pages/system/Batch.vue
 msgid "ID"
 msgstr "ID"
 
@@ -3449,13 +3069,11 @@ msgstr "Wenn leer, wird der ursprüngliche Dateiname verwendet"
 msgid "Ignore Difference"
 msgstr "Differenz ignorieren"
 
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Image"
 msgstr "Bild"
 
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
+#: src/layouts/Menu.js src/pages/Import.vue
 msgid "Import"
 msgstr "Importieren"
 
@@ -3524,14 +3142,10 @@ msgstr "In Bericht aufnehmen"
 msgid "Include in drop-down menus:"
 msgstr "In Dropdown-Menüs aufnehmen:"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/reports/IncomeStatement.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/reports/IncomeStatement.vue
+#: src/pages/system/Defaults.vue src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -3539,8 +3153,7 @@ msgstr "In Dropdown-Menüs aufnehmen:"
 msgid "Income"
 msgstr "Ertrag"
 
-#: src/layouts/Menu.js
-#: src/pages/reports/IncomeStatement.vue
+#: src/layouts/Menu.js src/pages/reports/IncomeStatement.vue
 msgid "Income Statement"
 msgstr "Erfolgsrechnung"
 
@@ -3552,8 +3165,7 @@ msgstr "Erhöht"
 msgid "Initializing Editor..."
 msgstr "Editor wird initialisiert..."
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 msgid "Inline"
 msgstr "Inline"
 
@@ -3617,11 +3229,8 @@ msgstr "Fügt die Telefonnummer ein (nur Ziffern)."
 msgid "Inserts the two-digit year (or full year if using yyyy)."
 msgstr "Fügt das zweistellige Jahr ein (oder das volle Jahr bei yyyy)."
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Internal Notes"
 msgstr "Interne Notizen"
@@ -3638,18 +3247,10 @@ msgstr "Ungültige GIFI-Kontonummer"
 msgid "Invalid account ID"
 msgstr "Ungültige Konto-ID"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
 #: src/pages/Import.vue
 msgid "Invalid date format. Use yyyy-mm-dd format."
 msgstr "Ungültiges Datumsformat. Verwenden Sie das Format JJJJ-MM-TT."
@@ -3662,8 +3263,7 @@ msgstr "Ungültiges E-Mail-Format"
 msgid "Invalid invite code - using public signup"
 msgstr "Ungültiger Einladungscode - öffentliche Registrierung wird verwendet"
 
-#: src/components/TwoFactorSetup.vue
-#: src/components/TwoFactorVerify.vue
+#: src/components/TwoFactorSetup.vue src/components/TwoFactorVerify.vue
 msgid "Invalid session. Please login again."
 msgstr "Ungültige Sitzung. Bitte melden Sie sich erneut an."
 
@@ -3671,16 +3271,14 @@ msgstr "Ungültige Sitzung. Bitte melden Sie sich erneut an."
 msgid "Invalid shortcut key"
 msgstr "Ungültiges Tastenkürzel"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/goodservices/AddPart.vue src/pages/system/Defaults.vue
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Inventory"
 msgstr "Inventar"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/AddPart.vue
 msgid "Inventory Details"
 msgstr "Inventardetails"
 
@@ -3692,8 +3290,7 @@ msgstr "Weiteren Benutzer einladen"
 msgid "Invite Code"
 msgstr "Einladungscode"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 #: src/pages/central/IndexPage.vue
 msgid "Invite User"
 msgstr "Benutzer einladen"
@@ -3718,42 +3315,33 @@ msgstr "Einladung erfolgreich gesendet"
 msgid "Invites"
 msgstr "Einladungen"
 
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/SearchVC.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Invoice"
 msgstr "Rechnung"
 
-#: src/pages/ar/ConsolidateInvoices.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
+#: src/pages/ar/ConsolidateInvoices.vue src/pages/cash/Payments.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
 msgid "Invoice #"
 msgstr "Rechnung Nr."
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransactions.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Invoice Date"
 msgstr "Rechnungsdatum"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Invoice Date (yyyy-mm-dd)"
 msgstr "Rechnungsdatum (JJJJ-MM-TT)"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 msgid "Invoice Delete canceled"
 msgstr "Rechnungslöschung abgebrochen"
 
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
 msgid "Invoice Description QR"
 msgstr "Rechnungsbeschreibung QR"
 
@@ -3761,37 +3349,25 @@ msgstr "Rechnungsbeschreibung QR"
 msgid "Invoice Header"
 msgstr "Rechnungskopf"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
 msgid "Invoice ID is required"
 msgstr "Rechnungs-ID ist erforderlich"
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/UserStations.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/UserStations.vue src/components/LastTransactions.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/TaxReport.vue src/pages/pos/PointOfSale.vue
 #: src/pages/reports/AllTaxes.vue
 msgid "Invoice Number"
 msgstr "Rechnungsnummer"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 msgid "Invoice deleted successfully"
 msgstr "Rechnung erfolgreich gelöscht"
 
@@ -3811,8 +3387,7 @@ msgstr "Rechnung(en)"
 msgid "Item Description"
 msgstr "Artikelbeschreibung"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Item Notes"
 msgstr "Artikelnotizen"
@@ -3825,17 +3400,13 @@ msgstr "Artikelnummer"
 msgid "Item Status"
 msgstr "Artikelstatus"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Items"
 msgstr "Artikel"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "January"
 msgstr "Januar"
 
@@ -3851,13 +3422,11 @@ msgstr "Job/Projektnummer"
 msgid "Journal"
 msgstr "Journal"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "July"
 msgstr "Juli"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "June"
 msgstr "Juni"
 
@@ -3873,12 +3442,9 @@ msgstr "Bezeichnung"
 msgid "Label must be at least 3 characters long"
 msgstr "Bezeichnung muss mindestens 3 Zeichen lang sein"
 
-#: src/components/LanguageSwitcher.vue
-#: src/components/SettingsPanel.vue
-#: src/components/SettingsPanel.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/components/LanguageSwitcher.vue src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue src/pages/arap/SearchVC.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Language"
 msgstr "Sprache"
 
@@ -3886,8 +3452,7 @@ msgstr "Sprache"
 msgid "Last 14 Days"
 msgstr "Letzte 14 Tage"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 msgid "Last 5 Transactions"
 msgstr "Letzte 5 Transaktionen"
@@ -3900,8 +3465,7 @@ msgstr "Letzte 7 Tage"
 msgid "Last 90 Days"
 msgstr "Letzte 90 Tage"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Last Cost"
 msgstr "Letzter Preis"
@@ -3910,8 +3474,7 @@ msgstr "Letzter Preis"
 msgid "Last Month"
 msgstr "Letzter Monat"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue
 msgid "Last Name"
 msgstr "Nachname"
 
@@ -3962,8 +3525,7 @@ msgstr "Passiven"
 msgid "Line Account"
 msgstr "Zeilenkonto"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Line Accounts"
 msgstr "Zeilenkonten"
 
@@ -3971,8 +3533,7 @@ msgstr "Zeilenkonten"
 msgid "Line Amount"
 msgstr "Zeilenbetrag"
 
-#: src/ai_plugin/components/TemplateBuilder.vue
-#: src/pages/Import.vue
+#: src/ai_plugin/components/TemplateBuilder.vue src/pages/Import.vue
 msgid "Line Description"
 msgstr "Zeilenbeschreibung"
 
@@ -3988,9 +3549,7 @@ msgstr "Position"
 msgid "Line Item Account"
 msgstr "Positionskonto"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
 msgid "Line Items"
 msgstr "Positionen"
 
@@ -4010,8 +3569,7 @@ msgstr "Zeilensteuerkonto"
 msgid "Line Tax Amount"
 msgstr "Zeilensteuerbetrag"
 
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Lineitem"
@@ -4025,8 +3583,7 @@ msgstr "Zeilen hinzufügen"
 msgid "List Accounts"
 msgstr "Kontenliste"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "List Price"
 msgstr "Listenpreis"
@@ -4076,20 +3633,15 @@ msgstr "Wird geladen..."
 msgid "Location"
 msgstr "Ort"
 
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue src/pages/system/Defaults.vue
+#: src/pages/system/Defaults.vue src/pages/system/Defaults.vue
 #: src/pages/system/Defaults.vue
 msgid "Lock"
 msgstr "Sperren"
 
-#: src/pages/LoginPage.vue
-#: src/pages/system/Employees.vue
+#: src/pages/LoginPage.vue src/pages/system/Employees.vue
 msgid "Login"
 msgstr "Login"
 
@@ -4101,24 +3653,18 @@ msgstr "Anmeldung erfolgreich"
 msgid "Logo Uploaded successfully."
 msgstr "Logo erfolgreich hochgeladen."
 
-#: src/components/SettingsPanel.vue
-#: src/components/SettingsPanel.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/components/SettingsPanel.vue src/components/SettingsPanel.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Logout"
 msgstr "Logout"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Lot"
 msgstr "Charge"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Make"
 msgstr "Marke"
 
@@ -4130,8 +3676,7 @@ msgstr "Marke und Modell"
 msgid "Manage Bank Transaction Rules"
 msgstr "Banktransaktionsregeln verwalten"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Manage Dataset"
 msgstr "Datensatz verwalten"
 
@@ -4139,8 +3684,7 @@ msgstr "Datensatz verwalten"
 msgid "Manage Rules"
 msgstr "Regeln verwalten"
 
-#: src/ai_plugin/configs.js
-#: src/components/OnboardingList.vue
+#: src/ai_plugin/configs.js src/components/OnboardingList.vue
 msgid "Manage Stations"
 msgstr "Stationen verwalten"
 
@@ -4156,8 +3700,7 @@ msgstr "Pflichtfelder"
 msgid "Manufacturing"
 msgstr "Fertigung"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "March"
 msgstr "März"
 
@@ -4189,8 +3732,7 @@ msgstr "Als exportiert markieren"
 msgid "Mark as Uploaded"
 msgstr "Als hochgeladen markieren"
 
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Markup"
 msgstr "Aufschlag"
 
@@ -4215,8 +3757,7 @@ msgstr "Maximal 20 Dateien erlaubt"
 msgid "Maximum Amount"
 msgstr "Maximalbetrag"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "May"
 msgstr "Mai"
 
@@ -4224,34 +3765,25 @@ msgstr "Mai"
 msgid "Member No."
 msgstr "Mitglieds-Nr."
 
-#: src/components/BankAccountForm.vue
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/Import.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/BankAccounts.vue
 msgid "Member Number"
 msgstr "Mitgliedsnummer"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue src/pages/cash/PaymentsReport.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/oe/OrderReports.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue src/pages/pos/PointOfSale.vue
 msgid "Memo"
 msgstr "Memo"
 
-#: src/components/EmailOptions.vue
-#: src/pages/arap/ArApBatch.vue
+#: src/components/EmailOptions.vue src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
 msgid "Message"
 msgstr "Nachricht"
@@ -4260,10 +3792,8 @@ msgstr "Nachricht"
 msgid "Method"
 msgstr "Methode"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Microfiche"
 msgstr "Mikrofiche"
 
@@ -4271,15 +3801,12 @@ msgstr "Mikrofiche"
 msgid "Missing IBAN"
 msgstr "Fehlende IBAN"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue
 msgid "Mobile"
 msgstr "Mobil"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Model"
 msgstr "Modell"
 
@@ -4287,15 +3814,12 @@ msgstr "Modell"
 msgid "Module"
 msgstr "Modul"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/reports/IncomeStatement.vue
 msgid "Month"
 msgstr "Monat"
 
-#: src/components/MainDashboard.vue
-#: src/pages/reports/BalanceSheet.vue
+#: src/components/MainDashboard.vue src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/IncomeStatement.vue
 msgid "Monthly"
 msgstr "Monatlich"
@@ -4312,34 +3836,23 @@ msgstr "Monatliche Umsätze"
 msgid "My Workstations"
 msgstr "Meine Arbeitsplätze"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "N.W."
 msgstr "Nettogewicht"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "N/A"
 msgstr "N/V"
 
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Employees.vue
+#: src/components/LastTransactions.vue src/components/LastTransactions.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/VcHistory.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
+#: src/pages/system/Employees.vue src/pages/system/Employees.vue
 msgid "Name"
 msgstr "Name"
 
@@ -4377,7 +3890,8 @@ msgstr "Neue Nummer generiert"
 
 #: src/pages/Import.vue
 msgid "Next Number (GL Number, Invoice Number or Customer/Vendor Number)"
-msgstr "Nächste Nummer (Hauptbuch-, Rechnungs- oder Kunden-/Lieferantennummer)"
+msgstr ""
+"Nächste Nummer (Hauptbuch-, Rechnungs- oder Kunden-/Lieferantennummer)"
 
 #: src/ai_plugin/components/AiPrompt.vue
 msgid "No AI processing information available for this transaction"
@@ -4488,8 +4002,7 @@ msgstr "Keine Antwort verfügbar"
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "No roles available"
 msgstr "Keine Rollen verfügbar"
 
@@ -4541,8 +4054,7 @@ msgstr "Keine Validierungsregeln für diesen Importtyp definiert"
 msgid "No workstations assigned to you"
 msgstr "Keine Arbeitsplätze Ihnen zugewiesen"
 
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "No."
 msgstr "Nr."
 
@@ -4563,8 +4075,7 @@ msgstr "Steuer für nicht-inventarisierte Artikel"
 msgid "Non-tracking Items"
 msgstr "Nicht-inventarisierte Artikel"
 
-#: src/components/EmailOptions.vue
-#: src/pages/arap/ArApBatch.vue
+#: src/components/EmailOptions.vue src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
 msgid "None"
 msgstr "Keine"
@@ -4575,60 +4086,39 @@ msgstr "Nicht gemailt"
 
 #: src/ai_plugin/components/TemplateBuilder.vue
 #: src/ai_plugin/components/TemplateBuilder.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/oe/OrderReports.vue
-#: src/pages/system/Employees.vue
+#: src/components/LastTransactions.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/oe/OrderEntry.vue
+#: src/pages/oe/OrderReports.vue src/pages/system/Employees.vue
 msgid "Notes"
 msgstr "Notizen"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "November"
 msgstr "November"
 
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/components/LastTransactions.vue src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApBatch.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 #: src/pages/projectsjobs/ListProjects.vue
 #: src/pages/projectsjobs/ListProjects.vue
 msgid "Number"
 msgstr "Nummer"
 
-#: src/components/SettingsPanel.vue
-#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue src/components/SettingsPanel.vue
 msgid "Number Format"
 msgstr "Zahlenformat"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "OH"
 msgstr "Bestand"
 
@@ -4644,14 +4134,11 @@ msgstr "OTP an Ihre E-Mail gesendet"
 msgid "Obsolete"
 msgstr "Veraltet"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "Occupation"
 msgstr "Beruf"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "October"
 msgstr "Oktober"
 
@@ -4659,8 +4146,7 @@ msgstr "Oktober"
 msgid "Offset Account"
 msgstr "Gegenkonto"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 msgid "On Hand"
 msgstr "Am Lager"
 
@@ -4684,12 +4170,9 @@ msgstr "Nur Kleinbuchstaben und Zahlen erlaubt"
 msgid "Oops. Nothing here..."
 msgstr "Hoppla. Hier ist nichts..."
 
-#: src/components/OnboardingCard.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/components/OnboardingCard.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Open"
 msgstr "Offen"
@@ -4711,17 +4194,11 @@ msgstr "Auftrags-ID ist erforderlich"
 msgid "Order Information"
 msgstr "Auftragsinformationen"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/cash/adjustments/Confirmation.vue src/pages/oe/OrderEntry.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Order Number"
 msgstr "Auftragsnummer"
@@ -4762,8 +4239,7 @@ msgstr "Originale KI-Antwort"
 msgid "Orphaned"
 msgstr "Verwaist"
 
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 msgid "Outstanding"
 msgstr "Offen"
@@ -4772,13 +4248,9 @@ msgstr "Offen"
 msgid "PAIN.001 file exported successfully"
 msgstr "PAIN.001 Datei erfolgreich exportiert"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/oe/OrderEntry.vue
 #: src/pages/oe/OrderReports.vue
 msgid "PO Number"
 msgstr "Bestellnummer"
@@ -4787,8 +4259,7 @@ msgstr "Bestellnummer"
 msgid "POS"
 msgstr "Kasse"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Packaging"
 msgstr "Verpackung"
@@ -4798,12 +4269,9 @@ msgid "Packing List"
 msgstr "Lieferschein"
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/components/LastTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/Payments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/components/LastTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue src/pages/cash/Payments.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 msgid "Paid"
 msgstr "Bezahlt"
@@ -4833,8 +4301,7 @@ msgstr "Dateien analysieren"
 msgid "Parsed Transactions"
 msgstr "Analysierte Transaktionen"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
 #: src/pages/system/Defaults.vue
 msgid "Part Number"
 msgstr "Artikelnummer"
@@ -4847,35 +4314,28 @@ msgstr "Artikelnummer ist erforderlich"
 msgid "Part/Service saved successfully"
 msgstr "Ware/Dienstleistung erfolgreich gespeichert"
 
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
+#: src/layouts/Menu.js src/pages/Import.vue
 msgid "Parts"
 msgstr "Waren"
 
-#: src/pages/LoginPage.vue
-#: src/pages/Signup.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Employees.vue
+#: src/pages/LoginPage.vue src/pages/Signup.vue
+#: src/pages/central/IndexPage.vue src/pages/system/Employees.vue
 msgid "Password"
 msgstr "Passwort"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/arap/AddVC.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Payment"
 msgstr "Zahlung"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/cash/Payments.vue
+#: src/pages/Import.vue src/pages/Import.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/cash/Payments.vue
 msgid "Payment Account"
 msgstr "Zahlungskonto"
 
-#: src/pages/Import.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/pages/Import.vue src/pages/cash/PaymentsReport.vue
 msgid "Payment Accounts"
 msgstr "Zahlungskonten"
 
@@ -4935,17 +4395,13 @@ msgstr "Zahlungsstatus erfolgreich aktualisiert"
 msgid "Payment statuses updated successfully"
 msgstr "Zahlungsstatus erfolgreich aktualisiert"
 
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/layouts/Menu.js src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Payments"
 msgstr "Zahlungen"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/general-ledger/GeneralLedger.vue
+#: src/pages/central/IndexPage.vue src/pages/general-ledger/GeneralLedger.vue
 msgid "Pending"
 msgstr "Ausstehend"
 
@@ -4957,8 +4413,7 @@ msgstr "Ausstehende Einladungen"
 msgid "Pending is disabled due to station restrictions"
 msgstr "Ausstehend ist aufgrund von Stationsbeschränkungen deaktiviert"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Period Type"
 msgstr "Periodentyp"
 
@@ -4978,11 +4433,8 @@ msgstr "Zugriff verweigert"
 msgid "Permissions"
 msgstr "Berechtigungen"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/Defaults.vue
 msgid "Phone"
 msgstr "Telefon"
 
@@ -5026,8 +4478,7 @@ msgstr "Bitte speichern Sie zuerst den Kunden/Lieferanten"
 msgid "Please select a bank account"
 msgstr "Bitte wählen Sie ein Bankkonto aus"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 msgid "Please select a bank account and payments to export"
 msgstr "Bitte wählen Sie ein Bankkonto und Zahlungen zum Exportieren aus"
 
@@ -5057,8 +4508,7 @@ msgstr "Bitte wählen Sie einen Status aus"
 msgid "Please select a status and payments to update"
 msgstr "Bitte wählen Sie einen Status und Zahlungen zum Aktualisieren aus"
 
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransaction.vue
 msgid "Please select a vendor/customer first"
 msgstr "Bitte wählen Sie zuerst einen Lieferanten/Kunden aus"
 
@@ -5066,8 +4516,7 @@ msgstr "Bitte wählen Sie zuerst einen Lieferanten/Kunden aus"
 msgid "Please select at least one payment"
 msgstr "Bitte wählen Sie mindestens eine Zahlung aus"
 
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/ArReminder.vue
 msgid "Please select at least one transaction"
 msgstr "Bitte wählen Sie mindestens eine Transaktion aus"
 
@@ -5083,14 +4532,12 @@ msgstr "Bitte wählen Sie Dateien zum Hochladen aus."
 msgid "Please select payments to update"
 msgstr "Bitte wählen Sie Zahlungen zum Aktualisieren aus"
 
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransaction.vue
 msgid "Please try again"
 msgstr "Bitte versuchen Sie es erneut"
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
-#: src/components/Button.vue
-#: src/pages/cash/Payments.vue
+#: src/components/Button.vue src/pages/cash/Payments.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Post"
 msgstr "Buchen"
@@ -5099,12 +4546,9 @@ msgstr "Buchen"
 msgid "Post as New"
 msgstr "Als neu buchen"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
+#: src/components/BankAccountForm.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/Defaults.vue
 #: src/pages/system/Employees.vue
 msgid "Postal Office"
 msgstr "Poststelle"
@@ -5113,22 +4557,17 @@ msgstr "Poststelle"
 msgid "Posted successfully"
 msgstr "Erfolgreich gebucht"
 
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
+#: src/layouts/Menu.js src/layouts/Menu.js src/layouts/Menu.js
 msgid "Postings"
 msgstr "Buchungen"
 
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Currencies.vue
+#: src/pages/system/Currencies.vue src/pages/system/Currencies.vue
 #: src/pages/system/Defaults.vue
 msgid "Precision"
 msgstr "Genauigkeit"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Price"
 msgstr "Preis"
@@ -5137,14 +4576,10 @@ msgstr "Preis"
 msgid "Pricegroup"
 msgstr "Preisgruppe"
 
-#: src/components/Button.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/TrialTransactions.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/components/Button.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/TrialTransactions.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/ListAccounts.vue
 msgid "Print"
 msgstr "Drucken"
 
@@ -5156,8 +4591,7 @@ msgstr "Vollständigen Bericht drucken"
 msgid "Print Headings Only"
 msgstr "Nur Überschriften drucken"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 msgid "Print batch created successfully"
 msgstr "Druckstapel erfolgreich erstellt"
 
@@ -5165,8 +4599,7 @@ msgstr "Druckstapel erfolgreich erstellt"
 msgid "Process Year End"
 msgstr "Jahresabschluss durchführen"
 
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue src/pages/system/Batch.vue
 msgid "Processed At"
 msgstr "Verarbeitet am"
 
@@ -5195,19 +4628,15 @@ msgstr "Profitcenter"
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/oe/OrderEntry.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Project"
 msgstr "Projekt"
 
-#: src/pages/Import.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/Import.vue src/pages/arap/VcHistory.vue
 #: src/pages/arap/VcHistory.vue
 msgid "Project Number"
 msgstr "Projektnummer"
@@ -5220,9 +4649,7 @@ msgstr "Projekt erfolgreich hinzugefügt!"
 msgid "Project updated successfully!"
 msgstr "Projekt erfolgreich aktualisiert!"
 
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/layouts/Menu.js src/pages/Import.vue src/pages/Import.vue
 #: src/pages/projectsjobs/ListProjects.vue
 msgid "Projects"
 msgstr "Projekte"
@@ -5239,8 +4666,7 @@ msgstr "Prompt-Typ"
 msgid "Prompt saved successfully"
 msgstr "Prompt erfolgreich gespeichert"
 
-#: src/layouts/Menu.js
-#: src/pages/oe/OrderEntry.vue
+#: src/layouts/Menu.js src/pages/oe/OrderEntry.vue
 msgid "Purchase Order"
 msgstr "Einkaufsbestellung"
 
@@ -5252,8 +4678,7 @@ msgstr "Einkaufsbestellnummer"
 msgid "Purchase Order Reports"
 msgstr "Einkaufsbestellberichte"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/VcHistory.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Purchase Orders"
 msgstr "Einkaufsbestellungen"
@@ -5278,24 +4703,18 @@ msgstr "Q3"
 msgid "Q4"
 msgstr "Q4"
 
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
 msgid "QR IBAN"
 msgstr "QR-IBAN"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/components/BankAccountForm.vue src/pages/arap/ArApTransaction.vue
 msgid "QR-IBAN"
 msgstr "QR-IBAN"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Qty"
 msgstr "Menge"
 
@@ -5303,19 +4722,16 @@ msgstr "Menge"
 msgid "Quantity"
 msgstr "Anzahl"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Quantity must be greater than 0"
 msgstr "Menge muss grösser als 0 sein"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/reports/IncomeStatement.vue
 msgid "Quarter"
 msgstr "Quartal"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Quarterly"
 msgstr "Vierteljährlich"
 
@@ -5331,8 +4747,7 @@ msgstr "Offertennummer"
 msgid "Quotation Reports"
 msgstr "Offertenberichte"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/VcHistory.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Quotations"
 msgstr "Offerten"
@@ -5353,14 +4768,12 @@ msgstr "Offertanfrageberichte"
 msgid "RN"
 msgstr "RN"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "ROP"
 msgstr "Meldebestand"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/system/BankAccounts.vue
+#: src/components/BankAccountForm.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/BankAccounts.vue
 msgid "RVC"
 msgstr "Codierzeile"
@@ -5373,13 +4786,11 @@ msgstr "Satz (%)"
 msgid "Receipts"
 msgstr "Quittungen"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/UserStations.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/UserStations.vue
 msgid "Received Date"
 msgstr "Empfangsdatum"
 
-#: src/layouts/Menu.js
-#: src/pages/cash/Reconciliation.vue
+#: src/layouts/Menu.js src/pages/cash/Reconciliation.vue
 msgid "Reconciliation"
 msgstr "Abstimmung"
 
@@ -5403,29 +4814,22 @@ msgstr "Neu verbinden"
 msgid "Record Account"
 msgstr "Konto erfassen"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/pos/PointOfSale.vue
 msgid "Record In"
 msgstr "Buchen in"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/components/LastTransactions.vue
-#: src/pages/Import.vue
-#: src/pages/cash/adjustments/BankTransactionDetail.vue
+#: src/ai_plugin/pages/DocumentList.vue src/components/LastTransactions.vue
+#: src/pages/Import.vue src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/system/YearEnd.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/system/YearEnd.vue
 msgid "Reference"
 msgstr "Referenz"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/general-ledger/GeneralLedger.vue src/pages/system/Defaults.vue
 msgid "Reference Documents"
 msgstr "Referenzdokumente"
 
@@ -5438,8 +4842,7 @@ msgstr "Referenz-ID"
 msgid "References"
 msgstr "Referenzen"
 
-#: src/ai_plugin/pages/UserStations.vue
-#: src/pages/central/IndexPage.vue
+#: src/ai_plugin/pages/UserStations.vue src/pages/central/IndexPage.vue
 msgid "Refresh"
 msgstr "Aktualisieren"
 
@@ -5447,10 +4850,8 @@ msgstr "Aktualisieren"
 msgid "Refresh Datasets"
 msgstr "Datensätze aktualisieren"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Remaining"
 msgstr "Rest"
@@ -5459,8 +4860,7 @@ msgstr "Rest"
 msgid "Reminder"
 msgstr "Mahnung"
 
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/SearchVC.vue
 msgid "Remittance Voucher"
 msgstr "Einzahlungsschein"
 
@@ -5484,8 +4884,7 @@ msgstr "PDF ersetzen"
 msgid "Report Detail"
 msgstr "Berichtsdetails"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Report Parameters"
 msgstr "Berichtsparameter"
 
@@ -5493,12 +4892,8 @@ msgstr "Berichtsparameter"
 msgid "Reporting Method (Cash)"
 msgstr "Berichtsmethode (Vereinnahmt)"
 
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
+#: src/layouts/Menu.js src/layouts/Menu.js src/layouts/Menu.js
+#: src/layouts/Menu.js src/layouts/Menu.js src/layouts/Menu.js
 msgid "Reports"
 msgstr "Berichte"
 
@@ -5543,12 +4938,9 @@ msgstr "Verarbeitung wiederholen"
 msgid "Review carefully - this action cannot be undone"
 msgstr "Sorgfältig prüfen - diese Aktion kann nicht rückgängig gemacht werden"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Roles.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/system/Employees.vue
+#: src/pages/system/Employees.vue src/pages/system/Roles.vue
 msgid "Role"
 msgstr "Rolle"
 
@@ -5564,8 +4956,7 @@ msgstr "Rolle erfolgreich hinzugefügt"
 msgid "Role added successfully!"
 msgstr "Rolle erfolgreich hinzugefügt!"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "Role name is required"
 msgstr "Rollenname ist erforderlich"
 
@@ -5573,8 +4964,7 @@ msgstr "Rollenname ist erforderlich"
 msgid "Role updated successfully"
 msgstr "Rolle erfolgreich aktualisiert"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 #: src/pages/system/Roles.vue
 msgid "Roles"
 msgstr "Rollen"
@@ -5631,8 +5021,7 @@ msgstr "Regelname ist erforderlich"
 msgid "Rule updated successfully"
 msgstr "Regel erfolgreich aktualisiert"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "SIC"
 msgstr "SIC"
 
@@ -5652,8 +5041,7 @@ msgstr "Verkauf"
 msgid "Sales"
 msgstr "Verkäufe"
 
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
+#: src/layouts/Menu.js src/layouts/Menu.js
 msgid "Sales Invoice"
 msgstr "Ausgangsrechnung"
 
@@ -5661,15 +5049,12 @@ msgstr "Ausgangsrechnung"
 msgid "Sales Invoice/AR Transaction Number"
 msgstr "Ausgangsrechnung/Debitoren-Buchungsnummer"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "Sales Invoices"
 msgstr "Ausgangsrechnungen"
 
-#: src/layouts/Menu.js
-#: src/pages/oe/OrderEntry.vue
+#: src/layouts/Menu.js src/pages/oe/OrderEntry.vue
 msgid "Sales Order"
 msgstr "Auftragsbestätigung"
 
@@ -5681,10 +5066,8 @@ msgstr "Auftragsbestätigungsnummer"
 msgid "Sales Order Reports"
 msgstr "Auftragsbestätigungsberichte"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "Sales Orders"
 msgstr "Auftragsbestätigungen"
 
@@ -5700,26 +5083,17 @@ msgstr "Verkaufsoffertennummer"
 msgid "Salesperson"
 msgstr "Verkäufer"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "Salutation"
 msgstr "Anrede"
 
-#: src/components/BankAccountForm.vue
-#: src/components/Button.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/Audit.vue
-#: src/pages/system/Currencies.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
-#: src/pages/system/Roles.vue
-#: src/pages/system/Taxes.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/Gifi.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/components/BankAccountForm.vue src/components/Button.vue
+#: src/pages/arap/AddVC.vue src/pages/central/IndexPage.vue
+#: src/pages/projectsjobs/ListProjects.vue src/pages/system/Audit.vue
+#: src/pages/system/Currencies.vue src/pages/system/Defaults.vue
+#: src/pages/system/Employees.vue src/pages/system/Roles.vue
+#: src/pages/system/Taxes.vue src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/Gifi.vue src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "Save"
 msgstr "Speichern"
@@ -5728,8 +5102,7 @@ msgstr "Speichern"
 msgid "Save As New"
 msgstr "Als neu speichern"
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/system/Templates.vue
+#: src/pages/central/IndexPage.vue src/pages/system/Templates.vue
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -5757,16 +5130,13 @@ msgstr "Speichern Sie diese Backup-Codes"
 msgid "Scan with your authenticator app"
 msgstr "Scannen Sie mit Ihrer Authenticator-App"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Screen"
 msgstr "Bildschirm"
 
-#: src/components/Button.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/components/Button.vue src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/reports/TrialBalance.vue
 msgid "Search"
 msgstr "Suchen"
@@ -5775,22 +5145,16 @@ msgstr "Suchen"
 msgid "Search Amount"
 msgstr "Betrag suchen"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
 msgid "Search Customers"
 msgstr "Kunden suchen"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArReminder.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArReminder.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue src/pages/cash/Reconciliation.vue
 #: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderReports.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/oe/OrderReports.vue
 #: src/pages/reports/AllTaxes.vue
 msgid "Search Params"
 msgstr "Suchparameter"
@@ -5803,8 +5167,7 @@ msgstr "Zahlungen suchen"
 msgid "Search Transactions"
 msgstr "Transaktionen suchen"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
 msgid "Search Vendors"
 msgstr "Lieferanten suchen"
 
@@ -5828,14 +5191,12 @@ msgstr "Geheimnis in Zwischenablage kopiert"
 msgid "Select"
 msgstr "Auswählen"
 
-#: src/pages/Import.vue
-#: src/pages/cash/adjustments/BankTransactionDetail.vue
+#: src/pages/Import.vue src/pages/cash/adjustments/BankTransactionDetail.vue
 msgid "Select All"
 msgstr "Alle auswählen"
 
 #: src/ai_plugin/components/CmptImport.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 msgid "Select Bank Account"
 msgstr "Bankkonto auswählen"
 
@@ -5895,21 +5256,17 @@ msgstr "Dem ausgewählten Bankkonto fehlt die IBAN"
 msgid "Selection Summary"
 msgstr "Auswahlzusammenfassung"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Sell Price"
 msgstr "Verkaufspreis"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Sell price cannot be negative"
 msgstr "Verkaufspreis darf nicht negativ sein"
 
-#: src/ai_plugin/components/StationTransfer.vue
-#: src/pages/arap/ArApBatch.vue
+#: src/ai_plugin/components/StationTransfer.vue src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
 msgid "Send"
 msgstr "Senden"
@@ -5926,27 +5283,22 @@ msgstr "Einladung senden"
 msgid "Send OTP"
 msgstr "OTP senden"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/UserStations.vue
 msgid "Sender"
 msgstr "Absender"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/SearchPart.vue
 msgid "September"
 msgstr "September"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Serial No."
 msgstr "Serien-Nr."
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Serial Number"
 msgstr "Seriennummer"
@@ -5983,32 +5335,24 @@ msgstr "Dienstleistungen für Verkaufsrechnungen einrichten."
 msgid "Set up system defaults."
 msgstr "Systemstandards einrichten."
 
-#: src/components/SettingsPanel.vue
-#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue src/components/SettingsPanel.vue
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/oe/OrderEntry.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Ship Via"
 msgstr "Versandart"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/oe/OrderEntry.vue
 msgid "Shipping Point"
 msgstr "Versandstelle"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 msgid "Shipto"
 msgstr "Lieferadresse"
 
@@ -6020,8 +5364,7 @@ msgstr "Kurz"
 msgid "Shortcuts"
 msgstr "Tastenkürzel"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Show Account Numbers"
 msgstr "Kontonummern anzeigen"
 
@@ -6061,20 +5404,15 @@ msgstr "Registrierung erfolgreich!"
 msgid "Sort Names by Number"
 msgstr "Namen nach Nummer sortieren"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/cash/Payments.vue
+#: src/pages/cash/Payments.vue src/pages/cash/PaymentsReport.vue
 #: src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Source"
 msgstr "Quelle"
@@ -6083,13 +5421,11 @@ msgstr "Quelle"
 msgid "Split Ledger"
 msgstr "Hauptbuch aufteilen"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Spreadsheet not available"
 msgstr "Tabelle nicht verfügbar"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
+#: src/pages/Import.vue src/pages/Import.vue
 msgid "Spreadsheet not properly initialized"
 msgstr "Tabelle nicht ordnungsgemäss initialisiert"
 
@@ -6097,10 +5433,8 @@ msgstr "Tabelle nicht ordnungsgemäss initialisiert"
 msgid "Standard"
 msgstr "Standard"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/projectsjobs/ListProjects.vue
-#: src/pages/system/Employees.vue
+#: src/pages/arap/AddVC.vue src/pages/projectsjobs/ListProjects.vue
+#: src/pages/projectsjobs/ListProjects.vue src/pages/system/Employees.vue
 #: src/pages/system/Employees.vue
 msgid "Start Date"
 msgstr "Startdatum"
@@ -6113,8 +5447,7 @@ msgstr "Startdatum (JJJJ-MM-TT)"
 msgid "Startdate"
 msgstr "Startdatum"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/DocumentList.vue
 msgid "Started"
 msgstr "Gestartet"
@@ -6123,18 +5456,14 @@ msgstr "Gestartet"
 msgid "Starts with"
 msgstr "Beginnt mit"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
 msgid "State"
 msgstr "Kanton"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
-#: src/pages/system/Employees.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/BankAccounts.vue
+#: src/pages/system/Defaults.vue src/pages/system/Employees.vue
 msgid "State/Province"
 msgstr "Kanton"
 
@@ -6178,10 +5507,8 @@ msgstr "Stationen"
 #: src/ai_plugin/components/RuleManagerDialog.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/arap/ArApTransactions.vue
 #: src/pages/system/Batch.vue
 msgid "Status"
 msgstr "Status"
@@ -6196,30 +5523,24 @@ msgstr "Lagerort"
 
 #: src/pages/central/ApiKeys.vue
 msgid "Store this API key securely. It will not be shown again."
-msgstr "Speichern Sie diesen API-Schlüssel sicher. Er wird nicht erneut angezeigt."
+msgstr ""
+"Speichern Sie diesen API-Schlüssel sicher. Er wird nicht erneut angezeigt."
 
-#: src/components/BankAccountForm.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
+#: src/components/BankAccountForm.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/Defaults.vue
 #: src/pages/system/Employees.vue
 msgid "Street Name"
 msgstr "Strassenname"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
+#: src/components/BankAccountForm.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/AddVC.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/Defaults.vue
 #: src/pages/system/Employees.vue
 msgid "Street Number"
 msgstr "Hausnummer"
 
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
 msgid "Structured Bank Info"
 msgstr "Strukturierte Bankinfo"
 
@@ -6227,20 +5548,15 @@ msgstr "Strukturierte Bankinfo"
 msgid "Structured Remittance"
 msgstr "Strukturierte Mitteilung"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/UserStations.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/UserStations.vue
 #: src/components/EmailOptions.vue
 msgid "Subject"
 msgstr "Betreff"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/oe/OrderEntry.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Subtotal"
 msgstr "Zwischensumme"
@@ -6257,10 +5573,8 @@ msgstr "Erfolgreiche E-Mails"
 msgid "Successfully Imported"
 msgstr "Erfolgreich importiert"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/reports/AllTaxes.vue
+#: src/pages/arap/TaxReport.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/reports/AllTaxes.vue
 msgid "Summary"
 msgstr "Zusammenfassung"
 
@@ -6273,8 +5587,7 @@ msgstr "Sammelkonto:"
 msgid "Summary View"
 msgstr "Zusammenfassungsansicht"
 
-#: src/components/SettingsPanel.vue
-#: src/components/SettingsPanel.vue
+#: src/components/SettingsPanel.vue src/components/SettingsPanel.vue
 msgid "Switch Database"
 msgstr "Datenbank wechseln"
 
@@ -6286,10 +5599,8 @@ msgstr "Wechseln Sie in den Bearbeitungsmodus, um Änderungen zu speichern"
 msgid "System"
 msgstr "System"
 
-#: src/components/EmailOptions.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArReminder.vue
+#: src/components/EmailOptions.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArReminder.vue
 #: src/pages/arap/ArReminder.vue
 msgid "TEX"
 msgstr "TEX"
@@ -6298,14 +5609,10 @@ msgstr "TEX"
 msgid "Task marked as completed"
 msgstr "Aufgabe als erledigt markiert"
 
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
-#: src/pages/system/chart/AddAccount.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/TaxReport.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
+#: src/pages/system/chart/AddAccount.vue src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -6318,20 +5625,16 @@ msgid "Tax Accno"
 msgstr "Steuerkonto-Nr."
 
 #: src/ai_plugin/components/TemplateBuilder.vue
-#: src/ai_plugin/components/TemplateBuilder.vue
-#: src/pages/Import.vue
+#: src/ai_plugin/components/TemplateBuilder.vue src/pages/Import.vue
 #: src/pages/arap/ArApTransaction.vue
 msgid "Tax Account"
 msgstr "Steuerkonto"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/TaxReport.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/arap/TaxReport.vue
 msgid "Tax Accounts"
 msgstr "Steuerkonten"
 
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/Import.vue src/pages/arap/ArApTransaction.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 msgid "Tax Amount"
 msgstr "Steuerbetrag"
@@ -6344,27 +5647,19 @@ msgstr "Umsatzsteuer"
 msgid "Tax Group Subtotal"
 msgstr "Steuergruppe Zwischensumme"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/ArApTransaction.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Tax Included"
 msgstr "Inklusive MWST"
 
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransaction.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransaction.vue
 msgid "Tax Name Not Found"
 msgstr "Steuername nicht gefunden"
 
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
+#: src/pages/Import.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/TaxReport.vue
 #: src/pages/system/Taxes.vue
 msgid "Tax Number"
 msgstr "Steuernummer"
@@ -6393,8 +5688,7 @@ msgstr "Steuer erfolgreich aktualisiert!"
 msgid "Taxes"
 msgstr "Steuern"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/central/CreateDataset.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/central/CreateDataset.vue
 msgid "Template"
 msgstr "Vorlage"
 
@@ -6422,8 +5716,7 @@ msgstr "Vorlagentyp noch nicht implementiert"
 msgid "Templates"
 msgstr "Vorlagen"
 
-#: src/pages/Import.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/SearchVC.vue
 msgid "Terms"
 msgstr "Zahlungsbedingungen"
 
@@ -6436,8 +5729,7 @@ msgid "The total debit and credit amounts must be balanced."
 msgstr "Die Summe der Soll- und Haben-Beträge muss ausgeglichen sein."
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/central/ApiKeys.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/central/ApiKeys.vue
 #: src/pages/central/IndexPage.vue
 msgid "This action cannot be undone."
 msgstr "Diese Aktion kann nicht rückgängig gemacht werden."
@@ -6450,55 +5742,39 @@ msgstr "Dieses Feld ist erforderlich"
 msgid "This will permanently modify your accounting records"
 msgstr "Dies wird Ihre Buchhaltungsunterlagen dauerhaft ändern"
 
-#: src/pages/Import.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/Import.vue src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "Threshold"
 msgstr "Schwellenwert"
 
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
 msgid "Title"
 msgstr "Titel"
 
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/cash/PaymentsReport.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/Payments.vue
+#: src/pages/cash/PaymentsReport.vue src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
-#: src/pages/reports/AllTaxes.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/AllTaxes.vue src/pages/reports/IncomeStatement.vue
 msgid "To Date"
 msgstr "Bis Datum"
 
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Tool Number"
 msgstr "Werkzeugnummer"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/arap/VcHistory.vue
 #: src/pages/cash/adjustments/Confirmation.vue
-#: src/pages/general-ledger/GeneralLedger.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
-#: src/pages/reports/AllTaxes.vue
+#: src/pages/general-ledger/GeneralLedger.vue src/pages/oe/OrderEntry.vue
+#: src/pages/pos/PointOfSale.vue src/pages/reports/AllTaxes.vue
 #: src/pages/system/Batch.vue
 msgid "Total"
 msgstr "Total"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/pages/ar/ConsolidateInvoices.vue
+#: src/ai_plugin/pages/BankPayments.vue src/components/LastTransactions.vue
+#: src/components/LastTransactions.vue src/pages/ar/ConsolidateInvoices.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 msgid "Total Amount"
 msgstr "Gesamtbetrag"
@@ -6559,8 +5835,7 @@ msgstr "Gesamtausgaben für den gewählten Zeitraum"
 msgid "Total sales for the selected period"
 msgstr "Gesamtumsatz für den gewählten Zeitraum"
 
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/cash/Reconciliation.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/cash/Reconciliation.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Totals"
 msgstr "Summen"
@@ -6587,28 +5862,21 @@ msgid "Trans Date (yyyy-mm-dd)"
 msgstr "Buchungsdatum (JJJJ-MM-TT)"
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/UserStations.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
-#: src/components/LastTransactions.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/UserStations.vue src/components/LastTransactions.vue
+#: src/components/LastTransactions.vue src/components/LastTransactions.vue
 #: src/pages/cash/adjustments/BankAdjustment.vue
 msgid "Transaction Date"
 msgstr "Buchungsdatum"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Transaction Date From"
 msgstr "Buchungsdatum von"
 
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Transaction Date To"
 msgstr "Buchungsdatum bis"
@@ -6632,8 +5900,7 @@ msgid "Transaction Header"
 msgstr "Buchungskopf"
 
 #: src/ai_plugin/components/CmptImport.vue
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 msgid "Transaction ID"
@@ -6660,10 +5927,8 @@ msgstr "Buchung erfolgreich gelöscht"
 msgid "Transaction error: "
 msgstr "Buchungsfehler: "
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/ArApTransaction.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue src/pages/pos/PointOfSale.vue
 msgid "Transaction posted successfully"
 msgstr "Buchung erfolgreich getätigt"
 
@@ -6717,12 +5982,9 @@ msgid "Two-Factor Authentication"
 msgstr "Zwei-Faktor-Authentifizierung"
 
 #: src/ai_plugin/components/CmptImport.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/Batch.vue
-#: src/pages/system/chart/ListAccounts.vue
+#: src/ai_plugin/pages/DocumentList.vue src/ai_plugin/pages/DocumentList.vue
+#: src/pages/arap/SearchVC.vue src/pages/system/Batch.vue
+#: src/pages/system/Batch.vue src/pages/system/chart/ListAccounts.vue
 msgid "Type"
 msgstr "Typ"
 
@@ -6734,13 +5996,11 @@ msgstr "Typ-Indikator"
 msgid "Type of Business"
 msgstr "Geschäftsart"
 
-#: src/pages/Import.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/Import.vue src/pages/system/Defaults.vue
 msgid "Type of Contact"
 msgstr "Kontaktart"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 msgid "Unable to delete Invoice"
 msgstr "Rechnung konnte nicht gelöscht werden"
 
@@ -6752,16 +6012,11 @@ msgstr "Buchung konnte nicht gelöscht werden"
 msgid "Unable to delete transaction"
 msgstr "Buchung konnte nicht gelöscht werden"
 
-#: src/pages/Import.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/oe/OrderEntry.vue
-#: src/pages/pos/PointOfSale.vue
+#: src/pages/Import.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue src/pages/arap/VcHistory.vue
+#: src/pages/arap/VcHistory.vue src/pages/goodservices/AddPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
+#: src/pages/oe/OrderEntry.vue src/pages/pos/PointOfSale.vue
 msgid "Unit"
 msgstr "Einheit"
 
@@ -6785,8 +6040,7 @@ msgstr "Hauptbuch-Buchung aktualisieren"
 msgid "Update Payment Status"
 msgstr "Zahlungsstatus aktualisieren"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 msgid "Update Status"
 msgstr "Status aktualisieren"
 
@@ -6799,8 +6053,7 @@ msgid "Update status for selected payments"
 msgstr "Status für ausgewählte Zahlungen aktualisieren"
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
-#: src/pages/goodservices/AddPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/AddPart.vue src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Updated"
 msgstr "Aktualisiert"
@@ -6834,8 +6087,7 @@ msgstr "Hochladen"
 msgid "Upload Failed"
 msgstr "Upload fehlgeschlagen"
 
-#: src/pages/system/Templates.vue
-#: src/pages/system/Templates.vue
+#: src/pages/system/Templates.vue src/pages/system/Templates.vue
 msgid "Upload New Template"
 msgstr "Neue Vorlage hochladen"
 
@@ -6847,8 +6099,7 @@ msgstr "Upload erfolgreich"
 msgid "Upload up to 20"
 msgstr "Bis zu 20 hochladen"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Uploaded"
 msgstr "Hochgeladen"
@@ -6861,8 +6112,7 @@ msgstr "Hochgeladene Dateien:"
 msgid "Uploading..."
 msgstr "Wird hochgeladen..."
 
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 msgid "User"
 msgstr "Benutzer"
 
@@ -6883,10 +6133,8 @@ msgid "User removed from station successfully"
 msgstr "Benutzer erfolgreich von Station entfernt"
 
 #: src/ai_plugin/pages/ManageStations.vue
-#: src/ai_plugin/pages/ManageStations.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
-#: src/pages/central/IndexPage.vue
+#: src/ai_plugin/pages/ManageStations.vue src/pages/central/IndexPage.vue
+#: src/pages/central/IndexPage.vue src/pages/central/IndexPage.vue
 #: src/pages/system/Roles.vue
 msgid "Users"
 msgstr "Benutzer"
@@ -6907,8 +6155,7 @@ msgstr "Gültig bis"
 msgid "Validate Data"
 msgstr "Daten validieren"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/Import.vue
+#: src/ai_plugin/pages/BankPayments.vue src/pages/Import.vue
 msgid "Validation Errors"
 msgstr "Validierungsfehler"
 
@@ -6922,16 +6169,11 @@ msgstr "Valutadatum"
 
 #: src/ai_plugin/components/TemplateBuilder.vue
 #: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/BankTransactions.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/cash/Payments.vue
-#: src/pages/general-ledger/GlTransactions.vue
-#: src/pages/oe/OrderEntry.vue
+#: src/ai_plugin/pages/BankTransactions.vue src/pages/ap/VendorInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/AddVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/cash/Payments.vue
+#: src/pages/general-ledger/GlTransactions.vue src/pages/oe/OrderEntry.vue
 msgid "Vendor"
 msgstr "Lieferant"
 
@@ -6939,8 +6181,7 @@ msgstr "Lieferant"
 msgid "Vendor Bill"
 msgstr "Lieferantenrechnung"
 
-#: src/layouts/Menu.js
-#: src/pages/arap/VcHistory.vue
+#: src/layouts/Menu.js src/pages/arap/VcHistory.vue
 msgid "Vendor History"
 msgstr "Lieferantenverlauf"
 
@@ -6948,10 +6189,8 @@ msgstr "Lieferantenverlauf"
 msgid "Vendor ID"
 msgstr "Lieferanten-ID"
 
-#: src/ai_plugin/pages/DocumentList.vue
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/pages/ap/VendorInvoice.vue
+#: src/ai_plugin/pages/DocumentList.vue src/layouts/Menu.js
+#: src/layouts/Menu.js src/pages/ap/VendorInvoice.vue
 #: src/pages/ap/VendorInvoice.vue
 msgid "Vendor Invoice"
 msgstr "Kreditorenrechnung"
@@ -6960,8 +6199,7 @@ msgstr "Kreditorenrechnung"
 msgid "Vendor Invoice/AP Transaction Number"
 msgstr "Kreditorenrechnung/Kreditoren-Buchungsnummer"
 
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/VcHistory.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/VcHistory.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Vendor Invoices"
 msgstr "Kreditorenrechnungen"
@@ -6971,15 +6209,10 @@ msgstr "Kreditorenrechnungen"
 msgid "Vendor Name"
 msgstr "Lieferantenname"
 
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/TaxReport.vue
-#: src/pages/oe/OrderReports.vue
+#: src/pages/Import.vue src/pages/Import.vue src/pages/Import.vue
+#: src/pages/arap/ArApBatch.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
+#: src/pages/arap/TaxReport.vue src/pages/oe/OrderReports.vue
 #: src/pages/system/Defaults.vue
 msgid "Vendor Number"
 msgstr "Lieferantennummer"
@@ -7016,13 +6249,9 @@ msgstr "Lieferantennummer ist erforderlich"
 msgid "Vendor updated successfully"
 msgstr "Lieferant erfolgreich aktualisiert"
 
-#: src/layouts/Menu.js
-#: src/layouts/Menu.js
-#: src/pages/Import.vue
-#: src/pages/Import.vue
-#: src/pages/arap/ArApBatch.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/oe/OrderReports.vue
+#: src/layouts/Menu.js src/layouts/Menu.js src/pages/Import.vue
+#: src/pages/Import.vue src/pages/arap/ArApBatch.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/oe/OrderReports.vue
 msgid "Vendors"
 msgstr "Lieferanten"
 
@@ -7071,8 +6300,7 @@ msgstr "E-Mail-Details anzeigen"
 msgid "View Failed Transactions"
 msgstr "Fehlgeschlagene Transaktionen anzeigen"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/BankPayments.vue src/ai_plugin/pages/DocumentList.vue
 msgid "View File"
 msgstr "Datei anzeigen"
 
@@ -7094,14 +6322,14 @@ msgstr "Vorlage anzeigen"
 
 #: src/pages/system/Templates.vue
 msgid "View mode - toggle edit mode to make changes"
-msgstr "Ansichtsmodus - Bearbeitungsmodus umschalten, um Änderungen vorzunehmen"
+msgstr ""
+"Ansichtsmodus - Bearbeitungsmodus umschalten, um Änderungen vorzunehmen"
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
 msgid "View, edit, and delete existing bank transaction rules"
 msgstr "Vorhandene Banktransaktionsregeln anzeigen, bearbeiten und löschen"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 msgid "Volume"
 msgstr "Beleg"
 
@@ -7109,22 +6337,18 @@ msgstr "Beleg"
 msgid "Voucher Number"
 msgstr "Belegnummer"
 
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/arap/ArApTransactions.vue
 #: src/pages/oe/OrderReports.vue
 msgid "Warehouse"
 msgstr "Warenlager"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Way Bill"
 msgstr "Frachtbrief"
 
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/arap/ArApTransactions.vue
-#: src/pages/oe/OrderReports.vue
+#: src/pages/Import.vue src/pages/arap/ArApTransactions.vue
+#: src/pages/arap/ArApTransactions.vue src/pages/oe/OrderReports.vue
 msgid "Waybill"
 msgstr "Frachtbrief"
 
@@ -7132,8 +6356,7 @@ msgstr "Frachtbrief"
 msgid "Website"
 msgstr "Webseite"
 
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/goodservices/SearchPart.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/goodservices/SearchPart.vue
 msgid "Weight"
 msgstr "Gewicht"
 
@@ -7165,18 +6388,14 @@ msgstr "Telefon (Geschäft)"
 msgid "XeLatex"
 msgstr "XeLatex"
 
-#: src/pages/arap/VcHistory.vue
-#: src/pages/arap/VcHistory.vue
-#: src/pages/goodservices/SearchPart.vue
-#: src/pages/reports/IncomeStatement.vue
-#: src/pages/reports/IncomeStatement.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/arap/VcHistory.vue src/pages/arap/VcHistory.vue
+#: src/pages/goodservices/SearchPart.vue src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/IncomeStatement.vue src/pages/reports/IncomeStatement.vue
 #: src/pages/reports/IncomeStatement.vue
 msgid "Year"
 msgstr "Jahr"
 
-#: src/layouts/Menu.js
-#: src/pages/system/YearEnd.vue
+#: src/layouts/Menu.js src/pages/system/YearEnd.vue
 msgid "Year End"
 msgstr "Jahresabschluss"
 
@@ -7184,13 +6403,11 @@ msgstr "Jahresabschluss"
 msgid "Year End Date"
 msgstr "Jahresabschlussdatum"
 
-#: src/pages/reports/BalanceSheet.vue
-#: src/pages/reports/IncomeStatement.vue
+#: src/pages/reports/BalanceSheet.vue src/pages/reports/IncomeStatement.vue
 msgid "Yearly"
 msgstr "Jährlich"
 
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/BankAccounts.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/BankAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Yes"
@@ -7208,26 +6425,21 @@ msgstr ""
 msgid "You do not have permission to access this page."
 msgstr "Sie haben keine Berechtigung, auf diese Seite zuzugreifen."
 
-#: src/pages/system/BankAccounts.vue
-#: src/pages/system/Defaults.vue
+#: src/pages/system/BankAccounts.vue src/pages/system/Defaults.vue
 msgid "ZIP/Postal Code"
 msgstr "PLZ"
 
-#: src/pages/ap/VendorInvoice.vue
-#: src/pages/ar/SalesInvoice.vue
+#: src/pages/ap/VendorInvoice.vue src/pages/ar/SalesInvoice.vue
 msgid "Zip"
 msgstr "PLZ"
 
-#: src/components/BankAccountForm.vue
-#: src/pages/arap/AddVC.vue
-#: src/pages/arap/SearchVC.vue
-#: src/pages/arap/SearchVC.vue
+#: src/components/BankAccountForm.vue src/pages/arap/AddVC.vue
+#: src/pages/arap/SearchVC.vue src/pages/arap/SearchVC.vue
 #: src/pages/system/Employees.vue
 msgid "Zip/Postal Code"
 msgstr "PLZ"
 
-#: src/pages/Import.vue
-#: src/pages/arap/ArApTransactions.vue
+#: src/pages/Import.vue src/pages/arap/ArApTransactions.vue
 msgid "Zipcode"
 msgstr "PLZ"
 
@@ -7271,8 +6483,7 @@ msgstr "oder klicken zum Durchsuchen"
 msgid "potential match(es)"
 msgstr "mögliche Übereinstimmung(en)"
 
-#: src/ai_plugin/pages/BankPayments.vue
-#: src/pages/ar/ConsolidateInvoices.vue
+#: src/ai_plugin/pages/BankPayments.vue src/pages/ar/ConsolidateInvoices.vue
 msgid "selected"
 msgstr "ausgewählt"
 
@@ -7288,8 +6499,7 @@ msgstr "Aufgaben erledigt"
 msgid "transactions will be adjusted"
 msgstr "Transaktionen werden angepasst"
 
-#: src/pages/system/Employees.vue
-#: src/pages/system/Roles.vue
+#: src/pages/system/Employees.vue src/pages/system/Roles.vue
 #: src/pages/system/department/ListDepartments.vue
 msgid "updated successfully!"
 msgstr "erfolgreich aktualisiert!"
