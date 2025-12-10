@@ -21,7 +21,7 @@ msgstr "Willkomme"
 
 ## Development
 
-Can Run watch in a separate terminal during development to automatiocally compile PO files to JSON when they're modified
+Can Run watch in a s eparate terminal during development to automatiocally compile PO files to JSON when they're modified
 
 ```bash
 npm run i18n:watch

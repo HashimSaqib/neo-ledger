@@ -282,10 +282,12 @@
         bordered
         dense
         virtual-scroll
+        :virtual-scroll-slice-size="30"
+        :virtual-scroll-item-size="48"
+        :rows-per-page-options="[0]"
         :rows="tableRows"
         :columns="displayColumns"
         row-key="id"
-        :rows-per-page-options="[0]"
       >
         <!-- Custom body slot: group header, subtotal and normal rows -->
         <template v-slot:body="props">

@@ -319,6 +319,9 @@
         flat
         bordered
         dense
+        virtual-scroll
+        :virtual-scroll-slice-size="30"
+        :virtual-scroll-item-size="48"
         :rows-per-page-options="[0]"
         virtual-scroll-sticky-end
         hide-bottom
@@ -852,7 +855,8 @@ const fetchCustomers = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.message || t("Error fetching") + " " + type.value,
+      message:
+        error.response?.data?.message || t("Error fetching") + " " + type.value,
       type: "negative",
       position: "center",
     });
