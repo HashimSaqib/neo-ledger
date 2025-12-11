@@ -868,8 +868,11 @@ const flattenParams = (obj, prefix = "") => {
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
     if (key === "customer" && typeof value === "object") {
-      if (value.customernumber) {
+      // handle both customer and vendor selections
+      if (type.value === "customer" && value.customernumber) {
         flattened["customernumber"] = value.customernumber;
+      } else if (type.value === "vendor" && value.vendornumber) {
+        flattened["vendornumber"] = value.vendornumber;
       }
     } else if (key === "account" && typeof value === "object") {
       if (value.accno) {
