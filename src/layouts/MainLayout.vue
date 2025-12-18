@@ -206,10 +206,22 @@ const filterMenu = async () => {
     acs = [];
   }
 
+  let hidden = LocalStorage.getItem(`${client}_hidden`);
+  try {
+    hidden = hidden ? hidden : [];
+  } catch (error) {
+    console.error("Error parsing hidden items:", error);
+    hidden = [];
+  }
+
   // A helper function for recursive filtering.
   const recursiveFilter = (menu) => {
     return menu
       .map((item) => {
+        // skip items that are explicitly hidden
+        if (hidden.includes(item.perm)) {
+          return null;
+        }
         const sublinks = item.sublinks ? recursiveFilter(item.sublinks) : [];
         if (acs.includes(item.perm) || sublinks.length) {
           const updatedItem = { ...item, sublinks };

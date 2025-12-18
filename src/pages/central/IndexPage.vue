@@ -809,6 +809,19 @@
                 </template>
               </q-input>
 
+              <s-select
+                v-model="selectedRole.hidden"
+                :options="menuOptions"
+                :label="t('Hidden Menu Items')"
+                :multiple="true"
+                emit-value
+                map-options
+                option-value="value"
+                option-label="label"
+                class="q-mb-md"
+                search="label"
+              />
+
               <div class="q-my-md">
                 <div class="text-subtitle1 q-mb-sm text-primary">
                   {{ t("Access Controls") }}
@@ -1356,7 +1369,7 @@ const selectedDatasetForManage = ref(null);
 const roleDialog = ref(false);
 const isEditMode = ref(false);
 const selectedDataset = ref(null);
-const selectedRole = ref({ id: null, name: "", acs: [] });
+const selectedRole = ref({ id: null, name: "", acs: [], hidden: [] });
 
 // Invite management state
 const inviteDialog = ref(false);
@@ -1537,6 +1550,20 @@ const computeGroupedAcs = async () => {
     };
   });
 };
+
+// Flat list of all menu items for the hidden dropdown
+const menuOptions = computed(() => {
+  const options = [];
+  groupedAcs.value.forEach((group) => {
+    if (group.group) {
+      options.push({ label: group.label, value: group.group });
+    }
+    group.subs.forEach((sub) => {
+      options.push({ label: sub.label, value: sub.perm });
+    });
+  });
+  return options;
+});
 
 // Get invites for a specific dataset
 const getDatasetInvites = (datasetId) => {
@@ -1992,7 +2019,7 @@ onMounted(async () => {
 // Open dialog to add a new role
 const openAddRolePopup = (dataset) => {
   selectedDataset.value = dataset;
-  selectedRole.value = { id: null, name: "", acs: [] };
+  selectedRole.value = { id: null, name: "", acs: [], hidden: [] };
   isEditMode.value = false;
   roleDialog.value = true;
 };
@@ -2000,10 +2027,29 @@ const openAddRolePopup = (dataset) => {
 // Open dialog to edit an existing role
 const openEditRolePopup = (dataset, role) => {
   selectedDataset.value = dataset;
+  // hidden is stored in extra_info as {"hidden": "[...]"}
+  let hiddenValue = [];
+  if (role.extra_info) {
+    try {
+      const extraInfo =
+        typeof role.extra_info === "string"
+          ? JSON.parse(role.extra_info)
+          : role.extra_info;
+      if (extraInfo.hidden) {
+        hiddenValue =
+          typeof extraInfo.hidden === "string"
+            ? JSON.parse(extraInfo.hidden)
+            : extraInfo.hidden;
+      }
+    } catch (e) {
+      console.error("Failed to parse extra_info:", e);
+    }
+  }
   selectedRole.value = {
     id: role.id,
     name: role.name,
     acs: typeof role.acs === "string" ? JSON.parse(role.acs) : [...role.acs],
+    hidden: hiddenValue,
   };
   isEditMode.value = true;
   roleDialog.value = true;
@@ -2012,7 +2058,7 @@ const openEditRolePopup = (dataset, role) => {
 // Cancel role editing/creation
 const cancelRole = () => {
   roleDialog.value = false;
-  selectedRole.value = { id: null, name: "", acs: [] };
+  selectedRole.value = { id: null, name: "", acs: [], hidden: [] };
 };
 
 // Save role changes (create/update) via API
@@ -2031,6 +2077,7 @@ const saveRole = async () => {
     const payload = {
       name: selectedRole.value.name,
       acs: JSON.stringify(selectedRole.value.acs),
+      hidden: JSON.stringify(selectedRole.value.hidden),
     };
     const clientParam = `?client=${selectedDataset.value.db_name}`;
 

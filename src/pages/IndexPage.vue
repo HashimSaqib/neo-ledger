@@ -30,7 +30,9 @@ onMounted(async () => {
   try {
     const response = await api.get("get_acs");
     const acs = response.data.acs;
+    const hidden = response.data.hidden || [];
     LocalStorage.set(`${client}_acs`, acs);
+    LocalStorage.set(`${client}_hidden`, JSON.stringify(hidden));
     filterMenu();
   } catch (error) {
     console.error("Error fetching ACS data:", error);

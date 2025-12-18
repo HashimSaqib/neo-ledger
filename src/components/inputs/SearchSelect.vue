@@ -14,8 +14,9 @@
       dense
       :multiple="multiple"
       clearable
-      fill-input
-      hide-selected
+      :fill-input="!multiple"
+      :hide-selected="!multiple"
+      :use-chips="multiple"
       :emit-value="emitValue"
       :map-options="mapOptions"
       :option-value="optionValue"
