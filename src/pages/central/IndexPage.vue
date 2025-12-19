@@ -10,7 +10,7 @@
             fit="contain"
             style="max-height: 36px; max-width: 150px"
           />
-          <span v-else>Neo-Ledger</span>
+          <span v-else>{{ productName }}</span>
         </q-toolbar-title>
 
         <q-space />
@@ -1203,6 +1203,7 @@ import ApiKeys from "./ApiKeys.vue";
 import neoledgerConfig from "../../../neoledger.json";
 
 const logo = resolveLogo({ forceDark: true });
+const productName = neoledgerConfig.productName || "Neo Ledger";
 const showDatasetDialog = ref(false);
 
 // API Keys dialog state

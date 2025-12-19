@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted, computed } from "vue";
+import { ref, provide, onMounted, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useQuasar } from "quasar";
@@ -72,6 +72,7 @@ import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
 import { getMenuLinks } from "src/layouts/Menu.js";
 import { Cookies, Dark, LocalStorage } from "quasar";
+import config from "../../neoledger.json";
 
 const $q = useQuasar();
 const miniState = ref(false);
@@ -86,7 +87,8 @@ const drawerRef = ref(null);
 
 // Extract client from the route instead of from Cookies
 const client = route.params.client;
-const getDefaultTitle = () => company || client || t("Neo Ledger");
+const getDefaultTitle = () =>
+  company || client || config.productName || t("Neo Ledger");
 const title = ref(getDefaultTitle());
 
 // Provide title and update function to child components
@@ -95,6 +97,15 @@ console.log("Providing title:", title);
 provide("updateTitle", (newTitle) => {
   title.value = `${t(newTitle)} / ${getDefaultTitle()}` || getDefaultTitle();
 });
+
+// Update document title when title changes
+watch(
+  title,
+  (newTitle) => {
+    document.title = t(newTitle);
+  },
+  { immediate: true }
+);
 
 // Reactive printMode variable
 const printMode = ref(false);

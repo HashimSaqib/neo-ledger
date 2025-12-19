@@ -4,6 +4,7 @@ import { boot } from "quasar/wrappers";
 import { themes } from "src/css/themes";
 import { watch } from "vue";
 import { initFavicon } from "src/helpers/resolveLogo";
+import config from "../../neoledger.json";
 
 const THEME_COOKIE = "preferred-theme";
 
@@ -32,6 +33,11 @@ export const setTheme = (isDark) => {
 };
 
 export default boot(() => {
+  // Set product name from config if available
+  if (config.productName) {
+    document.title = config.productName;
+  }
+
   // If no theme cookie exists, create one with default 'light' theme
   if (!LocalStorage.has(THEME_COOKIE)) {
     setTheme(false);
