@@ -3,7 +3,15 @@
     <!-- Fixed header with title, theme toggle, language selector and logout -->
     <q-header style="background-color: var(--q-menubg)">
       <q-toolbar class="q-px-lg">
-        <q-toolbar-title>Neo-Ledger</q-toolbar-title>
+        <q-toolbar-title>
+          <q-img
+            v-if="logo"
+            :src="logo"
+            fit="contain"
+            style="max-height: 36px; max-width: 150px"
+          />
+          <span v-else>Neo-Ledger</span>
+        </q-toolbar-title>
 
         <q-space />
         <!-- Refresh Button -->
@@ -1188,10 +1196,13 @@ import { getMenuLinks } from "src/layouts/Menu.js";
 import { useRouter } from "vue-router";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
+import { resolveLogo } from "src/helpers/resolveLogo";
 import CreateDataset from "./CreateDataset.vue";
 import DatasetConnections from "./DatasetConnections.vue";
 import ApiKeys from "./ApiKeys.vue";
 import neoledgerConfig from "../../../neoledger.json";
+
+const logo = resolveLogo({ forceDark: true });
 const showDatasetDialog = ref(false);
 
 // API Keys dialog state

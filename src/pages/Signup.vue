@@ -175,8 +175,10 @@ import { Notify, useQuasar, LocalStorage } from "quasar";
 import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import axios from "axios";
-import logo from "assets/images/logo.png";
+import { resolveLogo } from "src/helpers/resolveLogo";
 import config from "../../neoledger.json";
+
+const logo = resolveLogo();
 const { t } = useI18n();
 const $q = useQuasar();
 const router = useRouter();

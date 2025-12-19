@@ -3,6 +3,7 @@ import { setCssVar, Cookies, LocalStorage, Dark } from "quasar";
 import { boot } from "quasar/wrappers";
 import { themes } from "src/css/themes";
 import { watch } from "vue";
+import { initFavicon } from "src/helpers/resolveLogo";
 
 const THEME_COOKIE = "preferred-theme";
 
@@ -37,6 +38,9 @@ export default boot(() => {
   } else {
     setTheme(isDark());
   }
+
+  // Apply custom favicon if available
+  initFavicon();
 
   // Watch for dark mode changes using Vue's watch
   watch(

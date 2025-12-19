@@ -38,3 +38,6 @@ neoledger.json
 
 # i18n generated files
 src/i18n/locales/*/messages.json
+
+# Custom branding (for whitelabeling)
+/src/assets/custom
