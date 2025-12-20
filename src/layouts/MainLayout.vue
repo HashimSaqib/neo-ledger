@@ -80,22 +80,29 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const leftDrawerOpen = ref(false);
-const company = Cookies.get("company");
 
 // Drawer reference
 const drawerRef = ref(null);
 
 // Extract client from the route instead of from Cookies
 const client = route.params.client;
-const getDefaultTitle = () =>
-  company || client || config.productName || t("Neo Ledger");
+const company = LocalStorage.getItem(`${client}_company`);
+
+const getDefaultTitle = () => {
+  const currentCompany = LocalStorage.getItem(`${client}_company`);
+  return currentCompany || client || config.productName || t("Neo Ledger");
+};
 const title = ref(getDefaultTitle());
 
 // Provide title and update function to child components
 provide("title", title);
 console.log("Providing title:", title);
-provide("updateTitle", (newTitle) => {
-  title.value = `${t(newTitle)} / ${getDefaultTitle()}` || getDefaultTitle();
+provide("updateTitle", (newTitle = "") => {
+  if (newTitle && newTitle !== "") {
+    title.value = `${t(newTitle)} / ${getDefaultTitle()}`;
+  } else {
+    title.value = getDefaultTitle();
+  }
 });
 
 // Update document title when title changes

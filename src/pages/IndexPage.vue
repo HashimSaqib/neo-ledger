@@ -25,11 +25,17 @@ const route = useRoute();
 const client = route.params.client || "default";
 const filterMenu = inject("filterMenu");
 const showOnboarding = ref(route.query.onboarding === "1");
+const updateTitle = inject("updateTitle");
 
 onMounted(async () => {
   try {
     const response = await api.get("get_acs");
     const acs = response.data.acs;
+    const company = response.data.company || "";
+    if (company) {
+      LocalStorage.set(`${client}_company`, company);
+      updateTitle("");
+    }
     const hidden = response.data.hidden || [];
     LocalStorage.set(`${client}_acs`, acs);
     LocalStorage.set(`${client}_hidden`, JSON.stringify(hidden));
