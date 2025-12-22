@@ -81,11 +81,21 @@
       <div class="q-mt-none q-gutter-x-sm">
         <h6 class="q-my-none">{{ t("Shortcuts") }}</h6>
         <p>
-          {{ t("All shortcut Use Ctrl + Shift as the base key. For dropdowns, use arrow key or search and press enter to select. Value will be copied to the cell and clipboard.") }}
+          {{
+            t(
+              "All shortcut Use Ctrl + Shift as the base key. For dropdowns, use arrow key or search and press enter to select. Value will be copied to the cell and clipboard."
+            )
+          }}
           <br />
-          <span class="text-weight-bold">Ctrl + Shift + N</span> - {{ t("Next Number (GL Number, Invoice Number or Customer/Vendor Number)") }}
+          <span class="text-weight-bold">Ctrl + Shift + N</span> -
+          {{
+            t(
+              "Next Number (GL Number, Invoice Number or Customer/Vendor Number)"
+            )
+          }}
           <br />
-          <span class="text-weight-bold">Ctrl + Shift + T</span> - {{ t("Today's Date in yyyy-mm-dd.") }}
+          <span class="text-weight-bold">Ctrl + Shift + T</span> -
+          {{ t("Today's Date in yyyy-mm-dd.") }}
           <br />
         </p>
       </div>
@@ -101,6 +111,7 @@
           bg-color="input"
           label-color="secondary"
           search="label"
+          option-label="label"
           account
           v-model="selectValues.account"
           @update:model-value="
@@ -119,6 +130,7 @@
           bg-color="input"
           label-color="secondary"
           search="label"
+          option-label="label"
           account
           v-model="selectValues.taxAccount"
           @update:model-value="
@@ -1244,7 +1256,8 @@ const formatDate = (dateString) => {
 
 const coreValidationRules = {
   accountExists: (value) => {
-    if (!value) return { valid: false, message: t("Account number is required") };
+    if (!value)
+      return { valid: false, message: t("Account number is required") };
     const valid = repositories.accounts.value.some(
       (account) => account.accno === value
     );
@@ -1266,7 +1279,8 @@ const coreValidationRules = {
   },
 
   customerExists: (value) => {
-    if (!value) return { valid: false, message: t("Customer number is required") };
+    if (!value)
+      return { valid: false, message: t("Customer number is required") };
     const valid = repositories.customers.value.some(
       (customer) => customer.customernumber === value
     );
@@ -1277,7 +1291,8 @@ const coreValidationRules = {
   },
 
   vendorExists: (value) => {
-    if (!value) return { valid: false, message: t("Vendor number is required") };
+    if (!value)
+      return { valid: false, message: t("Vendor number is required") };
     const valid = repositories.vendors.value.some(
       (vendor) => vendor.vendornumber === value
     );
@@ -1351,8 +1366,8 @@ const coreValidationRules = {
 
 const entityValidationRules = [
   {
-        field: "name",
-        rule: (value) => coreValidationRules.requiredField(value, t("Name")),
+    field: "name",
+    rule: (value) => coreValidationRules.requiredField(value, t("Name")),
   },
   {
     field: "email",
@@ -1957,7 +1972,12 @@ const validateData = () => {
 
           if (!result.valid) {
             highlightCell(sheet, fieldIndex, realRowIndex);
-            errors.push(t("{message} at row {row}", { message: result.message, row: realRowIndex + 1 }));
+            errors.push(
+              t("{message} at row {row}", {
+                message: result.message,
+                row: realRowIndex + 1,
+              })
+            );
           }
         });
       }
@@ -2409,7 +2429,10 @@ const importData = async () => {
 
         Notify.create({
           color: "warning",
-          message: t("Partial import: {successCount} items imported, {failureCount} items failed", { successCount, failureCount }),
+          message: t(
+            "Partial import: {successCount} items imported, {failureCount} items failed",
+            { successCount, failureCount }
+          ),
           icon: "warning",
           position: "center",
           timeout: 5000,
