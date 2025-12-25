@@ -144,6 +144,7 @@
 import { ref } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
+import { Notify } from "quasar";
 
 const { t } = useI18n();
 
@@ -220,7 +221,11 @@ const attachDrive = async () => {
     await api.post(`/client/${props.dataset.db_name}/select_drive`, {
       drive_id: selectedDrive.value,
     });
-    // Refresh the dataset or update UI as needed
+    Notify.create({
+      message: t("Drive attached successfully"),
+      type: "positive",
+      position: "top-right",
+    });
   } catch (error) {
     console.error("Error attaching drive:", error);
   } finally {
