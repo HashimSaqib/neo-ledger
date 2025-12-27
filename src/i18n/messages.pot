@@ -1807,7 +1807,7 @@ msgid "Custom Periods"
 msgstr ""
 
 #: src/ai_plugin/pages/UploadDocument.vue
-msgid "Custom prompt for AI processing "
+msgid "Additional instructions for AI processing"
 msgstr ""
 
 #: src/pages/ar/SalesInvoice.vue
