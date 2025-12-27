@@ -340,7 +340,7 @@
               :key="col.name"
               :class="getCellClass(col)"
             >
-              <span v-if="col.name === 'reference'">
+              <span v-if="col.name === 'reference'" class="wrapped-description">
                 <router-link :to="getPath(props.row)" class="text-primary">
                   {{ props.row.reference }}
                 </router-link>
@@ -376,7 +376,7 @@
               <span v-else-if="col.name === 'updated'">
                 {{ formatUpdatedTimestamp(props.row) }}
               </span>
-              <span v-else>
+              <span v-else class="wrapped-description">
                 {{
                   typeof col.field === "function"
                     ? col.field(props.row)
@@ -472,6 +472,7 @@ const baseColumns = ref([
     field: "reference",
     sortable: true,
     default: true,
+    style: "max-width: 300px",
   },
   {
     name: "description",
@@ -480,6 +481,7 @@ const baseColumns = ref([
     field: "description",
     sortable: true,
     default: true,
+    style: "max-width: 300px",
   },
   {
     name: "files",
@@ -1209,8 +1211,16 @@ const createPDF = () => {
 .text-right {
   text-align: right;
 }
+.description-cell {
+  max-width: 300px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 .wrapped-description {
-  white-space: pre-wrap;
-  min-width: 10vw;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: block;
 }
 </style>
