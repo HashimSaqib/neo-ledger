@@ -1,10 +1,10 @@
 <template>
-  <q-page class="q-pa-md">
-    <!-- Search Form Card -->
+  <q-page class="q-pa-sm">
+    <!-- Search Form -->
     <div class="container">
       <q-expansion-item
         :label="t('Report Parameters')"
-        class="q-mb-md"
+        class="q-mb-sm"
         header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
@@ -58,18 +58,19 @@
               </div>
             </div>
 
-            <!-- Custom Periods Section with Drag & Drop -->
-            <div class="q-mt-md">
-              <div class="row">
-                <div class="text-h6">{{ t("As Of") }}</div>
-                <q-btn
+            <!-- Custom Periods Section -->
+            <div class="q-mt-sm">
+              <div class="row items-center">
+                <div class="text-subtitle1 text-weight-medium">
+                  {{ t("As Of") }}
+                </div>
+                <s-button
+                  type="add-line"
                   :label="t('Add Date')"
                   @click="addPeriod"
                   class="q-ml-sm"
-                  color="primary"
                 />
               </div>
-              <!-- Draggable component wraps the period list -->
               <draggable
                 v-model="formData.periods"
                 group="periods"
@@ -77,111 +78,36 @@
               >
                 <template #item="{ element, index }">
                   <div class="row q-gutter-sm q-mt-xs items-center">
-                    <!-- Drag handle icon for rearranging -->
                     <div class="col-auto">
                       <q-icon
                         name="drag_indicator"
                         class="cursor-move drag-handle"
-                        size="sm"
+                        size="xs"
                       />
                     </div>
-                    <!-- Current Mode: only current date -->
-                    <template v-if="formData.periodMode === 'current'">
-                      <div class="col-12 col-md-3">
-                        <q-input
-                          v-model="element.todate"
-                          type="date"
-                          outlined
-                          dense
-                          :label="t('As of Date')"
-                          @update:model-value="() => updatePeriod(element)"
-                        />
-                      </div>
-                    </template>
-                    <!-- Monthly Mode: specific month-end -->
-                    <template v-else-if="formData.periodMode === 'monthly'">
-                      <div class="col-12 col-md-3">
-                        <q-input
-                          v-model="element.todate"
-                          type="date"
-                          outlined
-                          dense
-                          :label="t('Date')"
-                          @update:model-value="() => updatePeriod(element)"
-                        />
-                      </div>
-                    </template>
-                    <!-- Quarterly Mode: quarter-end date -->
-                    <template v-else-if="formData.periodMode === 'quarterly'">
-                      <div class="col-12 col-md-3">
-                        <q-input
-                          v-model="element.todate"
-                          type="date"
-                          outlined
-                          dense
-                          :label="t('Date')"
-                          @update:model-value="() => updatePeriod(element)"
-                        />
-                      </div>
-                    </template>
-                    <!-- Yearly Mode: year-end date -->
-                    <template v-else-if="formData.periodMode === 'yearly'">
-                      <div class="col-12 col-md-3">
-                        <q-input
-                          v-model="element.todate"
-                          type="date"
-                          outlined
-                          dense
-                          :label="t('Date')"
-                          @update:model-value="() => updatePeriod(element)"
-                        />
-                      </div>
-                    </template>
-                    <!-- Custom Mode: specific date -->
-                    <template v-else-if="formData.periodMode === 'custom'">
-                      <div class="col-12 col-md-3">
-                        <q-input
-                          v-model="element.todate"
-                          type="date"
-                          outlined
-                          dense
-                          :label="t('As of Date')"
-                          @update:model-value="() => updatePeriod(element)"
-                        />
-                      </div>
-                      <!-- Hidden input to store the automatic label -->
-                      <div style="display: none">
-                        <q-input v-model="element.label" readonly />
-                      </div>
-                    </template>
-
-                    <!-- Delete Button -->
-                    <div class="col-12 col-md-1">
+                    <div class="col-12 col-md-2">
+                      <q-input
+                        v-model="element.todate"
+                        type="date"
+                        outlined
+                        dense
+                        :label="t('Date')"
+                        @update:model-value="() => updatePeriod(element)"
+                      />
+                    </div>
+                    <div class="col-auto">
                       <q-btn
                         icon="delete"
                         color="negative"
                         flat
                         round
+                        size="sm"
                         @click="removePeriod(index)"
                       />
                     </div>
                   </div>
                 </template>
               </draggable>
-            </div>
-
-            <!-- Report Formatting -->
-            <div class="row items-center q-mb-sm" v-if="false">
-              <div class="col-12 col-md-4">
-                <q-option-group
-                  v-model="formData.accounttype"
-                  :options="accountTypeOptions"
-                  inline
-                  dense
-                  :label="t('Account Type')"
-                  type="radio"
-                />
-              </div>
             </div>
 
             <!-- Display Options -->
@@ -204,18 +130,12 @@
 
             <!-- Submit Button -->
             <div class="row q-mt-sm">
-              <q-btn
-                type="submit"
+              <s-button
+                type="search"
                 :label="t('Generate Report')"
-                color="primary"
-                icon="description"
+                @click="search"
                 :loading="loading"
-              >
-                <template v-slot:loading>
-                  <q-spinner-hourglass class="on-left" />
-                  {{ t("Generating...") }}
-                </template>
-              </q-btn>
+              />
             </div>
           </q-form>
         </q-card-section>
@@ -223,496 +143,561 @@
     </div>
 
     <!-- Report Output -->
-    <q-card
+    <div
       v-if="results && Object.keys(results).length"
-      class="shadow-2"
+      class="report-container"
       ref="reportContent"
     >
-      <q-card-actions class="q-pa-sm no-print">
-        <q-btn :label="t('Export')" @click="downloadExcel" color="accent" />
+      <div class="report-header">
+        <div class="header-info">
+          <span class="client-name">{{ results.company }}</span>
+          <span class="separator">•</span>
+          <span>{{ formattedDateRange }}</span>
+        </div>
+        <div class="header-actions">
+          <q-btn flat :label="t('Print')" @click="getPDF" size="sm" />
+          <q-btn
+            color="primary"
+            :label="t('Export')"
+            @click="downloadExcel"
+            size="sm"
+          />
+        </div>
+      </div>
 
-        <!-- Print button with toggle option -->
-        <q-btn
-          :label="t('Print')"
-          :icon="formData.heading_only === '1' ? 'print' : 'print'"
-          color="info"
-          @click="getPDF"
-        >
-          <q-tooltip>
-            {{
-              formData.heading_only === "1"
-                ? t("Print Headings Only")
-                : t("Print Full Report")
-            }}
-          </q-tooltip>
-        </q-btn>
+      <!-- Controls -->
+      <div class="controls-row">
+        <div class="variance-toggles">
+          <q-btn
+            :outline="!showVarianceDollar"
+            :color="showVarianceDollar ? 'primary' : 'grey-7'"
+            :label="t('Show Variance')"
+            @click="showVarianceDollar = !showVarianceDollar"
+            size="sm"
+            :class="{ 'active-toggle': showVarianceDollar }"
+            no-caps
+          />
+          <q-btn
+            :outline="!showVariancePercent"
+            :color="showVariancePercent ? 'primary' : 'grey-7'"
+            :label="t('Show Variance (%)')"
+            @click="showVariancePercent = !showVariancePercent"
+            size="sm"
+            class="q-ml-sm"
+            :class="{ 'active-toggle': showVariancePercent }"
+            no-caps
+          />
+          <q-btn-dropdown
+            v-if="varianceOptions.length > 0"
+            :label="selectedVarianceLabel"
+            color="primary"
+            size="sm"
+            class="q-ml-sm"
+            no-caps
+            outline
+            dense
+            menu-anchor="bottom left"
+            menu-self="top left"
+          >
+            <q-list dense class="variance-dropdown">
+              <q-item
+                v-for="option in varianceOptions"
+                :key="option.value"
+                clickable
+                v-close-popup
+                @click="selectVariance(option)"
+                :active="selectedVariance === option.value"
+                dense
+              >
+                <q-item-section>{{ option.label }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+        <div class="expand-controls">
+          <q-btn
+            flat
+            size="sm"
+            @click="collapseAllHeadings"
+            no-caps
+            icon="unfold_less"
+          >
+            {{ t("Collapse") }}
+          </q-btn>
+          <q-btn
+            flat
+            size="sm"
+            @click="expandAllHeadings"
+            no-caps
+            icon="unfold_more"
+          >
+            {{ t("Expand") }}
+          </q-btn>
+        </div>
+      </div>
 
-        <!-- Toggle button for heading only option -->
-        <q-btn
-          :icon="formData.heading_only === '1' ? 'view_headline' : 'view_list'"
-          :color="formData.heading_only === '1' ? 'primary' : 'grey-6'"
-          flat
-          round
-          dense
-          @click="toggleHeadingOnly"
-        >
-          <q-tooltip>
-            {{
-              formData.heading_only === "1"
-                ? t("Headings Only")
-                : t("Full Report")
-            }}
-          </q-tooltip>
-        </q-btn>
-
-        <q-space />
-        <q-btn
-          :label="t('Expand All')"
-          @click="expandAllHeadings"
-          color="secondary"
-          flat
-          icon="expand_less"
-        />
-        <q-btn
-          :label="t('Collapse All')"
-          @click="collapseAllHeadings"
-          color="secondary"
-          flat
-          icon="expand_more"
-        />
-      </q-card-actions>
-      <!-- Report Header -->
-      <q-card-section v-if="results.company" class="mutedbg">
-        <div class="text-center q-pa-sm">
-          <div class="text-h4 text-primary q-mb-sm">{{ results.company }}</div>
-          <div class="maintext">
-            <div v-if="results.address">{{ results.address }}</div>
-            <div v-if="results.companyemail">{{ results.companyemail }}</div>
-            <div v-if="results.companywebsite">
-              {{ results.companywebsite }}
-            </div>
+      <!-- Report Table -->
+      <div class="report-table">
+        <!-- Table Header -->
+        <div class="table-header">
+          <div class="col-account">{{ t("ACCOUNT") }}</div>
+          <div
+            v-for="period in results.periods"
+            :key="period.label"
+            class="col-amount"
+          >
+            {{ formatPeriodLabel(period.label) }}
           </div>
-          <div class="text-h5 q-mt-sm">{{ t("Balance Sheet") }}</div>
-          <div class="text-caption q-mt-sm">
-            {{ formattedDateRange }}
+          <div
+            v-if="showVarianceDollar && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            <span class="variance-label">{{ t("VAR") }}</span>
+            <span class="variance-sub">({{ getVarianceComparison() }})</span>
+          </div>
+          <div
+            v-if="showVariancePercent && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            {{ t("VAR %") }}
           </div>
         </div>
-      </q-card-section>
-      <q-card-section>
+
         <!-- Assets Section -->
-        <div>
-          <!-- Header Row -->
-          <q-item class="q-pa-xs q-my-none">
-            <q-item-section>
-              <strong>
-                {{
-                  formData.l_accno
-                    ? t("Acc No - Description")
-                    : t("Description")
-                }}
-              </strong>
-            </q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right"
-            >
-              <strong>{{ period.label }}</strong>
-            </q-item-section>
-          </q-item>
-          <div class="section-header">
-            <q-icon name="account_balance_wallet" class="q-mr-sm" />
+        <div class="section">
+          <div class="section-title" @click="toggleSection('assets')">
+            <q-icon
+              :name="sectionCollapsed.assets ? 'chevron_right' : 'expand_more'"
+              size="sm"
+              class="section-expand-icon"
+            />
             {{ t("Assets") }}
           </div>
-          <q-separator />
-          <q-list bordered separator>
-            <!-- Iterate over asset accounts -->
-            <template v-for="(account, index) in assetAccounts" :key="index">
-              <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                  'account-row': true,
-                  'heading-account': account.charttype === 'H',
-                  'detail-account': account.charttype === 'A',
-                  'heading-row': account.charttype === 'H',
-                }"
-              >
-                <!-- Show account number as plain text with indentation -->
-                <q-item-section v-if="formData.l_accno" avatar>
-                  <div :style="{ paddingLeft: getIndentation(account.level) }">
-                    <q-icon
-                      :name="getAccountIcon(account)"
-                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
-                      size="sm"
-                      class="q-mr-xs"
-                    />
-                    {{ account.accno }}
-                  </div>
-                </q-item-section>
-                <!-- Description with indentation and clickable for headings -->
-                <q-item-section>
-                  <div
-                    :style="{
-                      paddingLeft:
-                        account.level > 0
-                          ? getIndentation(account.level)
-                          : '0px',
-                    }"
-                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
-                    @click="
-                      account.charttype === 'H'
-                        ? toggleHeading(account.accno)
-                        : null
-                    "
-                  >
-                    <div class="row items-center">
-                      <span>{{ account.description }}</span>
-                      <q-icon
-                        v-if="account.charttype === 'H'"
-                        :name="getHeadingIcon(account.accno)"
-                        size="sm"
-                        class="q-ml-xs"
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </q-item-section>
-                <q-item-section
-                  v-for="period in results.periods"
-                  :key="period.label"
-                  class="col text-right"
-                >
-                  <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.charttype === 'A'">
-                      <router-link
-                        :to="getPath(account.accno, period)"
-                        target="_blank"
-                        style="text-decoration: none"
-                        class="maintext"
-                      >
-                        {{
-                          formatAmountCustom(
-                            account.periods[period.label].amount
-                          )
-                        }}
-                      </router-link>
-                    </template>
-                    <template v-else>
-                      {{
-                        formatAmountCustom(account.periods[period.label].amount)
-                      }}
-                    </template>
-                  </template>
-                  <template v-else>-</template>
-                </q-item-section>
-              </q-item>
-              <q-separator
-                v-if="shouldShowSeparator(account, index, assetAccounts)"
-              />
-            </template>
-          </q-list>
-          <!-- Assets Subtotal Row -->
-          <q-item class="q-pa-sm items-center total-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="calculate" color="primary" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Total Assets")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
+          <template v-if="!sectionCollapsed.assets">
+            <div
+              v-for="(account, index) in assetAccounts"
+              :key="'asset-' + index"
+              class="table-row"
+              :class="{
+                'heading-row': account.charttype === 'H',
+                'detail-row': account.charttype === 'A',
+              }"
             >
-              {{
-                formatAmountCustom(
-                  sumAllAccounts(completeAssetAccounts, period.label)
-                )
-              }}
-            </q-item-section>
-          </q-item>
+              <div class="col-account">
+                <span :style="{ marginLeft: getIndentation(account.level) }">
+                  <q-icon
+                    v-if="account.charttype === 'H'"
+                    :name="
+                      isHeadingCollapsed(account.accno)
+                        ? 'chevron_right'
+                        : 'expand_more'
+                    "
+                    size="xs"
+                    class="expand-arrow"
+                    @click.stop="toggleHeading(account.accno)"
+                  />
+                  <span class="account-name">
+                    <template v-if="formData.l_accno && account.accno"
+                      >{{ account.accno }} -
+                    </template>
+                    {{ account.description }}
+                  </span>
+                </span>
+              </div>
+              <div
+                v-for="period in results.periods"
+                :key="period.label"
+                class="col-amount"
+              >
+                <template v-if="account.periods[period.label] !== undefined">
+                  <router-link
+                    v-if="account.charttype === 'A'"
+                    :to="getPath(account.accno, period)"
+                    target="_blank"
+                    class="amount-link"
+                  >
+                    {{ formatNumber(account.periods[period.label].amount) }}
+                  </router-link>
+                  <span v-else>{{
+                    formatNumber(account.periods[period.label].amount)
+                  }}</span>
+                </template>
+                <template v-else>-</template>
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getAccountVariance(account))">
+                  {{ formatVariance(getAccountVariance(account)) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getAccountVariancePercent(account))"
+                >
+                  {{
+                    formatVariancePercent(getAccountVariancePercent(account))
+                  }}
+                </span>
+              </div>
+            </div>
+            <!-- Assets Total -->
+            <div class="table-row total-row">
+              <div class="col-account">{{ t("Total Assets") }}</div>
+              <div
+                v-for="period in results.periods"
+                :key="'asset-total-' + period.label"
+                class="col-amount"
+              >
+                {{
+                  formatNumber(
+                    sumAllAccounts(completeAssetAccounts, period.label)
+                  )
+                }}
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getTotalVariance('assets'))">
+                  {{ formatVariance(getTotalVariance("assets")) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getTotalVariancePercent('assets'))"
+                >
+                  {{ formatVariancePercent(getTotalVariancePercent("assets")) }}
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- Liabilities Section -->
-        <div class="q-mt-sm">
-          <div class="section-header">
-            <q-icon name="account_balance" class="q-mr-sm" />
+        <div class="section">
+          <div class="section-title" @click="toggleSection('liabilities')">
+            <q-icon
+              :name="
+                sectionCollapsed.liabilities ? 'chevron_right' : 'expand_more'
+              "
+              size="sm"
+              class="section-expand-icon"
+            />
             {{ t("Liabilities") }}
           </div>
-          <q-separator />
-          <q-list bordered separator>
-            <!-- Iterate over liability accounts -->
-            <template
+          <template v-if="!sectionCollapsed.liabilities">
+            <div
               v-for="(account, index) in liabilityAccounts"
-              :key="index"
+              :key="'liability-' + index"
+              class="table-row"
+              :class="{
+                'heading-row': account.charttype === 'H',
+                'detail-row': account.charttype === 'A',
+              }"
             >
-              <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                  'account-row': true,
-                  'heading-account': account.charttype === 'H',
-                  'detail-account': account.charttype === 'A',
-                  'heading-row': account.charttype === 'H',
-                }"
-              >
-                <!-- Show account number as plain text with indentation -->
-                <q-item-section v-if="formData.l_accno" avatar>
-                  <div :style="{ paddingLeft: getIndentation(account.level) }">
-                    <q-icon
-                      :name="getAccountIcon(account)"
-                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
-                      size="sm"
-                      class="q-mr-xs"
-                    />
-                    {{ account.accno }}
-                  </div>
-                </q-item-section>
-                <!-- Description with indentation and clickable for headings -->
-                <q-item-section>
-                  <div
-                    :style="{
-                      paddingLeft:
-                        account.level > 0
-                          ? getIndentation(account.level)
-                          : '0px',
-                    }"
-                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
-                    @click="
-                      account.charttype === 'H'
-                        ? toggleHeading(account.accno)
-                        : null
+              <div class="col-account">
+                <span :style="{ marginLeft: getIndentation(account.level) }">
+                  <q-icon
+                    v-if="account.charttype === 'H'"
+                    :name="
+                      isHeadingCollapsed(account.accno)
+                        ? 'chevron_right'
+                        : 'expand_more'
                     "
+                    size="xs"
+                    class="expand-arrow"
+                    @click.stop="toggleHeading(account.accno)"
+                  />
+                  <span class="account-name">
+                    <template v-if="formData.l_accno && account.accno"
+                      >{{ account.accno }} -
+                    </template>
+                    {{ account.description }}
+                  </span>
+                </span>
+              </div>
+              <div
+                v-for="period in results.periods"
+                :key="period.label"
+                class="col-amount"
+              >
+                <template v-if="account.periods[period.label] !== undefined">
+                  <router-link
+                    v-if="account.charttype === 'A'"
+                    :to="getPath(account.accno, period)"
+                    target="_blank"
+                    class="amount-link"
                   >
-                    <div class="row items-center">
-                      <span>{{ account.description }}</span>
-                      <q-icon
-                        v-if="account.charttype === 'H'"
-                        :name="getHeadingIcon(account.accno)"
-                        size="sm"
-                        class="q-ml-xs"
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </q-item-section>
-                <q-item-section
-                  v-for="period in results.periods"
-                  :key="period.label"
-                  class="col text-right"
+                    {{ formatNumber(account.periods[period.label].amount) }}
+                  </router-link>
+                  <span v-else>{{
+                    formatNumber(account.periods[period.label].amount)
+                  }}</span>
+                </template>
+                <template v-else>-</template>
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getAccountVariance(account), true)"
                 >
-                  <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.charttype === 'A'">
-                      <router-link
-                        :to="getPath(account.accno, period)"
-                        target="_blank"
-                        style="text-decoration: none"
-                        class="maintext"
-                      >
-                        {{
-                          formatAmountCustom(
-                            account.periods[period.label].amount
-                          )
-                        }}
-                      </router-link>
-                    </template>
-                    <template v-else>
-                      {{
-                        formatAmountCustom(account.periods[period.label].amount)
-                      }}
-                    </template>
-                  </template>
-                  <template v-else>-</template>
-                </q-item-section>
-              </q-item>
-              <q-separator
-                v-if="shouldShowSeparator(account, index, liabilityAccounts)"
-              />
-            </template>
-          </q-list>
-          <!-- Liabilities Subtotal Row -->
-          <q-item class="q-pa-sm items-center total-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="calculate" color="primary" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Total Liabilities")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
-            >
-              {{
-                formatAmountCustom(
-                  sumAllAccounts(completeLiabilityAccounts, period.label)
-                )
-              }}
-            </q-item-section>
-          </q-item>
+                  {{ formatVariance(getAccountVariance(account)) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="
+                    getVarianceClass(getAccountVariancePercent(account), true)
+                  "
+                >
+                  {{
+                    formatVariancePercent(getAccountVariancePercent(account))
+                  }}
+                </span>
+              </div>
+            </div>
+            <!-- Liabilities Total -->
+            <div class="table-row total-row">
+              <div class="col-account">{{ t("Total Liabilities") }}</div>
+              <div
+                v-for="period in results.periods"
+                :key="'liability-total-' + period.label"
+                class="col-amount"
+              >
+                {{
+                  formatNumber(
+                    sumAllAccounts(completeLiabilityAccounts, period.label)
+                  )
+                }}
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="
+                    getVarianceClass(getTotalVariance('liabilities'), true)
+                  "
+                >
+                  {{ formatVariance(getTotalVariance("liabilities")) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="
+                    getVarianceClass(
+                      getTotalVariancePercent('liabilities'),
+                      true
+                    )
+                  "
+                >
+                  {{
+                    formatVariancePercent(
+                      getTotalVariancePercent("liabilities")
+                    )
+                  }}
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- Equity Section -->
-        <div class="q-mt-md">
-          <div class="section-header">
-            <q-icon name="trending_up" class="q-mr-sm" />
+        <div class="section">
+          <div class="section-title" @click="toggleSection('equity')">
+            <q-icon
+              :name="sectionCollapsed.equity ? 'chevron_right' : 'expand_more'"
+              size="sm"
+              class="section-expand-icon"
+            />
             {{ t("Equity") }}
           </div>
-          <q-separator />
-          <q-list bordered separator>
-            <!-- Iterate over equity accounts -->
-            <template v-for="(account, index) in equityAccounts" :key="index">
-              <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                  'account-row': true,
-                  'heading-account': account.charttype === 'H',
-                  'detail-account': account.charttype === 'A',
-                  'heading-row': account.charttype === 'H',
-                }"
-              >
-                <!-- Show account number as plain text with indentation -->
-                <q-item-section v-if="formData.l_accno" avatar>
-                  <div :style="{ paddingLeft: getIndentation(account.level) }">
-                    <q-icon
-                      :name="getAccountIcon(account)"
-                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
-                      size="sm"
-                      class="q-mr-xs"
-                    />
-                    {{ account.accno }}
-                  </div>
-                </q-item-section>
-                <!-- Description with indentation and clickable for headings -->
-                <q-item-section>
-                  <div
-                    :style="{
-                      paddingLeft:
-                        account.level > 0
-                          ? getIndentation(account.level)
-                          : '0px',
-                    }"
-                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
-                    @click="
-                      account.charttype === 'H'
-                        ? toggleHeading(account.accno)
-                        : null
+          <template v-if="!sectionCollapsed.equity">
+            <div
+              v-for="(account, index) in equityAccounts"
+              :key="'equity-' + index"
+              class="table-row"
+              :class="{
+                'heading-row': account.charttype === 'H',
+                'detail-row': account.charttype === 'A',
+              }"
+            >
+              <div class="col-account">
+                <span :style="{ marginLeft: getIndentation(account.level) }">
+                  <q-icon
+                    v-if="account.charttype === 'H'"
+                    :name="
+                      isHeadingCollapsed(account.accno)
+                        ? 'chevron_right'
+                        : 'expand_more'
                     "
+                    size="xs"
+                    class="expand-arrow"
+                    @click.stop="toggleHeading(account.accno)"
+                  />
+                  <span class="account-name">
+                    <template v-if="formData.l_accno && account.accno"
+                      >{{ account.accno }} -
+                    </template>
+                    {{ account.description }}
+                  </span>
+                </span>
+              </div>
+              <div
+                v-for="period in results.periods"
+                :key="period.label"
+                class="col-amount"
+              >
+                <template v-if="account.periods[period.label] !== undefined">
+                  <router-link
+                    v-if="account.charttype === 'A'"
+                    :to="getPath(account.accno, period)"
+                    target="_blank"
+                    class="amount-link"
                   >
-                    <div class="row items-center">
-                      <span>{{ account.description }}</span>
-                      <q-icon
-                        v-if="account.charttype === 'H'"
-                        :name="getHeadingIcon(account.accno)"
-                        size="sm"
-                        class="q-ml-xs"
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </q-item-section>
-                <q-item-section
-                  v-for="period in results.periods"
-                  :key="period.label"
-                  class="col text-right"
+                    {{ formatNumber(account.periods[period.label].amount) }}
+                  </router-link>
+                  <span v-else>{{
+                    formatNumber(account.periods[period.label].amount)
+                  }}</span>
+                </template>
+                <template v-else>-</template>
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getAccountVariance(account))">
+                  {{ formatVariance(getAccountVariance(account)) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getAccountVariancePercent(account))"
                 >
-                  <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.charttype === 'A'">
-                      <router-link
-                        :to="getPath(account.accno, period)"
-                        target="_blank"
-                        style="text-decoration: none"
-                        class="maintext"
-                      >
-                        {{
-                          formatAmountCustom(
-                            account.periods[period.label].amount
-                          )
-                        }}
-                      </router-link>
-                    </template>
-                    <template v-else>
-                      {{
-                        formatAmountCustom(account.periods[period.label].amount)
-                      }}
-                    </template>
-                  </template>
-                  <template v-else>-</template>
-                </q-item-section>
-              </q-item>
-              <q-separator
-                v-if="shouldShowSeparator(account, index, equityAccounts)"
-              />
-            </template>
-          </q-list>
-          <!-- Current Earnings Row -->
-          <q-item class="q-pa-sm items-center total-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="calculate" color="primary" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Current Earnings")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
-            >
-              {{
-                formatAmountCustom(
-                  sumAllAccounts(completeAssetAccounts, period.label) -
-                    sumAllAccounts(completeLiabilityAccounts, period.label) -
-                    sumAllAccounts(completeEquityAccounts, period.label)
-                )
-              }}
-            </q-item-section>
-          </q-item>
-          <!-- Updated Total Equity Row -->
-          <q-item class="q-pa-sm items-center total-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="calculate" color="primary" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Total Equity")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
-            >
-              {{
-                formatAmountCustom(
-                  sumAllAccounts(completeAssetAccounts, period.label) -
-                    sumAllAccounts(completeLiabilityAccounts, period.label)
-                )
-              }}
-            </q-item-section>
-          </q-item>
-          <!-- New: Total Liabilities + Equity Row -->
-          <q-item class="q-pa-sm items-center net-income-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="account_balance" color="primary" size="sm" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Total Liabilities + Equity")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
-            >
-              {{
-                formatAmountCustom(
-                  sumAllAccounts(completeLiabilityAccounts, period.label) +
-                    (sumAllAccounts(completeAssetAccounts, period.label) -
-                      sumAllAccounts(completeLiabilityAccounts, period.label))
-                )
-              }}
-            </q-item-section>
-          </q-item>
+                  {{
+                    formatVariancePercent(getAccountVariancePercent(account))
+                  }}
+                </span>
+              </div>
+            </div>
+            <!-- Current Year Result -->
+            <div class="table-row subtotal-row">
+              <div class="col-account">{{ t("Current Earnings") }}</div>
+              <div
+                v-for="period in results.periods"
+                :key="'earnings-' + period.label"
+                class="col-amount"
+              >
+                {{ formatNumber(getCurrentEarnings(period.label)) }}
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getEarningsVariance())">
+                  {{ formatVariance(getEarningsVariance()) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getEarningsVariancePercent())">
+                  {{ formatVariancePercent(getEarningsVariancePercent()) }}
+                </span>
+              </div>
+            </div>
+            <!-- Total Equity -->
+            <div class="table-row total-row">
+              <div class="col-account">{{ t("Total Equity") }}</div>
+              <div
+                v-for="period in results.periods"
+                :key="'equity-total-' + period.label"
+                class="col-amount"
+              >
+                {{ formatNumber(getTotalEquity(period.label)) }}
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getTotalVariance('equity'))">
+                  {{ formatVariance(getTotalVariance("equity")) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getTotalVariancePercent('equity'))"
+                >
+                  {{ formatVariancePercent(getTotalVariancePercent("equity")) }}
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
-        <!-- (Removed the previous note about "Total Liabilities and Equity" being removed.) -->
-      </q-card-section>
-    </q-card>
+
+        <!-- Total Liabilities + Equity -->
+        <div class="table-row grand-total-row">
+          <div class="col-account">{{ t("Total Liabilities + Equity") }}</div>
+          <div
+            v-for="period in results.periods"
+            :key="'liabilities-equity-total-' + period.label"
+            class="col-amount"
+          >
+            {{ formatNumber(getTotalLiabilitiesAndEquity(period.label)) }}
+          </div>
+          <div
+            v-if="showVarianceDollar && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            <span
+              :class="getVarianceClass(getTotalVariance('liabilitiesEquity'))"
+            >
+              {{ formatVariance(getTotalVariance("liabilitiesEquity")) }}
+            </span>
+          </div>
+          <div
+            v-if="showVariancePercent && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            <span
+              :class="
+                getVarianceClass(getTotalVariancePercent('liabilitiesEquity'))
+              "
+            >
+              {{
+                formatVariancePercent(
+                  getTotalVariancePercent("liabilitiesEquity")
+                )
+              }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -722,31 +707,25 @@ import { date } from "quasar";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
-import { formatAmount, roundAmount } from "src/helpers/utils.js";
+import { roundAmount, formatAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
 import draggable from "vuedraggable";
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Balance Sheet"));
-const printToggle = inject("printToggle");
 const route = useRoute();
 const now = new Date();
-const currentYear = String(now.getFullYear());
-const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
-const today = date.formatDate(new Date(), "YYYY-MM-DD");
 
 const formData = ref({
   department: route.query.department || "",
   projectnumber: route.query.projectnumber || "",
-  currency: "",
-  decimalplaces: "2",
   usetemplate: false,
   l_accno: true,
   previousyear: false,
   accounttype: "standard",
   heading_only: "0",
-  periodMode: "current", // Options: current, monthly, quarterly, yearly, custom
+  periodMode: "current",
   periods: [],
 });
 
@@ -758,11 +737,6 @@ const periodModeOptions = [
   { label: t("Custom"), value: "custom" },
 ];
 
-const accountTypeOptions = [
-  { label: t("Standard"), value: "standard" },
-  { label: t("Manufacturing"), value: "manufacturing" },
-];
-
 const yearOptions = Array.from({ length: 5 }, (_, i) => {
   const yr = String(now.getFullYear() - i);
   return { value: yr, label: yr };
@@ -770,34 +744,91 @@ const yearOptions = Array.from({ length: 5 }, (_, i) => {
 
 const departments = ref([]);
 const projects = ref([]);
-const currencies = ref([]);
 const filtersOpen = ref(true);
 const loading = ref(false);
 const results = ref({});
-const collapsedHeadings = ref(new Set()); // Track collapsed heading account numbers
+const collapsedHeadings = ref(new Set());
+const showVarianceDollar = ref(true);
+const showVariancePercent = ref(false);
+const sectionCollapsed = ref({
+  assets: false,
+  liabilities: false,
+  equity: false,
+});
+const selectedVariance = ref("0-1"); // format: "currentIndex-previousIndex"
+
+// Generate all possible variance combinations from selected periods
+const varianceOptions = computed(() => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return [];
+
+  const options = [];
+  for (let i = 0; i < periods.length; i++) {
+    for (let j = i + 1; j < periods.length; j++) {
+      const label1 = formatPeriodLabel(periods[i].label);
+      const label2 = formatPeriodLabel(periods[j].label);
+      options.push({
+        value: `${i}-${j}`,
+        label: `${label1} vs ${label2}`,
+        currentIdx: i,
+        previousIdx: j,
+      });
+    }
+  }
+  return options;
+});
+
+const selectedVarianceLabel = computed(() => {
+  const option = varianceOptions.value.find(
+    (o) => o.value === selectedVariance.value
+  );
+  return option ? option.label : t("Select Variance");
+});
+
+const selectVariance = (option) => {
+  selectedVariance.value = option.value;
+};
+
+// Get current and previous period indices for variance calculations
+const getVarianceIndices = () => {
+  const parts = selectedVariance.value.split("-");
+  return {
+    currentIdx: parseInt(parts[0], 10),
+    previousIdx: parseInt(parts[1], 10),
+  };
+};
 
 const formattedDateRange = computed(() => {
-  if (formData.value.periods.length) {
-    return formData.value.periods.map((p) => p.label).join(", ");
+  if (results.value.periods?.length) {
+    return formatPeriodLabel(results.value.periods[0].label);
   }
   return t("N/A");
 });
 
-/**
- * Builds a hierarchical structure of accounts based on parent_accno relationships
- * @param {Object} rawAccounts - Raw account data from API
- * @param {Object} accountsInfo - Account metadata from API
- * @param {string} type - 'A' for assets, 'L' for liabilities, 'Q' for equity
- * @returns {Array} Hierarchical array of accounts with levels
- */
-const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
+const formatPeriodLabel = (label) => {
+  if (!label) return "";
+  // Convert YYYY-MM-DD to DD.MM.YYYY format
+  if (label.includes("-")) {
+    const parts = label.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    }
+  }
+  return label;
+};
+
+const buildAccountHierarchy = (
+  rawAccounts,
+  accountsInfo,
+  type,
+  respectCollapsed = true
+) => {
   const accountMap = new Map();
   const rootAccounts = [];
 
-  // First pass: create account objects and store in map
   Object.keys(rawAccounts).forEach((accno) => {
     const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
+    const periodsData = {};
 
     Object.keys(accountPeriods).forEach((periodLabel) => {
       if (accountPeriods[periodLabel][type]) {
@@ -807,7 +838,7 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
 
     if (Object.keys(periodsData).length > 0) {
       const accountInfo = accountsInfo[accno] || {};
-      const account = {
+      accountMap.set(accno, {
         accno,
         description: accountInfo.description || "",
         charttype: accountInfo.charttype || "A",
@@ -815,12 +846,10 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
         periods: periodsData,
         level: 0,
         children: [],
-      };
-      accountMap.set(accno, account);
+      });
     }
   });
 
-  // Second pass: build parent-child relationships
   accountMap.forEach((account) => {
     if (account.parent_accno && accountMap.has(account.parent_accno)) {
       const parent = accountMap.get(account.parent_accno);
@@ -831,190 +860,68 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
     }
   });
 
-  // Third pass: flatten the hierarchy while preserving order and levels
-  const flattenHierarchy = (accounts, result = []) => {
+  const flatten = (accounts, result = []) => {
     accounts.forEach((account) => {
       result.push(account);
-      // Only include children if the heading is not collapsed
-      if (
-        account.children.length > 0 &&
-        !collapsedHeadings.value.has(account.accno)
-      ) {
-        flattenHierarchy(account.children, result);
-      }
+      const shouldExpand = respectCollapsed
+        ? account.children.length > 0 &&
+          !collapsedHeadings.value.has(account.accno)
+        : account.children.length > 0;
+      if (shouldExpand) flatten(account.children, result);
     });
     return result;
   };
 
-  return flattenHierarchy(rootAccounts);
+  return flatten(rootAccounts);
 };
 
-/**
- * Builds a complete hierarchical structure of accounts for total calculations
- * This includes ALL accounts regardless of collapsed state
- * @param {Object} rawAccounts - Raw account data from API
- * @param {Object} accountsInfo - Account metadata from API
- * @param {string} type - 'A' for assets, 'L' for liabilities, 'Q' for equity
- * @returns {Array} Complete hierarchical array of accounts with levels
- */
-const buildCompleteAccountHierarchy = (rawAccounts, accountsInfo, type) => {
-  const accountMap = new Map();
-  const rootAccounts = [];
+const getRawData = () => ({
+  raw: results.value[""] || {},
+  info: results.value.accounts || {},
+});
 
-  // First pass: create account objects and store in map
-  Object.keys(rawAccounts).forEach((accno) => {
-    const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
-
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel][type]) {
-        periodsData[periodLabel] = accountPeriods[periodLabel][type];
-      }
-    });
-
-    if (Object.keys(periodsData).length > 0) {
-      const accountInfo = accountsInfo[accno] || {};
-      const account = {
-        accno,
-        description: accountInfo.description || "",
-        charttype: accountInfo.charttype || "A",
-        parent_accno: accountInfo.parent_accno || null,
-        periods: periodsData,
-        level: 0,
-        children: [],
-      };
-      accountMap.set(accno, account);
-    }
-  });
-
-  // Second pass: build parent-child relationships
-  accountMap.forEach((account) => {
-    if (account.parent_accno && accountMap.has(account.parent_accno)) {
-      const parent = accountMap.get(account.parent_accno);
-      parent.children.push(account);
-      account.level = parent.level + 1;
-    } else {
-      rootAccounts.push(account);
-    }
-  });
-
-  // Third pass: flatten the hierarchy while preserving order and levels
-  // This version includes ALL accounts regardless of collapsed state
-  const flattenHierarchy = (accounts, result = []) => {
-    accounts.forEach((account) => {
-      result.push(account);
-      // Include all children regardless of collapsed state
-      if (account.children.length > 0) {
-        flattenHierarchy(account.children, result);
-      }
-    });
-    return result;
-  };
-
-  return flattenHierarchy(rootAccounts);
-};
-
-/* ============================================================================
-   Computed properties for each account group.
-============================================================================ */
 const assetAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildAccountHierarchy(rawAccounts, accountsInfo, "A");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "A");
 });
 
 const liabilityAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildAccountHierarchy(rawAccounts, accountsInfo, "L");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "L");
 });
 
 const equityAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildAccountHierarchy(rawAccounts, accountsInfo, "Q");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "Q");
 });
 
-// Complete account hierarchies for total calculations (includes all accounts regardless of collapsed state)
 const completeAssetAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "A");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "A", false);
 });
 
 const completeLiabilityAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "L");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "L", false);
 });
 
 const completeEquityAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "Q");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "Q", false);
 });
 
-/* ============================================================================
-   Helper Functions for Formatting
-   - Negative values now use the default minus sign rather than wrapping with parentheses.
-============================================================================ */
-const formatAmountCustom = (value) => {
-  return formatAmount(value);
+const formatNumber = (value) => {
+  const num = Number(value) || 0;
+  if (num < 0) return `-${formatAmount(Math.abs(num))}`;
+  return formatAmount(num);
 };
 
-const roundAmountCustom = (value) => {
-  return roundAmount(value);
-};
-
-/**
- * Generates CSS padding based on account level for indentation
- * @param {number} level - Account hierarchy level
- * @returns {string} CSS padding value
- */
 const getIndentation = (level) => {
-  const basePadding = 16; // Base padding in pixels
-  const indentPerLevel = 24; // Additional padding per level
+  const basePadding = 12;
+  const indentPerLevel = 20;
   return `${basePadding + level * indentPerLevel}px`;
 };
 
-/**
- * Determines if an account should show a separator line
- * @param {Object} account - Account object
- * @param {number} index - Account index in the list
- * @param {Array} accounts - Full accounts array
- * @returns {boolean} Whether to show separator
- */
-const shouldShowSeparator = (account, index, accounts) => {
-  // Show separator after heading accounts
-  if (account.charttype === "H") {
-    return true;
-  }
-
-  // Show separator if next account is at a lower level (end of a group)
-  if (index < accounts.length - 1) {
-    const nextAccount = accounts[index + 1];
-    return nextAccount.level < account.level;
-  }
-
-  return false;
-};
-
-/**
- * Gets the appropriate icon for an account based on its type and level
- * @param {Object} account - Account object
- * @returns {string} Icon name
- */
-const getAccountIcon = (account) => {
-  if (account.charttype === "H") {
-    return "folder";
-  }
-  return "description";
-};
-
-/**
- * Toggles the collapsed state of a heading account
- * @param {string} accno - Account number to toggle
- */
 const toggleHeading = (accno) => {
   if (collapsedHeadings.value.has(accno)) {
     collapsedHeadings.value.delete(accno);
@@ -1023,239 +930,247 @@ const toggleHeading = (accno) => {
   }
 };
 
-/**
- * Checks if a heading account is collapsed
- * @param {string} accno - Account number to check
- * @returns {boolean} Whether the heading is collapsed
- */
 const isHeadingCollapsed = (accno) => {
   return collapsedHeadings.value.has(accno);
 };
 
-/**
- * Gets the appropriate icon for a heading based on its collapsed state
- * @param {string} accno - Account number
- * @returns {string} Icon name
- */
-const getHeadingIcon = (accno) => {
-  return isHeadingCollapsed(accno) ? "expand_more" : "expand_less";
-};
-
-/**
- * Expands all heading accounts
- */
 const expandAllHeadings = () => {
   collapsedHeadings.value.clear();
+  sectionCollapsed.value = { assets: false, liabilities: false, equity: false };
 };
 
-/**
- * Collapses all heading accounts
- */
 const collapseAllHeadings = () => {
-  // Get all heading account numbers from all account types
   const allAccounts = [
     ...assetAccounts.value,
     ...liabilityAccounts.value,
     ...equityAccounts.value,
   ];
-  const headingAccounts = allAccounts.filter(
-    (account) => account.charttype === "H"
-  );
-  headingAccounts.forEach((account) => {
-    collapsedHeadings.value.add(account.accno);
-  });
+  allAccounts
+    .filter((a) => a.charttype === "H")
+    .forEach((a) => collapsedHeadings.value.add(a.accno));
 };
 
-/* ============================================================================
-   Sum accounts for a given period.
-============================================================================ */
-const sumAccounts = (accountsArray, periodLabel) => {
-  return accountsArray.reduce((sum, account) => {
-    // Skip heading accounts (charttype 'H') when calculating totals
-    if (account.charttype === "H") return sum;
-    const amount = account.periods[periodLabel]?.amount || 0;
-    return sum + Number(amount);
-  }, 0);
+const toggleSection = (section) => {
+  sectionCollapsed.value[section] = !sectionCollapsed.value[section];
 };
 
-/**
- * Sums all accounts for a given period label, including collapsed accounts
- * This is used for total calculations that should include all accounts regardless of display state
- */
 const sumAllAccounts = (completeAccountsArray, periodLabel) => {
   return completeAccountsArray.reduce((sum, account) => {
-    // Skip heading accounts (charttype 'H') when calculating totals
     if (account.charttype === "H") return sum;
     const amount = account.periods[periodLabel]?.amount || 0;
     return sum + Number(amount);
   }, 0);
 };
 
-/* ============================================================================
-   Period-related functions and report generation.
-============================================================================ */
+const getCurrentEarnings = (periodLabel) => {
+  return (
+    sumAllAccounts(completeAssetAccounts.value, periodLabel) -
+    sumAllAccounts(completeLiabilityAccounts.value, periodLabel) -
+    sumAllAccounts(completeEquityAccounts.value, periodLabel)
+  );
+};
+
+const getTotalEquity = (periodLabel) => {
+  return (
+    sumAllAccounts(completeAssetAccounts.value, periodLabel) -
+    sumAllAccounts(completeLiabilityAccounts.value, periodLabel)
+  );
+};
+
+const getTotalLiabilitiesAndEquity = (periodLabel) => {
+  return (
+    sumAllAccounts(completeLiabilityAccounts.value, periodLabel) +
+    getTotalEquity(periodLabel)
+  );
+};
+
+// Variance calculations - using selected variance indices
+const getAccountVariance = (account) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = account.periods[periods[currentIdx]?.label]?.amount || 0;
+  const previous = account.periods[periods[previousIdx]?.label]?.amount || 0;
+  return Number(current) - Number(previous);
+};
+
+const getAccountVariancePercent = (account) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = account.periods[periods[currentIdx]?.label]?.amount || 0;
+  const previous = account.periods[periods[previousIdx]?.label]?.amount || 0;
+  if (previous === 0) return current !== 0 ? 100 : 0;
+  return (
+    ((Number(current) - Number(previous)) / Math.abs(Number(previous))) * 100
+  );
+};
+
+const getTotalVariance = (type) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+
+  let accounts;
+  if (type === "assets") accounts = completeAssetAccounts.value;
+  else if (type === "liabilities") accounts = completeLiabilityAccounts.value;
+  else if (type === "equity") {
+    const current = getTotalEquity(periods[currentIdx]?.label);
+    const previous = getTotalEquity(periods[previousIdx]?.label);
+    return current - previous;
+  } else if (type === "liabilitiesEquity") {
+    const current = getTotalLiabilitiesAndEquity(periods[currentIdx]?.label);
+    const previous = getTotalLiabilitiesAndEquity(periods[previousIdx]?.label);
+    return current - previous;
+  }
+
+  const current = sumAllAccounts(accounts, periods[currentIdx]?.label);
+  const previous = sumAllAccounts(accounts, periods[previousIdx]?.label);
+  return current - previous;
+};
+
+const getTotalVariancePercent = (type) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+
+  let current, previous;
+  if (type === "assets") {
+    current = sumAllAccounts(
+      completeAssetAccounts.value,
+      periods[currentIdx]?.label
+    );
+    previous = sumAllAccounts(
+      completeAssetAccounts.value,
+      periods[previousIdx]?.label
+    );
+  } else if (type === "liabilities") {
+    current = sumAllAccounts(
+      completeLiabilityAccounts.value,
+      periods[currentIdx]?.label
+    );
+    previous = sumAllAccounts(
+      completeLiabilityAccounts.value,
+      periods[previousIdx]?.label
+    );
+  } else if (type === "equity") {
+    current = getTotalEquity(periods[currentIdx]?.label);
+    previous = getTotalEquity(periods[previousIdx]?.label);
+  } else if (type === "liabilitiesEquity") {
+    current = getTotalLiabilitiesAndEquity(periods[currentIdx]?.label);
+    previous = getTotalLiabilitiesAndEquity(periods[previousIdx]?.label);
+  }
+
+  if (previous === 0) return current !== 0 ? 100 : 0;
+  return ((current - previous) / Math.abs(previous)) * 100;
+};
+
+const getEarningsVariance = () => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = getCurrentEarnings(periods[currentIdx]?.label);
+  const previous = getCurrentEarnings(periods[previousIdx]?.label);
+  return current - previous;
+};
+
+const getEarningsVariancePercent = () => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = getCurrentEarnings(periods[currentIdx]?.label);
+  const previous = getCurrentEarnings(periods[previousIdx]?.label);
+  if (previous === 0) return current !== 0 ? 100 : 0;
+  return ((current - previous) / Math.abs(previous)) * 100;
+};
+
+const formatVariance = (value) => {
+  if (value === null) return "-";
+  const absVal = Math.abs(value);
+  const formatted = formatAmount(absVal);
+  if (value < 0) return `-${formatted}`;
+  if (value > 0) return `+${formatted}`;
+  return "-";
+};
+
+const formatVariancePercent = (value) => {
+  if (value === null) return "-";
+  const absVal = Math.abs(value).toFixed(1);
+  if (value < 0) return `-${absVal}%`;
+  if (value > 0) return `+${absVal}%`;
+  return "-";
+};
+
+const getVarianceClass = (value, inverted = false) => {
+  if (value === null || value === 0) return "";
+  // For liabilities, decrease is good (inverted logic)
+  const isPositive = inverted ? value < 0 : value > 0;
+  return isPositive ? "variance-positive" : "variance-negative";
+};
+
+const getVarianceComparison = () => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return "";
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const p1 = formatPeriodLabel(periods[currentIdx]?.label);
+  const p2 = formatPeriodLabel(periods[previousIdx]?.label);
+  const year1 = p1.split(".")[2] || p1;
+  const year2 = p2.split(".")[2] || p2;
+  return `${year1} vs ${year2}`;
+};
+
 const updatePeriod = (period) => {
-  if (formData.value.periodMode === "current") {
-    if (period.todate) {
-      period.label = period.todate;
-    }
-  } else if (formData.value.periodMode === "monthly") {
-    if (period.todate) {
-      period.label = period.todate;
-    }
-  } else if (formData.value.periodMode === "quarterly") {
-    if (period.todate) {
-      period.label = period.todate;
-    }
-  } else if (formData.value.periodMode === "yearly") {
-    if (period.todate) {
-      period.label = period.todate;
-    }
-  } else if (formData.value.periodMode === "custom") {
-    if (period.todate) {
-      period.label = period.todate;
-    }
+  if (period.todate) {
+    period.label = period.todate;
   }
 };
 
 const addPeriod = () => {
-  let newPeriod = {};
-  // Calculate minYear from the provided yearOptions
   const allowedYears = yearOptions.map((y) => parseInt(y.value, 10));
   const minYear = Math.min(...allowedYears);
 
-  // Helper function to format date (e.g., YYYY-MM-DD)
-  const formatDate = (date) => {
-    if (typeof date === "string") {
-      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
-      try {
-        date = new Date(date);
-        if (isNaN(date.getTime())) throw new Error("Invalid date string");
-      } catch (e) {
-        console.error("Invalid date format provided:", date);
-        return new Date().toISOString().split("T")[0];
-      }
-    } else if (!(date instanceof Date)) {
-      console.error("Invalid date type provided:", date);
-      date = new Date();
-    }
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
+  const formatDate = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
   };
 
-  // Helper to parse date string (assuming YYYY-MM-DD) into a Date object
   const parseDate = (dateString) => {
-    try {
-      const parts = dateString.split("-");
-      if (parts.length === 3) {
-        return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-      }
-      const parsed = new Date(dateString);
-      if (isNaN(parsed.getTime())) throw new Error("Invalid date string");
-      return parsed;
-    } catch (e) {
-      console.error("Could not parse date string:", dateString, e);
-      return new Date();
+    const parts = dateString.split("-");
+    if (parts.length === 3) {
+      return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
     }
+    return new Date();
   };
+
+  let newPeriod = {};
 
   if (formData.value.periods.length > 0) {
     const lastPeriod =
       formData.value.periods[formData.value.periods.length - 1];
     const lastDate = parseDate(lastPeriod.todate);
-    const day = lastDate.getUTCDate();
 
-    if (formData.value.periodMode === "current") {
+    if (
+      formData.value.periodMode === "yearly" ||
+      formData.value.periodMode === "current"
+    ) {
       lastDate.setUTCFullYear(lastDate.getUTCFullYear() - 1);
-      if (lastDate.getUTCFullYear() < minYear) {
-        console.warn(
-          `Cannot add period before minimum allowed year (${minYear}).`
-        );
-        return;
-      }
-      const newDateStr = formatDate(lastDate);
-      newPeriod = { todate: newDateStr, label: newDateStr };
-    } else if (formData.value.periodMode === "monthly") {
-      // Move to previous month while keeping the same day
-      lastDate.setUTCMonth(lastDate.getUTCMonth() - 1);
-      // Ensure we don't exceed the last day of the month
-      const lastDayOfMonth = new Date(
-        lastDate.getUTCFullYear(),
-        lastDate.getUTCMonth() + 1,
-        0
-      ).getDate();
-      lastDate.setUTCDate(Math.min(day, lastDayOfMonth));
-
-      if (lastDate.getUTCFullYear() < minYear) {
-        console.warn(
-          `Cannot add period before minimum allowed year (${minYear}).`
-        );
-        return;
-      }
-      const newDateStr = formatDate(lastDate);
-      newPeriod = { todate: newDateStr, label: newDateStr };
     } else if (formData.value.periodMode === "quarterly") {
-      // Move to previous quarter while keeping the same day
       lastDate.setUTCMonth(lastDate.getUTCMonth() - 3);
-      // Ensure we don't exceed the last day of the month
-      const lastDayOfMonth = new Date(
-        lastDate.getUTCFullYear(),
-        lastDate.getUTCMonth() + 1,
-        0
-      ).getDate();
-      lastDate.setUTCDate(Math.min(day, lastDayOfMonth));
-
-      if (lastDate.getUTCFullYear() < minYear) {
-        console.warn(
-          `Cannot add period before minimum allowed year (${minYear}).`
-        );
-        return;
-      }
-      const newDateStr = formatDate(lastDate);
-      newPeriod = { todate: newDateStr, label: newDateStr };
-    } else if (formData.value.periodMode === "yearly") {
-      // Move to previous year while keeping the same day
-      lastDate.setUTCFullYear(lastDate.getUTCFullYear() - 1);
-      // Ensure we don't exceed the last day of the month
-      const lastDayOfMonth = new Date(
-        lastDate.getUTCFullYear(),
-        lastDate.getUTCMonth() + 1,
-        0
-      ).getDate();
-      lastDate.setUTCDate(Math.min(day, lastDayOfMonth));
-
-      if (lastDate.getUTCFullYear() < minYear) {
-        console.warn(
-          `Cannot add period before minimum allowed year (${minYear}).`
-        );
-        return;
-      }
-      const newDateStr = formatDate(lastDate);
-      newPeriod = { todate: newDateStr, label: newDateStr };
-    } else if (formData.value.periodMode === "custom") {
-      newPeriod = { ...lastPeriod };
+    } else {
+      lastDate.setUTCMonth(lastDate.getUTCMonth() - 1);
     }
+
+    if (lastDate.getUTCFullYear() < minYear) return;
+    const newDateStr = formatDate(lastDate);
+    newPeriod = { todate: newDateStr, label: newDateStr };
   } else {
     const today = formatDate(now);
-    if (formData.value.periodMode === "current") {
-      newPeriod = { todate: today, label: today };
-    } else if (formData.value.periodMode === "monthly") {
-      newPeriod = { todate: today, label: today };
-    } else if (formData.value.periodMode === "quarterly") {
-      newPeriod = { todate: today, label: today };
-    } else if (formData.value.periodMode === "yearly") {
-      newPeriod = { todate: today, label: today };
-    } else if (formData.value.periodMode === "custom") {
-      newPeriod = { todate: today, label: today };
-    }
+    newPeriod = { todate: today, label: today };
   }
 
-  if (Object.keys(newPeriod).length > 0) {
-    formData.value.periods.push(newPeriod);
-    updatePeriod(newPeriod);
-  }
+  formData.value.periods.push(newPeriod);
 };
 
 const removePeriod = (index) => {
@@ -1274,9 +1189,7 @@ const search = async () => {
     });
     params.l_accno = formData.value.l_accno ? 1 : 0;
 
-    const response = await api.get("/reports/balance_sheet", {
-      params: params,
-    });
+    const response = await api.get("/reports/balance_sheet", { params });
     results.value = response.data;
     filtersOpen.value = false;
   } catch (error) {
@@ -1299,7 +1212,7 @@ const getPDF = async () => {
     params.l_accno = formData.value.l_accno ? 1 : 0;
 
     const response = await api.get("/reports/balance_sheet", {
-      params: params,
+      params,
       responseType: "blob",
     });
     const blob = new Blob([response.data], { type: "application/pdf" });
@@ -1318,14 +1231,10 @@ const getPDF = async () => {
   }
 };
 
-const toggleHeadingOnly = () => {
-  formData.value.heading_only = formData.value.heading_only === "1" ? "0" : "1";
-};
-
 const createLink = inject("createLink");
 
 const getPath = (accno, period) => {
-  let todate = period.todate;
+  let todate = period.todate || period.label;
   if (todate && todate.includes("/")) {
     const parts = todate.split("/");
     todate = `${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(
@@ -1335,153 +1244,124 @@ const getPath = (accno, period) => {
   }
   const project = formData.value.projectnumber || "";
   const department = formData.value.department || "";
-  const params = new URLSearchParams({
-    accno,
-    todate,
-    project,
-    department,
-  });
+  const params = new URLSearchParams({ accno, todate, project, department });
   return createLink("trial.transactions") + `?${params.toString()}`;
 };
 
 const downloadExcel = () => {
   const includeAccNo = formData.value.l_accno;
-  let headerRow = includeAccNo ? ["Acc No - Description"] : ["Description"];
+  let headerRow = ["Account"];
   const periods = results.value.periods || [];
-  periods.forEach((period) => {
-    headerRow.push(period.label);
-  });
+  periods.forEach((period) => headerRow.push(formatPeriodLabel(period.label)));
+  if (periods.length >= 2) {
+    headerRow.push("VAR", "VAR %");
+  }
 
   const exportData = [];
-  const groupHeaderIndices = [];
-
   exportData.push(["Balance Sheet"]);
-  groupHeaderIndices.push(0);
   exportData.push([]);
   exportData.push(headerRow);
-  exportData.push(["Assets"]);
-  groupHeaderIndices.push(exportData.length - 1);
 
-  assetAccounts.value.forEach((account) => {
+  const addAccountRow = (account, type) => {
     let row = [];
-    if (includeAccNo) {
-      row.push(account.accno + " - " + account.description);
-    } else {
-      row.push(account.description);
-    }
+    const name =
+      includeAccNo && account.accno
+        ? `${account.accno} - ${account.description}`
+        : account.description;
+    row.push(name);
     periods.forEach((period) => {
-      const amt = account.periods[period.label]
-        ? account.periods[period.label].amount
-        : 0;
-      row.push(roundAmountCustom(amt));
+      const amt = account.periods[period.label]?.amount || 0;
+      row.push(roundAmount(amt));
     });
+    if (periods.length >= 2) {
+      row.push(getAccountVariance(account) || 0);
+      row.push(getAccountVariancePercent(account)?.toFixed(1) + "%" || "-");
+    }
     exportData.push(row);
-  });
+  };
+
+  exportData.push(["Assets"]);
+  assetAccounts.value.forEach((a) => addAccountRow(a, "A"));
 
   let assetsTotalRow = ["Total Assets"];
-  periods.forEach((period) => {
-    const total = sumAllAccounts(completeAssetAccounts.value, period.label);
-    assetsTotalRow.push(roundAmountCustom(total));
-  });
+  periods.forEach((p) =>
+    assetsTotalRow.push(
+      roundAmount(sumAllAccounts(completeAssetAccounts.value, p.label))
+    )
+  );
+  if (periods.length >= 2) {
+    assetsTotalRow.push(getTotalVariance("assets") || 0);
+    assetsTotalRow.push(
+      getTotalVariancePercent("assets")?.toFixed(1) + "%" || "-"
+    );
+  }
   exportData.push(assetsTotalRow);
+
   exportData.push([]);
   exportData.push(["Liabilities"]);
-  groupHeaderIndices.push(exportData.length - 1);
+  liabilityAccounts.value.forEach((a) => addAccountRow(a, "L"));
 
-  liabilityAccounts.value.forEach((account) => {
-    let row = [];
-    if (includeAccNo) {
-      row.push(account.accno + " - " + account.description);
-    } else {
-      row.push(account.description);
-    }
-    periods.forEach((period) => {
-      const amt = account.periods[period.label]
-        ? account.periods[period.label].amount
-        : 0;
-      row.push(roundAmountCustom(amt));
-    });
-    exportData.push(row);
-  });
+  let liabTotalRow = ["Total Liabilities"];
+  periods.forEach((p) =>
+    liabTotalRow.push(
+      roundAmount(sumAllAccounts(completeLiabilityAccounts.value, p.label))
+    )
+  );
+  if (periods.length >= 2) {
+    liabTotalRow.push(getTotalVariance("liabilities") || 0);
+    liabTotalRow.push(
+      getTotalVariancePercent("liabilities")?.toFixed(1) + "%" || "-"
+    );
+  }
+  exportData.push(liabTotalRow);
 
-  let liabilitiesTotalRow = ["Total Liabilities"];
-  periods.forEach((period) => {
-    const total = sumAllAccounts(completeLiabilityAccounts.value, period.label);
-    liabilitiesTotalRow.push(roundAmountCustom(total));
-  });
-  exportData.push(liabilitiesTotalRow);
   exportData.push([]);
   exportData.push(["Equity"]);
-  groupHeaderIndices.push(exportData.length - 1);
+  equityAccounts.value.forEach((a) => addAccountRow(a, "Q"));
 
-  equityAccounts.value.forEach((account) => {
-    let row = [];
-    if (includeAccNo) {
-      row.push(account.accno + " - " + account.description);
-    } else {
-      row.push(account.description);
-    }
-    periods.forEach((period) => {
-      const amt = account.periods[period.label]
-        ? account.periods[period.label].amount
-        : 0;
-      row.push(roundAmountCustom(amt));
-    });
-    exportData.push(row);
-  });
-
-  let currentEarningsRow = ["Current Earnings"];
-  periods.forEach((period) => {
-    const currentEarnings =
-      sumAllAccounts(completeAssetAccounts.value, period.label) -
-      sumAllAccounts(completeLiabilityAccounts.value, period.label) -
-      sumAllAccounts(completeEquityAccounts.value, period.label);
-    currentEarningsRow.push(roundAmountCustom(currentEarnings));
-  });
-  exportData.push(currentEarningsRow);
+  let earningsRow = ["Current Earnings"];
+  periods.forEach((p) =>
+    earningsRow.push(roundAmount(getCurrentEarnings(p.label)))
+  );
+  if (periods.length >= 2) {
+    earningsRow.push(getEarningsVariance() || 0);
+    earningsRow.push(getEarningsVariancePercent()?.toFixed(1) + "%" || "-");
+  }
+  exportData.push(earningsRow);
 
   let equityTotalRow = ["Total Equity"];
-  periods.forEach((period) => {
-    const totalEquity =
-      sumAllAccounts(completeAssetAccounts.value, period.label) -
-      sumAllAccounts(completeLiabilityAccounts.value, period.label);
-    equityTotalRow.push(roundAmountCustom(totalEquity));
-  });
+  periods.forEach((p) =>
+    equityTotalRow.push(roundAmount(getTotalEquity(p.label)))
+  );
+  if (periods.length >= 2) {
+    equityTotalRow.push(getTotalVariance("equity") || 0);
+    equityTotalRow.push(
+      getTotalVariancePercent("equity")?.toFixed(1) + "%" || "-"
+    );
+  }
   exportData.push(equityTotalRow);
 
-  // New row: Total Liabilities + Equity
-  let liabEquityTotalRow = ["Total Liabilities + Equity"];
-  periods.forEach((period) => {
-    const totalLiabEquity =
-      sumAllAccounts(completeLiabilityAccounts.value, period.label) +
-      (sumAllAccounts(completeAssetAccounts.value, period.label) -
-        sumAllAccounts(completeLiabilityAccounts.value, period.label));
-    liabEquityTotalRow.push(roundAmountCustom(totalLiabEquity));
-  });
-  exportData.push(liabEquityTotalRow);
+  let liabilitiesEquityTotalRow = ["Total Liabilities + Equity"];
+  periods.forEach((p) =>
+    liabilitiesEquityTotalRow.push(
+      roundAmount(getTotalLiabilitiesAndEquity(p.label))
+    )
+  );
+  if (periods.length >= 2) {
+    liabilitiesEquityTotalRow.push(getTotalVariance("liabilitiesEquity") || 0);
+    liabilitiesEquityTotalRow.push(
+      getTotalVariancePercent("liabilitiesEquity")?.toFixed(1) + "%" || "-"
+    );
+  }
+  exportData.push(liabilitiesEquityTotalRow);
 
   const worksheet = utils.aoa_to_sheet(exportData);
-  worksheet["!merges"] = worksheet["!merges"] || [];
-  groupHeaderIndices.forEach((rowIdx) => {
-    worksheet["!merges"].push({
-      s: { r: rowIdx, c: 0 },
-      e: { r: rowIdx, c: headerRow.length - 1 },
-    });
-    const cellRef = utils.encode_cell({ r: rowIdx, c: 0 });
-    if (worksheet[cellRef]) {
-      worksheet[cellRef].s = {
-        alignment: { horizontal: "center", vertical: "center" },
-      };
-    }
-  });
-
-  worksheet["!cols"] = headerRow.map((header, colIdx) => {
-    let maxLength = header ? header.toString().length : 0;
+  worksheet["!cols"] = headerRow.map((_, colIdx) => {
+    let maxLength = 10;
     exportData.forEach((row) => {
       const cellValue = row[colIdx];
-      if (cellValue != null) {
+      if (cellValue != null)
         maxLength = Math.max(maxLength, cellValue.toString().length);
-      }
     });
     return { wch: maxLength + 2 };
   });
@@ -1500,13 +1380,9 @@ watch(
 );
 
 onMounted(() => {
-  if (route.query.todate) {
-    search();
-  }
+  if (route.query.todate) search();
   fetchLinks();
-  if (formData.value.periods.length === 0) {
-    addPeriod();
-  }
+  if (formData.value.periods.length === 0) addPeriod();
 });
 
 const fetchLinks = async () => {
@@ -1514,7 +1390,6 @@ const fetchLinks = async () => {
     const response = await api.get("/create_links/incomestatement");
     departments.value = response.data.departments;
     projects.value = response.data.projects;
-    currencies.value = response.data.currencies;
   } catch (error) {
     console.error(error);
   }
@@ -1522,148 +1397,257 @@ const fetchLinks = async () => {
 </script>
 
 <style scoped>
-@media print {
-  .q-page {
-    padding: 0 !important;
-  }
-  .q-card,
-  .q-card-section {
-    box-shadow: none !important;
-    border: none !important;
-  }
-  .q-btn,
-  .q-expansion-item {
-    display: none !important;
-  }
-  .text-primary {
-    color: #000 !important;
-  }
-  .q-list--bordered {
-    border: none !important;
-  }
+.report-container {
+  background: var(--q-mainbg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.border-top {
-  border-top: 2px solid #eee;
-  padding-top: 1rem;
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--q-border);
+}
+
+.header-info {
+  font-size: 0.9rem;
+  color: var(--q-lighttext);
+}
+
+.client-name {
+  color: var(--q-primary);
+  font-weight: 600;
+}
+
+.separator {
+  margin: 0 8px;
+  color: var(--q-border);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--q-tint);
+  border-bottom: 1px solid var(--q-border);
+}
+
+.variance-toggles {
+  display: flex;
+  gap: 8px;
+}
+
+.active-toggle {
+  background: var(--q-primary) !important;
+  color: white !important;
+}
+
+.expand-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.report-table {
+  width: 100%;
+}
+
+.table-header {
+  display: flex;
+  padding: 10px 20px;
+  background: var(--q-tint);
+  border-bottom: 2px solid var(--q-border);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--q-lighttext);
+}
+
+.col-account {
+  flex: 2;
+  min-width: 200px;
+}
+
+.col-amount {
+  flex: 1;
+  text-align: right;
+  min-width: 100px;
+}
+
+.col-variance {
+  flex: 0.8;
+  text-align: right;
+  min-width: 90px;
+}
+
+.variance-label {
+  color: var(--q-primary);
+  font-weight: 600;
+}
+
+.variance-sub {
+  font-size: 0.65rem;
+  color: var(--q-lighttext);
+  display: block;
+}
+
+.section {
+  border-bottom: 1px solid var(--q-border);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  background: var(--q-mainbg);
+  border-bottom: 1px solid var(--q-border);
+}
+
+.section-title:hover {
+  background: var(--q-tint);
+}
+
+.section-expand-icon {
+  margin-right: 8px;
+  color: var(--q-lighttext);
+}
+
+.table-row {
+  display: flex;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--q-border);
+  font-size: 0.875rem;
+  align-items: center;
+}
+
+.table-row:hover {
+  background: var(--q-tint);
+}
+
+.heading-row {
+  font-weight: 600;
+  background: var(--q-tint);
+}
+
+.heading-row:hover {
+  background: var(--q-mutedbg);
+}
+
+.detail-row {
+  font-weight: 400;
+}
+
+.expand-arrow {
+  margin-right: 4px;
+  cursor: pointer;
+  color: var(--q-lighttext);
+  vertical-align: middle;
+}
+
+.account-name {
+  color: var(--q-maintext);
+}
+
+.amount-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.amount-link:hover {
+  color: var(--q-primary);
+  text-decoration: underline;
+}
+
+.total-row {
+  font-weight: 600;
+  background: var(--q-tint);
+  border-top: 2px solid var(--q-border);
+}
+
+.grand-total-row {
+  font-weight: 700;
+  background: var(--q-tint);
+  border-top: 3px double var(--q-border);
+}
+
+.subtotal-row {
+  font-weight: 500;
+  font-style: italic;
+}
+
+.variance-positive {
+  color: var(--q-positive);
+  font-weight: 500;
+}
+
+.variance-negative {
+  color: var(--q-negative);
+  font-weight: 500;
 }
 
 .drag-handle:hover {
   cursor: grab;
 }
 
-/* Account hierarchy styling */
-.account-row {
-  transition: background-color 0.2s ease;
+:deep(.variance-dropdown) {
+  font-size: 0.714rem;
+  min-width: 120px;
 }
 
-.account-row:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+:deep(.variance-dropdown .q-item) {
+  padding: 4px 10px;
+  min-height: 24px;
 }
 
-.heading-account {
-  border-left: 4px solid var(--q-primary);
-  background-color: rgba(var(--q-primary), 0.05);
-  transition: background-color 0.2s ease;
-}
-
-.heading-account:hover {
-  background-color: rgba(var(--q-primary), 0.1);
-}
-
-.detail-account {
-  border-left: 2px solid #e0e0e0;
-}
-
-.detail-account:hover {
-  border-left-color: #1976d2;
-  background-color: rgba(25, 118, 210, 0.02);
-}
-
-/* Indentation styling */
-.account-indent {
-  position: relative;
-}
-
-.account-indent::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 12px;
-  height: 1px;
-  background-color: #e0e0e0;
-  transform: translateY(-50%);
-}
-
-/* Amount styling - removed colors for better dark mode compatibility */
-.amount-positive {
-  font-weight: 500;
-}
-
-.amount-negative {
-  font-weight: 500;
-}
-
-.amount-zero {
-  color: #757575;
-}
-
-/* Section headers */
-.section-header {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-  color: white;
-  padding: 12px 16px;
-  margin: 16px 0 8px 0;
-  border-radius: 4px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Totals styling */
-.total-row {
-  background-color: #f5f5f5;
-  border-top: 2px solid #1976d2;
-  font-weight: 600;
-  color: #000 !important;
-}
-
-.net-income-row {
-  background-color: #e3f2fd;
-  border-top: 3px solid #1976d2;
-  font-weight: 700;
-  font-size: 1.1em;
-  color: #000 !important;
-}
-
-/* Heading row styling */
-.heading-row {
-  user-select: none;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-@media (max-width: 600px) {
-  .text-h4 {
-    font-size: 1.5rem;
+@media print {
+  .q-page {
+    padding: 0 !important;
   }
-  .text-h5 {
-    font-size: 1.2rem;
+  .report-container {
+    box-shadow: none !important;
   }
-  .q-item {
-    padding: 8px 16px;
+  .controls-row,
+  .header-actions {
+    display: none !important;
   }
+}
 
-  .account-row {
+@media (max-width: 768px) {
+  .report-header {
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    gap: 12px;
     align-items: flex-start;
   }
 
-  .q-item-section {
-    margin-bottom: 4px;
+  .col-account {
+    min-width: 150px;
+  }
+
+  .col-amount,
+  .col-variance {
+    min-width: 70px;
+    font-size: 0.8rem;
   }
 }
 </style>

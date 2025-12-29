@@ -1,10 +1,10 @@
 <template>
   <q-page class="q-pa-sm">
-    <!-- Search Form Card -->
+    <!-- Search Form -->
     <div class="container">
       <q-expansion-item
         :label="t('Report Parameters')"
-        class="q-mb-md"
+        class="q-mb-sm"
         header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
@@ -57,18 +57,6 @@
                   search="curr"
                 />
               </div>
-              <div class="col-12 col-md-3">
-                <q-input
-                  v-model="formData.decimalplaces"
-                  type="number"
-                  min="0"
-                  max="4"
-                  :label="t('Decimal Places')"
-                  outlined
-                  dense
-                  class="col-1"
-                />
-              </div>
             </div>
 
             <!-- Period Type Selection -->
@@ -84,19 +72,20 @@
               </div>
             </div>
 
-            <!-- Custom Periods Section with Drag & Drop -->
-            <div class="q-mt-md">
-              <div class="row">
-                <div class="text-h6">{{ t("Custom Periods") }}</div>
-                <q-btn
-                  icon="add"
+            <!-- Custom Periods Section -->
+            <div class="q-mt-sm">
+              <div class="row items-center">
+                <div class="text-subtitle1 text-weight-medium">
+                  {{ t("Custom Periods") }}
+                </div>
+                <s-button
+                  type="add-line"
                   :label="t('Add Period')"
                   @click="addPeriod"
-                  color="primary"
                   class="q-ml-sm"
+                  size="sm"
                 />
               </div>
-              <!-- Draggable component wraps the period list -->
               <draggable
                 v-model="formData.periods"
                 group="periods"
@@ -104,20 +93,21 @@
               >
                 <template #item="{ element, index }">
                   <div class="row q-gutter-sm q-mt-xs items-center">
-                    <!-- Drag handle icon for rearranging -->
                     <div class="col-auto">
                       <q-icon
                         name="drag_indicator"
                         class="cursor-move drag-handle"
-                        size="sm"
+                        size="xs"
                       />
                     </div>
-                    <!-- Current Mode: only year -->
+                    <!-- Current Mode -->
                     <template v-if="formData.periodMode === 'current'">
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <s-select
                           v-model="element.year"
                           :options="yearOptions"
+                          option-label="label"
+                          option-value="value"
                           outlined
                           dense
                           :label="t('Year')"
@@ -128,12 +118,14 @@
                         />
                       </div>
                     </template>
-                    <!-- Monthly Mode: month and year -->
+                    <!-- Monthly Mode -->
                     <template v-else-if="formData.periodMode === 'monthly'">
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <s-select
                           v-model="element.month"
                           :options="monthOptions"
+                          option-label="label"
+                          option-value="value"
                           outlined
                           dense
                           :label="t('Month')"
@@ -143,10 +135,12 @@
                           search="label"
                         />
                       </div>
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <s-select
                           v-model="element.year"
                           :options="yearOptions"
+                          option-label="label"
+                          option-value="value"
                           outlined
                           dense
                           :label="t('Year')"
@@ -157,12 +151,14 @@
                         />
                       </div>
                     </template>
-                    <!-- Quarterly Mode: quarter and year -->
+                    <!-- Quarterly Mode -->
                     <template v-else-if="formData.periodMode === 'quarterly'">
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <s-select
                           v-model="element.quarter"
                           :options="quarterOptions"
+                          option-label="label"
+                          option-value="value"
                           outlined
                           dense
                           :label="t('Quarter')"
@@ -172,10 +168,12 @@
                           search="label"
                         />
                       </div>
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <s-select
                           v-model="element.year"
                           :options="yearOptions"
+                          option-label="label"
+                          option-value="value"
                           outlined
                           dense
                           :label="t('Year')"
@@ -186,12 +184,14 @@
                         />
                       </div>
                     </template>
-                    <!-- Yearly Mode: only year -->
+                    <!-- Yearly Mode -->
                     <template v-else-if="formData.periodMode === 'yearly'">
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <s-select
                           v-model="element.year"
                           :options="yearOptions"
+                          option-label="label"
+                          option-value="value"
                           outlined
                           dense
                           :label="t('Year')"
@@ -202,9 +202,9 @@
                         />
                       </div>
                     </template>
-                    <!-- Custom Mode: date pickers for fromdate & todate -->
+                    <!-- Custom Mode -->
                     <template v-else-if="formData.periodMode === 'custom'">
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <q-input
                           v-model="element.fromdate"
                           type="date"
@@ -214,7 +214,7 @@
                           @update:model-value="() => updatePeriod(element)"
                         />
                       </div>
-                      <div class="col-12 col-md-3">
+                      <div class="col-12 col-md-2">
                         <q-input
                           v-model="element.todate"
                           type="date"
@@ -224,19 +224,14 @@
                           @update:model-value="() => updatePeriod(element)"
                         />
                       </div>
-                      <!-- Hidden input to store the automatic label -->
-                      <div style="display: none">
-                        <q-input v-model="element.label" readonly />
-                      </div>
                     </template>
-
-                    <!-- Delete Button -->
-                    <div class="col-12 col-md-1">
+                    <div class="col-auto">
                       <q-btn
                         icon="delete"
                         color="negative"
                         flat
                         round
+                        size="sm"
                         @click="removePeriod(index)"
                       />
                     </div>
@@ -254,20 +249,6 @@
                   inline
                   dense
                   :label="t('Accounting Method')"
-                />
-              </div>
-            </div>
-
-            <!-- Report Formatting -->
-            <div class="row items-center q-mb-sm">
-              <div class="col-12 col-md-4">
-                <q-option-group
-                  v-model="formData.accounttype"
-                  :options="accountTypeOptions"
-                  inline
-                  dense
-                  :label="t('Account Type')"
-                  type="radio"
                 />
               </div>
             </div>
@@ -292,398 +273,446 @@
 
             <!-- Submit Button -->
             <div class="row q-mt-sm">
-              <q-btn
-                type="submit"
+              <s-button
+                type="search"
                 :label="t('Generate Report')"
-                color="primary"
-                icon="description"
+                @click="search"
                 :loading="loading"
-              >
-                <template v-slot:loading>
-                  <q-spinner-hourglass class="on-left" />
-                  {{ t("Generating...") }}
-                </template>
-              </q-btn>
+              />
             </div>
           </q-form>
         </q-card-section>
       </q-expansion-item>
     </div>
+
     <!-- Report Output -->
-    <q-card v-if="results && Object.keys(results).length" ref="reportContent">
-      <q-card-actions class="q-pa-sm no-print">
-        <s-button type="export-xl" @click="downloadExcel" />
-        <s-button type="export-pdf" @click="downloadPDF" />
-        <q-space />
-        <q-btn
-          :label="t('Expand All')"
-          @click="expandAllHeadings"
-          color="secondary"
-          flat
-          icon="expand_less"
-        />
-        <q-btn
-          :label="t('Collapse All')"
-          @click="collapseAllHeadings"
-          color="secondary"
-          flat
-          icon="expand_more"
-        />
-      </q-card-actions>
-      <!-- Report Header -->
-      <q-card-section v-if="results.company" class="mutedbg">
-        <div class="text-center q-pa-sm">
-          <div class="text-h4 text-primary q-mb-sm">{{ results.company }}</div>
-          <div class="maintext">
-            <div v-if="results.address">{{ results.address }}</div>
-            <div v-if="results.companyemail">{{ results.companyemail }}</div>
-            <div v-if="results.companywebsite">
-              {{ results.companywebsite }}
-            </div>
+    <div
+      v-if="results && Object.keys(results).length"
+      class="report-container"
+      ref="reportContent"
+    >
+      <div class="report-header">
+        <div class="header-info">
+          <span class="client-name">{{ results.company }}</span>
+          <span class="separator">•</span>
+          <span>{{ formattedDateRange }}</span>
+        </div>
+        <div class="header-actions">
+          <q-btn flat :label="t('Print')" @click="downloadPDF" size="sm" />
+          <q-btn
+            color="primary"
+            :label="t('Export')"
+            @click="downloadExcel"
+            size="sm"
+          />
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-row">
+        <div class="variance-toggles">
+          <q-btn
+            :outline="!showVarianceDollar"
+            :color="showVarianceDollar ? 'primary' : 'grey-7'"
+            :label="t('Show Variance')"
+            @click="showVarianceDollar = !showVarianceDollar"
+            size="sm"
+            :class="{ 'active-toggle': showVarianceDollar }"
+            no-caps
+          />
+          <q-btn
+            :outline="!showVariancePercent"
+            :color="showVariancePercent ? 'primary' : 'grey-7'"
+            :label="t('Show Variance (%)')"
+            @click="showVariancePercent = !showVariancePercent"
+            size="sm"
+            class="q-ml-sm"
+            :class="{ 'active-toggle': showVariancePercent }"
+            no-caps
+          />
+          <q-btn-dropdown
+            v-if="varianceOptions.length > 0"
+            :label="selectedVarianceLabel"
+            color="primary"
+            size="sm"
+            class="q-ml-sm"
+            no-caps
+            outline
+            dense
+            menu-anchor="bottom left"
+            menu-self="top left"
+          >
+            <q-list dense class="variance-dropdown">
+              <q-item
+                v-for="option in varianceOptions"
+                :key="option.value"
+                clickable
+                v-close-popup
+                @click="selectVariance(option)"
+                :active="selectedVariance === option.value"
+                dense
+              >
+                <q-item-section>{{ option.label }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+        <div class="expand-controls">
+          <q-btn
+            flat
+            size="sm"
+            @click="collapseAllHeadings"
+            no-caps
+            icon="unfold_less"
+          >
+            {{ t("Collapse") }}
+          </q-btn>
+          <q-btn
+            flat
+            size="sm"
+            @click="expandAllHeadings"
+            no-caps
+            icon="unfold_more"
+          >
+            {{ t("Expand") }}
+          </q-btn>
+        </div>
+      </div>
+
+      <!-- Report Table -->
+      <div class="report-table">
+        <div class="table-header">
+          <div class="col-account">{{ t("ACCOUNT") }}</div>
+          <div
+            v-for="period in results.periods"
+            :key="period.label"
+            class="col-amount"
+          >
+            {{ period.label }}
           </div>
-          <div class="text-caption q-mt-sm">
-            {{ formattedDateRange }}
+          <div
+            v-if="showVarianceDollar && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            <span class="variance-label">{{ t("VAR") }}</span>
+            <span class="variance-sub">({{ getVarianceComparison() }})</span>
+          </div>
+          <div
+            v-if="showVariancePercent && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            {{ t("VAR %") }}
           </div>
         </div>
-      </q-card-section>
-      <q-card-section>
+
         <!-- Income Section -->
-        <div>
-          <!-- Header Row -->
-          <q-item class="q-pa-xs q-my-none">
-            <!-- Display static header text instead of account.accno -->
-            <q-item-section v-if="formData.l_accno" avatar>
-              {{ t("Acc No") }}
-            </q-item-section>
-            <q-item-section>{{ t("Description") }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right"
-            >
-              <strong>{{ period.label }}</strong>
-            </q-item-section>
-          </q-item>
-          <div class="section-header">
-            <q-icon name="trending_up" class="q-mr-sm" />
+        <div class="section">
+          <div class="section-title" @click="toggleSection('income')">
+            <q-icon
+              :name="sectionCollapsed.income ? 'chevron_right' : 'expand_more'"
+              size="sm"
+              class="section-expand-icon"
+            />
             {{ t("Income") }}
           </div>
-          <q-separator />
-          <q-list bordered separator>
-            <!-- Iterate over income accounts -->
-            <template v-for="(account, index) in incomeAccounts" :key="index">
-              <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                  'account-row': true,
-                  'heading-account': account.charttype === 'H',
-                  'detail-account': account.charttype === 'A',
-                  'heading-row': account.charttype === 'H',
-                }"
-              >
-                <!-- Show account number as plain text with indentation -->
-                <q-item-section v-if="formData.l_accno" avatar>
-                  <div :style="{ paddingLeft: getIndentation(account.level) }">
-                    <q-icon
-                      :name="getAccountIcon(account)"
-                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
-                      size="sm"
-                      class="q-mr-xs"
-                    />
-                    {{ account.accno }}
-                  </div>
-                </q-item-section>
-                <!-- Description with indentation and clickable for headings -->
-                <q-item-section>
-                  <div
-                    :style="{
-                      paddingLeft:
-                        account.level > 0
-                          ? getIndentation(account.level)
-                          : '0px',
-                    }"
-                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
-                    @click="
-                      account.charttype === 'H'
-                        ? toggleHeading(account.accno)
-                        : null
-                    "
-                  >
-                    <div class="row items-center">
-                      <span>{{ account.description }}</span>
-                      <q-icon
-                        v-if="account.charttype === 'H'"
-                        :name="getHeadingIcon(account.accno)"
-                        size="sm"
-                        class="q-ml-xs"
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </q-item-section>
-                <!-- For each period, render the amount as a clickable link if applicable -->
-                <q-item-section
-                  v-for="period in results.periods"
-                  :key="period.label"
-                  class="col text-right"
-                >
-                  <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.charttype === 'A'">
-                      <router-link
-                        :to="getPath(account.accno, period)"
-                        target="_blank"
-                        style="text-decoration: none"
-                        class="maintext"
-                      >
-                        {{
-                          formatAmountCustom(
-                            account.periods[period.label].amount
-                          )
-                        }}
-                      </router-link>
-                    </template>
-                    <template v-else>
-                      {{
-                        formatAmountCustom(account.periods[period.label].amount)
-                      }}
-                    </template>
-                  </template>
-                  <template v-else>-</template>
-                </q-item-section>
-              </q-item>
-              <q-separator
-                v-if="shouldShowSeparator(account, index, incomeAccounts)"
-              />
-            </template>
-          </q-list>
-          <!-- Income Subtotal Row -->
-          <q-item class="q-pa-sm items-center total-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="calculate" color="primary" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Total Income")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
+          <template v-if="!sectionCollapsed.income">
+            <div
+              v-for="(account, index) in incomeAccounts"
+              :key="'income-' + index"
+              class="table-row"
+              :class="{
+                'heading-row': account.charttype === 'H',
+                'detail-row': account.charttype === 'A',
+              }"
             >
-              <span class="amount-positive">
+              <div class="col-account">
+                <span :style="{ marginLeft: getIndentation(account.level) }">
+                  <q-icon
+                    v-if="account.charttype === 'H'"
+                    :name="
+                      isHeadingCollapsed(account.accno)
+                        ? 'chevron_right'
+                        : 'expand_more'
+                    "
+                    size="xs"
+                    class="expand-arrow"
+                    @click.stop="toggleHeading(account.accno)"
+                  />
+                  <span class="account-name">
+                    <template v-if="formData.l_accno && account.accno"
+                      >{{ account.accno }} -
+                    </template>
+                    {{ account.description }}
+                  </span>
+                </span>
+              </div>
+              <div
+                v-for="period in results.periods"
+                :key="period.label"
+                class="col-amount"
+              >
+                <template v-if="account.periods[period.label] !== undefined">
+                  <router-link
+                    v-if="account.charttype === 'A'"
+                    :to="getPath(account.accno, period)"
+                    target="_blank"
+                    class="amount-link"
+                  >
+                    {{ formatNumber(account.periods[period.label].amount) }}
+                  </router-link>
+                  <span v-else>{{
+                    formatNumber(account.periods[period.label].amount)
+                  }}</span>
+                </template>
+                <template v-else>-</template>
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getAccountVariance(account))">
+                  {{ formatVariance(getAccountVariance(account)) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getAccountVariancePercent(account))"
+                >
+                  {{
+                    formatVariancePercent(getAccountVariancePercent(account))
+                  }}
+                </span>
+              </div>
+            </div>
+            <div class="table-row total-row">
+              <div class="col-account">{{ t("Total Income") }}</div>
+              <div
+                v-for="period in results.periods"
+                :key="'income-total-' + period.label"
+                class="col-amount"
+              >
                 {{
-                  formatAmount(
+                  formatNumber(
                     sumAllAccounts(completeIncomeAccounts, period.label)
                   )
                 }}
-              </span>
-            </q-item-section>
-          </q-item>
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span :class="getVarianceClass(getTotalVariance('income'))">
+                  {{ formatVariance(getTotalVariance("income")) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getTotalVariancePercent('income'))"
+                >
+                  {{ formatVariancePercent(getTotalVariancePercent("income")) }}
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- Expenses Section -->
-        <div>
-          <div class="section-header">
-            <q-icon name="trending_down" class="q-mr-sm" />
+        <div class="section">
+          <div class="section-title" @click="toggleSection('expenses')">
+            <q-icon
+              :name="
+                sectionCollapsed.expenses ? 'chevron_right' : 'expand_more'
+              "
+              size="sm"
+              class="section-expand-icon"
+            />
             {{ t("Expenses") }}
           </div>
-          <q-list bordered separator>
-            <!-- Iterate over expense accounts -->
-            <template v-for="(account, index) in expenseAccounts" :key="index">
-              <q-item
-                :class="{
-                  'mutedbg text-bold': account.charttype === 'H',
-                  'account-row': true,
-                  'heading-account': account.charttype === 'H',
-                  'detail-account': account.charttype === 'A',
-                  'heading-row': account.charttype === 'H',
-                }"
-              >
-                <!-- Show account number as plain text with indentation -->
-                <q-item-section v-if="formData.l_accno" avatar>
-                  <div :style="{ paddingLeft: getIndentation(account.level) }">
-                    <q-icon
-                      :name="getAccountIcon(account)"
-                      :color="account.charttype === 'H' ? 'primary' : 'grey-6'"
-                      size="sm"
-                      class="q-mr-xs"
-                    />
-                    {{ account.accno }}
-                  </div>
-                </q-item-section>
-                <!-- Description with indentation and clickable for headings -->
-                <q-item-section>
-                  <div
-                    :style="{
-                      paddingLeft:
-                        account.level > 0
-                          ? getIndentation(account.level)
-                          : '0px',
-                    }"
-                    :class="{ 'cursor-pointer': account.charttype === 'H' }"
-                    @click="
-                      account.charttype === 'H'
-                        ? toggleHeading(account.accno)
-                        : null
-                    "
-                  >
-                    <div class="row items-center">
-                      <span>{{ account.description }}</span>
-                      <q-icon
-                        v-if="account.charttype === 'H'"
-                        :name="getHeadingIcon(account.accno)"
-                        size="sm"
-                        class="q-ml-xs"
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </q-item-section>
-                <!-- For each period, render the expense amount as a clickable link if applicable -->
-                <q-item-section
-                  v-for="period in results.periods"
-                  :key="period.label"
-                  class="col text-right"
-                >
-                  <template v-if="account.periods[period.label] !== undefined">
-                    <template v-if="account.charttype === 'A'">
-                      <router-link
-                        :to="getPath(account.accno, period)"
-                        target="_blank"
-                        style="text-decoration: none"
-                        class="maintext"
-                      >
-                        {{
-                          formatAmountCustom(
-                            account.periods[period.label].amount
-                          )
-                        }}
-                      </router-link>
-                    </template>
-                    <template v-else>
-                      {{
-                        formatAmountCustom(account.periods[period.label].amount)
-                      }}
-                    </template>
-                  </template>
-                  <template v-else>-</template>
-                </q-item-section>
-              </q-item>
-              <q-separator
-                v-if="shouldShowSeparator(account, index, expenseAccounts)"
-              />
-            </template>
-          </q-list>
-          <!-- Expense Subtotal Row -->
-          <q-item class="q-pa-sm items-center total-row">
-            <q-item-section v-if="formData.l_accno" avatar>
-              <q-icon name="calculate" color="primary" />
-            </q-item-section>
-            <q-item-section class="text-bold">{{
-              t("Total Expenses")
-            }}</q-item-section>
-            <q-item-section
-              v-for="period in results.periods"
-              :key="period.label"
-              class="col text-right text-bold"
+          <template v-if="!sectionCollapsed.expenses">
+            <div
+              v-for="(account, index) in expenseAccounts"
+              :key="'expense-' + index"
+              class="table-row"
+              :class="{
+                'heading-row': account.charttype === 'H',
+                'detail-row': account.charttype === 'A',
+              }"
             >
-              <span class="amount-negative">
-                <template
-                  v-if="
-                    sumAllAccounts(completeExpenseAccounts, period.label) < 0
+              <div class="col-account">
+                <span :style="{ marginLeft: getIndentation(account.level) }">
+                  <q-icon
+                    v-if="account.charttype === 'H'"
+                    :name="
+                      isHeadingCollapsed(account.accno)
+                        ? 'chevron_right'
+                        : 'expand_more'
+                    "
+                    size="xs"
+                    class="expand-arrow"
+                    @click.stop="toggleHeading(account.accno)"
+                  />
+                  <span class="account-name">
+                    <template v-if="formData.l_accno && account.accno"
+                      >{{ account.accno }} -
+                    </template>
+                    {{ account.description }}
+                  </span>
+                </span>
+              </div>
+              <div
+                v-for="period in results.periods"
+                :key="period.label"
+                class="col-amount"
+              >
+                <template v-if="account.periods[period.label] !== undefined">
+                  <router-link
+                    v-if="account.charttype === 'A'"
+                    :to="getPath(account.accno, period)"
+                    target="_blank"
+                    class="amount-link"
+                  >
+                    {{ formatNumber(account.periods[period.label].amount) }}
+                  </router-link>
+                  <span v-else>{{
+                    formatNumber(account.periods[period.label].amount)
+                  }}</span>
+                </template>
+                <template v-else>-</template>
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getAccountVariance(account), true)"
+                >
+                  {{ formatVariance(getAccountVariance(account)) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="
+                    getVarianceClass(getAccountVariancePercent(account), true)
                   "
                 >
                   {{
-                    formatAmount(
-                      Math.abs(
-                        sumAllAccounts(completeExpenseAccounts, period.label)
-                      )
-                    )
+                    formatVariancePercent(getAccountVariancePercent(account))
                   }}
-                </template>
-                <template
-                  v-else-if="
-                    sumAllAccounts(completeExpenseAccounts, period.label) > 0
+                </span>
+              </div>
+            </div>
+            <div class="table-row total-row">
+              <div class="col-account">{{ t("Total Expenses") }}</div>
+              <div
+                v-for="period in results.periods"
+                :key="'expense-total-' + period.label"
+                class="col-amount"
+              >
+                {{
+                  formatExpenseTotal(
+                    sumAllAccounts(completeExpenseAccounts, period.label)
+                  )
+                }}
+              </div>
+              <div
+                v-if="showVarianceDollar && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="getVarianceClass(getTotalVariance('expenses'), true)"
+                >
+                  {{ formatVariance(getTotalVariance("expenses")) }}
+                </span>
+              </div>
+              <div
+                v-if="showVariancePercent && results.periods?.length >= 2"
+                class="col-variance"
+              >
+                <span
+                  :class="
+                    getVarianceClass(getTotalVariancePercent('expenses'), true)
                   "
                 >
                   {{
-                    formatAmount(
-                      -sumAllAccounts(completeExpenseAccounts, period.label)
-                    )
+                    formatVariancePercent(getTotalVariancePercent("expenses"))
                   }}
-                </template>
-                <template v-else>
-                  {{ formatAmount(0) }}
-                </template>
-              </span>
-            </q-item-section>
-          </q-item>
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
 
-        <!-- Net Income Section -->
-        <q-separator />
-        <q-item class="items-center q-my-none q-py-none net-income-row">
-          <q-item-section v-if="formData.l_accno" avatar>
-            <q-icon name="account_balance" color="primary" size="sm" />
-          </q-item-section>
-          <q-item-section class="q-pa-sm">
-            {{ t("Net Income/(Loss)") }}:
-          </q-item-section>
-          <q-item-section
+        <!-- Net Income Row -->
+        <div class="table-row net-income-row">
+          <div class="col-account">{{ t("Net Income/(Loss)") }}</div>
+          <div
             v-for="period in results.periods"
-            :key="period.label"
-            class="col text-right"
+            :key="'net-' + period.label"
+            class="col-amount"
           >
-            <template v-if="netIncome(period.label) < 0">
-              <span class="amount-negative">
-                ({{ formatAmount(Math.abs(netIncome(period.label))) }})
-              </span>
-            </template>
-            <template v-else>
-              <span class="amount-positive">
-                {{ formatAmount(netIncome(period.label)) }}
-              </span>
-            </template>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-    </q-card>
+            <span
+              :class="
+                netIncome(period.label) < 0
+                  ? 'variance-negative'
+                  : 'variance-positive'
+              "
+            >
+              {{ formatNetIncome(netIncome(period.label)) }}
+            </span>
+          </div>
+          <div
+            v-if="showVarianceDollar && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            <span :class="getVarianceClass(getNetIncomeVariance())">
+              {{ formatVariance(getNetIncomeVariance()) }}
+            </span>
+          </div>
+          <div
+            v-if="showVariancePercent && results.periods?.length >= 2"
+            class="col-variance"
+          >
+            <span :class="getVarianceClass(getNetIncomeVariancePercent())">
+              {{ formatVariancePercent(getNetIncomeVariancePercent()) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script setup>
-// =====================================================
-// Imports and Dependency Registration
-// =====================================================
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { date } from "quasar";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
-import { formatAmount, roundAmount } from "src/helpers/utils.js";
+import { roundAmount, formatAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
 import draggable from "vuedraggable";
-
-// =====================================================
-// Injection and Initial Setup
-// =====================================================
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Income Statement"));
-const printToggle = inject("printToggle");
 const route = useRoute();
 const now = new Date();
 const currentYear = String(now.getFullYear());
 const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
 
-// =====================================================
-// Reactive Data and Options
-// =====================================================
 const formData = ref({
   department: route.query.department || "",
   projectnumber: route.query.projectnumber || "",
   currency: "",
-  decimalplaces: "2",
   usetemplate: false,
   method: "accrual",
   l_heading: false,
@@ -692,7 +721,7 @@ const formData = ref({
   previousyear: "0",
   reversedisplay: false,
   accounttype: "standard",
-  periodMode: "current", // Options: current, monthly, quarterly, yearly, custom
+  periodMode: "current",
   periods: [],
 });
 
@@ -702,6 +731,11 @@ const periodModeOptions = [
   { label: t("Quarterly"), value: "quarterly" },
   { label: t("Yearly"), value: "yearly" },
   { label: t("Custom"), value: "custom" },
+];
+
+const methodOptions = [
+  { label: t("Accrual"), value: "accrual" },
+  { label: t("Cash"), value: "cash" },
 ];
 
 const monthOptions = Array.from({ length: 12 }, (_, i) => ({
@@ -727,13 +761,56 @@ const currencies = ref([]);
 const filtersOpen = ref(true);
 const loading = ref(false);
 const results = ref({});
-const collapsedHeadings = ref(new Set()); // Track collapsed heading account numbers
+const collapsedHeadings = ref(new Set());
+const showVarianceDollar = ref(true);
+const showVariancePercent = ref(false);
+const sectionCollapsed = ref({
+  income: false,
+  expenses: false,
+});
+const selectedVariance = ref("0-1"); // format: "currentIndex-previousIndex"
 
-// =====================================================
-// Computed Properties
-// =====================================================
+// Generate all possible variance combinations from selected periods
+const varianceOptions = computed(() => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return [];
 
-// Formats the date range by joining period labels
+  const options = [];
+  for (let i = 0; i < periods.length; i++) {
+    for (let j = i + 1; j < periods.length; j++) {
+      const label1 = periods[i].label;
+      const label2 = periods[j].label;
+      options.push({
+        value: `${i}-${j}`,
+        label: `${label1} vs ${label2}`,
+        currentIdx: i,
+        previousIdx: j,
+      });
+    }
+  }
+  return options;
+});
+
+const selectedVarianceLabel = computed(() => {
+  const option = varianceOptions.value.find(
+    (o) => o.value === selectedVariance.value
+  );
+  return option ? option.label : t("Select Variance");
+});
+
+const selectVariance = (option) => {
+  selectedVariance.value = option.value;
+};
+
+// Get current and previous period indices for variance calculations
+const getVarianceIndices = () => {
+  const parts = selectedVariance.value.split("-");
+  return {
+    currentIdx: parseInt(parts[0], 10),
+    previousIdx: parseInt(parts[1], 10),
+  };
+};
+
 const formattedDateRange = computed(() => {
   if (formData.value.periods.length) {
     return formData.value.periods.map((p) => p.label).join(", ");
@@ -741,21 +818,18 @@ const formattedDateRange = computed(() => {
   return t("N/A");
 });
 
-/**
- * Builds a hierarchical structure of accounts based on parent_accno relationships
- * @param {Object} rawAccounts - Raw account data from API
- * @param {Object} accountsInfo - Account metadata from API
- * @param {string} type - 'I' for income, 'E' for expenses
- * @returns {Array} Hierarchical array of accounts with levels
- */
-const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
+const buildAccountHierarchy = (
+  rawAccounts,
+  accountsInfo,
+  type,
+  respectCollapsed = true
+) => {
   const accountMap = new Map();
   const rootAccounts = [];
 
-  // First pass: create account objects and store in map
   Object.keys(rawAccounts).forEach((accno) => {
     const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
+    const periodsData = {};
 
     Object.keys(accountPeriods).forEach((periodLabel) => {
       if (accountPeriods[periodLabel][type]) {
@@ -765,7 +839,7 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
 
     if (Object.keys(periodsData).length > 0) {
       const accountInfo = accountsInfo[accno] || {};
-      const account = {
+      accountMap.set(accno, {
         accno,
         description: accountInfo.description || "",
         charttype: accountInfo.charttype || "A",
@@ -773,12 +847,10 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
         periods: periodsData,
         level: 0,
         children: [],
-      };
-      accountMap.set(accno, account);
+      });
     }
   });
 
-  // Second pass: build parent-child relationships
   accountMap.forEach((account) => {
     if (account.parent_accno && accountMap.has(account.parent_accno)) {
       const parent = accountMap.get(account.parent_accno);
@@ -789,186 +861,71 @@ const buildAccountHierarchy = (rawAccounts, accountsInfo, type) => {
     }
   });
 
-  // Third pass: flatten the hierarchy while preserving order and levels
-  const flattenHierarchy = (accounts, result = []) => {
+  const flatten = (accounts, result = []) => {
     accounts.forEach((account) => {
       result.push(account);
-      // Only include children if the heading is not collapsed
-      if (
-        account.children.length > 0 &&
-        !collapsedHeadings.value.has(account.accno)
-      ) {
-        flattenHierarchy(account.children, result);
-      }
+      const shouldExpand = respectCollapsed
+        ? account.children.length > 0 &&
+          !collapsedHeadings.value.has(account.accno)
+        : account.children.length > 0;
+      if (shouldExpand) flatten(account.children, result);
     });
     return result;
   };
 
-  return flattenHierarchy(rootAccounts);
+  return flatten(rootAccounts);
 };
 
-/**
- * Builds a complete hierarchical structure of accounts for total calculations
- * This includes ALL accounts regardless of collapsed state
- * @param {Object} rawAccounts - Raw account data from API
- * @param {Object} accountsInfo - Account metadata from API
- * @param {string} type - 'I' for income, 'E' for expenses
- * @returns {Array} Complete hierarchical array of accounts with levels
- */
-const buildCompleteAccountHierarchy = (rawAccounts, accountsInfo, type) => {
-  const accountMap = new Map();
-  const rootAccounts = [];
+const getRawData = () => ({
+  raw: results.value[""] || {},
+  info: results.value.accounts || {},
+});
 
-  // First pass: create account objects and store in map
-  Object.keys(rawAccounts).forEach((accno) => {
-    const accountPeriods = rawAccounts[accno];
-    let periodsData = {};
-
-    Object.keys(accountPeriods).forEach((periodLabel) => {
-      if (accountPeriods[periodLabel][type]) {
-        periodsData[periodLabel] = accountPeriods[periodLabel][type];
-      }
-    });
-
-    if (Object.keys(periodsData).length > 0) {
-      const accountInfo = accountsInfo[accno] || {};
-      const account = {
-        accno,
-        description: accountInfo.description || "",
-        charttype: accountInfo.charttype || "A",
-        parent_accno: accountInfo.parent_accno || null,
-        periods: periodsData,
-        level: 0,
-        children: [],
-      };
-      accountMap.set(accno, account);
-    }
-  });
-
-  // Second pass: build parent-child relationships
-  accountMap.forEach((account) => {
-    if (account.parent_accno && accountMap.has(account.parent_accno)) {
-      const parent = accountMap.get(account.parent_accno);
-      parent.children.push(account);
-      account.level = parent.level + 1;
-    } else {
-      rootAccounts.push(account);
-    }
-  });
-
-  // Third pass: flatten the hierarchy while preserving order and levels
-  // This version includes ALL accounts regardless of collapsed state
-  const flattenHierarchy = (accounts, result = []) => {
-    accounts.forEach((account) => {
-      result.push(account);
-      // Include all children regardless of collapsed state
-      if (account.children.length > 0) {
-        flattenHierarchy(account.children, result);
-      }
-    });
-    return result;
-  };
-
-  return flattenHierarchy(rootAccounts);
-};
-
-// Compute income accounts from results with hierarchy
 const incomeAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildAccountHierarchy(rawAccounts, accountsInfo, "I");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "I");
 });
 
-// Compute expense accounts from results with hierarchy
 const expenseAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildAccountHierarchy(rawAccounts, accountsInfo, "E");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "E");
 });
 
-// Complete account hierarchies for total calculations (includes all accounts regardless of collapsed state)
 const completeIncomeAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "I");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "I", false);
 });
 
 const completeExpenseAccounts = computed(() => {
-  const rawAccounts = results.value[""] || {};
-  const accountsInfo = results.value.accounts || {};
-  return buildCompleteAccountHierarchy(rawAccounts, accountsInfo, "E");
+  const { raw, info } = getRawData();
+  return buildAccountHierarchy(raw, info, "E", false);
 });
 
-// =====================================================
-// Helper Functions
-// =====================================================
+const formatNumber = (value) => {
+  const num = Number(value) || 0;
+  if (num < 0) return `-${formatAmount(Math.abs(num))}`;
+  return formatAmount(num);
+};
 
-/**
- * Generates CSS padding based on account level for indentation
- * @param {number} level - Account hierarchy level
- * @returns {string} CSS padding value
- */
+const formatExpenseTotal = (value) => {
+  const num = Number(value) || 0;
+  if (num < 0) return formatAmount(Math.abs(num));
+  if (num > 0) return `-${formatAmount(num)}`;
+  return formatAmount(0);
+};
+
+const formatNetIncome = (value) => {
+  const num = Number(value) || 0;
+  if (num < 0) return `-${formatAmount(Math.abs(num))}`;
+  return formatAmount(num);
+};
+
 const getIndentation = (level) => {
-  const basePadding = 16; // Base padding in pixels
-  const indentPerLevel = 24; // Additional padding per level
+  const basePadding = 12;
+  const indentPerLevel = 20;
   return `${basePadding + level * indentPerLevel}px`;
 };
 
-/**
- * Determines if an account should show a separator line
- * @param {Object} account - Account object
- * @param {number} index - Account index in the list
- * @param {Array} accounts - Full accounts array
- * @returns {boolean} Whether to show separator
- */
-const shouldShowSeparator = (account, index, accounts) => {
-  // Show separator after heading accounts
-  if (account.charttype === "H") {
-    return true;
-  }
-
-  // Show separator if next account is at a lower level (end of a group)
-  if (index < accounts.length - 1) {
-    const nextAccount = accounts[index + 1];
-    return nextAccount.level < account.level;
-  }
-
-  return false;
-};
-
-/**
- * Gets the appropriate icon for an account based on its type and level
- * @param {Object} account - Account object
- * @returns {string} Icon name
- */
-const getAccountIcon = (account) => {
-  if (account.charttype === "H") {
-    return "folder";
-  }
-  return "description";
-};
-
-/**
- * Calculates the total for a specific account group (parent and its children)
- * @param {Array} accounts - All accounts array
- * @param {string} parentAccno - Parent account number
- * @param {string} periodLabel - Period label
- * @returns {number} Total amount for the group
- */
-const getGroupTotal = (accounts, parentAccno, periodLabel) => {
-  return accounts.reduce((total, account) => {
-    if (account.parent_accno === parentAccno || account.accno === parentAccno) {
-      const amount = account.periods[periodLabel]?.amount || 0;
-      return total + amount;
-    }
-    return total;
-  }, 0);
-};
-
-/**
- * Toggles the collapsed state of a heading account
- * @param {string} accno - Account number to toggle
- */
 const toggleHeading = (accno) => {
   if (collapsedHeadings.value.has(accno)) {
     collapsedHeadings.value.delete(accno);
@@ -977,49 +934,141 @@ const toggleHeading = (accno) => {
   }
 };
 
-/**
- * Checks if a heading account is collapsed
- * @param {string} accno - Account number to check
- * @returns {boolean} Whether the heading is collapsed
- */
 const isHeadingCollapsed = (accno) => {
   return collapsedHeadings.value.has(accno);
 };
 
-/**
- * Gets the appropriate icon for a heading based on its collapsed state
- * @param {string} accno - Account number
- * @returns {string} Icon name
- */
-const getHeadingIcon = (accno) => {
-  return isHeadingCollapsed(accno) ? "expand_more" : "expand_less";
-};
-
-/**
- * Expands all heading accounts
- */
 const expandAllHeadings = () => {
   collapsedHeadings.value.clear();
+  sectionCollapsed.value = { income: false, expenses: false };
 };
 
-/**
- * Collapses all heading accounts
- */
 const collapseAllHeadings = () => {
-  // Get all heading account numbers from both income and expense accounts
   const allAccounts = [...incomeAccounts.value, ...expenseAccounts.value];
-  const headingAccounts = allAccounts.filter(
-    (account) => account.charttype === "H"
-  );
-  headingAccounts.forEach((account) => {
-    collapsedHeadings.value.add(account.accno);
-  });
+  allAccounts
+    .filter((a) => a.charttype === "H")
+    .forEach((a) => collapsedHeadings.value.add(a.accno));
 };
 
-/**
- * Updates a period object based on the current period mode.
- * This sets the fromdate, todate, and label properties accordingly.
- */
+const toggleSection = (section) => {
+  sectionCollapsed.value[section] = !sectionCollapsed.value[section];
+};
+
+const sumAllAccounts = (completeAccountsArray, periodLabel) => {
+  return completeAccountsArray.reduce((sum, account) => {
+    if (account.charttype === "H") return sum;
+    const amount = account.periods[periodLabel]?.amount || 0;
+    return sum + Number(amount);
+  }, 0);
+};
+
+const netIncome = (periodLabel) => {
+  const incomeSum = sumAllAccounts(completeIncomeAccounts.value, periodLabel);
+  const expenseSum = sumAllAccounts(completeExpenseAccounts.value, periodLabel);
+  return incomeSum + expenseSum;
+};
+
+// Variance calculations - using selected variance indices
+const getAccountVariance = (account) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = account.periods[periods[currentIdx]?.label]?.amount || 0;
+  const previous = account.periods[periods[previousIdx]?.label]?.amount || 0;
+  return Number(current) - Number(previous);
+};
+
+const getAccountVariancePercent = (account) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = account.periods[periods[currentIdx]?.label]?.amount || 0;
+  const previous = account.periods[periods[previousIdx]?.label]?.amount || 0;
+  if (previous === 0) return current !== 0 ? 100 : 0;
+  return (
+    ((Number(current) - Number(previous)) / Math.abs(Number(previous))) * 100
+  );
+};
+
+const getTotalVariance = (type) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+
+  const accounts =
+    type === "income"
+      ? completeIncomeAccounts.value
+      : completeExpenseAccounts.value;
+  const current = sumAllAccounts(accounts, periods[currentIdx]?.label);
+  const previous = sumAllAccounts(accounts, periods[previousIdx]?.label);
+  return current - previous;
+};
+
+const getTotalVariancePercent = (type) => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+
+  const accounts =
+    type === "income"
+      ? completeIncomeAccounts.value
+      : completeExpenseAccounts.value;
+  const current = sumAllAccounts(accounts, periods[currentIdx]?.label);
+  const previous = sumAllAccounts(accounts, periods[previousIdx]?.label);
+  if (previous === 0) return current !== 0 ? 100 : 0;
+  return ((current - previous) / Math.abs(previous)) * 100;
+};
+
+const getNetIncomeVariance = () => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = netIncome(periods[currentIdx]?.label);
+  const previous = netIncome(periods[previousIdx]?.label);
+  return current - previous;
+};
+
+const getNetIncomeVariancePercent = () => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return null;
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  const current = netIncome(periods[currentIdx]?.label);
+  const previous = netIncome(periods[previousIdx]?.label);
+  if (previous === 0) return current !== 0 ? 100 : 0;
+  return ((current - previous) / Math.abs(previous)) * 100;
+};
+
+const formatVariance = (value) => {
+  if (value === null) return "-";
+  const absVal = Math.abs(value);
+  const formatted = formatAmount(absVal);
+  if (value < 0) return `-${formatted}`;
+  if (value > 0) return `+${formatted}`;
+  return "-";
+};
+
+const formatVariancePercent = (value) => {
+  if (value === null) return "-";
+  const absVal = Math.abs(value).toFixed(1);
+  if (value < 0) return `-${absVal}%`;
+  if (value > 0) return `+${absVal}%`;
+  return "-";
+};
+
+const getVarianceClass = (value, inverted = false) => {
+  if (value === null || value === 0) return "";
+  // For expenses, decrease is good (inverted logic)
+  const isPositive = inverted ? value < 0 : value > 0;
+  return isPositive ? "variance-positive" : "variance-negative";
+};
+
+const getVarianceComparison = () => {
+  const periods = results.value.periods || [];
+  if (periods.length < 2) return "";
+  const { currentIdx, previousIdx } = getVarianceIndices();
+  return `${periods[currentIdx]?.label} vs ${periods[previousIdx]?.label}`;
+};
+
 const updatePeriod = (period) => {
   if (formData.value.periodMode === "current") {
     if (period.year) {
@@ -1077,18 +1126,12 @@ const updatePeriod = (period) => {
   }
 };
 
-/**
- * Adds a new period line.
- * If a period exists, its values are cloned; otherwise, default values are set.
- */
 const addPeriod = () => {
   let newPeriod = {};
-  // Get allowed years as numbers from the yearOptions array.
   const allowedYears = yearOptions.map((y) => parseInt(y.value, 10));
   const minYear = Math.min(...allowedYears);
 
   if (formData.value.periods.length > 0) {
-    // Compute the "before" period based on the last period and current mode.
     const lastPeriod =
       formData.value.periods[formData.value.periods.length - 1];
 
@@ -1108,16 +1151,14 @@ const addPeriod = () => {
       } else {
         month = month - 1;
       }
-      if (year < minYear) {
-        year = minYear;
-      }
+      if (year < minYear) year = minYear;
       newPeriod = {
         ...lastPeriod,
         month: month.toString().padStart(2, "0"),
         year: year.toString(),
       };
     } else if (formData.value.periodMode === "quarterly") {
-      let quarter = lastPeriod.quarter; // Expected format: "Q1", "Q2", etc.
+      let quarter = lastPeriod.quarter;
       let year = Number(lastPeriod.year);
       const qNumber = parseInt(quarter.substring(1), 10);
       if (qNumber === 1) {
@@ -1126,16 +1167,12 @@ const addPeriod = () => {
       } else {
         quarter = "Q" + (qNumber - 1);
       }
-      if (year < minYear) {
-        year = minYear;
-      }
+      if (year < minYear) year = minYear;
       newPeriod = { ...lastPeriod, quarter, year: year.toString() };
     } else if (formData.value.periodMode === "custom") {
-      // For custom, simply copy the current period.
       newPeriod = { ...lastPeriod };
     }
   } else {
-    // No period exists yet; create one with the current values.
     if (formData.value.periodMode === "current") {
       newPeriod = { year: currentYear, fromdate: "", todate: "", label: "" };
     } else if (formData.value.periodMode === "monthly") {
@@ -1169,60 +1206,10 @@ const addPeriod = () => {
   updatePeriod(newPeriod);
 };
 
-/**
- * Removes a period line based on its index.
- */
 const removePeriod = (index) => {
   formData.value.periods.splice(index, 1);
 };
 
-/**
- * Sums the amounts for a given period label from an array of accounts.
- * Filters out heading accounts (charttype === 'H') when calculating totals.
- */
-const sumAccounts = (accountsArray, periodLabel) => {
-  return accountsArray.reduce((sum, account) => {
-    // Skip heading accounts when calculating totals
-    if (account.charttype === "H") {
-      return sum;
-    }
-    const amount = account.periods[periodLabel]?.amount || 0;
-    return sum + Number(amount);
-  }, 0);
-};
-
-/**
- * Sums all accounts for a given period label, including collapsed accounts
- * This is used for total calculations that should include all accounts regardless of display state
- */
-const sumAllAccounts = (completeAccountsArray, periodLabel) => {
-  return completeAccountsArray.reduce((sum, account) => {
-    // Skip heading accounts (charttype 'H') when calculating totals
-    if (account.charttype === "H") return sum;
-    const amount = account.periods[periodLabel]?.amount || 0;
-    return sum + Number(amount);
-  }, 0);
-};
-
-/**
- * Custom amount formatting function to match Balance Sheet styling
- */
-const formatAmountCustom = (value) => {
-  return formatAmount(value);
-};
-
-/**
- * Calculates net income (income + expenses) for a given period label.
- */
-const netIncome = (periodLabel) => {
-  const incomeSum = sumAllAccounts(completeIncomeAccounts.value, periodLabel);
-  const expenseSum = sumAllAccounts(completeExpenseAccounts.value, periodLabel);
-  return incomeSum + expenseSum;
-};
-
-/**
- * Generates the report by calling the API with formData parameters.
- */
 const search = async () => {
   try {
     loading.value = true;
@@ -1237,26 +1224,22 @@ const search = async () => {
     loading.value = false;
   }
 };
-const getPDF = async () => {
+
+const downloadPDF = async () => {
   try {
     loading.value = true;
     const params = { ...formData.value, usetemplate: "Y" };
     const response = await api.get("/reports/income_statement", {
-      params: params,
+      params,
       responseType: "blob",
     });
-    // Create a Blob from the response data
     const blob = new Blob([response.data], { type: "application/pdf" });
-    // Generate a URL for the Blob
     const url = window.URL.createObjectURL(blob);
-    // Create a temporary link element
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", "income_statement.pdf");
     document.body.appendChild(link);
-    // Trigger the download by simulating a click
     link.click();
-    // Cleanup: remove the link and revoke the Blob URL
     link.parentNode.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch (error) {
@@ -1266,23 +1249,15 @@ const getPDF = async () => {
   }
 };
 
-/**
- * Returns the path to the trial transactions report.
- * Accepts an account number and a specific period.
- * Formats the fromdate and todate from the period and includes other query parameters.
- */
 const createLink = inject("createLink");
 
 const getPath = (accno, period) => {
-  // Helper to format "YYYYMMDD" to "YYYY-MM-DD"
   const formatDateStr = (dateStr) =>
     `${dateStr.substr(0, 4)}-${dateStr.substr(4, 2)}-${dateStr.substr(6, 2)}`;
-
   const fromdate = formatDateStr(period.fromdate);
   const todate = formatDateStr(period.todate);
   const project = formData.value.projectnumber || "";
   const department = formData.value.department || "";
-
   const params = new URLSearchParams({
     accno,
     fromdate,
@@ -1293,107 +1268,89 @@ const getPath = (accno, period) => {
   return createLink("trial.transactions") + `?${params.toString()}`;
 };
 
-/**
- * Exports the report data to an Excel file.
- */
 const downloadExcel = () => {
   const includeAccNo = formData.value.l_accno;
-  let headerRow = includeAccNo ? ["Acc No", "Description"] : ["Description"];
+  let headerRow = ["Account"];
   const periods = results.value.periods || [];
-  periods.forEach((period) => {
-    headerRow.push(period.label);
-  });
+  periods.forEach((period) => headerRow.push(period.label));
+  if (periods.length >= 2) {
+    headerRow.push("VAR", "VAR %");
+  }
 
   const exportData = [];
-  const groupHeaderIndices = [];
-
   exportData.push(["Income Statement"]);
-  groupHeaderIndices.push(0);
   exportData.push([]);
   exportData.push(headerRow);
-  exportData.push(["Income"]);
-  groupHeaderIndices.push(exportData.length - 1);
 
-  incomeAccounts.value.forEach((account) => {
+  const addAccountRow = (account) => {
     let row = [];
-    if (includeAccNo) {
-      row.push(account.accno, account.description);
-    } else {
-      row.push(account.description);
-    }
+    const name =
+      includeAccNo && account.accno
+        ? `${account.accno} - ${account.description}`
+        : account.description;
+    row.push(name);
     periods.forEach((period) => {
-      const amt = account.periods[period.label]
-        ? account.periods[period.label].amount
-        : 0;
+      const amt = account.periods[period.label]?.amount || 0;
       row.push(roundAmount(amt));
     });
+    if (periods.length >= 2) {
+      row.push(getAccountVariance(account) || 0);
+      row.push(getAccountVariancePercent(account)?.toFixed(1) + "%" || "-");
+    }
     exportData.push(row);
-  });
+  };
 
-  let incomeTotalRow = includeAccNo ? ["", "Total Income"] : ["Total Income"];
-  periods.forEach((period) => {
-    const total = sumAllAccounts(completeIncomeAccounts.value, period.label);
-    incomeTotalRow.push(roundAmount(total));
-  });
+  exportData.push(["Income"]);
+  incomeAccounts.value.forEach((a) => addAccountRow(a));
+
+  let incomeTotalRow = ["Total Income"];
+  periods.forEach((p) =>
+    incomeTotalRow.push(
+      roundAmount(sumAllAccounts(completeIncomeAccounts.value, p.label))
+    )
+  );
+  if (periods.length >= 2) {
+    incomeTotalRow.push(getTotalVariance("income") || 0);
+    incomeTotalRow.push(
+      getTotalVariancePercent("income")?.toFixed(1) + "%" || "-"
+    );
+  }
   exportData.push(incomeTotalRow);
+
   exportData.push([]);
   exportData.push(["Expenses"]);
-  groupHeaderIndices.push(exportData.length - 1);
+  expenseAccounts.value.forEach((a) => addAccountRow(a));
 
-  expenseAccounts.value.forEach((account) => {
-    let row = [];
-    if (includeAccNo) {
-      row.push(account.accno, account.description);
-    } else {
-      row.push(account.description);
-    }
-    periods.forEach((period) => {
-      const amt = account.periods[period.label]
-        ? account.periods[period.label].amount
-        : 0;
-      row.push(roundAmount(amt));
-    });
-    exportData.push(row);
-  });
-
-  let expenseTotalRow = includeAccNo
-    ? ["", "Total Expenses"]
-    : ["Total Expenses"];
-  periods.forEach((period) => {
-    const total = sumAllAccounts(completeExpenseAccounts.value, period.label);
-    expenseTotalRow.push(roundAmount(total));
-  });
+  let expenseTotalRow = ["Total Expenses"];
+  periods.forEach((p) =>
+    expenseTotalRow.push(
+      roundAmount(sumAllAccounts(completeExpenseAccounts.value, p.label))
+    )
+  );
+  if (periods.length >= 2) {
+    expenseTotalRow.push(getTotalVariance("expenses") || 0);
+    expenseTotalRow.push(
+      getTotalVariancePercent("expenses")?.toFixed(1) + "%" || "-"
+    );
+  }
   exportData.push(expenseTotalRow);
+
   exportData.push([]);
-  let netIncomeRow = includeAccNo ? ["", "Net Income"] : ["Net Income"];
-  periods.forEach((period) => {
-    const net = netIncome(period.label);
-    netIncomeRow.push(roundAmount(net));
-  });
+  let netIncomeRow = ["Net Income"];
+  periods.forEach((p) => netIncomeRow.push(roundAmount(netIncome(p.label))));
+  if (periods.length >= 2) {
+    netIncomeRow.push(getNetIncomeVariance() || 0);
+    netIncomeRow.push(getNetIncomeVariancePercent()?.toFixed(1) + "%" || "-");
+  }
   exportData.push(netIncomeRow);
 
   const worksheet = utils.aoa_to_sheet(exportData);
-  worksheet["!merges"] = worksheet["!merges"] || [];
-  groupHeaderIndices.forEach((rowIdx) => {
-    worksheet["!merges"].push({
-      s: { r: rowIdx, c: 0 },
-      e: { r: rowIdx, c: headerRow.length - 1 },
-    });
-    const cellRef = utils.encode_cell({ r: rowIdx, c: 0 });
-    if (worksheet[cellRef]) {
-      worksheet[cellRef].s = {
-        alignment: { horizontal: "center", vertical: "center" },
-      };
-    }
-  });
-
-  worksheet["!cols"] = headerRow.map((header, colIdx) => {
-    let maxLength = header ? header.toString().length : 0;
+  worksheet["!cols"] = headerRow.map((_, colIdx) => {
+    let maxLength = 10;
     exportData.forEach((row) => {
       const cellValue = row[colIdx];
-      if (cellValue != null) {
+      if (cellValue != null)
         maxLength = Math.max(maxLength, cellValue.toString().length);
-      }
     });
     return { wch: maxLength + 2 };
   });
@@ -1403,11 +1360,6 @@ const downloadExcel = () => {
   writeFile(workbook, "income_statement.xlsx", { compression: true });
 };
 
-// =====================================================
-// Watchers and Lifecycle Hooks
-// =====================================================
-
-// When period mode changes, clear periods and add a new one.
 watch(
   () => formData.value.periodMode,
   () => {
@@ -1417,18 +1369,11 @@ watch(
 );
 
 onMounted(() => {
-  if (route.query.fromdate || route.query.todate) {
-    search();
-  }
+  if (route.query.fromdate || route.query.todate) search();
   fetchLinks();
-  if (formData.value.periods.length === 0) {
-    addPeriod();
-  }
+  if (formData.value.periods.length === 0) addPeriod();
 });
 
-// =====================================================
-// Fetch Lookup Data for Links and Select Options
-// =====================================================
 const fetchLinks = async () => {
   try {
     const response = await api.get("/create_links/incomestatement");
@@ -1442,179 +1387,253 @@ const fetchLinks = async () => {
 </script>
 
 <style scoped>
-@media print {
-  .q-page {
-    padding: 0 !important;
-  }
-  .q-card,
-  .q-card-section {
-    box-shadow: none !important;
-    border: none !important;
-  }
-  .q-btn,
-  .q-expansion-item {
-    display: none !important;
-  }
-  .text-primary {
-    color: #000 !important;
-  }
-  .q-list--bordered {
-    border: none !important;
-  }
+.report-container {
+  background: var(--q-mainbg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.border-top {
-  border-top: 2px solid #eee;
-  padding-top: 1rem;
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--q-border);
+}
+
+.header-info {
+  font-size: 0.9rem;
+  color: var(--q-lighttext);
+}
+
+.client-name {
+  color: var(--q-primary);
+  font-weight: 600;
+}
+
+.separator {
+  margin: 0 8px;
+  color: var(--q-border);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--q-tint);
+  border-bottom: 1px solid var(--q-border);
+}
+
+.variance-toggles {
+  display: flex;
+  gap: 8px;
+}
+
+.active-toggle {
+  background: var(--q-primary) !important;
+  color: white !important;
+}
+
+.expand-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.report-table {
+  width: 100%;
+}
+
+.table-header {
+  display: flex;
+  padding: 10px 20px;
+  background: var(--q-tint);
+  border-bottom: 2px solid var(--q-border);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--q-lighttext);
+}
+
+.col-account {
+  flex: 2;
+  min-width: 200px;
+}
+
+.col-amount {
+  flex: 1;
+  text-align: right;
+  min-width: 100px;
+}
+
+.col-variance {
+  flex: 0.8;
+  text-align: right;
+  min-width: 90px;
+}
+
+.variance-label {
+  color: var(--q-primary);
+  font-weight: 600;
+}
+
+.variance-sub {
+  font-size: 0.65rem;
+  color: var(--q-lighttext);
+  display: block;
+}
+
+.section {
+  border-bottom: 1px solid var(--q-border);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  background: var(--q-mainbg);
+  border-bottom: 1px solid var(--q-border);
+}
+
+.section-title:hover {
+  background: var(--q-tint);
+}
+
+.section-expand-icon {
+  margin-right: 8px;
+  color: var(--q-lighttext);
+}
+
+.table-row {
+  display: flex;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--q-border);
+  font-size: 0.875rem;
+  align-items: center;
+}
+
+.table-row:hover {
+  background: var(--q-tint);
+}
+
+.heading-row {
+  font-weight: 600;
+  background: var(--q-tint);
+}
+
+.heading-row:hover {
+  background: var(--q-mutedbg);
+}
+
+.detail-row {
+  font-weight: 400;
+}
+
+.expand-arrow {
+  margin-right: 4px;
+  cursor: pointer;
+  color: var(--q-lighttext);
+  vertical-align: middle;
+}
+
+.account-name {
+  color: var(--q-maintext);
+}
+
+.amount-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.amount-link:hover {
+  color: var(--q-primary);
+  text-decoration: underline;
+}
+
+.total-row {
+  font-weight: 600;
+  background: var(--q-tint);
+  border-top: 2px solid var(--q-border);
+}
+
+.net-income-row {
+  font-weight: 700;
+  background: var(--q-highlight);
+  border-top: 3px solid var(--q-primary);
+  font-size: 0.95rem;
+}
+
+.variance-positive {
+  color: var(--q-positive);
+  font-weight: 500;
+}
+
+.variance-negative {
+  color: var(--q-negative);
+  font-weight: 500;
 }
 
 .drag-handle:hover {
   cursor: grab;
 }
 
-/* Account hierarchy styling */
-.account-row {
-  transition: background-color 0.2s ease;
+:deep(.variance-dropdown) {
+  font-size: 0.714rem;
+  min-width: 120px;
 }
 
-.account-row:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+:deep(.variance-dropdown .q-item) {
+  padding: 4px 10px;
+  min-height: 24px;
 }
 
-.heading-account {
-  border-left: 4px solid var(--q-primary);
-  background-color: rgba(var(--q-primary), 0.05);
-  transition: background-color 0.2s ease;
-}
-
-.heading-account:hover {
-  background-color: rgba(var(--q-primary), 0.1);
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-/* Expand/collapse icon styling */
-.expand-icon {
-  transition: transform 0.2s ease;
-}
-
-.expand-icon:hover {
-  transform: scale(1.1);
-}
-
-/* Target the expand/collapse icons specifically */
-.q-icon.expand-icon {
-  transition: transform 0.2s ease;
-}
-
-.q-icon.expand-icon:hover {
-  transform: scale(1.1);
-}
-
-/* Heading row styling */
-.heading-row {
-  user-select: none;
-}
-
-.heading-row:hover .expand-icon {
-  opacity: 1;
-}
-
-/* Target all icons in heading rows for expand/collapse effect */
-.heading-row .q-icon {
-  transition: transform 0.2s ease;
-}
-
-.heading-row:hover .q-icon {
-  transform: scale(1.1);
-}
-
-.detail-account {
-  border-left: 2px solid #e0e0e0;
-}
-
-.detail-account:hover {
-  border-left-color: #1976d2;
-  background-color: rgba(25, 118, 210, 0.02);
-}
-
-/* Indentation styling */
-.account-indent {
-  position: relative;
-}
-
-.account-indent::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 12px;
-  height: 1px;
-  background-color: #e0e0e0;
-  transform: translateY(-50%);
-}
-
-/* Amount styling - removed colors for better dark mode compatibility */
-.amount-positive {
-  font-weight: 500;
-}
-
-.amount-negative {
-  font-weight: 500;
-}
-
-.amount-zero {
-  color: #757575;
-}
-
-/* Section headers */
-.section-header {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-  color: white;
-  padding: 12px 16px;
-  margin: 16px 0 8px 0;
-  border-radius: 4px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Totals styling */
-.total-row {
-  background-color: #f5f5f5;
-  border-top: 2px solid var(--q-primary);
-  font-weight: 600;
-  color: #000 !important;
-}
-
-.net-income-row {
-  background-color: #e3f2fd;
-  border-top: 3px solid var(--q-primary);
-  font-weight: 700;
-  font-size: 1.1em;
-  color: #000 !important;
-}
-
-@media (max-width: 600px) {
-  .text-h4 {
-    font-size: 1.5rem;
+@media print {
+  .q-page {
+    padding: 0 !important;
   }
-  .text-h5 {
-    font-size: 1.2rem;
+  .report-container {
+    box-shadow: none !important;
   }
-  .q-item {
-    padding: 8px 16px;
+  .controls-row,
+  .header-actions {
+    display: none !important;
   }
+}
 
-  .account-row {
+@media (max-width: 768px) {
+  .report-header {
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    gap: 12px;
     align-items: flex-start;
   }
 
-  .q-item-section {
-    margin-bottom: 4px;
+  .col-account {
+    min-width: 150px;
+  }
+
+  .col-amount,
+  .col-variance {
+    min-width: 70px;
+    font-size: 0.8rem;
   }
 }
 </style>

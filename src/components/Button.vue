@@ -5,7 +5,7 @@
     :outline="isOutline"
     v-on="$listeners"
     class="button"
-    size="11px"
+    :size="size"
     flat
   >
     <q-icon v-if="buttonIcon" :name="buttonIcon" class="icon-color" />
@@ -32,7 +32,7 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: "md",
+    default: "sm",
   },
   icon: {
     type: String,
