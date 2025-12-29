@@ -1639,7 +1639,7 @@ msgstr "Benutzerdefinierte Perioden"
 
 #: src/ai_plugin/pages/UploadDocument.vue
 msgid "Additional instructions for AI processing"
-msgstr "Zusätzliche Anweisungen für KI-Verarbeitung"
+msgstr ""
 
 #: src/pages/ar/SalesInvoice.vue src/pages/arap/AddVC.vue
 #: src/pages/arap/ArReminder.vue src/pages/arap/ArReminder.vue
