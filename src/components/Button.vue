@@ -64,6 +64,8 @@ const buttonClasses = computed(() => {
     save: "primary",
     search: "primary",
     clear: "secondary",
+    edit: "primary",
+    download: "secondary",
     default: "primary",
   };
 
@@ -132,6 +134,8 @@ const displayLabel = computed(() => {
     save: t("Save"),
     search: t("Search"),
     clear: t("Clear"),
+    edit: t("Edit"),
+    download: t("Download"),
     default: "",
   };
   return labelMap[props.type] || "";
