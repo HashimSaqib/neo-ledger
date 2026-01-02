@@ -17,6 +17,11 @@ const getMenuLinks = async () => {
       perm: "customer",
       sublinks: [
         {
+          title: "Overview",
+          link: "/arap/overview/customer",
+          perm: "customer.overview",
+        },
+        {
           title: "Postings",
           sublinks: [
             {
@@ -99,6 +104,11 @@ const getMenuLinks = async () => {
       icon: "storefront",
       perm: "vendor",
       sublinks: [
+        {
+          title: "Overview",
+          link: "/arap/overview/vendor",
+          perm: "vendor.overview",
+        },
         {
           title: "Postings",
           sublinks: [

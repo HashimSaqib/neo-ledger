@@ -5,6 +5,7 @@ const GlTransactions = () =>
   import("src/pages/general-ledger/GlTransactions.vue");
 const ArApTransaction = () => import("src/pages/arap/ArApTransaction.vue");
 const ArApTransactions = () => import("src/pages/arap/ArApTransactions.vue");
+const ArapOverview = () => import("src/pages/arap/ArapOverview.vue");
 const TaxReport = () => import("src/pages/arap/TaxReport.vue");
 const PaymentsReport = () => import("src/pages/cash/PaymentsReport.vue");
 const ArApBatch = () => import("src/pages/arap/ArApBatch.vue");
@@ -90,6 +91,17 @@ const getRoutes = async () => {
           meta: { permission: "gl.transactions" },
         },
         // ARAP
+        {
+          path: "arap/overview/:type",
+          component: ArapOverview,
+          meta: {
+            permission: (route) => {
+              return route.params.type === "customer"
+                ? "customer.overview"
+                : "vendor.overview";
+            },
+          },
+        },
         {
           path: "arap/transaction/:type/:reverse",
           component: ArApTransaction,
