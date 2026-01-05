@@ -26,7 +26,7 @@
         </q-btn>
 
         <!-- Logout Button -->
-        <q-btn-dropdown flat dense icon="settings" auto-close>
+        <q-btn-dropdown flat dense icon="settings">
           <q-list>
             <!-- Dark Mode Toggle -->
             <q-item>
@@ -58,11 +58,7 @@
                   class="q-px-none"
                 >
                   <template v-slot:option="{ itemProps, opt }">
-                    <q-item
-                      v-bind="itemProps"
-                      clickable
-                      @click="switchLanguage(opt)"
-                    >
+                    <q-item v-bind="itemProps" clickable>
                       <q-item-section>{{ opt.label }}</q-item-section>
                     </q-item>
                   </template>
@@ -77,6 +73,7 @@
               v-ripple
               @click="handleLogout"
               class="text-negative"
+              v-close-popup
             >
               <q-item-section avatar>
                 <q-icon name="logout" color="negative" />
