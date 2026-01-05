@@ -118,6 +118,7 @@ const getRoutes = async () => {
           path: "arap/transactions/:type",
           component: ArApTransactions,
           meta: {
+            usePathKey: true,
             permission: (route) => {
               return route.params.type === "customer"
                 ? "customer.transactions"

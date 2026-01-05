@@ -363,8 +363,15 @@
         <!-- Party Name Column -->
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
-            <div class="wrapped-description">
-              {{ props.row.name }}
+            <div class="wrapped-vc">
+              <a
+                href="#"
+                @click.prevent="openEditVc(props.row)"
+                class="text-primary"
+                style="text-decoration: none"
+              >
+                {{ props.row.name }}
+              </a>
             </div>
           </q-td>
         </template>
@@ -424,12 +431,29 @@
         </template>
       </q-table>
     </div>
+    <q-inner-loading :showing="loading">
+      <q-spinner-gears size="50px" color="primary" />
+    </q-inner-loading>
+
+    <!-- Add/Edit VC Dialog -->
+    <q-dialog v-model="vcDialog">
+      <q-card style="min-width: 80vw" class="q-pa-none">
+        <q-card-section class="q-pa-none">
+          <AddVC
+            :id="selectedVcId"
+            :type="type"
+            @close="vcDialog = false"
+            @saved="vcSaved"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { LocalStorage, Notify } from "quasar";
 import draggable from "vuedraggable";
@@ -442,11 +466,13 @@ import {
   formatUpdatedTimestamp,
 } from "src/helpers/utils";
 import FileList from "src/components/FileList.vue";
+import AddVC from "src/pages/arap/AddVC.vue";
 const createLink = inject("createLink");
 
 const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 const route = useRoute();
+const router = useRouter();
 
 // Initialize the type based on route param ("customer" or "vendor")
 const type = ref(route.params.type || "customer");
@@ -814,7 +840,7 @@ const columns = computed(() => {
 const filteredResults = computed(() => {
   return results.value.map((result) => {
     const filtered = {};
-    const requiredKeys = ["id", "invoice", "till"];
+    const requiredKeys = ["id", "invoice", "till", "vendor_id", "customer_id"];
     requiredKeys.forEach((key) => {
       filtered[key] = result[key];
     });
@@ -847,7 +873,7 @@ const fetchAccounts = async () => {
 };
 
 const customers = ref([]);
-const fetchCustomers = async () => {
+const fetcuVcs = async () => {
   try {
     // Use dynamic endpoint: /arap/list/customer or /arap/list/vendor
     const response = await api.get(`/arap/list/${type.value}`);
@@ -868,12 +894,7 @@ const flattenParams = (obj, prefix = "") => {
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
     if (key === "customer" && typeof value === "object") {
-      // handle both customer and vendor selections
-      if (type.value === "customer" && value.customernumber) {
-        flattened["customernumber"] = value.customernumber;
-      } else if (type.value === "vendor" && value.vendornumber) {
-        flattened["vendornumber"] = value.vendornumber;
-      }
+      flattened["vc_id"] = value.id;
     } else if (key === "account" && typeof value === "object") {
       if (value.accno) {
         flattened["accno"] = value.accno;
@@ -900,7 +921,7 @@ const flattenParams = (obj, prefix = "") => {
  *
  * Additionally, if a query parameter "search" equals "1", the search() function is called.
  */
-const loadParams = () => {
+const loadParams = (triggerSearch = true) => {
   const query = route.query;
 
   // Load account using "accno"
@@ -908,7 +929,10 @@ const loadParams = () => {
     const account = recordAccounts.value.find(
       (acc) => acc.accno === query.accno
     );
-    formData.value.account = account || query.accno;
+    formData.value.account = account || {
+      accno: query.accno,
+      label: query.accno,
+    };
   }
 
   // Load party using "customernumber" (remains the same key)
@@ -918,6 +942,11 @@ const loadParams = () => {
         c.customernumber.toLowerCase() === query.customernumber.toLowerCase()
     );
     formData.value.customer = cust || query.customer;
+  }
+
+  if (query.vc_id) {
+    const cust = customers.value.find((c) => c.id == query.vc_id);
+    formData.value.customer = cust || { id: query.vc_id, label: "Loading..." };
   }
 
   // Simplify loading of other parameters using an array of keys
@@ -950,7 +979,7 @@ const loadParams = () => {
   });
 
   // Auto-trigger search if "search" equals "1"
-  if (query.search === "1") {
+  if (triggerSearch && query.search === "1") {
     search();
   }
 };
@@ -966,6 +995,7 @@ const search = async () => {
     filtersOpen.value = false;
     results.value = response.data.transactions;
     totals.value = response.data.totals;
+    router.replace({ query: { ...params, search: 1 } });
   } catch (error) {
     console.error(error);
     Notify.create({
@@ -1032,15 +1062,31 @@ const downloadPDF = () => {
   );
 };
 onMounted(async () => {
-  processFilters();
-  await fetchAccounts();
-  await fetchCustomers();
   updateTitle(
     type.value === "customer" ? "Customer Transactions" : "Vendor Transactions"
   );
+  processFilters();
+  loadParams(true);
+  await Promise.all([fetchAccounts(), fetcuVcs()]);
 
-  loadParams();
+  loadParams(false);
 });
+
+const vcDialog = ref(false);
+const selectedVcId = ref(null);
+
+const openEditVc = (row) => {
+  const id = row.vendor_id || row.customer_id;
+  if (id) {
+    selectedVcId.value = id;
+    vcDialog.value = true;
+  }
+};
+
+const vcSaved = async () => {
+  vcDialog.value = false;
+  await Promise.all([search(), fetcuVcs()]);
+};
 </script>
 
 <style scoped>
@@ -1111,6 +1157,12 @@ onMounted(async () => {
 
 .wrapped-description {
   white-space: pre-wrap;
-  min-width: 10vw;
+  max-width: 25vw;
+  line-break: anywhere;
+}
+.wrapped-vc {
+  white-space: pre-wrap;
+  max-width: 10vw;
+  line-break: anywhere;
 }
 </style>

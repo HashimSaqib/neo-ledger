@@ -57,7 +57,10 @@
 
     <q-page-container class="lightbg q-px-md-none q-py-md">
       <router-view v-slot="{ Component }">
-        <component :is="Component" :key="route.fullPath" />
+        <component
+          :is="Component"
+          :key="route.meta.usePathKey ? route.path : route.fullPath"
+        />
       </router-view>
     </q-page-container>
   </q-layout>
