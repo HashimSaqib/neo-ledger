@@ -272,6 +272,12 @@
                   <div class="text-weight-medium">
                     {{ props.row.name }}
                   </div>
+                  <div
+                    class="text-caption"
+                    v-if="emailDomain && emailDomain !== ''"
+                  >
+                    {{ `${props.row.db_name}@${emailDomain}` }}
+                  </div>
                 </q-td>
               </template>
 
@@ -1204,6 +1210,7 @@ import neoledgerConfig from "../../../neoledger.json";
 
 const logo = resolveLogo({ forceDark: true });
 const productName = neoledgerConfig.productName || "Neo Ledger";
+const emailDomain = neoledgerConfig.email_domain || "";
 const showDatasetDialog = ref(false);
 
 // API Keys dialog state
