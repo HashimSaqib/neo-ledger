@@ -257,7 +257,7 @@
 
 <script setup>
 import { ref, computed, onMounted, inject, watch, nextTick } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { Notify, getCssVar, useQuasar } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -272,6 +272,7 @@ Chart.register(...registerables);
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const updateTitle = inject("updateTitle");
 const createLink = inject("createLink");
 
@@ -597,9 +598,17 @@ const activeStatusTitle = computed(() => {
 });
 
 const newInvoiceLink = computed(() => {
-  return isCustomer.value
+  const path = isCustomer.value
     ? createLink("customer.invoice")
     : createLink("vendor.transaction");
+  const flatParams = flattenParams(formData.value);
+  return {
+    path,
+    query: {
+      callback: createLink("base") + `/arap/overview/${vcType.value}`,
+      ...flatParams,
+    },
+  };
 });
 
 const newInvoiceLabel = computed(() => {
@@ -692,12 +701,28 @@ const getInvoiceLink = (row) => {
     : createLink(
         isCustomer.value ? "customer.transaction" : "vendor.transaction"
       );
-  return { path, query: { id: row.id } };
+  const flatParams = flattenParams(formData.value);
+  return {
+    path,
+    query: {
+      id: row.id,
+      callback: createLink("base") + `/arap/overview/${vcType.value}`,
+      ...flatParams,
+    },
+  };
 };
 
 const getVcLink = (row) => {
   const path = createLink(vcType.value);
-  return { path, query: { id: row.vc_id } };
+  const flatParams = flattenParams(formData.value);
+  return {
+    path,
+    query: {
+      id: row.vc_id,
+      callback: createLink("base") + `/arap/overview/${vcType.value}`,
+      ...flatParams,
+    },
+  };
 };
 
 const fetchVcList = async () => {
@@ -706,6 +731,42 @@ const fetchVcList = async () => {
     vcList.value = response.data;
   } catch (error) {
     console.error(error);
+  }
+};
+
+const flattenParams = (obj) => {
+  const flattened = {};
+  Object.entries(obj).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === "") return;
+    if (key === "vc" && typeof value === "object") {
+      flattened["vc_id"] = value.id;
+    } else {
+      flattened[key] = value;
+    }
+  });
+  return flattened;
+};
+
+const loadParams = (triggerSearch = true) => {
+  const query = route.query;
+
+  if (query.vc_id) {
+    const foundVc = vcList.value.find((c) => c.id == query.vc_id);
+    formData.value.vc = foundVc || { id: query.vc_id, label: "Loading..." };
+  }
+
+  const simpleParams = [
+    "invnumber",
+    "description",
+    "transdatefrom",
+    "transdateto",
+  ];
+  simpleParams.forEach((key) => {
+    if (query[key]) formData.value[key] = query[key];
+  });
+
+  if (triggerSearch && query.search === "1") {
+    fetchOverview();
   }
 };
 
@@ -724,6 +785,9 @@ const fetchOverview = async () => {
     if (formData.value.invnumber) params.invnumber = formData.value.invnumber;
     if (formData.value.description)
       params.description = formData.value.description;
+
+    const flatParams = flattenParams(formData.value);
+    router.replace({ query: { ...flatParams, search: 1 } });
 
     const response = await api.get(`/arap/overview/${vcType.value}`, {
       params,
@@ -781,7 +845,7 @@ const downloadPDF = () => {
 onMounted(async () => {
   updateTitle(pageTitle.value);
   await fetchVcList();
-  fetchOverview();
+  loadParams(true);
 });
 </script>
 
