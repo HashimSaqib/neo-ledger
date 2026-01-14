@@ -28,6 +28,12 @@
           <div class="print-preview__sidebar">
             <div class="print-preview__toolbar">
               <s-button type="edit" @click="exitPrintMode" />
+              <s-button
+                type="secondary"
+                :label="t('Reversal')"
+                icon="swap_horiz"
+                @click="reverseTransactionFromPrint"
+              />
               <s-button type="email" @click="toggleEmailDialog" />
               <s-button type="download" @click="downloadPdf" />
             </div>
@@ -810,6 +816,14 @@
             v-if="canPost"
           />
           <s-button type="new-number" @click="newNumber" class="q-mr-md" />
+          <s-button
+            type="secondary"
+            :label="t('Reversal')"
+            icon="swap_horiz"
+            v-if="invId"
+            class="q-mr-md"
+            @click="reverseTransaction"
+          />
           <s-button
             type="post-as-new"
             @click="postInvoice(false, true)"
@@ -1850,6 +1864,33 @@ const deleteInvoice = async () => {
     console.error(error);
   }
 };
+
+const reverseTransaction = () => {
+  invId.value = "";
+  invNumber.value = "REVERSE-" + (invNumber.value || "");
+  invDate.value = getTodayDate();
+  dueDate.value = getTodayDate();
+
+  if (invType.value === "invoice") {
+    invType.value = "credit_invoice";
+    updateTitle(t("Credit Invoice"));
+  } else {
+    invType.value = "invoice";
+    updateTitle(t("Customer Invoice"));
+  }
+
+  Notify.create({
+    message: t("Transaction reversed. Please review and post."),
+    type: "positive",
+    position: "top-right",
+  });
+};
+
+const reverseTransactionFromPrint = () => {
+  exitPrintMode();
+  reverseTransaction();
+};
+
 const postInvoice = async (save = false, isNew = false) => {
   if (!selectedCustomer.value) {
     Notify.create({

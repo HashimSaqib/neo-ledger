@@ -616,6 +616,15 @@
             <s-button type="new-number" @click="newNumber" class="q-mr-md" />
 
             <s-button
+              type="secondary"
+              :label="t('Reversal')"
+              icon="swap_horiz"
+              v-if="invId"
+              class="q-mr-md"
+              @click="reverseTransaction"
+            />
+
+            <s-button
               type="post"
               @click="postInvoice"
               class="q-mr-md"
@@ -1634,6 +1643,34 @@ const loadInvoice = async (invoice) => {
     invNumber.value = invoice.invNumber || "";
     description.value = invoice.description || "";
     invId.value = invoice.id;
+
+    if (reverse.value === "reverse") {
+      invNumber.value = "REVERSE-" + (invoice.invNumber || "");
+      invDate.value = getTodayDate();
+      dueDate.value = getTodayDate();
+      executionDate.value = getTodayDate();
+      invId.value = null;
+
+      if (type.value === "customer") {
+        if (invoice.type === "credit_note") {
+          transactionType.value = "transaction";
+          updateTitle(t("AR Transaction"));
+        } else {
+          transactionType.value = "credit_note";
+          updateTitle(t("Credit Note"));
+        }
+      } else {
+        if (invoice.type === "debit_note") {
+          transactionType.value = "transaction";
+          updateTitle(t("AP Transaction"));
+        } else {
+          transactionType.value = "debit_note";
+          updateTitle(t("Debit Note"));
+        }
+      }
+      pending.value = "0";
+    }
+
     ordNumber.value = "";
     poNumber.value = "";
     dcn.value = invoice.dcn || "";
@@ -2157,6 +2194,39 @@ const printTransaction = async () => {
     console.error("Error downloading invoice:", error);
     loading.value = false;
   }
+};
+
+const reverseTransaction = () => {
+  invId.value = null;
+  invNumber.value = "REVERSE-" + (invNumber.value || "");
+  invDate.value = getTodayDate();
+  dueDate.value = getTodayDate();
+  executionDate.value = getTodayDate();
+  pending.value = "0";
+
+  if (type.value === "customer") {
+    if (transactionType.value === "credit_note") {
+      transactionType.value = "transaction";
+      updateTitle(t("AR Transaction"));
+    } else {
+      transactionType.value = "credit_note";
+      updateTitle(t("Credit Note"));
+    }
+  } else {
+    if (transactionType.value === "debit_note") {
+      transactionType.value = "transaction";
+      updateTitle(t("AP Transaction"));
+    } else {
+      transactionType.value = "debit_note";
+      updateTitle(t("Debit Note"));
+    }
+  }
+
+  Notify.create({
+    message: t("Transaction reversed. Please review and post."),
+    type: "positive",
+    position: "top-right",
+  });
 };
 
 const handleTransferSuccess = () => {

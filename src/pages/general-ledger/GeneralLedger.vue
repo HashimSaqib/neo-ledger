@@ -226,6 +226,7 @@
               :options="filteredTaxAccounts"
               option-value="accno"
               option-label="label"
+              L
               :label="t('Tax Accno')"
               dense
               class="col-2"
@@ -335,6 +336,13 @@
       />
       <div class="q-gutter-x-sm">
         <s-button type="delete" v-if="canDelete" @click="deleteTransaction" />
+        <s-button
+          type="secondary"
+          :label="t('Reversal')"
+          icon="swap_horiz"
+          v-if="formData.id"
+          @click="reverseTransaction"
+        />
 
         <s-button type="new-number" v-if="canPostAsNew" @click="newNumber" />
         <s-button
@@ -895,6 +903,24 @@ const loadTransaction = async (id) => {
 // Handler for file deletion event from the FileList component.
 const handleFileDeletion = (index) => {
   existingFiles.value.splice(index, 1);
+};
+
+const reverseTransaction = () => {
+  lines.value.forEach((line) => {
+    const temp = line.debit;
+    line.debit = line.credit;
+    line.credit = temp;
+  });
+
+  formData.value.id = null;
+  formData.value.reference = `REVERSE-${formData.value.reference || ""}`;
+  formData.value.transdate = getTodayDate();
+
+  Notify.create({
+    message: t("Transaction reversed. Please review and post."),
+    type: "positive",
+    position: "top-right",
+  });
 };
 
 const deleteTransaction = async () => {
