@@ -427,7 +427,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, nextTick, computed } from "vue";
+import { ref, onMounted, inject, nextTick, computed, watch } from "vue";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
 import { useRoute } from "vue-router";
@@ -444,6 +444,7 @@ const updateTitle = inject("updateTitle");
 const props = defineProps({
   id: { type: [String, Number], default: null },
   type: { type: String, default: null },
+  initialData: { type: Object, default: null },
 });
 const emit = defineEmits(["saved"]);
 const componentId = computed(() => (props.type ? props.id : route.query.id));
@@ -474,6 +475,8 @@ const form = ref({
   income: "",
   cogs: "",
   taxes: {},
+  // External integration
+  mocoId: null,
   referenceDescription: "",
   referenceConfidential: false,
   notes: "",
@@ -846,6 +849,12 @@ const submitForm = async () => {
   // Convert any boolean values in the postData to "1" or "0"
   convertBooleans(postData);
 
+  // Convert mocoId to moco_id for API
+  if (postData.mocoId) {
+    postData.moco_id = postData.mocoId;
+    delete postData.mocoId;
+  }
+
   const id = componentId.value;
   postData.id = id;
   postData.item = componentType.value;
@@ -908,6 +917,49 @@ function handleMakeModelEnter(index) {
   }
 }
 
+// Apply initial data when provided - uses a watcher so it works when dialog reopens
+const applyInitialData = () => {
+  if (!props.initialData || componentId.value) return;
+
+  if (props.initialData.description) {
+    form.value.description = props.initialData.description;
+  }
+
+  if (props.initialData.mocoId) {
+    form.value.mocoId = props.initialData.mocoId;
+  }
+
+  // Default unit to hours for services created from Moco
+  if (type.value === "service") {
+    form.value.unit = "h";
+  }
+
+  // Match income account by accno property
+  if (props.initialData.incomeAccno) {
+    const accounts =
+      type.value === "service"
+        ? serviceIncomeAccounts.value
+        : incomeAccounts.value;
+    const matchedAccount = accounts.find(
+      (acc) => String(acc.accno) === String(props.initialData.incomeAccno)
+    );
+    if (matchedAccount) {
+      form.value.income = matchedAccount;
+    }
+  }
+};
+
+watch(
+  () => props.initialData,
+  () => {
+    // Only apply if accounts are already loaded
+    if (serviceIncomeAccounts.value.length || incomeAccounts.value.length) {
+      applyInitialData();
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(async () => {
   await getLinks();
   // Load item data if an id is provided in the route
@@ -915,5 +967,8 @@ onMounted(async () => {
   if (id) {
     await loadData();
   }
+
+  // Apply initial data after links are loaded
+  applyInitialData();
 });
 </script>
