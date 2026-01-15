@@ -12,90 +12,30 @@
       <!-- Actions column: Edit button is always visible. -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn
+          <s-button
+            type="edit"
             :label="t('Edit')"
-            color="primary"
             @click="openEditPopup(props.row)"
-            flat
-            size="sm"
           />
         </q-td>
       </template>
     </q-table>
 
-    <q-btn
+    <s-button
+      type="add"
       :label="t('Add Project')"
-      color="primary"
       @click="openAddPopup"
-      size="sm"
       class="q-my-sm"
     />
 
     <!-- Dialog for adding or editing a project -->
     <q-dialog v-model="editDialog">
-      <q-card style="min-width: 50vw">
-        <q-card-section>
-          <div class="text-h6">
-            {{ isEditMode ? t("Edit Project") : t("Add Project") }}
-          </div>
-
-          <q-input
-            v-model="selectedProject.projectnumber"
-            :label="t('Number')"
-            outlined
-            dense
-            class="q-my-sm"
-          />
-          <q-input
-            v-model="selectedProject.description"
-            :label="t('Description')"
-            outlined
-            dense
-            class="q-my-sm"
-          />
-
-          <s-select
-            search="label"
-            :options="customers"
-            option-label="label"
-            v-model="selectedProject.selectedCustomer"
-            :label="t('Customer')"
-            outlined
-            dense
-            class="q-my-sm"
-          />
-
-          <div class="row">
-            <q-input
-              v-model="selectedProject.startdate"
-              :label="t('Start Date')"
-              type="date"
-              outlined
-              dense
-              class="q-my-sm col-5 q-mr-sm"
-            />
-
-            <q-input
-              v-model="selectedProject.enddate"
-              :label="t('End Date')"
-              type="date"
-              outlined
-              dense
-              class="q-my-sm col-5"
-            />
-          </div>
-        </q-card-section>
-
-        <q-card-actions align="right" class="q-mt-none q-pt-none">
-          <q-btn flat :label="t('Cancel')" color="negative" v-close-popup />
-          <q-btn
-            flat
-            :label="t('Save')"
-            color="positive"
-            @click="saveProject"
-          />
-        </q-card-actions>
-      </q-card>
+      <AddProject
+        :projectId="editProjectId"
+        :initialData="initialData"
+        @saved="onProjectSaved"
+        @cancel="editDialog = false"
+      />
     </q-dialog>
   </q-page>
 </template>
@@ -105,6 +45,8 @@ import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
+import AddProject from "./AddProject.vue";
+
 const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 
@@ -113,16 +55,8 @@ updateTitle(t("Projects"));
 // State variables
 const projects = ref([]);
 const editDialog = ref(false);
-const isEditMode = ref(false);
-
-const selectedProject = ref({
-  description: "",
-  customer: "",
-  selectedCustomer: "",
-  startdate: null,
-  enddate: null,
-  id: null,
-});
+const editProjectId = ref(null);
+const initialData = ref(null);
 
 const columns = [
   {
@@ -188,86 +122,25 @@ const getProjects = async () => {
     }
   }
 };
-const customers = ref([]);
-const fetchLinks = async () => {
-  try {
-    const response = await api.get("/create_links/projects");
-    customers.value = response.data.customers;
-  } catch (error) {
-    console.log(error);
-  }
-};
+
 const openAddPopup = () => {
-  selectedProject.value = {
-    projectnumber: "",
-    description: "",
-    customer: "",
-    startdate: null,
-    enddate: null,
-    id: null,
-  };
-  isEditMode.value = false;
+  editProjectId.value = null;
+  initialData.value = null;
   editDialog.value = true;
 };
 
-const openEditPopup = async (project) => {
-  try {
-    const response = await api.get(`/projects/${project.id}`);
-    selectedProject.value = {
-      id: response.data.id,
-      projectnumber: response.data.projectnumber,
-      description: response.data.description,
-      selectedCustomer: customers.value.find(
-        (cus) => cus.id === response.data.customer_id
-      ),
-      startdate: response.data.startdate,
-      enddate: response.data.enddate,
-    };
-    isEditMode.value = true;
-    editDialog.value = true;
-  } catch (error) {
-    Notify.create({
-      message:
-        error.response?.data?.message || t("Failed to fetch project details"),
-      type: "negative",
-      position: "center",
-    });
-  }
+const openEditPopup = (project) => {
+  editProjectId.value = project.id;
+  initialData.value = null;
+  editDialog.value = true;
 };
-const saveProject = async () => {
-  try {
-    if (isEditMode.value) {
-      const data = {
-        ...selectedProject.value,
-        customer_id: selectedProject.value.selectedCustomer?.id,
-      };
-      await api.post(`/projects/${selectedProject.value.id}`, data);
-      Notify.create({
-        message: t("Project updated successfully!"),
-        type: "positive",
-        position: "top-right",
-      });
-    } else {
-      await api.post("/projects", selectedProject.value);
-      Notify.create({
-        message: t("Project added successfully!"),
-        type: "positive",
-        position: "top-right",
-      });
-    }
-    editDialog.value = false;
-    getProjects();
-  } catch (error) {
-    Notify.create({
-      message: error.response?.data?.message || t("An error occurred"),
-      type: "negative",
-      position: "center",
-    });
-  }
+
+const onProjectSaved = () => {
+  editDialog.value = false;
+  getProjects();
 };
 
 onMounted(() => {
-  fetchLinks();
   getProjects();
 });
 </script>
