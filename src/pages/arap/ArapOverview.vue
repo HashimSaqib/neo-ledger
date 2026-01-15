@@ -765,9 +765,7 @@ const loadParams = (triggerSearch = true) => {
     if (query[key]) formData.value[key] = query[key];
   });
 
-  if (triggerSearch && query.search === "1") {
-    fetchOverview();
-  }
+  fetchOverview();
 };
 
 const fetchOverview = async () => {
