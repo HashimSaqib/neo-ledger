@@ -1,9 +1,7 @@
 <template>
   <q-dialog
     v-model="localDialog"
-    v-if="
-      allowCreation && chartsOptions.length > 0 && templateOptions.length > 0
-    "
+    v-if="allowCreation && chartsOptions.length > 0"
   >
     <q-card style="min-width: 60vw">
       <q-card-section class="q-pb-none">
@@ -52,13 +50,18 @@
             hide-bottom-space
           />
 
-          <!-- Template select using the "templates" array -->
+          <!-- Template Language select -->
           <s-select
-            v-model="selectedTemplate"
-            :options="templateOptions"
-            :label="t('Template')"
+            v-model="selectedTemplateLanguage"
+            :options="templateLanguageOptions"
+            :label="t('Template Language')"
+            option-label="label"
+            option-value="value"
+            emit-value
+            map-options
+            search="label"
             outlined
-            :rules="[(val) => !!val || t('Template is required')]"
+            :rules="[(val) => !!val || t('Template Language is required')]"
             class="q-mb-sm"
             hide-bottom-space
           />
@@ -109,22 +112,29 @@ watch(localDialog, (newVal) => {
 const datasetName = ref("");
 const companyName = ref("");
 const chartsOptions = ref([]);
-const templateOptions = ref([]);
 const selectedChart = ref(null);
-const selectedTemplate = ref(null);
+const selectedTemplateLanguage = ref("en-US");
+
+// Template language options with labels
+const templateLanguageOptions = ref([
+  { label: "German (Switzerland)", value: "de-CH" },
+  { label: "German (Germany)", value: "de-DE" },
+  { label: "English (US)", value: "en-US" },
+  { label: "French (Switzerland)", value: "fr-CH" },
+  { label: "Italian (Switzerland)", value: "it-CH" },
+]);
 
 // Reference to the q-form component for validation
 const datasetForm = ref(null);
 
 const allowCreation = ref(false);
-// Fetch options for charts (template languages) and templates
+// Fetch options for charts
 const fetchOptions = async () => {
   try {
     const { data } = await api.get("/create_dataset");
     allowCreation.value = data.db_creation;
     if (allowCreation.value) {
       chartsOptions.value = data.charts;
-      templateOptions.value = data.templates;
     }
   } catch (error) {
     Notify.create({
@@ -155,9 +165,8 @@ const createDataset = () => {
     company: companyName.value,
     dataset: datasetName.value,
     chart: selectedChart.value,
-    templates: selectedTemplate.value,
+    template_language: selectedTemplateLanguage.value,
   });
-
   // Close the dialog
   localDialog.value = false;
 };
