@@ -1620,6 +1620,33 @@ const loadInvoice = async (invoice) => {
           ? projects.value.find((proj) => proj.id === item.project)
           : null,
     }));
+
+    // Handle old transactions: if we have taxes but no line tax data, add empty lines for each tax
+    if (
+      lineTax.value &&
+      invoice.taxes &&
+      invoice.taxes.length > 0 &&
+      !invoice.lineitems.some((item) => item.taxAccount)
+    ) {
+      // Add empty lines for each tax with tax account and amount
+      invoice.taxes.forEach((tax, taxIndex) => {
+        const taxAcc = taxAccountList.value.find(
+          (acc) => acc.accno.toString() === tax.accno.toString()
+        );
+
+        lines.value.push({
+          id: Date.now() + invoice.lineitems.length + taxIndex,
+          amount: 0,
+          account: null,
+          description: "",
+          taxAccount: taxAcc || null,
+          taxAmount: parseFloat(tax.amount) || 0,
+          apiTaxAmount: parseFloat(tax.amount) || 0,
+          apiTaxAccount: tax.accno,
+          project: null,
+        });
+      });
+    }
     console.log(projects.value);
     recordAccount.value = recordAccounts.value[0] || null;
     invDate.value = invoice.invDate || "";
