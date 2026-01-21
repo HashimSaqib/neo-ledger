@@ -386,7 +386,7 @@
                     label-color="secondary"
                     dense
                     :options="items"
-                    option-label="partnumber"
+                    option-label="label"
                     option-value="partnumber"
                     @update:model-value="handleLineItemChange(line, index)"
                     search="label"
@@ -1696,7 +1696,10 @@ const loadInvoice = async (invoice) => {
   lines.value = invoice.lines.map((line) => {
     return {
       id: lineId++,
-      partnumber: line,
+      partnumber: {
+        ...line,
+        label: `${line.partnumber} -- ${line.description}`,
+      },
       description: line.description,
       qty: line.qty,
       onhand: line.onhand,

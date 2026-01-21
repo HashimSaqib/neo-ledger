@@ -17,12 +17,12 @@
         <div class="row q-mb-md q-gutter-sm">
           <q-checkbox
             v-model="showAdditionalInfo"
-            label="Additional Information"
+            :label="t('Additional Information')"
             dense
           />
           <q-checkbox
             v-model="showContactPerson"
-            label="Contact Person"
+            :label="t('Contact Person')"
             dense
           />
           <q-checkbox
@@ -511,7 +511,7 @@ const isEditMode = computed(() => !!componentId.value);
 
 // Compute VC type based on the componentType value
 const vcType = computed(() =>
-  componentType.value === "customer" ? t("Customer") : t("Vendor")
+  componentType.value === "customer" ? "Customer" : "Vendor"
 );
 
 // Section visibility toggles
@@ -804,7 +804,7 @@ const currencies = ref();
 const fetchLinks = async () => {
   try {
     const response = await api.get(
-      `/create_links/${vcType.value.toLowerCase()}`
+      `/create_links/${componentType.value}`
     );
     accounts.value = response.data.accounts.all;
     defaultRecordAccount.value = response.data.record || null;
