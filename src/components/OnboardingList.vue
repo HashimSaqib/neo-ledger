@@ -68,7 +68,9 @@ const onboardingItems = ref([
   {
     id: "defaults",
     title: t("Configure Defaults"),
-    description: t("Set up system defaults."),
+    description: t(
+      "Set up system defaults. Business Number is required for VAT Invoices.",
+    ),
     completed: false,
     link: `/client/${props.client}/system/defaults`,
     fieldName: "defaults",
@@ -116,7 +118,9 @@ const onboardingItems = ref([
   {
     id: "stations",
     title: t("Manage Stations"),
-    description: t("Configure workstations for automated processing."),
+    description: t(
+      "Configure workstations for automated processing. Station needs to be set as default to AI processing. Approval rule needs to be added for each station (by clicking on add rule) and users need to be added to each station.",
+    ),
     completed: false,
     link: `/client/${props.client}/stations/manage`,
     fieldName: "stations",
