@@ -692,10 +692,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, inject } from "vue";
-import { date } from "quasar";
+import { ref, computed, onMounted, watch, inject, nextTick } from "vue";
+import { date, LocalStorage } from "quasar";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { roundAmount, formatAmount } from "src/helpers/utils.js";
 import { utils, writeFile } from "xlsx";
@@ -705,6 +705,10 @@ const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 updateTitle(t("Income Statement"));
 const route = useRoute();
+const router = useRouter();
+
+const client = route.params.client;
+const STORAGE_KEY = `${client}_income_statement_params`;
 const now = new Date();
 const currentYear = String(now.getFullYear());
 const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
@@ -1218,6 +1222,17 @@ const search = async () => {
     });
     results.value = response.data;
     filtersOpen.value = false;
+
+    // Save parameters after successful search
+    saveParams();
+
+    // Update URL with search parameters
+    const queryParams = {
+      periodMode: formData.value.periodMode,
+      method: formData.value.method,
+      search: "1",
+    };
+    router.replace({ query: queryParams });
   } catch (error) {
     console.error(error);
   } finally {
@@ -1360,18 +1375,111 @@ const downloadExcel = () => {
   writeFile(workbook, "income_statement.xlsx", { compression: true });
 };
 
+// Flag to prevent watcher from resetting periods during load
+const isLoadingParams = ref(false);
+
 watch(
   () => formData.value.periodMode,
   () => {
+    if (isLoadingParams.value) return;
     formData.value.periods = [];
     addPeriod();
   }
 );
 
-onMounted(() => {
-  if (route.query.fromdate || route.query.todate) search();
+// Save report parameters to LocalStorage
+const saveParams = () => {
+  const params = {
+    periodMode: formData.value.periodMode,
+    periods: formData.value.periods,
+    method: formData.value.method,
+    l_accno: formData.value.l_accno,
+    accounttype: formData.value.accounttype,
+    showVarianceDollar: showVarianceDollar.value,
+    showVariancePercent: showVariancePercent.value,
+  };
+  try {
+    LocalStorage.set(STORAGE_KEY, params);
+  } catch (error) {
+    console.error("Error saving report params:", error);
+  }
+};
+
+// Load report parameters from LocalStorage
+const loadParams = async () => {
+  try {
+    const savedParams = LocalStorage.getItem(STORAGE_KEY);
+    if (savedParams) {
+      const params =
+        typeof savedParams === "string" ? JSON.parse(savedParams) : savedParams;
+
+      // Set flag to prevent watcher from clearing periods
+      isLoadingParams.value = true;
+
+      if (params.periodMode) {
+        formData.value.periodMode = params.periodMode;
+      }
+      
+      // Wait for Vue to process periodMode change before setting periods
+      await nextTick();
+      
+      if (params.periods && params.periods.length > 0) {
+        // Deep copy the periods to ensure all nested properties are preserved
+        formData.value.periods = JSON.parse(JSON.stringify(params.periods));
+      }
+      if (params.method) {
+        formData.value.method = params.method;
+      }
+      if (params.l_accno !== undefined) {
+        formData.value.l_accno = params.l_accno;
+      }
+      if (params.accounttype) {
+        formData.value.accounttype = params.accounttype;
+      }
+      if (params.showVarianceDollar !== undefined) {
+        showVarianceDollar.value = params.showVarianceDollar;
+      }
+      if (params.showVariancePercent !== undefined) {
+        showVariancePercent.value = params.showVariancePercent;
+      }
+
+      // Wait for Vue to process all changes before resetting flag
+      await nextTick();
+      isLoadingParams.value = false;
+    }
+  } catch (error) {
+    console.error("Error loading saved params:", error);
+    LocalStorage.remove(STORAGE_KEY);
+    isLoadingParams.value = false;
+  }
+};
+
+// Watch for changes to save parameters
+watch(
+  [
+    () => formData.value.periodMode,
+    () => formData.value.periods,
+    () => formData.value.method,
+    () => formData.value.l_accno,
+    () => formData.value.accounttype,
+    showVarianceDollar,
+    showVariancePercent,
+  ],
+  () => {
+    if (!isLoadingParams.value) {
+      saveParams();
+    }
+  },
+  { deep: true }
+);
+
+onMounted(async () => {
+  await loadParams();
   fetchLinks();
+  // Only add default period if none were loaded from storage
   if (formData.value.periods.length === 0) addPeriod();
+  // Auto-search if query params are present
+  if (route.query.fromdate || route.query.todate) search();
 });
 
 const fetchLinks = async () => {
