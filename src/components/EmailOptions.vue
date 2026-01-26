@@ -52,27 +52,6 @@
           rows="4"
         />
       </div>
-      <div class="col-6">
-        <q-checkbox
-          v-model="emailData.inline"
-          :true-value="1"
-          :false-value="0"
-          :label="t('Inline (HTML)')"
-        />
-      </div>
-      <div class="col-6">
-        <q-select
-          v-model="emailData.attachment"
-          :options="attachmentOptions"
-          :label="t('Attachment (PDF)')"
-          outlined
-          dense
-          bg-color="input"
-          label-color="secondary"
-          emit-value
-          map-options
-        />
-      </div>
       <div class="col-12">
         <q-btn
           color="primary"
@@ -120,12 +99,6 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 const loading = ref(false);
-
-const attachmentOptions = [
-  { label: t("TEX"), value: "tex" },
-  { label: t("HTML"), value: "html" },
-  { label: t("None"), value: "" },
-];
 
 const emailData = ref({
   email: "",

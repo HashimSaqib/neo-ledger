@@ -790,14 +790,6 @@
         search="label"
       />
       <s-select
-        :label="t('Format')"
-        :options="['tex', 'html']"
-        v-model="printOptions.format"
-        class="mainbg"
-        dense
-        outlined
-      />
-      <s-select
         :label="t('Location')"
         :options="printLocations"
         v-model="printOptions.location"

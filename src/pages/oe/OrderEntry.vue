@@ -682,13 +682,6 @@
         search="label"
       />
       <s-select
-        :options="['tex', 'html']"
-        v-model="printOptions.format"
-        class="mainbg"
-        dense
-        outlined
-      />
-      <s-select
         :options="printLocations"
         v-model="printOptions.location"
         class="mainbg"
@@ -1022,11 +1015,11 @@ const fetchAccounts = async () => {
     const response = await api.get("/charts");
     const accounts = response.data;
     paymentAccounts.value = accounts.filter((account) =>
-      account.link.split(":").includes("AR_paid")
+      account.link.split(":").includes("AR_paid"),
     );
     defaultPaymentAccount.value = paymentAccounts.value[0];
     openPaymentAccounts.value = paymentAccounts.value.filter(
-      (account) => account.closed === 0
+      (account) => account.closed === 0,
     );
   } catch (error) {
     console.log(error);
@@ -1054,7 +1047,7 @@ const fetchLinks = async () => {
     taxes.value = response.data.tax_accounts;
     if (currencies.value) {
       selectedCurrency.value = currencies.value.find(
-        (currency) => currency.rn === 1
+        (currency) => currency.rn === 1,
       );
     }
     projects.value = response.data.projects;
@@ -1150,12 +1143,12 @@ const canPost = computed(
     (!closedto.value ||
       !originalOrderDate.value ||
       originalOrderDate.value > closedto.value) &&
-    (!closedto.value || formData.value.date > closedto.value)
+    (!closedto.value || formData.value.date > closedto.value),
 );
 
 const canPostAsNew = computed(
   () =>
-    orderId.value && (!closedto.value || formData.value.date > closedto.value)
+    orderId.value && (!closedto.value || formData.value.date > closedto.value),
 );
 
 const canDelete = computed(
@@ -1164,7 +1157,7 @@ const canDelete = computed(
     (!closedto.value ||
       !originalOrderDate.value ||
       originalOrderDate.value > closedto.value) &&
-    revtrans.value != 1
+    revtrans.value != 1,
 );
 
 // Add originalOrderDate ref to track the original order date for existing orders
@@ -1183,27 +1176,27 @@ const vcUpdate = async (newValue) => {
   if (!paymentmethod_id.value) {
     defaultPaymentAccount.value =
       paymentAccounts.value.find(
-        (account) => account.accno === paymentAccountAccno
+        (account) => account.accno === paymentAccountAccno,
       ) || paymentAccounts.value[0];
   } else {
     defaultPaymentAccount.value =
       paymentAccounts.value.find(
-        (account) => account.id === paymentmethod_id.value
+        (account) => account.id === paymentmethod_id.value,
       ) || paymentAccounts.value[0];
   }
   payments.value.forEach(
     (payment) =>
-      payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
+      payment.amount === 0 && (payment.account = defaultPaymentAccount.value),
   );
   if (vc.value?.currency) {
     const vcCurrency = currencies.value.find(
-      (curr) => curr.curr === vc.value.currency
+      (curr) => curr.curr === vc.value.currency,
     );
     if (vcCurrency) {
       selectedCurrency.value = vcCurrency;
     } else {
       console.warn(
-        `Currency ${vc.value.currency} not found in available currencies`
+        `Currency ${vc.value.currency} not found in available currencies`,
       );
     }
   }
@@ -1302,7 +1295,7 @@ const handleLineItemChange = (newValue, index) => {
       line.extended = calculateExtended(
         line.qty || 1,
         line.price,
-        line.discount || 0
+        line.discount || 0,
       );
     } else {
       const line = lines.value[index];
@@ -1343,7 +1336,7 @@ const calculateTaxes = () => {
       return;
     }
     const selectedItem = items.value.find(
-      (item) => item.id === line.partnumber.id
+      (item) => item.id === line.partnumber.id,
     );
     if (selectedItem && selectedItem.taxaccounts) {
       selectedItem.taxaccounts.forEach((taxAccount) => {
@@ -1384,7 +1377,7 @@ const calculateTaxes = () => {
             taxAmount = netAmount * taxRate;
           }
           const existingTax = invoiceTaxes.value.find(
-            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(2)}%`
+            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(2)}%`,
           );
           if (existingTax) {
             existingTax.amount += parseFloat(taxAmount.toFixed(2));
@@ -1434,7 +1427,7 @@ const addPaymentAt = (index) => {
     amount: 0,
     account: paymentmethod_id.value
       ? openPaymentAccounts.value.find(
-          (acc) => acc.id == paymentmethod_id.value
+          (acc) => acc.id == paymentmethod_id.value,
         )
       : defaultPaymentAccount.value,
     exchangerate: 1,
@@ -1669,7 +1662,7 @@ const deleteOrder = async () => {
 
   try {
     const confirmed = await confirmDelete(
-      t("Are you sure you want to delete this order?")
+      t("Are you sure you want to delete this order?"),
     );
     if (!confirmed) return;
 
@@ -1711,7 +1704,7 @@ const printOrder = async () => {
       `/print_oe/${type.value}/${vcType.value}/${orderId.value}?template=${printOptions.value.template}&format=${printOptions.value.format}`,
       {
         responseType: "blob",
-      }
+      },
     );
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url = window.URL.createObjectURL(blob);
@@ -1920,12 +1913,12 @@ watch(
       line.extended = calculateExtended(
         line.qty || 1,
         line.price,
-        line.discount || 0
+        line.discount || 0,
       );
     });
     calculateTaxes();
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Add watcher for order date .changes
@@ -1934,7 +1927,7 @@ watch(
   () => {
     calculateTaxes();
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(partDialog, () => {
@@ -1970,7 +1963,7 @@ const fetchOrder = async (id) => {
     // Set currency
     if (orderData.currency) {
       const currency = currencies.value.find(
-        (c) => c.curr === orderData.currency
+        (c) => c.curr === orderData.currency,
       );
       if (currency) {
         selectedCurrency.value = currency;
@@ -1980,7 +1973,7 @@ const fetchOrder = async (id) => {
     // Set department
     if (orderData.department) {
       const department = departments.value.find(
-        (d) => d.description === orderData.department
+        (d) => d.description === orderData.department,
       );
       if (department) {
         selectedDepartment.value = department;

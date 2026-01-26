@@ -1,5 +1,55 @@
 <template>
   <q-page class="lightbg q-pa-sm relative-position">
+    <transition name="mode-fade" mode="out-in">
+      <!-- Print Mode View -->
+      <div v-if="isPrintMode" key="print" class="print-preview">
+        <div class="print-preview__columns">
+          <div class="print-preview__pdf-column">
+            <div v-if="pdfLoading" class="print-preview__loading">
+              <q-spinner-gears size="48px" color="primary" />
+              <span class="q-mt-md maintext">{{
+                t("Loading document...")
+              }}</span>
+            </div>
+
+            <div v-else-if="pdfUrl" class="print-preview__pdf-wrapper">
+              <embed
+                :src="pdfUrl + '#toolbar=0&navpanes=0&scrollbar=0'"
+                type="application/pdf"
+                class="print-preview__pdf"
+              />
+            </div>
+
+            <div v-else class="print-preview__error">
+              <q-icon name="error_outline" size="48px" color="negative" />
+              <span class="q-mt-md">{{ t("Unable to load PDF") }}</span>
+            </div>
+          </div>
+
+          <div class="print-preview__sidebar">
+            <div class="print-preview__toolbar">
+              <s-button type="edit" @click="exitPrintMode" />
+              <s-button
+                type="secondary"
+                :label="t('Reversal')"
+                icon="swap_horiz"
+                @click="reverseTransactionFromPrint"
+              />
+              <s-button type="download" @click="downloadPdf" />
+            </div>
+            <h6 class="print-preview__sidebar-title">
+              {{ t("Recent Transactions") }}
+            </h6>
+            <LastTransactions
+              :type="db"
+              ref="lastTransactionsRef"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Mode View -->
+      <div v-else key="edit">
     <q-splitter v-model="splitterModel" class="full-width" :limits="[40, 100]">
       <!-- Left Panel - Invoice Form -->
       <template v-slot:before>
@@ -592,8 +642,25 @@
           </div>
         </div>
         <!-- Action Buttons -->
+        <q-separator class="q-my-sm q-mt-md" size="2px" v-if="invId" />
+
+        <div class="row q-gutter-x-md items-center" v-if="invId">
+          <s-select
+            :options="printLocations"
+            v-model="printOptions.location"
+            class="mainbg"
+            dense
+            outlined
+            map-options
+            emit-value
+            option-label="label"
+            :label="t('Location')"
+          />
+          <s-button type="print" @click="printTransaction" v-if="invId" />
+        </div>
+
         <div class="row q-my-sm q-px-sm justify-end">
-          <div v-if="!hidePaymentFile && !isPendingDisabled">
+          <div v-if="type === 'vendor' && !hidePaymentFile && !isPendingDisabled">
             <q-checkbox
               left-label
               :disable="disablePaymentFile"
@@ -680,6 +747,8 @@
         </div>
       </template>
     </q-splitter>
+      </div>
+    </transition>
 
     <!-- Global Loading Indicator -->
     <q-inner-loading :showing="loading">
@@ -714,7 +783,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, inject, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, watch, computed, inject, nextTick } from "vue";
 import { api } from "src/boot/axios";
 import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -788,6 +857,83 @@ const revtrans = ref(null);
 const closedto = ref(null);
 const originaldate = ref(null);
 const pending = ref("0");
+
+// -------------------------
+// Print Options & Print Mode
+// -------------------------
+const printLocations = [
+  { label: t("Screen"), value: "screen" },
+  { label: t("Download"), value: "download" },
+];
+const printOptions = ref({
+  format: "tex",
+  location: "screen",
+});
+
+// Compute the print template based on transaction type and vc type
+// This function determines the template automatically based on the transaction
+// Easily extendable for new types (ap_transaction, ar_transaction, credit_note, debit_note)
+const getPrintTemplate = () => {
+  if (transactionType.value === "credit_note") return "credit_note";
+  if (transactionType.value === "debit_note") return "debit_note";
+  return type.value === "customer" ? "ar_transaction" : "ap_transaction";
+};
+
+// Print mode state - similar to SalesInvoice
+const pdfUrl = ref(null);
+const pdfLoading = ref(false);
+const printModeActive = ref(false);
+const isPrintMode = computed(() => {
+  return printModeActive.value && route.query.id;
+});
+
+const exitPrintMode = () => {
+  printModeActive.value = false;
+  if (pdfUrl.value) {
+    window.URL.revokeObjectURL(pdfUrl.value);
+    pdfUrl.value = null;
+  }
+};
+
+const loadPdfForPrintMode = async () => {
+  if (!isPrintMode.value) return;
+
+  pdfLoading.value = true;
+  try {
+    const template = getPrintTemplate();
+    const response = await api.get(
+      `/print_transaction?id=${route.query.id}&vc=${type.value}&template=${template}&format=tex`,
+      { responseType: "blob" }
+    );
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    pdfUrl.value = window.URL.createObjectURL(blob);
+  } catch (error) {
+    console.error("Error loading PDF:", error);
+    Notify.create({
+      message: t("Failed to load transaction PDF"),
+      type: "negative",
+      position: "center",
+    });
+  } finally {
+    pdfLoading.value = false;
+  }
+};
+
+const downloadPdf = () => {
+  if (!pdfUrl.value) return;
+  const template = getPrintTemplate();
+  const a = document.createElement("a");
+  a.href = pdfUrl.value;
+  a.download = `${template}_${invNumber.value || invId.value}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+
+const reverseTransactionFromPrint = () => {
+  exitPrintMode();
+  reverseTransaction();
+};
 
 // -------------------------
 // Entity, Account and Currency State
@@ -2173,11 +2319,27 @@ const loadAIPluginComponents = async () => {
 
 onMounted(async () => {
   await loadAIPluginComponents();
+  
+  // Initialize print mode only for ar_transaction (customer type, not credit note)
+  // Other types (ap_transaction, credit_note, debit_note) go directly to edit mode
+  const isArTransaction = type.value === "customer" && reverse.value !== "reverse";
+  if (route.query.id && isArTransaction) {
+    printModeActive.value = true;
+    loadPdfForPrintMode();
+  }
+  
   fetchLinks();
   fetchAccounts();
   fetchCurrencies();
   fetchvcList();
   fetchInvoice(route.query.id);
+});
+
+onUnmounted(() => {
+  // Clean up PDF URL to avoid memory leaks
+  if (pdfUrl.value) {
+    window.URL.revokeObjectURL(pdfUrl.value);
+  }
 });
 
 const printTransaction = async () => {
@@ -2188,29 +2350,35 @@ const printTransaction = async () => {
       type: "negative",
       position: "center",
     });
+    loading.value = false;
     return;
   }
 
   try {
+    const template = getPrintTemplate();
     const response = await api.get(
-      `/print_transaction?id=${invId.value}&vc=${type.value}`,
+      `/print_transaction?id=${invId.value}&vc=${type.value}&template=${template}&format=${printOptions.value.format}`,
       {
         responseType: "blob",
       }
     );
 
     const blob = new Blob([response.data], { type: "application/pdf" });
-
     const url = window.URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "invoice.pdf";
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    if (printOptions.value.location === "screen") {
+      // Open PDF in a new tab or window
+      window.open(url, "_blank");
+    } else {
+      // Download PDF
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${template}_${invId.value}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
     loading.value = false;
   } catch (error) {
     Notify.create({
@@ -2268,3 +2436,133 @@ const handleRefreshInvoice = async () => {
   }
 };
 </script>
+<style scoped>
+/* Print Preview Layout */
+.print-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Toolbar */
+.print-preview__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Two Column Layout */
+.print-preview__columns {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+/* PDF Column */
+.print-preview__pdf-column {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 750px;
+  aspect-ratio: 210 / 297;
+  border: 1px solid var(--q-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #525659;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.print-preview__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--q-maintext);
+}
+
+.print-preview__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--q-maintext);
+}
+
+.print-preview__pdf-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.print-preview__pdf {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Sidebar / Recent Transactions */
+.print-preview__sidebar {
+  flex: 1;
+  min-width: 300px;
+  background: var(--q-container);
+  border: 1px solid var(--q-border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.print-preview__sidebar-title {
+  margin: 0 0 1rem 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--q-secondary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .print-preview__columns {
+    flex-direction: column;
+  }
+
+  .print-preview__pdf-column {
+    max-width: 100%;
+  }
+
+  .print-preview__sidebar {
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .print-preview__toolbar {
+    justify-content: flex-start;
+  }
+}
+
+/* Mode transition - slide effect */
+.mode-fade-enter-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.mode-fade-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.mode-fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.mode-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+</style>
