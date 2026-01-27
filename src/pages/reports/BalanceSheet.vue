@@ -829,6 +829,7 @@ const buildAccountHierarchy = (
 ) => {
   const accountMap = new Map();
   const rootAccounts = [];
+  const multiplier = type === "A" ? -1 : 1; // Negate assets
 
   Object.keys(rawAccounts).forEach((accno) => {
     const accountPeriods = rawAccounts[accno];
@@ -836,7 +837,9 @@ const buildAccountHierarchy = (
 
     Object.keys(accountPeriods).forEach((periodLabel) => {
       if (accountPeriods[periodLabel][type]) {
-        periodsData[periodLabel] = accountPeriods[periodLabel][type];
+        const periodData = { ...accountPeriods[periodLabel][type] };
+        periodData.amount = (Number(periodData.amount) || 0) * multiplier;
+        periodsData[periodLabel] = periodData;
       }
     });
 
