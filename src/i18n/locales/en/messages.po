@@ -5,13 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Neo Ledger 0.0.1\n"
-"POT-Creation-Date: 2026-01-16 10:24:39+0000\n"
+"POT-Creation-Date: 2026-01-27 20:01:02+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 "Language-Team: English\n"
-"PO-Revision-Date: 2026-01-16 00:00+0000\n"
+"PO-Revision-Date: 2026-01-27 00:00+0000\n"
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid " payment(s) have missing BIC for selected bank account"
+msgstr ""
 
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
@@ -28,6 +32,10 @@ msgstr ""
 msgid ""
 ", title);\n"
 "provide("
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "1st & 15th"
 msgstr ""
 
 #: src/components/TwoFactorSetup.vue
@@ -371,6 +379,7 @@ msgstr ""
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/arap/ArReminder.vue
 #: src/pages/central/ApiKeys.vue
 #: src/pages/central/IndexPage.vue
@@ -467,6 +476,14 @@ msgstr ""
 msgid "Add New GIFI"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Add New Notification"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Add Notification"
+msgstr ""
+
 #: src/pages/pos/PointOfSale.vue
 msgid "Add POS Invoice"
 msgstr ""
@@ -536,11 +553,16 @@ msgstr ""
 
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/components/BankAccountForm.vue
+#: src/pages/arap/AddVC.vue
 msgid "Additional Information"
 msgstr ""
 
 #: src/ai_plugin/pages/UploadDocument.vue
 msgid "Additional instructions for AI processing"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Additional recipients who will receive a copy"
 msgstr ""
 
 #: src/ai_plugin/pages/UserStations.vue
@@ -617,6 +639,10 @@ msgstr ""
 msgid "All Taxes Report"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "All Weekdays (approx)"
+msgstr ""
+
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Allow GL?"
@@ -671,6 +697,10 @@ msgstr ""
 
 #: src/ai_plugin/pages/ManageStations.vue
 msgid "Amount ≤"
+msgstr ""
+
+#: src/ai_plugin/pages/ManageStations.vue
+msgid "An approval rule is required to save the station"
 msgstr ""
 
 #: src/pages/central/IndexPage.vue
@@ -860,7 +890,6 @@ msgstr ""
 msgid "Attachment"
 msgstr ""
 
-#: src/components/EmailOptions.vue
 #: src/pages/arap/ArReminder.vue
 msgid "Attachment (PDF)"
 msgstr ""
@@ -911,6 +940,10 @@ msgstr ""
 msgid "BCC"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "BCC (Blind Carbon Copy)"
+msgstr ""
+
 #: src/ai_plugin/components/CmptImport.vue
 #: src/pages/Import.vue
 #: src/pages/arap/SearchVC.vue
@@ -919,6 +952,9 @@ msgid "BIC"
 msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/UserStations.vue
+#: src/ai_plugin/pages/UserStations.vue
 msgid "BIC missing"
 msgstr ""
 
@@ -1207,6 +1243,10 @@ msgstr ""
 msgid "CC"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "CC (Carbon Copy)"
+msgstr ""
+
 #: src/pages/goodservices/AddPart.vue
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
@@ -1221,6 +1261,7 @@ msgstr ""
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/components/BankAccountForm.vue
 #: src/pages/ar/ConsolidateInvoices.vue
 #: src/pages/arap/ArApBatch.vue
@@ -1289,6 +1330,10 @@ msgstr ""
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Cannot set multiple options for AR"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Cannot upload: "
 msgstr ""
 
 #: src/layouts/Menu.js
@@ -1430,6 +1475,8 @@ msgstr ""
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/Integrations.vue
 #: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/central/ApiKeys.vue
 #: src/pages/central/ApiKeys.vue
 msgid "Close"
@@ -1510,16 +1557,16 @@ msgstr ""
 msgid "Configure Defaults"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Configure notification settings and delivery schedule"
+msgstr ""
+
 #: src/ai_plugin/pages/Moco.vue
 msgid "Configure webhook for automatic sync"
 msgstr ""
 
 #: src/ai_plugin/pages/ManageStations.vue
 msgid "Configure workstation settings"
-msgstr ""
-
-#: src/components/OnboardingList.vue
-msgid "Configure workstations for automated processing."
 msgstr ""
 
 #: src/ai_plugin/pages/Integrations.vue
@@ -1542,6 +1589,7 @@ msgstr ""
 msgid "Confirm Delete"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
@@ -1605,6 +1653,10 @@ msgstr ""
 
 #: src/pages/Import.vue
 msgid "Contact Information"
+msgstr ""
+
+#: src/pages/arap/AddVC.vue
+msgid "Contact Person"
 msgstr ""
 
 #: src/pages/Import.vue
@@ -1915,6 +1967,7 @@ msgstr ""
 msgid "Current Users"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/IncomeStatement.vue
 msgid "Custom"
@@ -1926,7 +1979,6 @@ msgstr ""
 
 #: src/ai_plugin/pages/Moco.vue
 #: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
 #: src/pages/arap/ArReminder.vue
 #: src/pages/arap/ArReminder.vue
 #: src/pages/arap/ArapOverview.vue
@@ -2030,6 +2082,8 @@ msgstr ""
 msgid "DOB"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/components/MainDashboard.vue
 msgid "Daily"
 msgstr ""
@@ -2109,6 +2163,10 @@ msgstr ""
 msgid "Dates"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Days: "
+msgstr ""
+
 #: src/pages/Import.vue
 #: src/pages/cash/Reconciliation.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
@@ -2152,6 +2210,7 @@ msgstr ""
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/Moco.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/ai_plugin/pages/UserStations.vue
 msgid "Default"
 msgstr ""
@@ -2179,6 +2238,7 @@ msgstr ""
 #: src/ai_plugin/components/RuleManagerDialog.vue
 #: src/ai_plugin/pages/ManageStations.vue
 #: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/components/Button.vue
 #: src/pages/central/ApiKeys.vue
 #: src/pages/system/Batch.vue
@@ -2210,6 +2270,14 @@ msgstr ""
 #: src/pages/arap/VcHistory.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Delivery Date"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Delivery Time"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Delivery Time *"
 msgstr ""
 
 #: src/ai_plugin/components/TemplateBuilder.vue
@@ -2388,6 +2456,7 @@ msgstr ""
 #: src/components/Button.vue
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Download"
 msgstr ""
@@ -2476,6 +2545,7 @@ msgstr ""
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/components/Button.vue
 #: src/pages/central/IndexPage.vue
 #: src/pages/goodservices/AddPart.vue
@@ -2507,6 +2577,10 @@ msgstr ""
 
 #: src/pages/system/Templates.vue
 msgid "Edit Mode"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Edit Notification"
 msgstr ""
 
 #: src/pages/pos/PointOfSale.vue
@@ -2573,6 +2647,19 @@ msgstr ""
 
 #: src/pages/arap/ArApBatch.vue
 msgid "Email Invoices"
+msgstr ""
+
+#: src/ai_plugin/configs.js
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Email Notifications"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Email Recipients"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Email Recipients (Optional)"
 msgstr ""
 
 #: src/pages/arap/ArReminder.vue
@@ -3007,6 +3094,10 @@ msgstr ""
 msgid "Failed to delete file."
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Failed to delete notification"
+msgstr ""
+
 #: src/ai_plugin/components/RuleManagerDialog.vue
 msgid "Failed to delete rule"
 msgstr ""
@@ -3109,6 +3200,10 @@ msgstr ""
 msgid "Failed to fetch metrics data"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Failed to fetch notification history"
+msgstr ""
+
 #: src/pages/system/chart/AddAccount.vue
 msgid "Failed to fetch parent accounts"
 msgstr ""
@@ -3127,6 +3222,10 @@ msgstr ""
 
 #: src/ai_plugin/components/RuleManagerDialog.vue
 msgid "Failed to fetch rules"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Failed to fetch subscriptions"
 msgstr ""
 
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
@@ -3229,6 +3328,10 @@ msgstr ""
 msgid "Failed to load required data"
 msgstr ""
 
+#: src/pages/arap/ArApTransaction.vue
+msgid "Failed to load transaction PDF"
+msgstr ""
+
 #: src/pages/arap/AddVC.vue
 msgid "Failed to load vc data"
 msgstr ""
@@ -3257,6 +3360,10 @@ msgstr ""
 #: src/components/BankAccountForm.vue
 #: src/pages/system/BankAccounts.vue
 msgid "Failed to save bank account"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Failed to save notification"
 msgstr ""
 
 #: src/ai_plugin/components/RuleCreationDialog.vue
@@ -3402,12 +3509,24 @@ msgstr ""
 msgid "Foreign Exchange Gain/Loss"
 msgstr ""
 
-#: src/pages/ap/VendorInvoice.vue
-msgid "Format"
-msgstr ""
-
 #: src/ai_plugin/components/MatchTransactionDialog.vue
 msgid "Found"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Frequency"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Frequency *"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Fri"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Friday"
 msgstr ""
 
 #: src/pages/arap/TaxReport.vue
@@ -3543,7 +3662,6 @@ msgstr ""
 msgid "HS Code"
 msgstr ""
 
-#: src/components/EmailOptions.vue
 #: src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
@@ -3570,6 +3688,10 @@ msgstr ""
 
 #: src/pages/system/Defaults.vue
 msgid "Hide Closed Accounts"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "History"
 msgstr ""
 
 #: src/pages/system/Employees.vue
@@ -3770,10 +3892,6 @@ msgstr ""
 msgid "Inline"
 msgstr ""
 
-#: src/components/EmailOptions.vue
-msgid "Inline (HTML)"
-msgstr ""
-
 #: src/pages/Import.vue
 msgid "Insert Rows"
 msgstr ""
@@ -3871,6 +3989,11 @@ msgstr ""
 #: src/pages/Import.vue
 #: src/pages/Import.vue
 msgid "Invalid date format. Use yyyy-mm-dd format."
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Invalid email address format"
 msgstr ""
 
 #: src/pages/central/IndexPage.vue
@@ -4116,6 +4239,10 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Last"
+msgstr ""
+
 #: src/components/MainDashboard.vue
 msgid "Last 14 Days"
 msgstr ""
@@ -4140,6 +4267,10 @@ msgstr ""
 msgid "Last Cost"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Last Day"
+msgstr ""
+
 #: src/components/MainDashboard.vue
 msgid "Last Month"
 msgstr ""
@@ -4153,12 +4284,20 @@ msgstr ""
 msgid "Last Numbers"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Last Sent"
+msgstr ""
+
 #: src/pages/central/ApiKeys.vue
 msgid "Last Used"
 msgstr ""
 
 #: src/components/MainDashboard.vue
 msgid "Last Year"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Last day of month"
 msgstr ""
 
 #: src/pages/system/Defaults.vue
@@ -4300,6 +4439,7 @@ msgid "Loading confirmation details..."
 msgstr ""
 
 #: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 msgid "Loading document..."
 msgstr ""
 
@@ -4328,6 +4468,8 @@ msgid "Loading..."
 msgstr ""
 
 #: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 msgid "Location"
 msgstr ""
 
@@ -4554,6 +4696,14 @@ msgstr ""
 msgid "Module"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Mon"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Monday"
+msgstr ""
+
 #: src/pages/arap/VcHistory.vue
 #: src/pages/arap/VcHistory.vue
 #: src/pages/goodservices/SearchPart.vue
@@ -4561,6 +4711,8 @@ msgstr ""
 msgid "Month"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/components/MainDashboard.vue
 #: src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/IncomeStatement.vue
@@ -4628,6 +4780,7 @@ msgstr ""
 msgid "Net Income/(Loss)"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/central/ApiKeys.vue
 msgid "Never"
 msgstr ""
@@ -4740,6 +4893,10 @@ msgstr ""
 msgid "No email data available"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "No history available"
+msgstr ""
+
 #: src/ai_plugin/pages/UserStations.vue
 msgid "No invoices assigned to this station"
 msgstr ""
@@ -4758,6 +4915,10 @@ msgstr ""
 
 #: src/ai_plugin/components/CmptImport.vue
 msgid "No matching IBAN found. Please select manually."
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "No notifications configured"
 msgstr ""
 
 #: src/pages/oe/OrderEntry.vue
@@ -4862,7 +5023,6 @@ msgstr ""
 msgid "Non-tracking Items"
 msgstr ""
 
-#: src/components/EmailOptions.vue
 #: src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
 msgid "None"
@@ -4894,6 +5054,26 @@ msgstr ""
 #: src/pages/oe/OrderReports.vue
 #: src/pages/system/Employees.vue
 msgid "Notes"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Notification History"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Notification Type *"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Notification created successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Notification deleted successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Notification updated successfully"
 msgstr ""
 
 #: src/pages/arap/VcHistory.vue
@@ -5146,6 +5326,11 @@ msgstr ""
 msgid "Paid Early"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Paid Invoices"
+msgstr ""
+
 #: src/pages/arap/ArApTransactions.vue
 msgid "Paid Late"
 msgstr ""
@@ -5282,6 +5467,11 @@ msgstr ""
 msgid "Payments"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Payments Uploaded"
+msgstr ""
+
 #: src/pages/central/IndexPage.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 msgid "Pending"
@@ -5385,8 +5575,24 @@ msgstr ""
 msgid "Please select a bank account to edit"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Please select a delivery time"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Please select a frequency"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Please select a notification type"
+msgstr ""
+
 #: src/pages/system/AiPrompts.vue
 msgid "Please select a prompt type"
+msgstr ""
+
+#: src/ai_plugin/pages/Integrations.vue
+msgid "Please select a start date"
 msgstr ""
 
 #: src/ai_plugin/components/StationTransfer.vue
@@ -5470,6 +5676,11 @@ msgstr ""
 msgid "Precision"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Press Enter after each email"
+msgstr ""
+
 #: src/pages/Import.vue
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
@@ -5480,6 +5691,10 @@ msgstr ""
 
 #: src/pages/arap/SearchVC.vue
 msgid "Pricegroup"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Primary recipient email address"
 msgstr ""
 
 #: src/components/Button.vue
@@ -5733,6 +5948,7 @@ msgid "Received Date"
 msgstr ""
 
 #: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 msgid "Recent Transactions"
 msgstr ""
 
@@ -5766,6 +5982,10 @@ msgstr ""
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/pos/PointOfSale.vue
 msgid "Record In"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Records"
 msgstr ""
 
 #: src/ai_plugin/pages/DocumentList.vue
@@ -5908,6 +6128,7 @@ msgstr ""
 
 #: src/pages/ar/SalesInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 msgid "Reversal"
@@ -6088,6 +6309,14 @@ msgstr ""
 msgid "Salutation"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Sat"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Saturday"
+msgstr ""
+
 #: src/components/BankAccountForm.vue
 #: src/components/Button.vue
 #: src/pages/arap/AddVC.vue
@@ -6118,6 +6347,10 @@ msgstr ""
 msgid "Save Connection"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Save Notification"
+msgstr ""
+
 #: src/pages/system/AiPrompts.vue
 msgid "Save Prompt"
 msgstr ""
@@ -6144,6 +6377,7 @@ msgstr ""
 
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 #: src/pages/oe/OrderEntry.vue
 msgid "Screen"
 msgstr ""
@@ -6240,6 +6474,14 @@ msgstr ""
 msgid "Select Columns"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Select Days"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Select Days of Month"
+msgstr ""
+
 #: src/pages/system/Templates.vue
 msgid "Select File"
 msgstr ""
@@ -6263,6 +6505,10 @@ msgstr ""
 #: src/pages/reports/BalanceSheet.vue
 #: src/pages/reports/IncomeStatement.vue
 msgid "Select Variance"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Select any time when the notification should be sent"
 msgstr ""
 
 #: src/pages/ar/ConsolidateInvoices.vue
@@ -6332,10 +6578,18 @@ msgstr ""
 msgid "Send OTP"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Send To (Primary Email)"
+msgstr ""
+
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/UserStations.vue
 msgid "Sender"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Sent At"
 msgstr ""
 
 #: src/pages/arap/VcHistory.vue
@@ -6383,10 +6637,6 @@ msgstr ""
 
 #: src/components/OnboardingList.vue
 msgid "Set up services for sale invoices."
-msgstr ""
-
-#: src/components/OnboardingList.vue
-msgid "Set up system defaults."
 msgstr ""
 
 #: src/components/SettingsPanel.vue
@@ -6518,6 +6768,7 @@ msgid "Spreadsheet not properly initialized"
 msgstr ""
 
 #: src/ai_plugin/pages/BankTransactions.vue
+#: src/ai_plugin/pages/Integrations.vue
 #: src/pages/arap/AddVC.vue
 #: src/pages/projectsjobs/AddProject.vue
 #: src/pages/projectsjobs/ListProjects.vue
@@ -6602,6 +6853,7 @@ msgstr ""
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/ManageStations.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/arap/ArApTransactions.vue
 #: src/pages/system/Batch.vue
 msgid "Status"
@@ -6702,6 +6954,14 @@ msgstr ""
 msgid "Summary View"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Sun"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Sunday"
+msgstr ""
+
 #: src/components/SettingsPanel.vue
 #: src/components/SettingsPanel.vue
 msgid "Switch Database"
@@ -6715,7 +6975,6 @@ msgstr ""
 msgid "System"
 msgstr ""
 
-#: src/components/EmailOptions.vue
 #: src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArApBatch.vue
 #: src/pages/arap/ArReminder.vue
@@ -6827,6 +7086,7 @@ msgid "Taxes"
 msgstr ""
 
 #: src/pages/ap/VendorInvoice.vue
+#: src/pages/ar/SalesInvoice.vue
 msgid "Template"
 msgstr ""
 
@@ -6890,6 +7150,14 @@ msgstr ""
 #: src/pages/arap/AddVC.vue
 #: src/pages/arap/SearchVC.vue
 msgid "Threshold"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Thu"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Thursday"
 msgstr ""
 
 #: src/pages/arap/AddVC.vue
@@ -7159,6 +7427,14 @@ msgstr ""
 msgid "Try adjusting your search query"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Tue"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Tuesday"
+msgstr ""
+
 #: src/components/TwoFactorVerify.vue
 msgid "Two-Factor Authentication"
 msgstr ""
@@ -7167,6 +7443,7 @@ msgstr ""
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/DocumentList.vue
 #: src/ai_plugin/pages/DocumentList.vue
+#: src/ai_plugin/pages/Notifications.vue
 #: src/pages/arap/SearchVC.vue
 #: src/pages/system/Batch.vue
 #: src/pages/system/Batch.vue
@@ -7201,6 +7478,7 @@ msgid "Unable to delete transaction"
 msgstr ""
 
 #: src/pages/ar/SalesInvoice.vue
+#: src/pages/arap/ArApTransaction.vue
 msgid "Unable to load PDF"
 msgstr ""
 
@@ -7223,6 +7501,11 @@ msgstr ""
 
 #: src/ai_plugin/pages/UserStations.vue
 msgid "Unknown Vendor"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Unpaid Receivables"
 msgstr ""
 
 #: src/ai_plugin/pages/BankTransactions.vue
@@ -7396,7 +7679,6 @@ msgstr ""
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
-#: src/pages/arap/AddVC.vue
 #: src/pages/arap/ArapOverview.vue
 #: src/pages/arap/SearchVC.vue
 #: src/pages/arap/TaxReport.vue
@@ -7632,6 +7914,19 @@ msgstr ""
 msgid "Website"
 msgstr ""
 
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Wed"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Wednesday"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Weekly"
+msgstr ""
+
 #: src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Weight"
@@ -7659,6 +7954,11 @@ msgstr ""
 
 #: src/pages/system/Employees.vue
 msgid "Work Phone"
+msgstr ""
+
+#: src/ai_plugin/pages/Notifications.vue
+#: src/ai_plugin/pages/Notifications.vue
+msgid "Workflow Pending Invoices"
 msgstr ""
 
 #: src/pages/system/Defaults.vue
