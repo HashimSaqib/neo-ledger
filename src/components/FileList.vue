@@ -21,7 +21,10 @@
             size="sm"
             color="primary"
           />
-          <template v-else>{{ file.name }}</template>
+          <template v-else>
+            <span>{{ truncateFileName(file.name) }}</span>
+            <q-tooltip v-if="file.name.length > 13">{{ file.name }}</q-tooltip>
+          </template>
         </a>
       </q-item-section>
       <q-item-section side v-if="!report">
@@ -65,6 +68,15 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["file-deleted", "file-preview"]);
+
+const truncateFileName = (name) => {
+  const maxLength = 13;
+  if (name.length <= maxLength) return name;
+  // Show first 5 chars + "..." + last 5 chars = 13 chars
+  const startChars = 10;
+  const endChars = 10;
+  return `${name.slice(0, startChars)}...${name.slice(-endChars)}`;
+};
 
 const handlePreview = (link) => {
   emit("file-preview", link);
