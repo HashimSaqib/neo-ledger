@@ -496,7 +496,7 @@
               >
                 {{
                   formatNumber(
-                    sumAllAccounts(completeIncomeAccounts, period.label)
+                    sumAllAccounts(completeIncomeAccounts, period.label),
                   )
                 }}
               </div>
@@ -619,7 +619,7 @@
               >
                 {{
                   formatExpenseTotal(
-                    sumAllAccounts(completeExpenseAccounts, period.label)
+                    sumAllAccounts(completeExpenseAccounts, period.label),
                   )
                 }}
               </div>
@@ -797,7 +797,7 @@ const varianceOptions = computed(() => {
 
 const selectedVarianceLabel = computed(() => {
   const option = varianceOptions.value.find(
-    (o) => o.value === selectedVariance.value
+    (o) => o.value === selectedVariance.value,
   );
   return option ? option.label : t("Select Variance");
 });
@@ -826,7 +826,7 @@ const buildAccountHierarchy = (
   rawAccounts,
   accountsInfo,
   type,
-  respectCollapsed = true
+  respectCollapsed = true,
 ) => {
   const accountMap = new Map();
   const rootAccounts = [];
@@ -1090,7 +1090,7 @@ const updatePeriod = (period) => {
       const lastDay = new Date(
         parseInt(selectedYear, 10),
         parseInt(selectedMonth, 10),
-        0
+        0,
       ).getDate();
       period.fromdate = period.year + selectedMonth + "01";
       period.todate =
@@ -1225,14 +1225,6 @@ const search = async () => {
 
     // Save parameters after successful search
     saveParams();
-
-    // Update URL with search parameters
-    const queryParams = {
-      periodMode: formData.value.periodMode,
-      method: formData.value.method,
-      search: "1",
-    };
-    router.replace({ query: queryParams });
   } catch (error) {
     console.error(error);
   } finally {
@@ -1321,13 +1313,13 @@ const downloadExcel = () => {
   let incomeTotalRow = ["Total Income"];
   periods.forEach((p) =>
     incomeTotalRow.push(
-      roundAmount(sumAllAccounts(completeIncomeAccounts.value, p.label))
-    )
+      roundAmount(sumAllAccounts(completeIncomeAccounts.value, p.label)),
+    ),
   );
   if (periods.length >= 2) {
     incomeTotalRow.push(getTotalVariance("income") || 0);
     incomeTotalRow.push(
-      getTotalVariancePercent("income")?.toFixed(1) + "%" || "-"
+      getTotalVariancePercent("income")?.toFixed(1) + "%" || "-",
     );
   }
   exportData.push(incomeTotalRow);
@@ -1339,13 +1331,13 @@ const downloadExcel = () => {
   let expenseTotalRow = ["Total Expenses"];
   periods.forEach((p) =>
     expenseTotalRow.push(
-      roundAmount(sumAllAccounts(completeExpenseAccounts.value, p.label))
-    )
+      roundAmount(sumAllAccounts(completeExpenseAccounts.value, p.label)),
+    ),
   );
   if (periods.length >= 2) {
     expenseTotalRow.push(getTotalVariance("expenses") || 0);
     expenseTotalRow.push(
-      getTotalVariancePercent("expenses")?.toFixed(1) + "%" || "-"
+      getTotalVariancePercent("expenses")?.toFixed(1) + "%" || "-",
     );
   }
   exportData.push(expenseTotalRow);
@@ -1384,7 +1376,7 @@ watch(
     if (isLoadingParams.value) return;
     formData.value.periods = [];
     addPeriod();
-  }
+  },
 );
 
 // Save report parameters to LocalStorage
@@ -1419,10 +1411,10 @@ const loadParams = async () => {
       if (params.periodMode) {
         formData.value.periodMode = params.periodMode;
       }
-      
+
       // Wait for Vue to process periodMode change before setting periods
       await nextTick();
-      
+
       if (params.periods && params.periods.length > 0) {
         // Deep copy the periods to ensure all nested properties are preserved
         formData.value.periods = JSON.parse(JSON.stringify(params.periods));
@@ -1470,7 +1462,7 @@ watch(
       saveParams();
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(async () => {

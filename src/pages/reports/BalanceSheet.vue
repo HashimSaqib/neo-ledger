@@ -355,7 +355,7 @@
               >
                 {{
                   formatNumber(
-                    sumAllAccounts(completeAssetAccounts, period.label)
+                    sumAllAccounts(completeAssetAccounts, period.label),
                   )
                 }}
               </div>
@@ -479,7 +479,7 @@
               >
                 {{
                   formatNumber(
-                    sumAllAccounts(completeLiabilityAccounts, period.label)
+                    sumAllAccounts(completeLiabilityAccounts, period.label),
                   )
                 }}
               </div>
@@ -503,13 +503,13 @@
                   :class="
                     getVarianceClass(
                       getTotalVariancePercent('liabilities'),
-                      true
+                      true,
                     )
                   "
                 >
                   {{
                     formatVariancePercent(
-                      getTotalVariancePercent("liabilities")
+                      getTotalVariancePercent("liabilities"),
                     )
                   }}
                 </span>
@@ -690,7 +690,7 @@
             >
               {{
                 formatVariancePercent(
-                  getTotalVariancePercent("liabilitiesEquity")
+                  getTotalVariancePercent("liabilitiesEquity"),
                 )
               }}
             </span>
@@ -784,7 +784,7 @@ const varianceOptions = computed(() => {
 
 const selectedVarianceLabel = computed(() => {
   const option = varianceOptions.value.find(
-    (o) => o.value === selectedVariance.value
+    (o) => o.value === selectedVariance.value,
   );
   return option ? option.label : t("Select Variance");
 });
@@ -825,7 +825,7 @@ const buildAccountHierarchy = (
   rawAccounts,
   accountsInfo,
   type,
-  respectCollapsed = true
+  respectCollapsed = true,
 ) => {
   const accountMap = new Map();
   const rootAccounts = [];
@@ -1045,20 +1045,20 @@ const getTotalVariancePercent = (type) => {
   if (type === "assets") {
     current = sumAllAccounts(
       completeAssetAccounts.value,
-      periods[currentIdx]?.label
+      periods[currentIdx]?.label,
     );
     previous = sumAllAccounts(
       completeAssetAccounts.value,
-      periods[previousIdx]?.label
+      periods[previousIdx]?.label,
     );
   } else if (type === "liabilities") {
     current = sumAllAccounts(
       completeLiabilityAccounts.value,
-      periods[currentIdx]?.label
+      periods[currentIdx]?.label,
     );
     previous = sumAllAccounts(
       completeLiabilityAccounts.value,
-      periods[previousIdx]?.label
+      periods[previousIdx]?.label,
     );
   } else if (type === "equity") {
     current = getTotalEquity(periods[currentIdx]?.label);
@@ -1202,13 +1202,6 @@ const search = async () => {
 
     // Save parameters after successful search
     saveParams();
-
-    // Update URL with search parameters
-    const queryParams = {
-      periodMode: formData.value.periodMode,
-      search: "1",
-    };
-    router.replace({ query: queryParams });
   } catch (error) {
     console.error(error);
   } finally {
@@ -1256,7 +1249,7 @@ const getPath = (accno, period) => {
     const parts = todate.split("/");
     todate = `${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(
       2,
-      "0"
+      "0",
     )}`;
   }
   const project = formData.value.projectnumber || "";
@@ -1303,13 +1296,13 @@ const downloadExcel = () => {
   let assetsTotalRow = ["Total Assets"];
   periods.forEach((p) =>
     assetsTotalRow.push(
-      roundAmount(sumAllAccounts(completeAssetAccounts.value, p.label))
-    )
+      roundAmount(sumAllAccounts(completeAssetAccounts.value, p.label)),
+    ),
   );
   if (periods.length >= 2) {
     assetsTotalRow.push(getTotalVariance("assets") || 0);
     assetsTotalRow.push(
-      getTotalVariancePercent("assets")?.toFixed(1) + "%" || "-"
+      getTotalVariancePercent("assets")?.toFixed(1) + "%" || "-",
     );
   }
   exportData.push(assetsTotalRow);
@@ -1321,13 +1314,13 @@ const downloadExcel = () => {
   let liabTotalRow = ["Total Liabilities"];
   periods.forEach((p) =>
     liabTotalRow.push(
-      roundAmount(sumAllAccounts(completeLiabilityAccounts.value, p.label))
-    )
+      roundAmount(sumAllAccounts(completeLiabilityAccounts.value, p.label)),
+    ),
   );
   if (periods.length >= 2) {
     liabTotalRow.push(getTotalVariance("liabilities") || 0);
     liabTotalRow.push(
-      getTotalVariancePercent("liabilities")?.toFixed(1) + "%" || "-"
+      getTotalVariancePercent("liabilities")?.toFixed(1) + "%" || "-",
     );
   }
   exportData.push(liabTotalRow);
@@ -1338,7 +1331,7 @@ const downloadExcel = () => {
 
   let earningsRow = ["Current Earnings"];
   periods.forEach((p) =>
-    earningsRow.push(roundAmount(getCurrentEarnings(p.label)))
+    earningsRow.push(roundAmount(getCurrentEarnings(p.label))),
   );
   if (periods.length >= 2) {
     earningsRow.push(getEarningsVariance() || 0);
@@ -1348,12 +1341,12 @@ const downloadExcel = () => {
 
   let equityTotalRow = ["Total Equity"];
   periods.forEach((p) =>
-    equityTotalRow.push(roundAmount(getTotalEquity(p.label)))
+    equityTotalRow.push(roundAmount(getTotalEquity(p.label))),
   );
   if (periods.length >= 2) {
     equityTotalRow.push(getTotalVariance("equity") || 0);
     equityTotalRow.push(
-      getTotalVariancePercent("equity")?.toFixed(1) + "%" || "-"
+      getTotalVariancePercent("equity")?.toFixed(1) + "%" || "-",
     );
   }
   exportData.push(equityTotalRow);
@@ -1361,13 +1354,13 @@ const downloadExcel = () => {
   let liabilitiesEquityTotalRow = ["Total Liabilities + Equity"];
   periods.forEach((p) =>
     liabilitiesEquityTotalRow.push(
-      roundAmount(getTotalLiabilitiesAndEquity(p.label))
-    )
+      roundAmount(getTotalLiabilitiesAndEquity(p.label)),
+    ),
   );
   if (periods.length >= 2) {
     liabilitiesEquityTotalRow.push(getTotalVariance("liabilitiesEquity") || 0);
     liabilitiesEquityTotalRow.push(
-      getTotalVariancePercent("liabilitiesEquity")?.toFixed(1) + "%" || "-"
+      getTotalVariancePercent("liabilitiesEquity")?.toFixed(1) + "%" || "-",
     );
   }
   exportData.push(liabilitiesEquityTotalRow);
@@ -1397,7 +1390,7 @@ watch(
     if (isLoadingParams.value) return;
     formData.value.periods = [];
     addPeriod();
-  }
+  },
 );
 
 // Save report parameters to LocalStorage
@@ -1431,10 +1424,10 @@ const loadParams = async () => {
       if (params.periodMode) {
         formData.value.periodMode = params.periodMode;
       }
-      
+
       // Wait for Vue to process periodMode change before setting periods
       await nextTick();
-      
+
       if (params.periods && params.periods.length > 0) {
         // Deep copy the periods to ensure all nested properties are preserved
         formData.value.periods = JSON.parse(JSON.stringify(params.periods));
@@ -1478,7 +1471,7 @@ watch(
       saveParams();
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(async () => {
