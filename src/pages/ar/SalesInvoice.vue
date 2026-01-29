@@ -754,16 +754,35 @@
               dense
               @keyup.enter="handlePaymentEnter(index, $event)"
             />
-            <fn-input
-              outlined
-              v-model="payment.amount"
-              :label="t('Amount')"
-              class="q-mt-sm"
-              bg-color="input"
-              label-color="secondary"
-              dense
-              @keyup.enter="handlePaymentEnter(index, $event)"
-            />
+            <div class="flex items-end q-gutter-xs">
+              <fn-input
+                outlined
+                v-model="payment.amount"
+                :label="t('Amount')"
+                class="q-mt-sm"
+                bg-color="input"
+                label-color="secondary"
+                dense
+                @keyup.enter="handlePaymentEnter(index, $event)"
+              />
+              <q-btn
+                v-if="index === payments.length - 1 && balance !== 0"
+                flat
+                dense
+                round
+                icon="content_copy"
+                color="primary"
+                size="sm"
+                class="q-mb-xs"
+                @click="copyRemainingBalanceToPayment(index)"
+              >
+                <q-tooltip
+                  >{{ t("Copy remaining balance") }} ({{
+                    formatAmount(balance)
+                  }})</q-tooltip
+                >
+              </q-btn>
+            </div>
             <fn-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
               outlined
@@ -1510,6 +1529,11 @@ const payments = ref([
     account: defaultPaymentAccount.value,
   },
 ]);
+
+const copyRemainingBalanceToPayment = (index) => {
+  payments.value[index].amount = balance.value;
+};
+
 const addPaymentAt = (index) => {
   const newPayment = {
     date: getTodayDate(),
