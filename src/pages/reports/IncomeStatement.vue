@@ -358,24 +358,40 @@
           </q-btn-dropdown>
         </div>
         <div class="expand-controls">
-          <q-btn
+          <q-btn-dropdown
+            :label="selectedCollapseLabel"
             flat
             size="sm"
-            @click="collapseAllHeadings"
             no-caps
+            dense
             icon="unfold_less"
+            menu-anchor="bottom right"
+            menu-self="top right"
           >
-            {{ t("Collapse") }}
-          </q-btn>
-          <q-btn
-            flat
-            size="sm"
-            @click="expandAllHeadings"
-            no-caps
-            icon="unfold_more"
-          >
-            {{ t("Expand") }}
-          </q-btn>
+            <q-list dense class="collapse-dropdown">
+              <q-item
+                clickable
+                v-close-popup
+                @click="expandAllHeadings"
+                :active="selectedCollapseLevel === -1"
+                dense
+              >
+                <q-item-section>{{ t("Expand All") }}</q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item
+                v-for="level in collapseLevelOptions"
+                :key="level.value"
+                clickable
+                v-close-popup
+                @click="collapseToLevel(level.value)"
+                :active="selectedCollapseLevel === level.value"
+                dense
+              >
+                <q-item-section>{{ level.label }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
         </div>
       </div>
 
@@ -773,6 +789,7 @@ const sectionCollapsed = ref({
   expenses: false,
 });
 const selectedVariance = ref("0-1"); // format: "currentIndex-previousIndex"
+const selectedCollapseLevel = ref(-1); // -1 means fully expanded
 
 // Generate all possible variance combinations from selected periods
 const varianceOptions = computed(() => {
@@ -800,6 +817,40 @@ const selectedVarianceLabel = computed(() => {
     (o) => o.value === selectedVariance.value,
   );
   return option ? option.label : t("Select Variance");
+});
+
+// Calculate the maximum heading level from all accounts
+const maxHeadingLevel = computed(() => {
+  const allAccounts = [
+    ...completeIncomeAccounts.value,
+    ...completeExpenseAccounts.value,
+  ];
+  let maxLevel = 0;
+  allAccounts
+    .filter((a) => a.charttype === "H")
+    .forEach((a) => {
+      if (a.level > maxLevel) maxLevel = a.level;
+    });
+  return maxLevel;
+});
+
+// Generate collapse level options based on actual heading levels
+const collapseLevelOptions = computed(() => {
+  const options = [];
+  for (let i = 0; i <= maxHeadingLevel.value; i++) {
+    options.push({
+      value: i,
+      label: `${t("Level")} ${i + 1}`,
+    });
+  }
+  return options;
+});
+
+const selectedCollapseLabel = computed(() => {
+  if (selectedCollapseLevel.value === -1) {
+    return t("Expand All");
+  }
+  return `${t("Level")} ${selectedCollapseLevel.value + 1}`;
 });
 
 const selectVariance = (option) => {
@@ -945,12 +996,19 @@ const isHeadingCollapsed = (accno) => {
 const expandAllHeadings = () => {
   collapsedHeadings.value.clear();
   sectionCollapsed.value = { income: false, expenses: false };
+  selectedCollapseLevel.value = -1;
 };
 
-const collapseAllHeadings = () => {
-  const allAccounts = [...incomeAccounts.value, ...expenseAccounts.value];
+const collapseToLevel = (level) => {
+  selectedCollapseLevel.value = level;
+  collapsedHeadings.value.clear();
+  const allAccounts = [
+    ...completeIncomeAccounts.value,
+    ...completeExpenseAccounts.value,
+  ];
+  // Collapse all headings at or above the selected level
   allAccounts
-    .filter((a) => a.charttype === "H")
+    .filter((a) => a.charttype === "H" && a.level >= level)
     .forEach((a) => collapsedHeadings.value.add(a.accno));
 };
 
@@ -1236,6 +1294,10 @@ const downloadPDF = async () => {
   try {
     loading.value = true;
     const params = { ...formData.value, usetemplate: "Y" };
+    // Add heading_level if a collapse level is selected
+    if (selectedCollapseLevel.value !== -1) {
+      params.heading_level = selectedCollapseLevel.value + 1;
+    }
     const response = await api.get("/reports/income_statement", {
       params,
       responseType: "blob",
@@ -1694,6 +1756,16 @@ const fetchLinks = async () => {
 :deep(.variance-dropdown .q-item) {
   padding: 4px 10px;
   min-height: 24px;
+}
+
+:deep(.collapse-dropdown) {
+  font-size: 0.8rem;
+  min-width: 110px;
+}
+
+:deep(.collapse-dropdown .q-item) {
+  padding: 6px 12px;
+  min-height: 28px;
 }
 
 @media print {
