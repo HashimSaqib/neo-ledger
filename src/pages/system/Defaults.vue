@@ -251,6 +251,11 @@
             name="xelatex"
             :label="t('XeLatex')"
           />
+          <q-checkbox
+            v-model="form.paymentfile"
+            name="paymentfile"
+            :label="t('Payment File')"
+          />
         </div>
       </div>
       <div class="row items-center">
@@ -390,7 +395,7 @@
       <div class="maintext q-my-none">
         {{
           t(
-            "Next numbers combine fixed patterns with variables and auto-incrementing digits. Use variables like <%date%> or <%yy%><%mm%> together with numbers (e.g., 0001) to create custom numbering sequences that increment automatically."
+            "Next numbers combine fixed patterns with variables and auto-incrementing digits. Use variables like <%date%> or <%yy%><%mm%> together with numbers (e.g., 0001) to create custom numbering sequences that increment automatically.",
           )
         }}
       </div>
@@ -732,6 +737,7 @@ const form = ref({
   weightunit: "",
   namesbynumber: false,
   xelatex: false,
+  paymentfile: false,
   typeofcontact: "",
   checkinventory: false,
   forcewarehouse: false,
@@ -814,7 +820,7 @@ function filterInventoryAccounts(accounts) {
         link.includes("IC") &&
         !link.includes("sale") &&
         !link.includes("cogs") &&
-        !link.includes("IC_tax")
+        !link.includes("IC_tax"),
     );
   });
 }
@@ -825,7 +831,7 @@ function filterIncomeAccounts(accounts) {
     const link = acc.link.split(":");
     return link.some(
       (link) =>
-        (link.includes("IC") && link.includes("sale")) || link === "IC_income"
+        (link.includes("IC") && link.includes("sale")) || link === "IC_income",
     );
   });
 }
@@ -836,20 +842,20 @@ function filterExpenseAccounts(accounts) {
     const link = acc.link.split(":");
     return link.some(
       (link) =>
-        (link.includes("IC") && link.includes("cogs")) || link === "IC_expense"
+        (link.includes("IC") && link.includes("cogs")) || link === "IC_expense",
     );
   });
 }
 
 function filterFxGainLossAccounts(accounts) {
   return accounts.filter(
-    (acc) => ["I", "E"].includes(acc.category) && acc.charttype === "A"
+    (acc) => ["I", "E"].includes(acc.category) && acc.charttype === "A",
   );
 }
 
 function filterCashOverShortAccounts(accounts) {
   return accounts.filter(
-    (acc) => ["I", "E"].includes(acc.category) && acc.charttype === "A"
+    (acc) => ["I", "E"].includes(acc.category) && acc.charttype === "A",
   );
 }
 
@@ -986,7 +992,9 @@ const filteredTokens = computed(() => {
   return allTokens.filter(
     (token) =>
       token.categories.includes("all") ||
-      token.categories.some((category) => relevantCategories.includes(category))
+      token.categories.some((category) =>
+        relevantCategories.includes(category),
+      ),
   );
 });
 
@@ -1001,7 +1009,7 @@ function insertToken(token) {
   } else {
     Notify.create({
       message: t(
-        "Please select a Last Number field before inserting a variable."
+        "Please select a Last Number field before inserting a variable.",
       ),
       type: "warning",
       position: "center",
@@ -1015,19 +1023,19 @@ async function loadDefaults() {
 
     // Apply filters to create specific account option arrays
     inventoryOptions.value = parseAccountOptions(
-      filterInventoryAccounts(data.all_accounts)
+      filterInventoryAccounts(data.all_accounts),
     );
     incomeOptions.value = parseAccountOptions(
-      filterIncomeAccounts(data.all_accounts)
+      filterIncomeAccounts(data.all_accounts),
     );
     expenseOptions.value = parseAccountOptions(
-      filterExpenseAccounts(data.all_accounts)
+      filterExpenseAccounts(data.all_accounts),
     );
     fxgainlossOptions.value = parseAccountOptions(
-      filterFxGainLossAccounts(data.all_accounts)
+      filterFxGainLossAccounts(data.all_accounts),
     );
     cashovershortOptions.value = parseAccountOptions(
-      filterCashOverShortAccounts(data.all_accounts)
+      filterCashOverShortAccounts(data.all_accounts),
     );
     arOptions.value = parseAccountOptions(filterARAccounts(data.all_accounts));
     apOptions.value = parseAccountOptions(filterAPAccounts(data.all_accounts));
@@ -1067,43 +1075,44 @@ async function loadDefaults() {
     form.value.linetax = data.settings?.line_tax || false;
     form.value.namesbynumber = data.settings?.sort_names_by_number || false;
     form.value.xelatex = data.settings?.xe_latex || false;
+    form.value.paymentfile = data.settings?.paymentfile ? true : false;
     form.value.typeofcontact = data.settings?.type_of_contact || "";
 
     // Account Defaults - Find complete account objects by ID
     form.value.inventory_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.inventory_account_id
+        data.account_defaults?.inventory_account_id,
       ) || null;
     form.value.income_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.income_account_id
+        data.account_defaults?.income_account_id,
       ) || null;
     form.value.expense_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.expense_account_id
+        data.account_defaults?.expense_account_id,
       ) || null;
     form.value.fx_gain_loss_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.fx_gain_loss_account_id
+        data.account_defaults?.fx_gain_loss_account_id,
       ) || null;
     form.value.cash_over_short_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.cash_over_short_account_id
+        data.account_defaults?.cash_over_short_account_id,
       ) || null;
     form.value.ar_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.ar_account_id
+        data.account_defaults?.ar_account_id,
       ) || null;
     form.value.ap_account =
       findAccountById(
         data.all_accounts,
-        data.account_defaults?.ap_account_id
+        data.account_defaults?.ap_account_id,
       ) || null;
 
     // Number Sequences
@@ -1191,6 +1200,7 @@ async function submitForm() {
         line_tax: form.value.linetax,
         sort_names_by_number: form.value.namesbynumber,
         xe_latex: form.value.xelatex,
+        paymentfile: form.value.paymentfile,
         type_of_contact: form.value.typeofcontact,
       },
 
