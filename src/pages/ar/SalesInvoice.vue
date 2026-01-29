@@ -522,7 +522,8 @@
                     outlined
                     v-model="line.project"
                     :options="filteredProjects"
-                    option-label="projectnumber"
+                    option-label="description"
+                    search="description"
                     option-value="value"
                     emit-value
                     map-options
