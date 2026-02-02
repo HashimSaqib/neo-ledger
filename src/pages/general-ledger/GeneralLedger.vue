@@ -1013,12 +1013,8 @@ const updateTaxAmount = (val, index) => {
     return;
   }
 
-  // Calculate base amount from gross amount that includes tax
-  const newRate = taxAcc.rate * 100;
-  let baseAmount = (grossAmount / (newRate + 100)) * 100;
-  console.log(grossAmount, newRate, baseAmount);
-  // Tax amount is the difference
-  lines.value[index].linetaxamount = grossAmount - baseAmount;
+  // Tax amount is the rate applied on the whole amount
+  lines.value[index].linetaxamount = grossAmount * taxAcc.rate;
 };
 
 const handleOffsetAccountChange = (val) => {
