@@ -1,29 +1,26 @@
 <template>
   <div class="q-pa-md text-center">
-    <!-- If there is a connection (active or error) -->
-    <div v-if="dataset.connections && dataset.connections.length > 0">
+    <!-- If there is a drive connection (google_drive or dropbox) -->
+    <div v-if="driveConnection">
       <!-- Display active connection -->
-      <div v-if="dataset.connections[0].status === 'active'" class="q-pa-md">
+      <div v-if="driveConnection.status === 'active'" class="q-pa-md">
         <q-icon name="check_circle" color="green" size="3em" />
         <div class="text-h5 q-mt-sm">
           {{
-            dataset.connections[0].type === "dropbox"
+            driveConnection.type === "dropbox"
               ? t("Dropbox")
               : t("Google Drive")
           }}
           {{ t("Connection Active") }}
         </div>
 
-        <div
-          v-if="dataset.connections[0].drive_id"
-          class="text-subtitle1 q-mt-sm"
-        >
+        <div v-if="driveConnection.drive_id" class="text-subtitle1 q-mt-sm">
           {{ t("Using Shared Drive") }}
         </div>
 
         <!-- Get Drives button for active connections -->
         <q-btn
-          v-if="allDrive && dataset.connections[0].type === 'google_drive'"
+          v-if="allDrive && driveConnection.type === 'google_drive'"
           dense
           :label="t('Get Drives')"
           color="secondary"
@@ -66,26 +63,23 @@
       </div>
 
       <!-- Display connection with error and reconnect button -->
-      <div
-        v-else-if="dataset.connections[0].status === 'error'"
-        class="q-pa-md"
-      >
+      <div v-else-if="driveConnection.status === 'error'" class="q-pa-md">
         <q-icon name="error_outline" color="red" size="3em" />
         <div class="text-h5 q-mt-sm">{{ t("Connection Disabled") }}</div>
         <div class="q-mt-sm text-subtitle2">
-          {{ t("Error") }}: {{ dataset.connections[0].error }}
+          {{ t("Error") }}: {{ driveConnection.error }}
         </div>
         <q-btn
           dense
           :label="`${t('Reconnect')} ${
-            dataset.connections[0].type === 'dropbox'
+            driveConnection.type === 'dropbox'
               ? t('Dropbox')
               : t('Google Drive')
           }`"
           color="primary"
           icon="folder"
           :href="
-            dataset.connections[0].type === 'dropbox'
+            driveConnection.type === 'dropbox'
               ? `https://www.dropbox.com/oauth2/authorize?client_id=${dropboxKey}&response_type=code&state=${
                   dataset.db_name
                 }|dropbox&token_access_type=offline&redirect_uri=${encodeURIComponent(
@@ -141,7 +135,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
@@ -171,6 +165,16 @@ const props = defineProps({
   },
 });
 
+// Find a connection with type google_drive or dropbox
+const driveConnection = computed(() => {
+  if (!props.dataset.connections || props.dataset.connections.length === 0) {
+    return null;
+  }
+  return props.dataset.connections.find(
+    (conn) => conn.type === "google_drive" || conn.type === "dropbox"
+  );
+});
+
 const drives = ref([]);
 const loading = ref(false);
 const selectedDrive = ref(null);
@@ -187,12 +191,8 @@ const getDrives = async () => {
     drives.value = response.data.drives;
 
     // Check if connection has a drive_id to pre-select
-    if (
-      props.dataset.connections &&
-      props.dataset.connections.length > 0 &&
-      props.dataset.connections[0].drive_id
-    ) {
-      const existingDriveId = props.dataset.connections[0].drive_id;
+    if (driveConnection.value && driveConnection.value.drive_id) {
+      const existingDriveId = driveConnection.value.drive_id;
       const driveExists = drives.value.some(
         (drive) => drive.id === existingDriveId
       );
