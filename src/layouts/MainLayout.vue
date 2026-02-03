@@ -78,7 +78,7 @@ import { Cookies, Dark, LocalStorage } from "quasar";
 import config from "../../neoledger.json";
 
 const $q = useQuasar();
-const miniState = ref(false);
+const miniState = ref(true);
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
