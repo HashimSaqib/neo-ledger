@@ -214,6 +214,17 @@
             class="lightbg input-box"
           />
         </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.termdays"
+            name="termdays"
+            type="number"
+            :label="t('Term (days)')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
         <div class="col-auto">
           <q-checkbox
             v-model="form.method"
@@ -735,6 +746,7 @@ const form = ref({
   restockingcharge: "",
   roundchange: "",
   weightunit: "",
+  termdays: "",
   namesbynumber: false,
   xelatex: false,
   paymentfile: false,
@@ -1065,6 +1077,7 @@ async function loadDefaults() {
     form.value.restockingcharge = data.settings?.restocking_charge || "";
     form.value.roundchange = data.settings?.round_change || "";
     form.value.weightunit = data.settings?.weight_unit || "";
+    form.value.termdays = data.settings?.term_days ?? "";
     form.value.clearing = data.settings?.clearing_account || "";
     form.value.transition = data.settings?.transition_account || "";
 
@@ -1189,6 +1202,7 @@ async function submitForm() {
         restocking_charge: form.value.restockingcharge,
         round_change: form.value.roundchange,
         weight_unit: form.value.weightunit,
+        term_days: form.value.termdays,
         clearing_account: form.value.clearing,
         transition_account: form.value.transition,
 

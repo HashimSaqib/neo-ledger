@@ -387,7 +387,9 @@
             class="col-12 col-md-3 container-bg q-pa-md q-pl-sm"
           >
             <div class="row items-center justify-between q-mb-sm">
-              <div class="text-subtitle2 text-weight-medium">{{ t("Bank Accounts") }}</div>
+              <div class="text-subtitle2 text-weight-medium">
+                {{ t("Bank Accounts") }}
+              </div>
               <q-btn
                 flat
                 round
@@ -511,7 +513,7 @@ const isEditMode = computed(() => !!componentId.value);
 
 // Compute VC type based on the componentType value
 const vcType = computed(() =>
-  componentType.value === "customer" ? "Customer" : "Vendor"
+  componentType.value === "customer" ? "Customer" : "Vendor",
 );
 
 // Section visibility toggles
@@ -599,7 +601,7 @@ const updateVCSettings = async () => {
 
   if (!haveProps.value) {
     updateTitle(
-      isEditMode.value ? `Edit ${vcType.value}` : `Add ${vcType.value}`
+      isEditMode.value ? `Edit ${vcType.value}` : `Add ${vcType.value}`,
     );
   }
 
@@ -623,7 +625,7 @@ const updateVCSettings = async () => {
     }
     if (defaultRecordAccount.value) {
       form.value.arap_accno = recordAccounts.value.find(
-        (acc) => acc.value.id == defaultRecordAccount.value.id
+        (acc) => acc.value.id == defaultRecordAccount.value.id,
       );
     }
 
@@ -747,7 +749,7 @@ const submitForm = async () => {
 
     // Convert tax checkbox values to 1 or 0
     const taxKeys = Object.keys(payload).filter((key) =>
-      key.startsWith("tax_")
+      key.startsWith("tax_"),
     );
     taxKeys.forEach((key) => {
       payload[key] = form.value[key] ? 1 : 0;
@@ -797,15 +799,13 @@ const submitForm = async () => {
 
 watch(
   () => route.params.type,
-  () => updateVCSettings()
+  () => updateVCSettings(),
 );
 
 const currencies = ref();
 const fetchLinks = async () => {
   try {
-    const response = await api.get(
-      `/create_links/${componentType.value}`
-    );
+    const response = await api.get(`/create_links/${componentType.value}`);
     accounts.value = response.data.accounts.all;
     defaultRecordAccount.value = response.data.record || null;
     currencies.value = response.data.currencies;
@@ -835,6 +835,7 @@ const fetchLinks = async () => {
     taxAccounts.value.forEach((tax) => {
       form.value[`tax_${tax.id}`] = 0;
     });
+    form.value.terms = response.data.term_days || 0;
   } catch (error) {
     console.error(error);
   }

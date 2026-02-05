@@ -101,6 +101,17 @@
           @refresh="refreshWidget(widget.type)"
           @toggle-visibility="toggleWidgetVisibility(widget.id)"
         />
+        <bank-activity-widget
+          v-else-if="widget.type === 'bank_activity'"
+          :data="widgetData[widget.type]"
+          :loading="widgetLoading[widget.type]"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          :selected-account-ids="getBankActivitySelectedIds()"
+          @refresh="refreshWidget(widget.type)"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          @update:selected-account-ids="setBankActivitySelectedIds($event)"
+        />
       </div>
 
       <!-- Empty State -->
@@ -230,6 +241,7 @@ import { Notify, LocalStorage } from "quasar";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
 import OverviewWidget from "./OverviewWidget.vue";
+import BankActivityWidget from "./BankActivityWidget.vue";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -258,6 +270,7 @@ const draggedIndex = ref(null);
 const widgetWidths = reactive({
   ar_overview: "half",
   ap_overview: "half",
+  bank_activity: "half",
 });
 
 const widthOptions = [
@@ -279,11 +292,13 @@ const config = ref({
 const widgetData = ref({
   ar_overview: null,
   ap_overview: null,
+  bank_activity: null,
 });
 
 const widgetLoading = ref({
   ar_overview: false,
   ap_overview: false,
+  bank_activity: false,
 });
 
 // Period type options
@@ -344,6 +359,14 @@ const widgetDefinitions = [
     icon: "trending_down",
     permission: "vendor.overview",
   },
+  {
+    id: "bank_activity",
+    type: "bank_activity",
+    label: t("Bank Account Activity"),
+    description: t("View bank account balance trends over time"),
+    icon: "account_balance",
+    permission: "gl.transactions",
+  },
 ];
 
 // Get widget width
@@ -363,11 +386,15 @@ const getDefaultOrder = (widgetId) => {
 const ensureWidgetConfig = (widgetId) => {
   if (!config.value.widgets[widgetId]) {
     const defaultOrder = getDefaultOrder(widgetId);
-    config.value.widgets[widgetId] = {
+    const base = {
       enabled: true,
       order: defaultOrder,
       width: widgetWidths[widgetId] || "half",
     };
+    if (widgetId === "bank_activity") {
+      base.selected_account_ids = [];
+    }
+    config.value.widgets[widgetId] = base;
   }
   return config.value.widgets[widgetId];
 };
@@ -377,6 +404,20 @@ const updateWidgetWidth = (widgetId, width) => {
   ensureWidgetConfig(widgetId);
   config.value.widgets[widgetId].width = width;
   widgetWidths[widgetId] = width;
+};
+
+// Bank activity widget: selected account ids (empty = show all)
+const getBankActivitySelectedIds = () => {
+  const ids = config.value.widgets.bank_activity?.selected_account_ids;
+  return Array.isArray(ids) ? ids : [];
+};
+
+const setBankActivitySelectedIds = (ids) => {
+  ensureWidgetConfig("bank_activity");
+  config.value.widgets.bank_activity.selected_account_ids = Array.isArray(ids)
+    ? ids
+    : [];
+  saveConfig();
 };
 
 // All widgets with current config state
@@ -591,11 +632,9 @@ const initializeWidgetConfigs = () => {
   widgetDefinitions.forEach((def, index) => {
     if (!newWidgets[def.id]) {
       console.log(`Widget ${def.id} not found, creating with defaults`);
-      newWidgets[def.id] = {
-        enabled: true,
-        order: index + 1,
-        width: "half",
-      };
+      const base = { enabled: true, order: index + 1, width: "half" };
+      if (def.id === "bank_activity") base.selected_account_ids = [];
+      newWidgets[def.id] = base;
       needsSave = true;
     } else {
       console.log(`Widget ${def.id} found:`, newWidgets[def.id]);
@@ -716,6 +755,7 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
             const serverWidgetConfig = serverConfig.widgets[widgetId];
             if (serverWidgetConfig && typeof serverWidgetConfig === "object") {
               config.value.widgets[widgetId] = {
+                ...serverWidgetConfig,
                 enabled: serverWidgetConfig.enabled !== false,
                 order:
                   typeof serverWidgetConfig.order === "number"
@@ -755,6 +795,11 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
       if (configResponse.data.vendor_overview) {
         widgetData.value.ap_overview = configResponse.data.vendor_overview;
       }
+      if (configResponse.data.bank_accounts) {
+        widgetData.value.bank_activity = {
+          bank_accounts: configResponse.data.bank_accounts,
+        };
+      }
 
       // If there are period dates, re-fetch with those dates
       if (config.value.period.start || config.value.period.end) {
@@ -782,6 +827,11 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
     }
     if (response.data.vendor_overview) {
       widgetData.value.ap_overview = response.data.vendor_overview;
+    }
+    if (response.data.bank_accounts) {
+      widgetData.value.bank_activity = {
+        bank_accounts: response.data.bank_accounts,
+      };
     }
 
     emit("config-loaded", config.value);
@@ -814,6 +864,14 @@ const refreshWidget = async (widgetType) => {
     }
     if (widgetType === "ap_overview" && response.data.vendor_overview) {
       widgetData.value.ap_overview = response.data.vendor_overview;
+    }
+    if (
+      widgetType === "bank_activity" &&
+      response.data.bank_accounts
+    ) {
+      widgetData.value.bank_activity = {
+        bank_accounts: response.data.bank_accounts,
+      };
     }
   } catch (error) {
     console.error("Error refreshing widget:", error);
@@ -898,11 +956,13 @@ const resetToDefaults = () => {
 
   // Reset widget orders and widths
   widgetDefinitions.forEach((def, index) => {
-    config.value.widgets[def.id] = {
+    const base = {
       enabled: hasPermission(def.permission),
       order: index + 1,
       width: "half",
     };
+    if (def.id === "bank_activity") base.selected_account_ids = [];
+    config.value.widgets[def.id] = base;
     widgetWidths[def.id] = "half";
   });
 };
