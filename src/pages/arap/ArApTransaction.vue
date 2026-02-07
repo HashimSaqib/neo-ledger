@@ -726,8 +726,14 @@
                 />
 
                 <s-button
+                  type="post-as-new"
+                  @click="postInvoice(false, true)"
+                  class="q-mr-md"
+                  v-if="canPostAsNew"
+                />
+                <s-button
                   type="post"
-                  @click="postInvoice"
+                  @click="postInvoice(true, false)"
                   class="q-mr-md"
                   v-if="canPost"
                 />
@@ -948,7 +954,7 @@ const loadPdfForPrintMode = async () => {
     const template = getPrintTemplate();
     const response = await api.get(
       `/print_transaction?id=${route.query.id}&vc=${type.value}&template=${template}&format=tex`,
-      { responseType: "blob" }
+      { responseType: "blob" },
     );
     const blob = new Blob([response.data], { type: "application/pdf" });
     pdfUrl.value = window.URL.createObjectURL(blob);
@@ -1020,7 +1026,7 @@ const getBankAccountLabel = (bank) => {
 const selectedBankHasQriban = computed(() => {
   if (!vcBankId.value || !vcBankAccounts.value.length) return false;
   const selectedBank = vcBankAccounts.value.find(
-    (bank) => bank.id === vcBankId.value
+    (bank) => bank.id === vcBankId.value,
   );
   return (
     selectedBank && selectedBank.qriban && selectedBank.qriban.trim() !== ""
@@ -1086,7 +1092,7 @@ const computeLineTaxAmount = (line) => {
       a.accno ===
       (typeof line.taxAccount === "object"
         ? line.taxAccount.accno
-        : line.taxAccount)
+        : line.taxAccount),
   );
   if (!taxAcc) return 0;
   const taxRate = taxAcc.rate;
@@ -1152,7 +1158,7 @@ const calculateTaxes = () => {
 
     const totalLines = lines.value.reduce(
       (acc, line) => acc + (parseFloat(line.amount) || 0),
-      0
+      0,
     );
 
     invoiceTaxes.value.forEach((tax) => {
@@ -1173,7 +1179,7 @@ const calculateTaxes = () => {
 const subtotal = computed(() => {
   let totalValue = lines.value.reduce(
     (acc, line) => acc + (parseFloat(line.amount) || 0),
-    0
+    0,
   );
   if (taxIncluded.value) {
     const totalTaxes = invoiceTaxes.value
@@ -1190,7 +1196,7 @@ const total = computed(() => {
     .reduce((acc, tax) => acc + (parseFloat(tax.amount) || 0), 0);
   let totalValue = lines.value.reduce(
     (acc, line) => acc + (parseFloat(line.amount) || 0),
-    0
+    0,
   );
   if (!taxIncluded.value) totalValue += totalTaxes;
   return parseFloat(totalValue.toFixed(2));
@@ -1213,7 +1219,7 @@ const isPendingDisabled = computed(() => {
       totalValue,
       (value) => {
         pending.value = value;
-      }
+      },
     );
     return result;
   }
@@ -1227,7 +1233,7 @@ const getPendingDisabledTooltip = () => {
       stations.value,
       allowed_amount.value,
       t,
-      formatAmount
+      formatAmount,
     );
   }
 
@@ -1257,7 +1263,7 @@ const payments = ref([
 const remainingBalance = computed(() => {
   const totalPayments = payments.value.reduce(
     (acc, payment) => acc + (parseFloat(payment.amount) || 0),
-    0
+    0,
   );
   return parseFloat((total.value - totalPayments).toFixed(2));
 });
@@ -1377,7 +1383,7 @@ const fetchLinks = async () => {
       user_stations.value = response.data.user_stations || {};
 
       const permissions = aiHelpers.processStationPermissions(
-        user_stations.value
+        user_stations.value,
       );
       allowed_all.value = permissions.allowed_all;
       allowed_amount.value = permissions.allowed_amount;
@@ -1429,14 +1435,14 @@ const fetchAccounts = async () => {
     const linkPaid = type.value === "vendor" ? "AP_paid" : "AR_paid";
     const icLink = type.value === "vendor" ? "AP_amount" : "AR_amount";
     recordAccounts.value = accounts.value.filter(
-      (account) => account.link === linkType
+      (account) => account.link === linkType,
     );
     recordAccount.value = openRecordAccounts.value[0] || null;
     paymentAccounts.value = accounts.value.filter((account) =>
-      account.link.split(":").includes(linkPaid)
+      account.link.split(":").includes(linkPaid),
     );
     itemAccounts.value = accounts.value.filter((account) =>
-      account.link.split(":").includes(icLink)
+      account.link.split(":").includes(icLink),
     );
   } catch (error) {
     console.error("Failed to fetch accounts:", error);
@@ -1515,7 +1521,18 @@ const approveTransaction = async () => {
   await postInvoice();
 };
 
-const postInvoice = async () => {
+const newNumber = async () => {
+  try {
+    const endpoint =
+      type.value === "vendor" ? "next_number/ap" : "next_number/ar";
+    const response = await api.get(endpoint);
+    invNumber.value = response.data.number;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const postInvoice = async (save = true, isNew = false) => {
   if (!selectedVc.value) {
     Notify.create({
       message: t("Entity is required: " + vcLabel.value),
@@ -1552,14 +1569,14 @@ const postInvoice = async () => {
         payment.account &&
         (typeof payment.account === "object"
           ? payment.account.label
-          : payment.account)
+          : payment.account),
     );
 
   // If neither a valid line nor a valid payment exists, notify and exit.
   if (!validLineExists && !validPaymentExists) {
     Notify.create({
       message: t(
-        "At least one line item or payment with amount and account is required"
+        "At least one line item or payment with amount and account is required",
       ),
       type: "negative",
       position: "center",
@@ -1623,7 +1640,7 @@ const postInvoice = async () => {
     invoiceData.exchangerate = exchangeRate.value;
   }
   const taxesToSend = invoiceTaxes.value.filter(
-    (t) => lineTax.value || t.checked
+    (t) => lineTax.value || t.checked,
   );
   if (taxesToSend.length > 0) {
     invoiceData.taxes = taxesToSend.map((tax) => ({
@@ -1643,7 +1660,7 @@ const postInvoice = async () => {
 
   try {
     loading.value = true;
-    const idParam = invId.value ? `/${invId.value}` : "";
+    const idParam = isNew ? "" : invId.value ? `/${invId.value}` : "";
     const response = await api.post(
       `/arap/transaction/${type.value}${idParam}`,
       invoiceData,
@@ -1651,7 +1668,7 @@ const postInvoice = async () => {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
     Notify.create({
       message: t("Transaction posted successfully"),
@@ -1664,7 +1681,6 @@ const postInvoice = async () => {
       router.push({ path: route.query.callback, query: query });
     } else {
       // Otherwise, reset form data for a new transaction.
-      resetForm();
       lastTransactionsRef.value.fetchTransactions();
     }
   } catch (error) {
@@ -1687,7 +1703,7 @@ async function deleteTransaction(id) {
     const confirmed = await confirmDelete({
       title: t("Confirm Deletion"),
       message: t(
-        "Are you sure you want to delete this transaction? This action cannot be undone."
+        "Are you sure you want to delete this transaction? This action cannot be undone.",
       ),
     });
 
@@ -1808,7 +1824,7 @@ const loadInvoice = async (invoice) => {
       taxAccount:
         lineTax.value && item.taxAccount
           ? taxAccountList.value.find(
-              (acc) => acc.accno.toString() === item.taxAccount.toString()
+              (acc) => acc.accno.toString() === item.taxAccount.toString(),
             ) || null
           : null,
       taxAmount: lineTax.value ? item.taxAmount || 0 : 0,
@@ -1830,7 +1846,7 @@ const loadInvoice = async (invoice) => {
       // Add empty lines for each tax with tax account and amount
       invoice.taxes.forEach((tax, taxIndex) => {
         const taxAcc = taxAccountList.value.find(
-          (acc) => acc.accno.toString() === tax.accno.toString()
+          (acc) => acc.accno.toString() === tax.accno.toString(),
         );
 
         lines.value.push({
@@ -1855,13 +1871,13 @@ const loadInvoice = async (invoice) => {
     link.value = invoice.file;
     if (invoice.currency) {
       selectedCurrency.value = currencies.value.find(
-        (curr) => curr.curr === invoice.currency
+        (curr) => curr.curr === invoice.currency,
       );
     }
     exchangeRate.value = invoice.exchangerate || 1;
     if (departments.value?.length) {
       selectedDepartment.value = departments.value.find(
-        (dpt) => dpt.id === invoice.department_id
+        (dpt) => dpt.id === invoice.department_id,
       );
     }
     notes.value = invoice.notes || "";
@@ -1924,7 +1940,7 @@ const loadInvoice = async (invoice) => {
           amount: 0,
           account: invoice.paymentmethod_id
             ? openPaymentAccounts.value.find(
-                (acc) => acc.id == invoice.paymentmethod_id
+                (acc) => acc.id == invoice.paymentmethod_id,
               )
             : openPaymentAccounts.value[0],
         },
@@ -2031,7 +2047,7 @@ const openEditBankDialog = () => {
     return;
   }
   editingBank.value = vcBankAccounts.value.find(
-    (bank) => bank.id === vcBankId.value
+    (bank) => bank.id === vcBankId.value,
   );
   showBankFormDialog.value = true;
 };
@@ -2056,7 +2072,7 @@ const filterValidTaxes = (invoiceDate) => {
 
   // First, filter taxes to only include those in the allowed list
   const allowedTaxes = taxes.value.filter((tax) =>
-    taxAccounts.value.includes(tax.accno)
+    taxAccounts.value.includes(tax.accno),
   );
 
   // Group taxes by chart_id
@@ -2121,7 +2137,7 @@ const vcUpdate = async (newValue) => {
 
       // Set default bank account (is_primary = 1)
       const defaultBank = vcBankAccounts.value.find(
-        (bank) => bank.is_primary === 1
+        (bank) => bank.is_primary === 1,
       );
       vcBankId.value = defaultBank ? defaultBank.id : null;
 
@@ -2153,7 +2169,7 @@ const vcUpdate = async (newValue) => {
       const recordAccountAccno = fetchedEntity?.AR?.split("--")[0] ?? "";
       if (recordAccountAccno) {
         const matchingRecord = recordAccounts.value.find(
-          (account) => account.accno === recordAccountAccno
+          (account) => account.accno === recordAccountAccno,
         );
         if (matchingRecord) {
           recordAccount.value = matchingRecord;
@@ -2164,29 +2180,29 @@ const vcUpdate = async (newValue) => {
         fetchedEntity?.payment_accno?.split("--")[0] || "";
       defaultPaymentAccount.value =
         paymentAccounts.value.find(
-          (account) => account.accno === paymentAccountAccno
+          (account) => account.accno === paymentAccountAccno,
         ) || paymentAccounts.value[0];
       if (paymentmethod_id.value) {
         defaultPaymentAccount.value =
           paymentAccounts.value.find(
-            (account) => account.id === paymentmethod_id.value
+            (account) => account.id === paymentmethod_id.value,
           ) || paymentAccounts.value[0];
       }
       payments.value.forEach(
         (payment) =>
           payment.amount === 0 &&
-          (payment.account = defaultPaymentAccount.value)
+          (payment.account = defaultPaymentAccount.value),
       );
 
       if (fetchedEntity?.currency) {
         const matchingCurrency = currencies.value.find(
-          (curr) => curr.curr === fetchedEntity.currency
+          (curr) => curr.curr === fetchedEntity.currency,
         );
         if (matchingCurrency) {
           selectedCurrency.value = matchingCurrency;
         } else {
           console.warn(
-            `No matching currency found for: ${fetchedEntity.currency}`
+            `No matching currency found for: ${fetchedEntity.currency}`,
           );
         }
       }
@@ -2228,22 +2244,26 @@ watch(invDate, (newDate) => {
 // Computed Properties & Watchers
 // -------------------------
 const vcLabel = computed(() =>
-  type.value === "vendor" ? "Vendor" : "Customer"
+  type.value === "vendor" ? "Vendor" : "Customer",
 );
 const vcNumberField = computed(() =>
-  type.value === "vendor" ? "vendornumber" : "customernumber"
+  type.value === "vendor" ? "vendornumber" : "customernumber",
 );
 
 // Computed properties for conditional visibility
 const canPost = computed(
-  () => !closedto.value || invDate.value > closedto.value
+  () => !closedto.value || invDate.value > closedto.value,
+);
+
+const canPostAsNew = computed(
+  () => !closedto.value || invDate.value > closedto.value,
 );
 
 const canDelete = computed(
   () =>
     invId.value &&
     (!closedto.value || originaldate.value > closedto.value) &&
-    revtrans.value != 1
+    revtrans.value != 1,
 );
 
 watch(
@@ -2254,7 +2274,7 @@ watch(
       calculateTaxes();
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -2297,13 +2317,13 @@ watch(
       const icLink = newType === "vendor" ? "AP_amount" : "AR_amount";
 
       recordAccounts.value = accounts.value.filter(
-        (account) => account.link === linkType
+        (account) => account.link === linkType,
       );
       paymentAccounts.value = accounts.value.filter((account) =>
-        account.link.split(":").includes(linkPaid)
+        account.link.split(":").includes(linkPaid),
       );
       itemAccounts.value = accounts.value.filter((account) =>
-        account.link.split(":").includes(icLink)
+        account.link.split(":").includes(icLink),
       );
       recordAccount.value = openRecordAccounts.value[0] || null;
       payments.value[0].account = paymentAccounts.value[0] || null;
@@ -2312,17 +2332,17 @@ watch(
     selectedFile.value = null;
     splitterModel.value = 100;
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const openRecordAccounts = computed(() =>
-  recordAccounts.value.filter((account) => account.closed === 0)
+  recordAccounts.value.filter((account) => account.closed === 0),
 );
 const openPaymentAccounts = computed(() =>
-  paymentAccounts.value.filter((account) => account.closed === 0)
+  paymentAccounts.value.filter((account) => account.closed === 0),
 );
 const openItemAccounts = computed(() =>
-  itemAccounts.value.filter((account) => account.closed === 0)
+  itemAccounts.value.filter((account) => account.closed === 0),
 );
 
 // Load AI plugin components conditionally
@@ -2416,7 +2436,7 @@ const printTransaction = async () => {
       `/print_transaction?id=${invId.value}&vc=${type.value}&template=${template}&format=${printOptions.value.format}`,
       {
         responseType: "blob",
-      }
+      },
     );
 
     const blob = new Blob([response.data], { type: "application/pdf" });
@@ -2601,11 +2621,15 @@ const handleRefreshInvoice = async () => {
 
 /* Mode transition - slide effect */
 .mode-fade-enter-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .mode-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .mode-fade-enter-from {
