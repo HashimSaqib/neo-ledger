@@ -6,7 +6,7 @@
       {{ `Account ${accno} - ${description}` }}
     </h6>
     <!-- Transactions Table -->
-    <div v-if="filteredResults.length > 0" class="q-mt-sm">
+    <div v-if="results.length > 0" class="q-mt-md">
       <div class="row q-mb-sm hide-print">
         <q-btn
           :label="t('Export')"
@@ -22,66 +22,91 @@
         />
       </div>
       <q-table
+        :key="tableKey"
         table-class="mainbg maintext"
-        :rows="filteredResults"
-        row-key="rowKey"
-        :columns="columns"
         flat
         bordered
         dense
         hide-bottom
-        rows-per-page-options="0"
+        virtual-scroll
+        :virtual-scroll-slice-size="30"
+        :virtual-scroll-item-size="48"
+        :rows-per-page-options="[0]"
+        virtual-scroll-sticky-end
+        :rows="tableRows"
+        :columns="columns"
+        row-key="id"
       >
         <template v-slot:body="props">
           <q-tr
             :props="props"
-            :class="[
-              props.row.isTotalRow
-                ? 'total-row'
-                : props.rowIndex % 2 === 0
-                ? 'lightbg'
-                : 'mainbg',
-            ]"
+            :class="props.rowIndex % 2 === 0 ? 'lightbg' : 'mainbg'"
           >
-            <q-td v-for="col in columns" :key="col.name" :props="props">
-              <template v-if="props.row.isTotalRow">
-                <template v-if="col.name === 'description'">
-                  <strong>{{ props.row.description }}</strong>
-                </template>
+            <q-td
+              v-for="col in columns"
+              :key="col.name"
+              :props="props"
+              :class="
+                ['reference', 'description', 'source'].includes(col.name)
+                  ? 'description-cell'
+                  : ''
+              "
+            >
+              <template v-if="col.name === 'reference'">
+                <span class="wrapped-description">
+                  <router-link :to="getPath(props.row)" class="text-primary">
+                    {{ props.row.reference }}
+                  </router-link>
+                </span>
+              </template>
+              <template
+                v-else-if="col.name === 'description' || col.name === 'source'"
+              >
+                <span class="wrapped-description">{{
+                  props.row[col.field]
+                }}</span>
+              </template>
+              <template v-else-if="col.name === 'files'">
+                <file-list :files="props.row.files" :report="true" />
+              </template>
+              <template v-else>
                 <template
-                  v-else-if="
+                  v-if="
                     col.name === 'debit' ||
                     col.name === 'credit' ||
                     col.name === 'balance'
                   "
                 >
-                  <strong>{{ formatAmount(props.row[col.field]) }}</strong>
-                </template>
-              </template>
-              <template v-else>
-                <template v-if="col.name === 'reference'">
-                  <router-link :to="getPath(props.row)" class="text-primary">
-                    {{ props.row.reference }}
-                  </router-link>
-                </template>
-                <template v-else-if="col.name === 'files'">
-                  <file-list :files="props.row.files" :report="true" />
+                  {{ formatAmount(props.row[col.field]) }}
                 </template>
                 <template v-else>
-                  <template
-                    v-if="
-                      col.name === 'debit' ||
-                      col.name === 'credit' ||
-                      col.name === 'balance'
-                    "
-                  >
-                    {{ formatAmount(props.row[col.field]) }}
-                  </template>
-                  <template v-else>
-                    {{ props.row[col.field] }}
-                  </template>
+                  {{ props.row[col.field] }}
                 </template>
               </template>
+            </q-td>
+          </q-tr>
+        </template>
+        <!-- Totals row (sticky at bottom with virtual-scroll-sticky-end) -->
+        <template v-slot:bottom-row v-if="totals">
+          <q-tr class="totals-row">
+            <q-td
+              v-for="col in columns"
+              :key="col.name"
+              :style="{ textAlign: col.align || 'left' }"
+            >
+              <template v-if="col.name === 'description'">
+                <strong>{{ totals.description }}</strong>
+              </template>
+              <template
+                v-else-if="
+                  col.name === 'debit' ||
+                  col.name === 'credit' ||
+                  col.name === 'balance'
+                "
+              >
+                {{ formatAmount(totals[col.name]) || "" }}
+              </template>
+              <template v-else>&nbsp;</template>
             </q-td>
           </q-tr>
         </template>
@@ -118,6 +143,7 @@ const filtersOpen = ref(true);
 const results = ref([]);
 const accno = ref("");
 const description = ref("");
+const tableKey = ref(0);
 
 /* Base Columns & Column Selection */
 const baseColumns = ref([
@@ -136,6 +162,7 @@ const baseColumns = ref([
     label: "Reference",
     field: "reference",
     default: true,
+    style: "max-width: 300px",
   },
   {
     name: "description",
@@ -143,6 +170,7 @@ const baseColumns = ref([
     label: "Description",
     field: "description",
     default: true,
+    style: "max-width: 300px",
   },
   {
     name: "files",
@@ -157,6 +185,7 @@ const baseColumns = ref([
     label: "Source",
     field: "source",
     default: true,
+    style: "max-width: 300px",
   },
   {
     name: "cleared",
@@ -192,12 +221,12 @@ const selectedColumns = ref(
   baseColumns.value.reduce((acc, column) => {
     acc[column.name] = column.default;
     return acc;
-  }, {})
+  }, {}),
 );
 
 const columns = computed(() => {
   return baseColumns.value.filter(
-    (column) => selectedColumns.value[column.name]
+    (column) => selectedColumns.value[column.name],
   );
 });
 
@@ -220,38 +249,43 @@ function formatRow(result) {
   return formatted;
 }
 
-const filteredResults = computed(() => {
+/* Table rows only (no total) - for virtual scroll, same as GlTransactions */
+const tableRows = computed(() => {
   let balance = 0;
-  let totalDebits = 0;
-  let totalCredits = 0;
-  // Always include these columns
   const requiredKeys = ["module", "invoice", "till", "db"];
-  const processedResults = results.value.map((result) => {
-    // Process row as before
+  return results.value.map((result) => {
     const formatted = formatRow(result);
-    // Ensure required columns are always added
     requiredKeys.forEach((key) => {
       formatted[key] = result[key];
     });
     const debit = parseFloat(formatted.debit) || 0;
     const credit = parseFloat(formatted.credit) || 0;
-    totalDebits += debit;
-    totalCredits += credit;
     balance += debit - credit;
     formatted.balance = balance;
     formatted.module = result.module;
-    console.log(formatted);
     return formatted;
   });
-  processedResults.push({
+});
+
+/* Totals for footer slot - same pattern as GlTransactions */
+const totals = computed(() => {
+  if (tableRows.value.length === 0) return null;
+  let totalDebits = 0;
+  let totalCredits = 0;
+  let balance = 0;
+  tableRows.value.forEach((row) => {
+    const debit = parseFloat(row.debit) || 0;
+    const credit = parseFloat(row.credit) || 0;
+    totalDebits += debit;
+    totalCredits += credit;
+    balance += debit - credit;
+  });
+  return {
     description: "Total",
     debit: totalDebits,
     credit: totalCredits,
-    balance: balance,
-    isTotalRow: true,
-    rowKey: "total-row",
-  });
-  return processedResults;
+    balance,
+  };
 });
 const createLink = inject("createLink");
 
@@ -302,6 +336,7 @@ const search = async () => {
     results.value = response.data.transactions;
     accno.value = response.data.accno;
     description.value = response.data.description;
+    tableKey.value += 1;
   } catch (error) {
     console.error(error);
   }
@@ -320,26 +355,23 @@ const downloadExcel = () => {
   exportData.push([]);
   exportData.push(headerRow);
 
-  // Add transaction rows (excluding the total row)
-  filteredResults.value.forEach((row) => {
-    if (!row.isTotalRow) {
-      const dataRow = baseColumns.value.map((col) => {
-        if (["debit", "credit", "balance"].includes(col.name)) {
-          return row[col.field] ? parseFloat(row[col.field]) : 0;
-        }
-        return row[col.field] || "";
-      });
-      exportData.push(dataRow);
-    }
+  // Add transaction rows
+  tableRows.value.forEach((row) => {
+    const dataRow = baseColumns.value.map((col) => {
+      if (["debit", "credit", "balance"].includes(col.name)) {
+        return row[col.field] ? parseFloat(row[col.field]) : 0;
+      }
+      return row[col.field] || "";
+    });
+    exportData.push(dataRow);
   });
 
   // Append total row
-  const totalRow = filteredResults.value.find((row) => row.isTotalRow);
-  if (totalRow) {
+  if (totals.value) {
     const totalDataRow = baseColumns.value.map((col) => {
-      if (col.name === "description") return totalRow.description;
+      if (col.name === "description") return totals.value.description;
       if (["debit", "credit", "balance"].includes(col.name)) {
-        return totalRow[col.field] ? parseFloat(totalRow[col.field]) : 0;
+        return totals.value[col.name] ?? 0;
       }
       return "";
     });
@@ -373,13 +405,83 @@ const downloadExcel = () => {
 };
 const title = inject("title");
 const downloadPDF = () => {
-  createPDF(filteredResults.value, columns.value, [], title.value);
+  const rowsWithTotal = totals.value
+    ? [...tableRows.value, { ...totals.value, isTotalRow: true }]
+    : tableRows.value;
+  createPDF(rowsWithTotal, columns.value, [], title.value);
 };
 </script>
 
 <style scoped>
-.total-row {
-  background-color: var(--q-color-primary-light);
-  font-weight: bold;
+@media print {
+  :deep(.q-table__container) {
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+  :deep(.q-virtual-scroll__content) {
+    transform: none !important;
+  }
+  :deep(.totals-row) {
+    position: static !important;
+  }
+}
+
+:deep(.q-table__container) {
+  height: calc(100vh - 180px);
+  position: relative;
+}
+:deep(.q-table thead) {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  background-color: var(--q-maintext);
+  color: var(--q-maindark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+:deep(.q-table thead tr) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+:deep(.q-table thead tr th) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  font-weight: var(--q-font-weight-bolder);
+  background-color: var(--q-maintext);
+  color: var(--q-mainbg);
+}
+:deep(.totals-row) {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 2;
+  background-color: var(--q-maintext);
+  color: var(--q-mainbg);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.12);
+}
+:deep(.totals-row td) {
+  position: sticky !important;
+  bottom: 0 !important;
+  font-weight: var(--q-font-weight-bolder);
+  background-color: var(--q-maintext);
+  color: var(--q-mainbg);
+}
+:deep(.q-table td) {
+  padding: 8px 16px;
+}
+:deep(.q-virtual-scroll__content) {
+  margin-bottom: 0 !important;
+}
+.description-cell {
+  max-width: 300px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.wrapped-description {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: block;
 }
 </style>
