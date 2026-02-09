@@ -54,6 +54,9 @@
           {{ formatAmount(props.row.paid) }}
         </q-td>
       </template>
+      <template v-slot:body-cell-transdate="props">
+        <q-td :props="props">{{ formatDate(props.row.transdate) }}</q-td>
+      </template>
     </q-table>
   </div>
 </template>
@@ -62,7 +65,7 @@
 import { ref, onMounted, inject, computed } from "vue";
 import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
-import { formatAmount } from "src/helpers/utils";
+import { formatAmount, formatDate } from "src/helpers/utils";
 
 const { t } = useI18n();
 const createLink = inject("createLink");

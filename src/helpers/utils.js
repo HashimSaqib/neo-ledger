@@ -131,6 +131,14 @@ export const formatAmount = (amount) => {
   }
 };
 
+// Format a date string from yyyy-mm-dd to dd.mm.yyyy
+export const formatDate = (dateStr) => {
+  if (dateStr === null || dateStr === undefined) return "";
+  const match = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return dateStr;
+  return `${match[3]}.${match[2]}.${match[1]}`;
+};
+
 // Parse a formatted amount string back to a number based on the current number format
 export const parseAmount = (amountString) => {
   if (!amountString || typeof amountString !== "string") return 0;

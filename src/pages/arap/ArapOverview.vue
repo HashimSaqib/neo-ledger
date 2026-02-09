@@ -233,12 +233,16 @@
             </q-td>
           </template>
 
+          <template v-slot:body-cell-transdate="props">
+            <q-td :props="props">{{ formatDate(props.row.transdate) }}</q-td>
+          </template>
+
           <template v-slot:body-cell-duedate="props">
             <q-td
               :props="props"
               :class="{ 'text-negative': isOverdue(props.row) }"
             >
-              {{ props.row.duedate }}
+              {{ formatDate(props.row.duedate) }}
             </q-td>
           </template>
         </q-table>
@@ -264,6 +268,7 @@ import { useI18n } from "vue-i18n";
 import { Chart, registerables } from "chart.js";
 import {
   formatAmount,
+  formatDate,
   downloadReport,
   createPDF as createPDFUtil,
 } from "src/helpers/utils";

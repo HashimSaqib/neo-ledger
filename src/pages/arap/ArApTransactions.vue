@@ -336,6 +336,15 @@
         </template>
 
         <!-- Created Date Column -->
+        <template v-slot:body-cell-transdate="props">
+          <q-td :props="props">{{ formatDate(props.row.transdate) }}</q-td>
+        </template>
+        <template v-slot:body-cell-duedate="props">
+          <q-td :props="props">{{ formatDate(props.row.duedate) }}</q-td>
+        </template>
+        <template v-slot:body-cell-datepaid="props">
+          <q-td :props="props">{{ formatDate(props.row.datepaid) }}</q-td>
+        </template>
         <template v-slot:body-cell-created="props">
           <q-td :props="props">{{ formatTimestamp(props.row.created) }}</q-td>
         </template>
@@ -460,6 +469,7 @@ import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import {
   formatAmount,
+  formatDate,
   downloadReport,
   createPDF,
   formatTimestamp,

@@ -370,6 +370,9 @@
                   )
                 }}
               </span>
+              <span v-else-if="col.name === 'transdate'">
+                {{ formatDate(props.row.transdate) }}
+              </span>
               <span v-else-if="col.name === 'created'">
                 {{ formatTimestamp(props.row.created) }}
               </span>
@@ -422,6 +425,7 @@ import draggable from "vuedraggable";
 import { useI18n } from "vue-i18n";
 import {
   formatAmount,
+  formatDate,
   roundAmount,
   formatTimestamp,
   formatUpdatedTimestamp,
@@ -1027,6 +1031,7 @@ const downloadTransactions = () => {
       const newRow = displayColumns.value.map((col) => {
         if (col.name === "reference") return row.reference;
         if (col.name === "accno") return row.accno;
+        if (col.name === "transdate") return formatDate(row.transdate);
         if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
           return roundAmount(
             typeof col.field === "function" ? col.field(row) : row[col.field]
@@ -1113,6 +1118,7 @@ const createPDF = () => {
         displayColumns.value.map((col) => {
           if (col.name === "reference") return row.reference;
           if (col.name === "accno") return row.accno;
+          if (col.name === "transdate") return formatDate(row.transdate);
           if (numericColumns.includes(col.name)) {
             return formatAmount(
               typeof col.field === "function" ? col.field(row) : row[col.field]
