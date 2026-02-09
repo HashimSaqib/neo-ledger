@@ -98,9 +98,9 @@
             class="summary-card"
             :class="[
               `summary-card--${status}`,
-              { 'summary-card--active': activeStatus === status },
+              { 'summary-card--active': activeStatuses.includes(status) },
             ]"
-            @click="setActiveStatus(status)"
+            @click="toggleStatus(status)"
           >
             <div class="summary-card__header">
               <span class="summary-card__title">{{ card.title }}</span>
@@ -176,6 +176,8 @@
 
         <q-table
           v-if="activeTransactions.length > 0"
+          v-model:sort-by="sortBy"
+          v-model:sort-order="sortOrder"
           :rows="activeTransactions"
           :columns="columns"
           row-key="id"
@@ -245,6 +247,18 @@
               {{ formatDate(props.row.duedate) }}
             </q-td>
           </template>
+
+          <template v-slot:body-cell-status="props">
+            <q-td :props="props">
+              <span
+                v-if="props.row.status"
+                class="status-badge"
+                :class="`status-badge--${props.row.status}`"
+              >
+                {{ getStatusLabel(props.row.status) }}
+              </span>
+            </q-td>
+          </template>
         </q-table>
 
         <div v-else class="text-center q-py-lg mutedtext">
@@ -306,7 +320,9 @@ const loading = ref(false);
 const searched = ref(false);
 const vcList = ref([]);
 const overviewData = ref(null);
-const activeStatus = ref("open");
+const activeStatuses = ref(["open"]);
+const sortBy = ref("transdate");
+const sortOrder = ref("desc");
 
 const $q = useQuasar();
 const activeView = ref("overview");
@@ -586,10 +602,38 @@ watch(
 );
 
 const activeTransactions = computed(() => {
-  if (!overviewData.value?.transactions) return [];
-  return (
-    overviewData.value.transactions[activeStatus.value]?.transactions || []
-  );
+  if (!overviewData.value?.transactions || activeStatuses.value.length === 0)
+    return [];
+  const tx = overviewData.value.transactions;
+  const byId = new Map();
+  activeStatuses.value.forEach((status) => {
+    (tx[status]?.transactions || []).forEach((row) =>
+      byId.set(row.id, { ...row, status: row.status || status })
+    );
+  });
+  const rows = Array.from(byId.values());
+  const field = sortBy.value;
+  const desc = sortOrder.value === "desc";
+  const dateFields = ["transdate", "duedate"];
+  const numFields = ["totalamount", "amountpaid", "outstanding"];
+  rows.sort((a, b) => {
+    let aVal = a[field];
+    let bVal = b[field];
+    if (field === "outstanding") {
+      aVal = a.totalamount - a.amountpaid;
+      bVal = b.totalamount - b.amountpaid;
+    }
+    let cmp = 0;
+    if (dateFields.includes(field)) {
+      cmp = (aVal || "").localeCompare(bVal || "");
+    } else if (numFields.includes(field) || field === "outstanding") {
+      cmp = (Number(aVal) || 0) - (Number(bVal) || 0);
+    } else {
+      cmp = String(aVal ?? "").localeCompare(String(bVal ?? ""));
+    }
+    return desc ? -cmp : cmp;
+  });
+  return rows;
 });
 
 const activeStatusTitle = computed(() => {
@@ -599,7 +643,12 @@ const activeStatusTitle = computed(() => {
     closed: t("Closed Transactions"),
     overpaid: t("Overpaid Transactions"),
   };
-  return titles[activeStatus.value] || t("Transactions");
+  if (activeStatuses.value.length === 0) return t("Transactions");
+  if (activeStatuses.value.length === 1)
+    return titles[activeStatuses.value[0]] || t("Transactions");
+  return activeStatuses.value
+    .map((s) => getStatusLabel(s))
+    .join(", ");
 });
 
 const newInvoiceLink = computed(() => {
@@ -621,6 +670,13 @@ const newInvoiceLabel = computed(() => {
 });
 
 const columns = computed(() => [
+  {
+    name: "status",
+    label: t("Status"),
+    field: "status",
+    align: "left",
+    sortable: true,
+  },
   {
     name: "invnum",
     label: t("Invoice #"),
@@ -680,8 +736,13 @@ const columns = computed(() => [
   },
 ]);
 
-const setActiveStatus = (status) => {
-  activeStatus.value = status;
+const toggleStatus = (status) => {
+  const idx = activeStatuses.value.indexOf(status);
+  if (idx >= 0) {
+    activeStatuses.value = activeStatuses.value.filter((_, i) => i !== idx);
+  } else {
+    activeStatuses.value = [...activeStatuses.value, status];
+  }
 };
 
 const getStatusColor = (status) => {
@@ -798,12 +859,14 @@ const fetchOverview = async () => {
     overviewData.value = response.data;
     filtersOpen.value = false;
 
-    // set active status to first one that has transactions
-    const statuses = ["open", "overdue", "closed", "overpaid"];
-    for (const status of statuses) {
-      if (response.data.transactions[status]?.no > 0) {
-        activeStatus.value = status;
-        break;
+    // if no type selected, set to first one that has transactions
+    if (activeStatuses.value.length === 0) {
+      const statuses = ["open", "overdue", "closed", "overpaid"];
+      for (const status of statuses) {
+        if (response.data.transactions[status]?.no > 0) {
+          activeStatuses.value = [status];
+          break;
+        }
       }
     }
   } catch (error) {
@@ -1082,6 +1145,37 @@ onMounted(async () => {
     font-size: 0.75rem;
     color: var(--q-mutedtext);
     margin-top: 0.25rem;
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &--open {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+  }
+
+  &--overdue {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+  }
+
+  &--closed {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+  }
+
+  &--overpaid {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316;
   }
 }
 
