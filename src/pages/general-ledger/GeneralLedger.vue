@@ -370,6 +370,7 @@ import { date, Notify } from "quasar";
 import { useRoute, useRouter } from "vue-router";
 import {
   formatAmount,
+  roundAmount,
   confirmDelete,
   convertFilesToBase64,
 } from "src/helpers/utils";
@@ -421,7 +422,7 @@ const lines = ref([{ ...initialLine }, { ...initialLine }]);
 const transactionTitle = computed(() =>
   formData.value.id
     ? t("Update General Ledger Transaction")
-    : t("Add General Ledger Transaction")
+    : t("Add General Ledger Transaction"),
 );
 updateTitle(transactionTitle.value);
 
@@ -489,10 +490,14 @@ const toggleExtra = (index) => {
 };
 
 const totalDebit = computed(() =>
-  lines.value.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0)
+  roundAmount(
+    lines.value.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0),
+  ),
 );
 const totalCredit = computed(() =>
-  lines.value.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0)
+  roundAmount(
+    lines.value.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0),
+  ),
 );
 
 // Computed properties for conditional visibility
@@ -501,11 +506,11 @@ const canPost = computed(
     (!closedto.value ||
       !formData.value.originaldate ||
       formData.value.originaldate > closedto.value) &&
-    (!closedto.value || formData.value.transdate > closedto.value)
+    (!closedto.value || formData.value.transdate > closedto.value),
 );
 
 const canPostAsNew = computed(
-  () => !closedto.value || formData.value.transdate > closedto.value
+  () => !closedto.value || formData.value.transdate > closedto.value,
 );
 
 const canDelete = computed(
@@ -514,7 +519,7 @@ const canDelete = computed(
     (!closedto.value ||
       !formData.value.originaldate ||
       formData.value.originaldate > closedto.value) &&
-    revtrans.value != 1
+    revtrans.value != 1,
 );
 
 const lineTax = ref(false);
@@ -569,7 +574,7 @@ const filterTaxAccounts = () => {
           ? line.taxAccount.accno
           : line.taxAccount;
       const isValidTax = filteredTaxAccounts.value.some(
-        (tax) => tax.accno === taxAccNo
+        (tax) => tax.accno === taxAccNo,
       );
 
       if (!isValidTax) {
@@ -583,7 +588,7 @@ const filterTaxAccounts = () => {
   if (removedTaxes) {
     Notify.create({
       message: t(
-        "Some line taxes have been removed as they are no longer valid for the selected date."
+        "Some line taxes have been removed as they are no longer valid for the selected date.",
       ),
       type: "warning",
       position: "center",
@@ -596,7 +601,7 @@ watch(
   () => formData.value.transdate,
   () => {
     filterTaxAccounts();
-  }
+  },
 );
 
 // Add watch on offset account to remove existing lines when offset account is selected
@@ -606,13 +611,14 @@ watch(
     if (newOffsetAccount) {
       // Remove any existing lines that use the new offset account
       lines.value = lines.value.filter(
-        (line) => !line.account || line.account.accno !== newOffsetAccount.accno
+        (line) =>
+          !line.account || line.account.accno !== newOffsetAccount.accno,
       );
     } else if (oldOffsetAccount) {
       // When offset account is cleared, we don't need to do anything special
       // The filteredOpenAccounts computed property will handle showing all accounts again
     }
-  }
+  },
 );
 
 const projects = ref([]);
@@ -660,7 +666,7 @@ const fetchLinks = async () => {
   }
 };
 const openAccounts = computed(() =>
-  accounts.value.filter((account) => account.closed === 0)
+  accounts.value.filter((account) => account.closed === 0),
 );
 
 const filteredOpenAccounts = computed(() => {
@@ -668,7 +674,7 @@ const filteredOpenAccounts = computed(() => {
     return openAccounts.value;
   }
   return openAccounts.value.filter(
-    (account) => account.accno !== formData.value.offsetAccount.accno
+    (account) => account.accno !== formData.value.offsetAccount.accno,
   );
 });
 
@@ -771,7 +777,7 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
     } else {
       response = await api.post("/gl/transactions", payload, {
@@ -846,24 +852,24 @@ const loadTransaction = async (id) => {
         pending: transactionData.pending ? 1 : 0,
         offsetAccount: transactionData.offset_accno
           ? accounts.value.find(
-              (acc) => acc.accno === transactionData.offset_accno
+              (acc) => acc.accno === transactionData.offset_accno,
             )
           : null,
       };
       pending.value = transactionData.pending ? 1 : 0;
       if (departments.value?.length) {
         formData.value.selectedDepartment = departments.value.find(
-          (dpt) => dpt.id === transactionData.department_id
+          (dpt) => dpt.id === transactionData.department_id,
         );
       }
       formData.value.currency = currencies.value.find(
-        (curr) => curr.curr === transactionData.curr
+        (curr) => curr.curr === transactionData.curr,
       );
 
       // Filter out lines that use the offset account if it exists
       const filteredLines = transactionData.offset_accno
         ? transactionData.lines.filter(
-            (line) => line.accno !== transactionData.offset_accno
+            (line) => line.accno !== transactionData.offset_accno,
           )
         : transactionData.lines;
 
@@ -928,7 +934,7 @@ const deleteTransaction = async () => {
     const confirmed = await confirmDelete({
       title: t("Confirm Deletion"),
       message: t(
-        "Are you sure you want to delete this transaction? This action cannot be undone."
+        "Are you sure you want to delete this transaction? This action cannot be undone.",
       ),
     });
 
@@ -994,7 +1000,7 @@ const updateTaxAmount = (val, index) => {
     return;
   }
   const taxAcc = filteredTaxAccounts.value.find(
-    (item) => item.accno === val.accno
+    (item) => item.accno === val.accno,
   );
   if (!taxAcc || !taxAcc.rate) {
     lines.value[index].linetaxamount = 0;
@@ -1045,6 +1051,8 @@ onMounted(async () => {
   border-radius: 10px;
   border: 1px solid var(--q-border);
   font-weight: 600;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
 }
 </style>
