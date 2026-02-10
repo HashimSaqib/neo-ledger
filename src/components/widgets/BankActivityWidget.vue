@@ -396,8 +396,19 @@ watch(
   { deep: true }
 );
 
+// When loading becomes false, the chart section is in the DOM — init chart then
+watch(
+  () => props.loading,
+  async (loading) => {
+    if (!loading && hasData.value) {
+      await nextTick();
+      initChart();
+    }
+  }
+);
+
 onMounted(() => {
-  if (hasData.value) {
+  if (hasData.value && !props.loading) {
     nextTick(() => {
       initChart();
     });

@@ -70,25 +70,26 @@
       </div>
     </div>
 
-    <!-- Widgets Grid -->
-    <div class="widgets-grid" ref="gridRef">
-      <div
-        v-for="(widget, index) in visibleWidgets"
-        :key="widget.id"
-        class="widget-wrapper"
+    <!-- Widgets Grid (masonry: two columns, widgets stack in column to avoid row gaps) -->
+    <div class="widgets-grid widgets-grid--masonry" ref="gridRef">
+      <template v-if="visibleWidgets.length > 0">
+      <div class="masonry-column">
+        <div
+          v-for="(widget, colIndex) in leftColumnWidgets"
+          :key="widget.id"
+          class="widget-wrapper widget-wrapper--masonry"
         :class="[
-          `widget-wrapper--${getWidgetWidth(widget.id)}`,
           { 'widget-wrapper--dragging': draggingWidget === widget.id },
           { 'widget-wrapper--drag-over': dragOverWidget === widget.id },
         ]"
         :data-widget-id="widget.id"
-        :data-index="index"
+        :data-index="colIndex * 2"
         draggable="true"
-        @dragstart="onDragStart($event, widget, index)"
-        @dragenter="onDragEnter($event, widget, index)"
+        @dragstart="onDragStart($event, widget, colIndex * 2)"
+        @dragenter="onDragEnter($event, widget, colIndex * 2)"
         @dragover.prevent="onDragOver"
         @dragleave="onDragLeave"
-        @drop="onDrop($event, widget, index)"
+        @drop="onDrop($event, widget, colIndex * 2)"
         @dragend="onDragEnd"
       >
         <overview-widget
@@ -99,6 +100,28 @@
           :is-dragging="draggingWidget === widget.id"
           :period-type="config.period_type"
           @refresh="refreshWidget(widget.type)"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+        />
+        <top10-vc-widget
+          v-else-if="widget.type === 'top10_customers'"
+          type="customer"
+          :data="widgetData.ar_overview"
+          :previous-data="widgetData.ar_overview_previous"
+          :loading="widgetLoading.ar_overview"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          @refresh="refreshWidget('top10_customers')"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+        />
+        <top10-vc-widget
+          v-else-if="widget.type === 'top10_vendors'"
+          type="vendor"
+          :data="widgetData.ap_overview"
+          :previous-data="widgetData.ap_overview_previous"
+          :loading="widgetLoading.ap_overview"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          @refresh="refreshWidget('top10_vendors')"
           @toggle-visibility="toggleWidgetVisibility(widget.id)"
         />
         <bank-activity-widget
@@ -112,7 +135,73 @@
           @toggle-visibility="toggleWidgetVisibility(widget.id)"
           @update:selected-account-ids="setBankActivitySelectedIds($event)"
         />
+        </div>
       </div>
+      <div class="masonry-column">
+        <div
+          v-for="(widget, colIndex) in rightColumnWidgets"
+          :key="widget.id"
+          class="widget-wrapper widget-wrapper--masonry"
+        :class="[
+          { 'widget-wrapper--dragging': draggingWidget === widget.id },
+          { 'widget-wrapper--drag-over': dragOverWidget === widget.id },
+        ]"
+        :data-widget-id="widget.id"
+        :data-index="colIndex * 2 + 1"
+        draggable="true"
+        @dragstart="onDragStart($event, widget, colIndex * 2 + 1)"
+        @dragenter="onDragEnter($event, widget, colIndex * 2 + 1)"
+        @dragover.prevent="onDragOver"
+        @dragleave="onDragLeave"
+        @drop="onDrop($event, widget, colIndex * 2 + 1)"
+        @dragend="onDragEnd"
+      >
+        <overview-widget
+          v-if="widget.type === 'ar_overview' || widget.type === 'ap_overview'"
+          :type="widget.type === 'ar_overview' ? 'customer' : 'vendor'"
+          :data="widgetData[widget.type]"
+          :loading="widgetLoading[widget.type]"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          @refresh="refreshWidget(widget.type)"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+        />
+        <top10-vc-widget
+          v-else-if="widget.type === 'top10_customers'"
+          type="customer"
+          :data="widgetData.ar_overview"
+          :previous-data="widgetData.ar_overview_previous"
+          :loading="widgetLoading.ar_overview"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          @refresh="refreshWidget('top10_customers')"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+        />
+        <top10-vc-widget
+          v-else-if="widget.type === 'top10_vendors'"
+          type="vendor"
+          :data="widgetData.ap_overview"
+          :previous-data="widgetData.ap_overview_previous"
+          :loading="widgetLoading.ap_overview"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          @refresh="refreshWidget('top10_vendors')"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+        />
+        <bank-activity-widget
+          v-else-if="widget.type === 'bank_activity'"
+          :data="widgetData[widget.type]"
+          :loading="widgetLoading[widget.type]"
+          :is-dragging="draggingWidget === widget.id"
+          :period-type="config.period_type"
+          :selected-account-ids="getBankActivitySelectedIds()"
+          @refresh="refreshWidget(widget.type)"
+          @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          @update:selected-account-ids="setBankActivitySelectedIds($event)"
+        />
+        </div>
+      </div>
+      </template>
 
       <!-- Empty State -->
       <div v-if="visibleWidgets.length === 0" class="widgets-empty">
@@ -240,8 +329,10 @@ import { useI18n } from "vue-i18n";
 import { Notify, LocalStorage } from "quasar";
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
+import { getPreviousPeriod } from "src/helpers/utils";
 import OverviewWidget from "./OverviewWidget.vue";
 import BankActivityWidget from "./BankActivityWidget.vue";
+import Top10VcWidget from "./Top10VcWidget.vue";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -270,6 +361,8 @@ const draggedIndex = ref(null);
 const widgetWidths = reactive({
   ar_overview: "half",
   ap_overview: "half",
+  top10_customers: "half",
+  top10_vendors: "half",
   bank_activity: "half",
 });
 
@@ -292,12 +385,16 @@ const config = ref({
 const widgetData = ref({
   ar_overview: null,
   ap_overview: null,
+  ar_overview_previous: null,
+  ap_overview_previous: null,
   bank_activity: null,
 });
 
 const widgetLoading = ref({
   ar_overview: false,
   ap_overview: false,
+  top10_customers: false,
+  top10_vendors: false,
   bank_activity: false,
 });
 
@@ -357,6 +454,22 @@ const widgetDefinitions = [
     label: t("Accounts Payable Overview"),
     description: t("View vendor invoice status and trends"),
     icon: "trending_down",
+    permission: "vendor.overview",
+  },
+  {
+    id: "top10_customers",
+    type: "top10_customers",
+    label: t("Top 10 Customers"),
+    description: t("Top customers by % of sales in the selected period"),
+    icon: "people",
+    permission: "customer.overview",
+  },
+  {
+    id: "top10_vendors",
+    type: "top10_vendors",
+    label: t("Top 10 Vendors"),
+    description: t("Top vendors by % of purchases in the selected period"),
+    icon: "business",
     permission: "vendor.overview",
   },
   {
@@ -443,6 +556,14 @@ const visibleWidgets = computed(() => {
   return allWidgets.value
     .filter((w) => w.enabled && w.hasPermission)
     .sort((a, b) => a.order - b.order);
+});
+
+// Masonry: split into left/right columns so widgets stack vertically (no row gaps)
+const leftColumnWidgets = computed(() => {
+  return visibleWidgets.value.filter((_, index) => index % 2 === 0);
+});
+const rightColumnWidgets = computed(() => {
+  return visibleWidgets.value.filter((_, index) => index % 2 === 1);
 });
 
 const enabledWidgetsCount = computed(() => {
@@ -834,6 +955,42 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
       };
     }
 
+    // Fetch previous period for Top 10 trend comparison
+    const start = config.value.period.start;
+    const end = config.value.period.end;
+    if (start && end) {
+      const prev = getPreviousPeriod(
+        start,
+        end,
+        config.value.period_type
+      );
+      if (prev.start && prev.end) {
+        try {
+          const prevResponse = await api.get("/dashboard/widgets", {
+            params: {
+              transdatefrom: prev.start,
+              transdateto: prev.end,
+            },
+          });
+          if (prevResponse.data.customer_overview) {
+            widgetData.value.ar_overview_previous =
+              prevResponse.data.customer_overview;
+          }
+          if (prevResponse.data.vendor_overview) {
+            widgetData.value.ap_overview_previous =
+              prevResponse.data.vendor_overview;
+          }
+        } catch (prevErr) {
+          console.error("Error fetching previous period:", prevErr);
+          widgetData.value.ar_overview_previous = null;
+          widgetData.value.ap_overview_previous = null;
+        }
+      }
+    } else {
+      widgetData.value.ar_overview_previous = null;
+      widgetData.value.ap_overview_previous = null;
+    }
+
     emit("config-loaded", config.value);
   } catch (error) {
     console.error("Error fetching widget data:", error);
@@ -846,7 +1003,13 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
 };
 
 const refreshWidget = async (widgetType) => {
-  widgetLoading.value[widgetType] = true;
+  const loadingKey =
+    widgetType === "top10_customers"
+      ? "ar_overview"
+      : widgetType === "top10_vendors"
+        ? "ap_overview"
+        : widgetType;
+  widgetLoading.value[loadingKey] = true;
 
   const params = {};
   if (config.value.period.start) {
@@ -859,19 +1022,58 @@ const refreshWidget = async (widgetType) => {
   try {
     const response = await api.get("/dashboard/widgets", { params });
 
-    if (widgetType === "ar_overview" && response.data.customer_overview) {
-      widgetData.value.ar_overview = response.data.customer_overview;
+    if (widgetType === "ar_overview" || widgetType === "top10_customers") {
+      if (response.data.customer_overview) {
+        widgetData.value.ar_overview = response.data.customer_overview;
+      }
     }
-    if (widgetType === "ap_overview" && response.data.vendor_overview) {
-      widgetData.value.ap_overview = response.data.vendor_overview;
+    if (widgetType === "ap_overview" || widgetType === "top10_vendors") {
+      if (response.data.vendor_overview) {
+        widgetData.value.ap_overview = response.data.vendor_overview;
+      }
     }
-    if (
-      widgetType === "bank_activity" &&
-      response.data.bank_accounts
-    ) {
+    if (widgetType === "bank_activity" && response.data.bank_accounts) {
       widgetData.value.bank_activity = {
         bank_accounts: response.data.bank_accounts,
       };
+    }
+
+    // For Top 10 widgets, also fetch previous period for trend
+    if (
+      (widgetType === "top10_customers" || widgetType === "top10_vendors") &&
+      config.value.period.start &&
+      config.value.period.end
+    ) {
+      const prev = getPreviousPeriod(
+        config.value.period.start,
+        config.value.period.end,
+        config.value.period_type
+      );
+      if (prev.start && prev.end) {
+        try {
+          const prevResponse = await api.get("/dashboard/widgets", {
+            params: {
+              transdatefrom: prev.start,
+              transdateto: prev.end,
+            },
+          });
+          if (widgetType === "top10_customers" && prevResponse.data.customer_overview) {
+            widgetData.value.ar_overview_previous =
+              prevResponse.data.customer_overview;
+          }
+          if (widgetType === "top10_vendors" && prevResponse.data.vendor_overview) {
+            widgetData.value.ap_overview_previous =
+              prevResponse.data.vendor_overview;
+          }
+        } catch (prevErr) {
+          console.error("Error fetching previous period:", prevErr);
+          if (widgetType === "top10_customers") {
+            widgetData.value.ar_overview_previous = null;
+          } else {
+            widgetData.value.ap_overview_previous = null;
+          }
+        }
+      }
     }
   } catch (error) {
     console.error("Error refreshing widget:", error);
@@ -881,7 +1083,7 @@ const refreshWidget = async (widgetType) => {
       position: "top",
     });
   } finally {
-    widgetLoading.value[widgetType] = false;
+    widgetLoading.value[loadingKey] = false;
   }
 };
 
@@ -1044,6 +1246,22 @@ watch(
   min-height: 300px;
 }
 
+/* Masonry: two columns, widgets stack in column to avoid gaps when one widget is taller */
+.widgets-grid--masonry {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.masonry-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .widget-wrapper {
   transition: all 0.3s ease;
   cursor: grab;
@@ -1054,6 +1272,10 @@ watch(
 
   &--half {
     width: calc(50% - 0.5rem);
+  }
+
+  &--masonry {
+    width: 100%;
   }
 
   &--dragging {
@@ -1074,6 +1296,14 @@ watch(
 
 @media (max-width: 1024px) {
   .widget-wrapper--half {
+    width: 100%;
+  }
+
+  .widgets-grid--masonry {
+    flex-direction: column;
+  }
+
+  .widgets-grid--masonry .widget-wrapper--masonry {
     width: 100%;
   }
 }

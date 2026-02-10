@@ -362,8 +362,20 @@ watch(
   { deep: true }
 );
 
+// When loading becomes false, the chart section is finally in the DOM — init chart then
+// (on date change we update data while still loading, so initChart() runs with canvas null)
+watch(
+  () => props.loading,
+  async (loading) => {
+    if (!loading && hasData.value) {
+      await nextTick();
+      initChart();
+    }
+  }
+);
+
 onMounted(() => {
-  if (hasData.value) {
+  if (hasData.value && !props.loading) {
     nextTick(() => {
       initChart();
     });

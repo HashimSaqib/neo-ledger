@@ -139,6 +139,67 @@ export const formatDate = (dateStr) => {
   return `${match[3]}.${match[2]}.${match[1]}`;
 };
 
+/**
+ * Get the previous period date range given current start, end and period type.
+ * Used for period-over-period comparison (e.g. this month vs last month).
+ * @param {string} start - Start date YYYY-MM-DD
+ * @param {string} end - End date YYYY-MM-DD
+ * @param {string} periodType - "daily" | "monthly" | "quarterly" | "yearly"
+ * @returns {{ start: string, end: string }} Previous period in YYYY-MM-DD
+ */
+export const getPreviousPeriod = (start, end, periodType) => {
+  if (!start || !end) return { start: "", end: "" };
+  const startDate = new Date(start + "T00:00:00");
+  const endDate = new Date(end + "T00:00:00");
+  const year = startDate.getFullYear();
+  const month = startDate.getMonth();
+
+  if (periodType === "yearly") {
+    const prevStart = new Date(year - 1, 0, 1);
+    const prevEnd = new Date(year - 1, 11, 31);
+    return {
+      start: prevStart.toISOString().slice(0, 10),
+      end: prevEnd.toISOString().slice(0, 10),
+    };
+  }
+  if (periodType === "quarterly") {
+    const quarter = Math.floor(month / 3) + 1;
+    const qStartMonth = (quarter - 1) * 3;
+    let prevQ, prevYear;
+    if (quarter === 1) {
+      prevQ = 4;
+      prevYear = year - 1;
+    } else {
+      prevQ = quarter - 1;
+      prevYear = year;
+    }
+    const prevStart = new Date(prevYear, (prevQ - 1) * 3, 1);
+    const prevEnd = new Date(prevYear, (prevQ - 1) * 3 + 3, 0);
+    return {
+      start: prevStart.toISOString().slice(0, 10),
+      end: prevEnd.toISOString().slice(0, 10),
+    };
+  }
+  if (periodType === "monthly") {
+    const prevStart = new Date(year, month - 1, 1);
+    const prevEnd = new Date(year, month, 0);
+    return {
+      start: prevStart.toISOString().slice(0, 10),
+      end: prevEnd.toISOString().slice(0, 10),
+    };
+  }
+  // daily: same length, ending the day before current start
+  const days = Math.round((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
+  const prevEnd = new Date(startDate);
+  prevEnd.setDate(prevEnd.getDate() - 1);
+  const prevStart = new Date(prevEnd);
+  prevStart.setDate(prevStart.getDate() - days + 1);
+  return {
+    start: prevStart.toISOString().slice(0, 10),
+    end: prevEnd.toISOString().slice(0, 10),
+  };
+};
+
 // Parse a formatted amount string back to a number based on the current number format
 export const parseAmount = (amountString) => {
   if (!amountString || typeof amountString !== "string") return 0;
