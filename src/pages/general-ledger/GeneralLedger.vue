@@ -85,10 +85,34 @@
           clearable
           @update:model-value="handleOffsetAccountChange"
         />
+        <!-- Offset Tax Account (when offset account is selected) -->
+        <s-select
+          v-if="formData.offsetAccount && lineTax"
+          outlined
+          v-model="formData.offsetTaxAccount"
+          :options="filteredTaxAccounts"
+          option-label="label"
+          :label="t('Offset Tax Account')"
+          dense
+          class="col-3"
+          popup-content-class="mainbg maintext"
+          bg-color="input"
+          label-color="secondary"
+          search="label"
+          clearable
+          :error="offsetTaxAccountError"
+          :error-message="
+            offsetTaxAccountError
+              ? t(
+                  'Offset Tax Account is required when offset account is selected, tax is excluded, and lines have tax.',
+                )
+              : undefined
+          "
+        />
         <!-- Offset Account Totals -->
         <template v-if="formData.offsetAccount" class="q-my-none">
           <text-input
-            :model-value="formatAmount(totalCredit)"
+            :model-value="formatAmount(offsetDebit)"
             :label="t('Debit')"
             class="col-2"
             outlined
@@ -96,8 +120,17 @@
             readonly
           />
           <text-input
-            :model-value="formatAmount(totalDebit)"
+            :model-value="formatAmount(offsetCredit)"
             :label="t('Credit')"
+            class="col-2"
+            outlined
+            dense
+            readonly
+          />
+          <text-input
+            v-if="lineTax"
+            :model-value="formatAmount(offsetTaxAmount)"
+            :label="t('Tax Amount')"
             class="col-2"
             outlined
             dense
@@ -171,6 +204,7 @@
         <h5 class="container-title" style="margin-bottom: 0">
           Journal Entries
         </h5>
+
         <s-button type="add-line" @click="addLine" />
       </div>
 
@@ -206,6 +240,12 @@
             outlined
             dense
             @keydown.enter="handleEnter($event, index)"
+            @update:model-value="
+              () =>
+                lineTax &&
+                line.taxAccount &&
+                updateTaxAmount(line.taxAccount, index)
+            "
           />
           <!-- Credit input -->
           <fn-input
@@ -217,6 +257,12 @@
             outlined
             dense
             @keydown.enter="handleEnter($event, index)"
+            @update:model-value="
+              () =>
+                lineTax &&
+                line.taxAccount &&
+                updateTaxAmount(line.taxAccount, index)
+            "
           />
           <!-- Tax fields if Linetax is enabled -->
           <template v-if="lineTax">
@@ -307,20 +353,16 @@
           {{ t("Total") }}
         </div>
         <div class="q-pa-sm col-2">
-          {{ formatAmount(totalDebit) }}
+          {{ formatAmount(displayTotalDebit) }}
         </div>
         <div class="q-pa-sm col-2">
-          {{ formatAmount(totalCredit) }}
+          {{ formatAmount(displayTotalCredit) }}
         </div>
         <div
           class="q-pa-sm col-2 text-bold"
-          :class="
-            !formData.offsetAccount && totalDebit - totalCredit == 0
-              ? 'text-positive'
-              : 'text-negative'
-          "
+          :class="isTotalBalanced ? 'text-positive' : 'text-negative'"
         >
-          {{ formatAmount(totalDebit - totalCredit) }}
+          {{ formatAmount(displayTotalDebit - displayTotalCredit) }}
         </div>
       </div>
 
@@ -335,6 +377,12 @@
         :false-value="0"
       />
       <div class="q-gutter-x-sm">
+        <q-checkbox
+          v-if="lineTax"
+          v-model="formData.taxIncluded"
+          :label="t('Tax Included')"
+          @update:model-value="recalculateAllLineTaxAmounts"
+        />
         <s-button type="delete" v-if="canDelete" @click="deleteTransaction" />
         <s-button
           type="secondary"
@@ -342,6 +390,13 @@
           icon="swap_horiz"
           v-if="formData.id"
           @click="reverseTransaction"
+        />
+        <s-button
+          type="secondary"
+          :label="t('Reverse charge')"
+          icon="account_balance"
+          v-if="showReverseChargeButton"
+          @click="applyReverseCharge"
         />
 
         <s-button type="new-number" v-if="canPostAsNew" @click="newNumber" />
@@ -400,7 +455,9 @@ const initialFormData = {
   id: null,
   files: [],
   offsetAccount: null,
+  offsetTaxAccount: null,
   pending: 0,
+  taxIncluded: false,
 };
 
 const initialLine = {
@@ -449,12 +506,6 @@ const isEmptyLine = (line) => {
 };
 
 const addLine = () => {
-  if (lines.value.length > 1) {
-    const emptyIndex = lines.value.findIndex((line) => isEmptyLine(line));
-    if (emptyIndex > -1) {
-      lines.value.splice(emptyIndex, 1);
-    }
-  }
   lines.value.push({ ...initialLine });
 };
 
@@ -489,16 +540,239 @@ const toggleExtra = (index) => {
   lines.value[index].showExtra = !lines.value[index].showExtra;
 };
 
-const totalDebit = computed(() =>
+const totalDebit = computed(() => {
+  const sumDebits = lines.value.reduce(
+    (sum, line) => sum + parseFloat(line.debit || 0),
+    0,
+  );
+  if (!formData.value.taxIncluded && lineTax.value) {
+    const taxOnDebits = lines.value.reduce(
+      (sum, line) =>
+        sum +
+        (parseFloat(line.debit || 0) > 0
+          ? parseFloat(line.linetaxamount || 0)
+          : 0),
+      0,
+    );
+    return roundAmount(sumDebits + taxOnDebits);
+  }
+  return roundAmount(sumDebits);
+});
+const totalCredit = computed(() => {
+  const sumCredits = lines.value.reduce(
+    (sum, line) => sum + parseFloat(line.credit || 0),
+    0,
+  );
+  if (!formData.value.taxIncluded && lineTax.value) {
+    const taxOnCredits = lines.value.reduce(
+      (sum, line) =>
+        sum +
+        (parseFloat(line.credit || 0) > 0
+          ? parseFloat(line.linetaxamount || 0)
+          : 0),
+      0,
+    );
+    return roundAmount(sumCredits + taxOnCredits);
+  }
+  return roundAmount(sumCredits);
+});
+
+// Line tax sums (tax on debit lines vs credit lines) for offset tax calculation
+const taxOnDebits = computed(() =>
   roundAmount(
-    lines.value.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0),
+    lines.value.reduce(
+      (sum, line) =>
+        sum +
+        (parseFloat(line.debit || 0) > 0
+          ? parseFloat(line.linetaxamount || 0)
+          : 0),
+      0,
+    ),
   ),
 );
-const totalCredit = computed(() =>
+const taxOnCredits = computed(() =>
   roundAmount(
-    lines.value.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0),
+    lines.value.reduce(
+      (sum, line) =>
+        sum +
+        (parseFloat(line.credit || 0) > 0
+          ? parseFloat(line.linetaxamount || 0)
+          : 0),
+      0,
+    ),
   ),
 );
+
+// Offset tax amount: total of line tax amounts attributed to the offset side (proportional to debit/credit difference)
+const offsetTaxAmount = computed(() => {
+  if (!formData.value.offsetAccount || !lineTax.value) return 0;
+  const debits = totalDebit.value;
+  const credits = totalCredit.value;
+  if (debits > credits) {
+    // Offset is credit; attribute proportion of debit-side tax to offset
+    if (debits <= 0) return 0;
+    return roundAmount(((debits - credits) / debits) * taxOnDebits.value);
+  }
+  if (credits > debits) {
+    // Offset is debit; attribute proportion of credit-side tax to offset
+    if (credits <= 0) return 0;
+    return roundAmount(((credits - debits) / credits) * taxOnCredits.value);
+  }
+  return 0;
+});
+
+// Offset account entry: debit and credit sides (include offset tax on debit side so transaction balances)
+const offsetDebit = computed(() => {
+  if (!formData.value.offsetAccount) return 0;
+  return roundAmount(
+    totalCredit.value +
+      (formData.value.offsetTaxAccount && lineTax.value
+        ? offsetTaxAmount.value
+        : 0),
+  );
+});
+
+const offsetCredit = computed(() => {
+  if (!formData.value.offsetAccount) return 0;
+  return roundAmount(totalDebit.value);
+});
+
+// Display totals: when offset selected, include offset + offset tax so the total row shows balanced
+const displayTotalDebit = computed(() => {
+  if (!formData.value.offsetAccount) return totalDebit.value;
+  return roundAmount(totalDebit.value + offsetDebit.value);
+});
+
+const displayTotalCredit = computed(() => {
+  if (!formData.value.offsetAccount) return totalCredit.value;
+  const offsetTax =
+    formData.value.offsetTaxAccount && lineTax.value
+      ? offsetTaxAmount.value
+      : 0;
+  return roundAmount(totalCredit.value + offsetCredit.value + offsetTax);
+});
+
+const isTotalBalanced = computed(() => {
+  if (formData.value.offsetAccount) {
+    return displayTotalDebit.value === displayTotalCredit.value;
+  }
+  return totalDebit.value === totalCredit.value;
+});
+
+// Offset tax account is required when: offset selected, tax excluded, and any line has a tax account
+const anyLineHasTaxAccount = computed(() =>
+  lines.value.some((line) => {
+    if (!line.taxAccount) return false;
+    const accno =
+      typeof line.taxAccount === "object"
+        ? line.taxAccount?.accno
+        : String(line.taxAccount).trim();
+    return !!accno;
+  }),
+);
+
+const offsetTaxAccountRequired = computed(
+  () =>
+    formData.value.offsetAccount &&
+    !formData.value.taxIncluded &&
+    lineTax.value &&
+    anyLineHasTaxAccount.value,
+);
+
+const offsetTaxAccountError = computed(
+  () => offsetTaxAccountRequired.value && !formData.value.offsetTaxAccount,
+);
+
+// Reverse charge: tax accnos for debit side and credit/offset side
+const REVERSE_CHARGE_DEBIT_ACCNO = "11760";
+const REVERSE_CHARGE_CREDIT_ACCNO = "22040";
+
+const reverseChargeAccountsAvailable = computed(() => {
+  if (!filteredTaxAccounts.value?.length) {
+    console.log(
+      "[Reverse charge] reverseChargeAccountsAvailable: false (no filteredTaxAccounts)",
+    );
+    return false;
+  }
+  const accnos = filteredTaxAccounts.value.map((t) => t.accno);
+  console.log("[Reverse charge] reverseChargeAccountsAvailable:", accnos);
+  const hasDebit = accnos.includes(REVERSE_CHARGE_DEBIT_ACCNO);
+  const hasCredit = accnos.includes(REVERSE_CHARGE_CREDIT_ACCNO);
+  const result = hasDebit && hasCredit;
+  console.log("[Reverse charge] reverseChargeAccountsAvailable:", {
+    accnos,
+    requiredDebit: REVERSE_CHARGE_DEBIT_ACCNO,
+    requiredCredit: REVERSE_CHARGE_CREDIT_ACCNO,
+    hasDebit,
+    hasCredit,
+    result,
+  });
+  return result;
+});
+
+// Case 1: exactly two lines, one debit and one credit
+const isReverseChargeTwoLines = computed(() => {
+  if (lines.value.length !== 2) {
+    console.log(
+      "[Reverse charge] isReverseChargeTwoLines: false (line count !== 2)",
+      {
+        lineCount: lines.value.length,
+      },
+    );
+    return false;
+  }
+  const [a, b] = lines.value;
+  const aDebit = parseFloat(a.debit || 0) > 0;
+  const aCredit = parseFloat(a.credit || 0) > 0;
+  const bDebit = parseFloat(b.debit || 0) > 0;
+  const bCredit = parseFloat(b.credit || 0) > 0;
+  const result =
+    (aDebit && !aCredit && !bDebit && bCredit) ||
+    (bDebit && !bCredit && !aDebit && aCredit);
+  console.log("[Reverse charge] isReverseChargeTwoLines:", {
+    a: { debit: a.debit, credit: a.credit, aDebit, aCredit },
+    b: { debit: b.debit, credit: b.credit, bDebit, bCredit },
+    result,
+  });
+  return result;
+});
+
+// Case 2: multiple lines, all debit, and offset account selected
+const isReverseChargeOffsetCase = computed(() => {
+  if (lines.value.length < 2 || !formData.value.offsetAccount) {
+    console.log("[Reverse charge] isReverseChargeOffsetCase: false", {
+      lineCount: lines.value.length,
+      hasOffsetAccount: !!formData.value.offsetAccount,
+    });
+    return false;
+  }
+  const allDebitNoCredit = lines.value.every(
+    (line) =>
+      parseFloat(line.debit || 0) > 0 && parseFloat(line.credit || 0) === 0,
+  );
+  console.log("[Reverse charge] isReverseChargeOffsetCase:", {
+    lineCount: lines.value.length,
+    lines: lines.value.map((l) => ({ debit: l.debit, credit: l.credit })),
+    allDebitNoCredit,
+  });
+  return allDebitNoCredit;
+});
+
+const showReverseChargeButton = computed(() => {
+  const lineTaxOk = !!lineTax.value;
+  const accountsOk = reverseChargeAccountsAvailable.value;
+  const twoLines = isReverseChargeTwoLines.value;
+  const offsetCase = isReverseChargeOffsetCase.value;
+  const result = lineTaxOk && accountsOk && (twoLines || offsetCase);
+  console.log("[Reverse charge] showReverseChargeButton:", {
+    lineTax: lineTaxOk,
+    reverseChargeAccountsAvailable: accountsOk,
+    isReverseChargeTwoLines: twoLines,
+    isReverseChargeOffsetCase: offsetCase,
+    result,
+  });
+  return result;
+});
 
 // Computed properties for conditional visibility
 const canPost = computed(
@@ -604,22 +878,10 @@ watch(
   },
 );
 
-// Add watch on offset account to remove existing lines when offset account is selected
-watch(
-  () => formData.value.offsetAccount,
-  (newOffsetAccount, oldOffsetAccount) => {
-    if (newOffsetAccount) {
-      // Remove any existing lines that use the new offset account
-      lines.value = lines.value.filter(
-        (line) =>
-          !line.account || line.account.accno !== newOffsetAccount.accno,
-      );
-    } else if (oldOffsetAccount) {
-      // When offset account is cleared, we don't need to do anything special
-      // The filteredOpenAccounts computed property will handle showing all accounts again
-    }
-  },
-);
+// When offset account is selected, we do NOT remove lines that use that account.
+// filteredOpenAccounts already excludes the offset account, so it cannot be
+// chosen for new or edited lines. Existing lines keep their accounts; if one
+// already has the offset account, the user can change it manually.
 
 const projects = ref([]);
 const filteredProjects = ref([]);
@@ -706,6 +968,18 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
     return;
   }
 
+  // When offset is selected, tax is excluded, and any line has tax: offset tax account is required
+  if (offsetTaxAccountRequired.value && !formData.value.offsetTaxAccount) {
+    Notify.create({
+      message: t(
+        "Offset Tax Account is required when offset account is selected, tax is excluded, and lines have tax.",
+      ),
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
   loading.value = true;
 
   const linesData = lines.value.map((line) => {
@@ -764,9 +1038,19 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
         : undefined,
       files: base64Files,
       pending: pending.value,
+      taxincluded: formData.value.taxIncluded,
       offset_accno: formData.value.offsetAccount
         ? formData.value.offsetAccount.accno
         : undefined,
+      offset_tax_accno: formData.value.offsetTaxAccount
+        ? typeof formData.value.offsetTaxAccount === "object"
+          ? formData.value.offsetTaxAccount.accno
+          : formData.value.offsetTaxAccount
+        : undefined,
+      offset_tax_amount:
+        formData.value.offsetAccount && formData.value.offsetTaxAccount
+          ? offsetTaxAmount.value
+          : undefined,
     };
     let response;
     if (formData.value.id && !isNew) {
@@ -801,6 +1085,8 @@ const submitTransaction = async (clearAfter = false, isNew = false) => {
       }
       formData.value.selectedDepartment = null;
       formData.value.offsetAccount = null;
+      formData.value.offsetTaxAccount = null;
+      formData.value.taxIncluded = false;
       lines.value = [{ ...initialLine }, { ...initialLine }];
       existingFiles.value = [];
       pending.value = 0;
@@ -850,10 +1136,19 @@ const loadTransaction = async (id) => {
         originaldate: transactionData.transdate,
         exchangeRate: transactionData.exchangeRate,
         pending: transactionData.pending ? 1 : 0,
+        taxIncluded:
+          transactionData.taxincluded !== undefined
+            ? !!transactionData.taxincluded
+            : false,
         offsetAccount: transactionData.offset_accno
           ? accounts.value.find(
               (acc) => acc.accno === transactionData.offset_accno,
             )
+          : null,
+        offsetTaxAccount: transactionData.offset_tax_accno
+          ? (taxAccounts.value.find(
+              (t) => t.accno === transactionData.offset_tax_accno,
+            ) ?? null)
           : null,
       };
       pending.value = transactionData.pending ? 1 : 0;
@@ -929,6 +1224,48 @@ const reverseTransaction = () => {
   });
 };
 
+const applyReverseCharge = () => {
+  const debitTax = filteredTaxAccounts.value.find(
+    (t) => t.accno === REVERSE_CHARGE_DEBIT_ACCNO,
+  );
+  const creditTax = filteredTaxAccounts.value.find(
+    (t) => t.accno === REVERSE_CHARGE_CREDIT_ACCNO,
+  );
+  if (!debitTax || !creditTax) {
+    Notify.create({
+      message: t("Reverse charge tax accounts not found."),
+      type: "negative",
+      position: "top-right",
+    });
+    return;
+  }
+
+  if (isReverseChargeTwoLines.value) {
+    const [a, b] = lines.value;
+    const aIsDebit =
+      parseFloat(a.debit || 0) > 0 && parseFloat(a.credit || 0) === 0;
+    if (aIsDebit) {
+      a.taxAccount = debitTax;
+      b.taxAccount = creditTax;
+    } else {
+      b.taxAccount = debitTax;
+      a.taxAccount = creditTax;
+    }
+  } else if (isReverseChargeOffsetCase.value) {
+    lines.value.forEach((line) => {
+      line.taxAccount = debitTax;
+    });
+    formData.value.offsetTaxAccount = creditTax;
+  }
+
+  recalculateAllLineTaxAmounts();
+  Notify.create({
+    message: t("Reverse charge applied. Please review tax amounts and post."),
+    type: "positive",
+    position: "top-right",
+  });
+};
+
 const deleteTransaction = async () => {
   try {
     const confirmed = await confirmDelete({
@@ -985,6 +1322,8 @@ const resetForm = () => {
   formData.value.selectedDepartment = null;
   formData.value.originaldate = null;
   formData.value.offsetAccount = null;
+  formData.value.offsetTaxAccount = null;
+  formData.value.taxIncluded = false;
   lines.value = [{ ...initialLine }, { ...initialLine }];
   existingFiles.value = [];
   pending.value = 0;
@@ -1019,13 +1358,36 @@ const updateTaxAmount = (val, index) => {
     return;
   }
 
-  // Tax amount is the rate applied on the whole amount
-  lines.value[index].linetaxamount = grossAmount * taxAcc.rate;
+  const rate = taxAcc.rate;
+  if (formData.value.taxIncluded) {
+    // Tax included: amount already contains tax → tax = amount - amount/(1+rate) = amount * rate / (1+rate)
+    lines.value[index].linetaxamount = roundAmount(
+      grossAmount - grossAmount / (1 + rate),
+    );
+  } else {
+    // Tax excluded: amount is before tax → tax = amount * rate
+    lines.value[index].linetaxamount = roundAmount(grossAmount * rate);
+  }
+};
+
+const recalculateAllLineTaxAmounts = () => {
+  lines.value.forEach((line, index) => {
+    if (line.taxAccount) {
+      const val =
+        typeof line.taxAccount === "object"
+          ? line.taxAccount
+          : filteredTaxAccounts.value.find(
+              (t) => t.accno === line.taxAccount || t.label === line.taxAccount,
+            );
+      if (val) updateTaxAmount(val, index);
+    }
+  });
 };
 
 const handleOffsetAccountChange = (val) => {
   if (!val) {
     formData.value.offsetAccount = null;
+    formData.value.offsetTaxAccount = null;
     return;
   }
   const foundAccount = accounts.value.find((acc) => acc.accno === val.accno);
@@ -1033,6 +1395,7 @@ const handleOffsetAccountChange = (val) => {
     formData.value.offsetAccount = foundAccount;
   } else {
     formData.value.offsetAccount = null;
+    formData.value.offsetTaxAccount = null;
   }
 };
 
