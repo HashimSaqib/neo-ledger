@@ -83,19 +83,19 @@
         <p>
           {{
             t(
-              "All shortcut Use Ctrl + Shift as the base key. For dropdowns, use arrow key or search and press enter to select. Value will be copied to the cell and clipboard."
+              "All shortcut Use Ctrl + Shift as the base key. For dropdowns, use arrow key or search and press enter to select. Value will be copied to the cell and clipboard.",
             )
           }}
           <br />
           <span class="text-weight-bold">Ctrl + Shift + N</span> -
           {{
             t(
-              "Next Number (GL Number, Invoice Number or Customer/Vendor Number)"
+              "Next Number (GL Number, Invoice Number or Customer/Vendor Number)",
             )
           }}
           <br />
           <span class="text-weight-bold">Ctrl + Shift + T</span> -
-          {{ t("Today's Date in yyyy-mm-dd.") }}
+          {{ t("Today's date (display format).") }}
           <br />
         </p>
       </div>
@@ -303,6 +303,7 @@ import { api } from "src/boot/axios";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 import { date } from "quasar";
+import { formatDate as formatDateDisplay } from "src/helpers/utils";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -379,13 +380,13 @@ const entityColumns = [
   { title: t("SIC Code"), key: "sic_code", required: false, default: false },
   { title: t("Currency"), key: "curr", required: true, default: true },
   {
-    title: t("Start Date (yyyy-mm-dd)"),
+    title: t("Start Date"),
     key: "startdate",
     required: true,
     default: false,
   },
   {
-    title: t("End Date (yyyy-mm-dd)"),
+    title: t("End Date"),
     key: "enddate",
     required: false,
     default: false,
@@ -501,13 +502,13 @@ const invoiceColumns = [
     default: true,
   },
   {
-    title: t("Invoice Date (yyyy-mm-dd)"),
+    title: t("Invoice Date"),
     key: "invdate",
     required: true,
     default: true,
   },
   {
-    title: t("Due Date (yyyy-mm-dd)"),
+    title: t("Due Date"),
     key: "duedate",
     required: true,
     default: true,
@@ -605,13 +606,13 @@ const transactionColumns = [
     default: true,
   },
   {
-    title: t("Invoice Date (yyyy-mm-dd)"),
+    title: t("Invoice Date"),
     key: "invdate",
     required: true,
     default: true,
   },
   {
-    title: t("Due Date (yyyy-mm-dd)"),
+    title: t("Due Date"),
     key: "duedate",
     required: true,
     default: true,
@@ -690,7 +691,7 @@ const transactionColumns = [
     default: false,
   },
   {
-    title: t("Payment Date (yyyy-mm-dd)"),
+    title: t("Payment Date"),
     key: "payment_date",
     required: false,
     default: false,
@@ -751,7 +752,7 @@ const importConfigs = {
         default: true,
       },
       {
-        title: t("Trans Date (yyyy-mm-dd)"),
+        title: t("Trans Date"),
         key: "transdate",
         required: true,
         default: true,
@@ -834,6 +835,12 @@ const importConfigs = {
         default: true,
       },
       ...invoiceColumns,
+      {
+        title: t("DCN"),
+        key: "dcn",
+        required: false,
+        default: false,
+      },
     ],
   },
   ap_invoice: {
@@ -953,7 +960,7 @@ watch(
   () => {
     initializeColumns();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -968,8 +975,8 @@ watch(
       spreadsheetData.value.length > 0
         ? [...spreadsheetData.value]
         : currentRawData.length > 0
-        ? [...currentRawData]
-        : [];
+          ? [...currentRawData]
+          : [];
 
     const isInitialOrDataEmpty = !oldVisible || dataToProcess.length === 0;
 
@@ -989,7 +996,7 @@ watch(
         const newRow = [];
         newVisible.forEach((newColConfig) => {
           const oldColIndex = actualOldVisible.findIndex(
-            (oldColConfig) => oldColConfig.key === newColConfig.key
+            (oldColConfig) => oldColConfig.key === newColConfig.key,
           );
           if (oldColIndex !== -1 && oldColIndex < rowData.length) {
             newRow.push(rowData[oldColIndex]);
@@ -1004,7 +1011,7 @@ watch(
 
     refreshSpreadsheet();
   },
-  { deep: false }
+  { deep: false },
 );
 
 const addLines = () => {
@@ -1052,7 +1059,7 @@ const openAccounts = computed(() => {
   const type = importType.value;
   if (type === "gl") {
     return repositories.accounts.value.filter(
-      (account) => account.closed === 0 && account.charttype === "A"
+      (account) => account.closed === 0 && account.charttype === "A",
     );
   }
 
@@ -1183,7 +1190,8 @@ const parseNumber = (value) => {
   return 0;
 };
 
-const formatDate = (dateString) => {
+/** Parses various date inputs and returns YYYY-MM-DD for API/storage. */
+const parseDateToApi = (dateString) => {
   if (!dateString) return "";
 
   try {
@@ -1249,7 +1257,7 @@ const formatDate = (dateString) => {
       return "";
     }
   } catch (error) {
-    console.error(`Error formatting date: ${dateString}`, error);
+    console.error(`Error parsing date: ${dateString}`, error);
     return "";
   }
 };
@@ -1259,7 +1267,7 @@ const coreValidationRules = {
     if (!value)
       return { valid: false, message: t("Account number is required") };
     const valid = repositories.accounts.value.some(
-      (account) => account.accno === value
+      (account) => account.accno === value,
     );
     return {
       valid,
@@ -1270,7 +1278,7 @@ const coreValidationRules = {
   partExists: (value) => {
     if (!value) return { valid: false, message: t("Part number is required") };
     const valid = repositories.parts.value.some(
-      (part) => part.partnumber === value
+      (part) => part.partnumber === value,
     );
     return {
       valid,
@@ -1282,7 +1290,7 @@ const coreValidationRules = {
     if (!value)
       return { valid: false, message: t("Customer number is required") };
     const valid = repositories.customers.value.some(
-      (customer) => customer.customernumber === value
+      (customer) => customer.customernumber === value,
     );
     return {
       valid,
@@ -1294,7 +1302,7 @@ const coreValidationRules = {
     if (!value)
       return { valid: false, message: t("Vendor number is required") };
     const valid = repositories.vendors.value.some(
-      (vendor) => vendor.vendornumber === value
+      (vendor) => vendor.vendornumber === value,
     );
     return {
       valid,
@@ -1305,7 +1313,7 @@ const coreValidationRules = {
   projectExists: (value) => {
     if (!value) return { valid: true, message: "" };
     const valid = repositories.projects.value.some(
-      (project) => project.projectnumber === value
+      (project) => project.projectnumber === value,
     );
     return {
       valid,
@@ -1316,7 +1324,7 @@ const coreValidationRules = {
   currencyExists: (value) => {
     if (!value) return { valid: false, message: t("Currency is required") };
     const valid = repositories.currencies.value.some(
-      (curr) => curr.curr === value
+      (curr) => curr.curr === value,
     );
     return {
       valid,
@@ -1329,7 +1337,7 @@ const coreValidationRules = {
       return { valid: false, message: t("Currency must be provided first") };
 
     const currencyObj = repositories.currencies.value.find(
-      (curr) => curr.curr === currency
+      (curr) => curr.curr === currency,
     );
     if (!currencyObj) return { valid: false, message: t("Currency not found") };
 
@@ -1389,13 +1397,11 @@ const entityValidationRules = [
     field: "startdate",
     rule: (value) => {
       if (!value) return { valid: true, message: "" };
-      const formattedDate = formatDate(value);
+      const apiDate = parseDateToApi(value);
       return {
-        valid: formattedDate !== "",
+        valid: apiDate !== "",
         message:
-          formattedDate === ""
-            ? t("Invalid date format. Use yyyy-mm-dd format.")
-            : "",
+          apiDate === "" ? t("Invalid date format. Enter a valid date.") : "",
       };
     },
   },
@@ -1403,13 +1409,11 @@ const entityValidationRules = [
     field: "enddate",
     rule: (value) => {
       if (!value) return { valid: true, message: "" };
-      const formattedDate = formatDate(value);
+      const apiDate = parseDateToApi(value);
       return {
-        valid: formattedDate !== "",
+        valid: apiDate !== "",
         message:
-          formattedDate === ""
-            ? t("Invalid date format. Use yyyy-mm-dd format.")
-            : "",
+          apiDate === "" ? t("Invalid date format. Enter a valid date.") : "",
       };
     },
   },
@@ -1438,12 +1442,12 @@ const validationConfigs = {
       {
         field: "transdate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1489,7 +1493,7 @@ const validationConfigs = {
                   difference: difference,
                 };
               }
-            }
+            },
           );
 
           let message = "";
@@ -1498,9 +1502,9 @@ const validationConfigs = {
             unbalancedRefs.forEach((ref) => {
               const details = transactionDetails[ref];
               message += `Ref: ${ref} (Debit: ${details.debit.toFixed(
-                2
+                2,
               )}, Credit: ${details.credit.toFixed(
-                2
+                2,
               )}, Difference: ${details.difference.toFixed(2)}), `;
             });
             message = message.slice(0, -2);
@@ -1546,12 +1550,12 @@ const validationConfigs = {
       {
         field: "invdate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1559,12 +1563,12 @@ const validationConfigs = {
       {
         field: "duedate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1613,12 +1617,12 @@ const validationConfigs = {
       {
         field: "invdate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1626,12 +1630,12 @@ const validationConfigs = {
       {
         field: "duedate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1676,12 +1680,12 @@ const validationConfigs = {
       {
         field: "invdate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1689,12 +1693,12 @@ const validationConfigs = {
       {
         field: "duedate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1732,12 +1736,12 @@ const validationConfigs = {
         field: "payment_date",
         rule: (value) => {
           if (!value) return { valid: true, message: "" };
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1769,12 +1773,12 @@ const validationConfigs = {
       {
         field: "invdate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1782,12 +1786,12 @@ const validationConfigs = {
       {
         field: "duedate",
         rule: (value) => {
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1825,12 +1829,12 @@ const validationConfigs = {
         field: "payment_date",
         rule: (value) => {
           if (!value) return { valid: true, message: "" };
-          const formattedDate = formatDate(value);
+          const apiDate = parseDateToApi(value);
           return {
-            valid: formattedDate !== "",
+            valid: apiDate !== "",
             message:
-              formattedDate === ""
-                ? t("Invalid date format. Use yyyy-mm-dd format.")
+              apiDate === ""
+                ? t("Invalid date format. Enter a valid date.")
                 : "",
           };
         },
@@ -1925,7 +1929,7 @@ const validateData = () => {
     const indexes = getColumnIndexes(importType.value);
 
     const nonEmptyRows = data.filter(
-      (row) => row && row.some((cell) => cell && cell.toString().trim() !== "")
+      (row) => row && row.some((cell) => cell && cell.toString().trim() !== ""),
     );
 
     if (nonEmptyRows.length === 0) {
@@ -1976,7 +1980,7 @@ const validateData = () => {
               t("{message} at row {row}", {
                 message: result.message,
                 row: realRowIndex + 1,
-              })
+              }),
             );
           }
         });
@@ -1985,7 +1989,7 @@ const validateData = () => {
 
     if (config.transactionValidations) {
       const objRows = nonEmptyRows.map((row) =>
-        rowToObject(row, importType.value)
+        rowToObject(row, importType.value),
       );
 
       config.transactionValidations.forEach((validation) => {
@@ -2071,7 +2075,7 @@ const formatEntityData = (row) => {
         key === "enddate" ||
         key === "duedate"
       ) {
-        entity[key] = formatDate(value);
+        entity[key] = parseDateToApi(value);
       } else {
         entity[key] = value;
       }
@@ -2080,14 +2084,14 @@ const formatEntityData = (row) => {
 
   if (importType.value === "customer") {
     const customer = repositories.customers.value.find(
-      (c) => c.customernumber === entity.customernumber
+      (c) => c.customernumber === entity.customernumber,
     );
     if (customer) {
       entity.customer_id = customer.id;
     }
   } else if (importType.value === "vendor") {
     const vendor = repositories.vendors.value.find(
-      (v) => v.vendornumber === entity.vendornumber
+      (v) => v.vendornumber === entity.vendornumber,
     );
     if (vendor) {
       entity.vendor_id = vendor.id;
@@ -2100,7 +2104,7 @@ const formatEntityData = (row) => {
 const getDepartment = (department) => {
   if (department) {
     const departmentObj = repositories.departments.value.find(
-      (d) => d.description === department
+      (d) => d.description === department,
     );
     if (departmentObj) {
       return `${departmentObj.description}--${departmentObj.id}`;
@@ -2110,7 +2114,7 @@ const getDepartment = (department) => {
 const getProject = (project) => {
   if (project) {
     const projectObj = repositories.projects.value.find(
-      (p) => p.projectnumber === project
+      (p) => p.projectnumber === project,
     );
     if (projectObj) {
       return `${projectObj.projectnumber}--${projectObj.id}`;
@@ -2161,7 +2165,7 @@ const importData = async () => {
     const data = sheet.getData?.() || [];
 
     const nonEmptyRows = data.filter(
-      (row) => row && row.some((cell) => cell && cell.toString().trim() !== "")
+      (row) => row && row.some((cell) => cell && cell.toString().trim() !== ""),
     );
 
     if (nonEmptyRows.length === 0) {
@@ -2192,12 +2196,12 @@ const importData = async () => {
         let entityId = null;
         if (importType.value === "ar_invoice") {
           const customer = repositories.customers.value.find(
-            (c) => c.customernumber === entityNumber
+            (c) => c.customernumber === entityNumber,
           );
           if (customer) entityId = customer.id;
         } else {
           const vendor = repositories.vendors.value.find(
-            (v) => v.vendornumber === entityNumber
+            (v) => v.vendornumber === entityNumber,
           );
           if (vendor) entityId = vendor.id;
         }
@@ -2207,10 +2211,13 @@ const importData = async () => {
             invNumber: invNumber,
             description: rowObj.description || "",
             type: "invoice",
-            invDate: formatDate(rowObj.invdate || ""),
-            dueDate: formatDate(rowObj.duedate || ""),
+            invDate: parseDateToApi(rowObj.invdate || ""),
+            dueDate: parseDateToApi(rowObj.duedate || ""),
             currency: rowObj.curr || "",
             exchangerate: parseNumber(rowObj.exchangerate) || 1.0,
+            ...(importType.value === "ar_invoice" && {
+              dcn: rowObj.dcn || "",
+            }),
             notes: rowObj.notes || "",
             intnotes: rowObj.intnotes || "",
             till: rowObj.till || "",
@@ -2245,7 +2252,7 @@ const importData = async () => {
         }
 
         const part = repositories.parts.value.find(
-          (p) => p.partnumber === rowObj.line_number
+          (p) => p.partnumber === rowObj.line_number,
         );
         invoicesByNumber[invNumber].lines.push({
           number: part ? part.id : "",
@@ -2278,7 +2285,7 @@ const importData = async () => {
 
         const transaction = {
           reference: reference,
-          transdate: formatDate(firstRow.transdate || ""),
+          transdate: parseDateToApi(firstRow.transdate || ""),
           department: getDepartment(firstRow.department),
           description: firstRow.description || "",
           notes: firstRow.notes || "",
@@ -2325,12 +2332,12 @@ const importData = async () => {
         let entityId = null;
         if (importType.value === "ar_transaction") {
           const customer = repositories.customers.value.find(
-            (c) => c.customernumber === entityNumber
+            (c) => c.customernumber === entityNumber,
           );
           if (customer) entityId = customer.id;
         } else {
           const vendor = repositories.vendors.value.find(
-            (v) => v.vendornumber === entityNumber
+            (v) => v.vendornumber === entityNumber,
           );
           if (vendor) entityId = vendor.id;
         }
@@ -2339,8 +2346,8 @@ const importData = async () => {
           transactionsByNumber[invNumber] = {
             invNumber: invNumber,
             description: rowObj.description || "",
-            invDate: formatDate(rowObj.invdate || ""),
-            dueDate: formatDate(rowObj.duedate || ""),
+            invDate: parseDateToApi(rowObj.invdate || ""),
+            dueDate: parseDateToApi(rowObj.duedate || ""),
             curr: rowObj.curr || "",
             exchangerate: parseNumber(rowObj.exchangerate) || 1.0,
             notes: rowObj.notes || "",
@@ -2384,7 +2391,7 @@ const importData = async () => {
           rowObj.payment_account
         ) {
           transactionsByNumber[invNumber].payments.push({
-            date: formatDate(rowObj.payment_date),
+            date: parseDateToApi(rowObj.payment_date),
             source: rowObj.payment_source || "",
             memo: rowObj.payment_memo || "",
             amount: parseNumber(rowObj.payment_amount),
@@ -2402,14 +2409,14 @@ const importData = async () => {
         importType.value === "gl"
           ? `/import/${importType.value}`
           : importType.value === "ar_invoice"
-          ? `/import/invoice/customer`
-          : importType.value === "ap_invoice"
-          ? `/import/invoice/vendor`
-          : importType.value === "ar_transaction"
-          ? `/import/transaction/customer`
-          : importType.value === "ap_transaction"
-          ? `/import/transaction/vendor`
-          : `/import/arap/${importType.value}`;
+            ? `/import/invoice/customer`
+            : importType.value === "ap_invoice"
+              ? `/import/invoice/vendor`
+              : importType.value === "ar_transaction"
+                ? `/import/transaction/customer`
+                : importType.value === "ap_transaction"
+                  ? `/import/transaction/vendor`
+                  : `/import/arap/${importType.value}`;
 
       const response = await api.post(endpoint, formattedData);
 
@@ -2431,7 +2438,7 @@ const importData = async () => {
           color: "warning",
           message: t(
             "Partial import: {successCount} items imported, {failureCount} items failed",
-            { successCount, failureCount }
+            { successCount, failureCount },
           ),
           icon: "warning",
           position: "center",
@@ -2463,7 +2470,7 @@ const importData = async () => {
       Notify.create({
         color: "negative",
         message: t(
-          error.response?.data?.message || "Failed to send data to server"
+          error.response?.data?.message || "Failed to send data to server",
         ),
         icon: "error",
         position: "center",
@@ -2527,7 +2534,7 @@ const columnGroups = computed(() => {
           "notes",
           "curr",
           "exchangerate",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
     groups.push({
@@ -2542,13 +2549,13 @@ const columnGroups = computed(() => {
           "projectnumber",
           "taxAccount",
           "linetaxamount",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
   } else if (currentType === "customer" || currentType === "vendor") {
     // First column is always customer/vendor number
     const firstCol = availableColumns.value.find(
-      (col) => col.key === "customernumber" || col.key === "vendornumber"
+      (col) => col.key === "customernumber" || col.key === "vendornumber",
     );
 
     groups.push({
@@ -2571,7 +2578,7 @@ const columnGroups = computed(() => {
           "typeofcontact",
           "gender",
           "notes",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2590,7 +2597,7 @@ const columnGroups = computed(() => {
           "email",
           "cc",
           "bcc",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2611,7 +2618,7 @@ const columnGroups = computed(() => {
           "threshold",
           "discountterms",
           "remittancevoucher",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2630,13 +2637,13 @@ const columnGroups = computed(() => {
           "bankstate",
           "bankzipcode",
           "bankcountry",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
   } else if (currentType === "ar_invoice" || currentType === "ap_invoice") {
     // First column is always customer/vendor number
     const firstCol = availableColumns.value.find(
-      (col) => col.key === "customernumber" || col.key === "vendornumber"
+      (col) => col.key === "customernumber" || col.key === "vendornumber",
     );
 
     groups.push({
@@ -2654,12 +2661,13 @@ const columnGroups = computed(() => {
           "duedate",
           "curr",
           "exchangerate",
+          "dcn",
           "notes",
           "intnotes",
           "department",
           "recordaccount",
           "taxincluded",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2672,7 +2680,7 @@ const columnGroups = computed(() => {
           "shippingpoint",
           "shipvia",
           "waybill",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2686,7 +2694,7 @@ const columnGroups = computed(() => {
           "price",
           "discount",
           "unit",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
   } else if (
@@ -2695,7 +2703,7 @@ const columnGroups = computed(() => {
   ) {
     // First column is always customer/vendor number
     const firstCol = availableColumns.value.find(
-      (col) => col.key === "customernumber" || col.key === "vendornumber"
+      (col) => col.key === "customernumber" || col.key === "vendornumber",
     );
 
     groups.push({
@@ -2720,7 +2728,7 @@ const columnGroups = computed(() => {
           "ordnumber",
           "ponumber",
           "taxincluded",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2734,7 +2742,7 @@ const columnGroups = computed(() => {
           "linetaxamount",
           "line_account",
           "line_project",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
 
@@ -2748,7 +2756,7 @@ const columnGroups = computed(() => {
           "payment_amount",
           "payment_exchangerate",
           "payment_account",
-        ].includes(col.key)
+        ].includes(col.key),
       ),
     });
   } else {
@@ -2863,11 +2871,12 @@ const handleShortcuts = async (event) => {
     }
   }
   if (key === "t") {
-    if (!lastSelected.value) return;
+    if (!lastSelected.value || !sheet) return;
     const { colIndex, rowIndex } = lastSelected.value;
     document.activeElement?.blur();
-    const today = new Date().toLocaleDateString("en-CA");
-    sheet.setValueFromCoords(colIndex, rowIndex, today);
+    const todayApi = date.formatDate(new Date(), "YYYY-MM-DD");
+    const todayDisplay = formatDateDisplay(todayApi);
+    sheet.setValueFromCoords(colIndex, rowIndex, todayDisplay);
     lastSelected.value = null;
     event.preventDefault();
     return;
@@ -2935,13 +2944,6 @@ const handleShortcuts = async (event) => {
     sheet.resetSelection(true);
     select.value.focus();
     select.value.showPopup();
-  } else {
-    Notify.create({
-      color: "warning",
-      message: t(`${label} dropdown is not available`),
-      icon: "warning",
-      position: "center",
-    });
   }
 };
 </script>
