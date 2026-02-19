@@ -1279,13 +1279,22 @@ const addPayment = () => {
     source: "",
     memo: "",
     amount: 0,
-    account: "",
+    account:
+      defaultPaymentAccount.value || openPaymentAccounts.value[0] || null,
   });
 };
 
 const removePayment = (index) => {
-  if (payments.value.length > 1) {
-    payments.value.splice(index, 1);
+  payments.value.splice(index, 1);
+  if (payments.value.length === 0) {
+    payments.value.push({
+      date: getTodayDate(),
+      source: "",
+      memo: "",
+      amount: 0,
+      account:
+        defaultPaymentAccount.value || openPaymentAccounts.value[0] || null,
+    });
   }
 };
 
@@ -1322,7 +1331,8 @@ const handlePaymentEnter = (index) => {
     source: "",
     memo: "",
     amount: 0,
-    account: "",
+    account:
+      defaultPaymentAccount.value || openPaymentAccounts.value[0] || null,
   };
   payments.value.splice(index + 1, 0, newPayment);
   nextTick(() => {
@@ -1921,16 +1931,23 @@ const loadInvoice = async (invoice) => {
       handleFilePreview(invoice.files[0].link);
     }
     if (invoice.payments && invoice.payments.length > 0) {
-      payments.value = invoice.payments.map((payment) => ({
-        date: payment.date || getTodayDate(),
-        source: payment.source || "",
-        memo: payment.memo || "",
-        amount: payment.amount || 0,
-        exchangerate: payment.exchangerate,
-        account:
-          paymentAccounts.value.find((acc) => acc.accno == payment.account) ||
-          paymentAccounts.value[0],
-      }));
+      payments.value = invoice.payments.map((payment) => {
+        // API may return account as "accno--description"; extract accno for lookup
+        const accountKey =
+          typeof payment.account === "string" && payment.account.includes("--")
+            ? payment.account.split("--")[0]
+            : payment.account;
+        return {
+          date: payment.date || getTodayDate(),
+          source: payment.source || "",
+          memo: payment.memo || "",
+          amount: payment.amount || 0,
+          exchangerate: payment.exchangerate,
+          account:
+            paymentAccounts.value.find((acc) => acc.accno == accountKey) ||
+            paymentAccounts.value[0],
+        };
+      });
     } else {
       payments.value = [
         {
