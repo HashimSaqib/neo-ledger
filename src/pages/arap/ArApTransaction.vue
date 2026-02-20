@@ -1768,6 +1768,11 @@ const files = ref([]);
 const existingFiles = ref([]);
 const transfer_history = ref([]);
 const loadInvoice = async (invoice) => {
+  // Ensure form defaults (taxes, lineTax) are loaded before vcUpdate builds taxAccountList.
+  // Otherwise a race in onMounted (fetchLinks vs fetchInvoice) can leave taxes empty.
+  if (!taxes.value.length) {
+    await fetchLinks();
+  }
   if (
     !vcList.value.length ||
     !recordAccounts.value.length ||
