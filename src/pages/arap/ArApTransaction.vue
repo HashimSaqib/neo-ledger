@@ -1124,6 +1124,11 @@ const calculateTaxes = () => {
   if (!lineTax.value && preserveApiTaxes.value) return;
 
   if (lineTax.value) {
+    lines.value.forEach((line) => {
+      if (line.taxAccount) {
+        line.taxAmount = computeLineTaxAmount(line);
+      }
+    });
     const taxAgg = {};
     lines.value.forEach((line) => {
       if (line.taxAccount && line.taxAmount) {
