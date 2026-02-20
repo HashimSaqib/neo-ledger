@@ -43,6 +43,17 @@
             class="q-mt-xs"
           />
 
+          <!-- Detail (text description) -->
+          <q-input
+            dense
+            outlined
+            v-model="selectedAccount.detail"
+            :label="t('Detail')"
+            type="textarea"
+            class="q-mt-xs"
+            rows="2"
+          />
+
           <!-- Parent Account Selection -->
           <s-select
             dense
@@ -286,6 +297,7 @@ updateTitle(t("Add Chart"));
 const selectedAccount = ref({
   accno: "",
   description: "",
+  detail: "",
   category: "",
   closed: "0",
   contra: "0",
@@ -503,6 +515,7 @@ function resetForm() {
   selectedAccount.value = {
     accno: "",
     description: "",
+    detail: "",
     category: "",
     closed: "0",
     contra: "0",

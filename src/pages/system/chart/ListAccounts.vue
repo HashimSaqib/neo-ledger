@@ -133,6 +133,17 @@
               class="q-mt-xs"
             />
 
+            <!-- Detail (text description) -->
+            <q-input
+              dense
+              outlined
+              v-model="selectedAccount.detail"
+              :label="t('Detail')"
+              type="textarea"
+              class="q-mt-xs"
+              rows="2"
+            />
+
             <!-- Row 3: Account Type, Contra and Chart Type -->
             <div class="row q-col-gutter-sm items-center q-mt-xs">
               <div class="col-6">
@@ -427,7 +438,10 @@
               />
 
               <q-btn :label="t('Save')" color="primary" type="submit" />
-              <q-btn :label="t('Save As New')" @click.prevent="saveAccount(true)" />
+              <q-btn
+                :label="t('Save As New')"
+                @click.prevent="saveAccount(true)"
+              />
             </div>
           </q-form>
         </q-card-section>
@@ -463,6 +477,12 @@ const columns = [
   { name: "contra", label: t("Contra"), field: "contra", align: "center" },
   { name: "dropdown", label: t("Drop-down"), field: "link", align: "left" },
   { name: "closed", label: t("Closed"), field: "closed", align: "center" },
+  {
+    name: "detail",
+    label: t("Detail"),
+    field: "detail",
+    align: "left",
+  },
 ];
 
 const categoryMapping = {
@@ -632,7 +652,7 @@ async function saveAccount(isNew = false) {
 
   const summaryCount = ["AR", "AP", "IC"].reduce(
     (acc, key) => acc + (selectedAccount.value[key] ? 1 : 0),
-    0
+    0,
   );
   if (summaryCount > 1) {
     Notify.create({
@@ -646,7 +666,7 @@ async function saveAccount(isNew = false) {
   const countSelected = (options) =>
     options.reduce(
       (count, opt) => count + (selectedAccount.value[opt] ? 1 : 0),
-      0
+      0,
     );
 
   const arOptions = ["AR_amount", "AR_paid", "AR_discount", "AR_tax"];
@@ -693,7 +713,7 @@ async function saveAccount(isNew = false) {
     if (dropDownOptions.some((opt) => selectedAccount.value[opt])) {
       Notify.create({
         message: t(
-          "Account cannot be set to any other type of account if AR, AP or IC is selected"
+          "Account cannot be set to any other type of account if AR, AP or IC is selected",
         ),
         color: "negative",
         position: "center",
@@ -751,7 +771,7 @@ async function deleteAccount(accountId) {
     Dialog.create({
       title: t("Confirm Deletion"),
       message: t(
-        "Are you sure you want to delete this account? This action cannot be undone."
+        "Are you sure you want to delete this account? This action cannot be undone.",
       ),
       cancel: true,
       persistent: true,
