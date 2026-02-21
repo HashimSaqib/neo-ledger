@@ -662,11 +662,11 @@ const downloadPDF = () => {
     });
     tableData.push(totalsRow);
 
-    // Generate table using centralized styles for tabular layout with grey lines
+    // Generate table: numeric columns right-aligned, no line break
     const columnStyles = Object.fromEntries(
       columns.value.map((col, index) => [
         index,
-        col.name === "paid" ? { halign: "right" } : {},
+        col.name === "paid" ? { halign: "right", overflow: "hidden" } : {},
       ])
     );
 
@@ -689,16 +689,16 @@ const downloadPDF = () => {
     return "";
   });
 
-  // Generate grand totals table with centralized styles
+  // Generate grand totals table
   createPDFWithCustomStyles(doc, [], [grandTotalsRow], {
     startY: yPosition,
     columnStyles: Object.fromEntries(
       columns.value.map((col, index) => [
         index,
-        col.name === "paid" ? { halign: "right" } : {},
+        col.name === "paid" ? { halign: "right", overflow: "hidden" } : {},
       ])
     ),
-    styles: { ...PDF_STYLES.table.styles, ...PDF_STYLES.totals },
+    styles: { ...PDF_STYLES.transactionTable.styles, ...PDF_STYLES.totals },
   });
 
   doc.save("payments_report.pdf");

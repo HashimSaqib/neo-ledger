@@ -655,12 +655,13 @@ const createPDF = () => {
   const headerRow = finalColumns.value.map((col) => col.label);
   const exportData = [];
 
-  // Define numeric columns to apply right alignment in PDF cells
+  // Define numeric columns: right aligned, no line break
   const numericColumns = ["sellprice", "discount", "total"];
   const columnStyles = {};
   finalColumns.value.forEach((col, index) => {
-    columnStyles[index] = numericColumns.includes(col.name)
-      ? { halign: "right" }
+    const isNumeric = numericColumns.includes(col.name);
+    columnStyles[index] = isNumeric
+      ? { halign: "right", overflow: "hidden" }
       : { halign: "left" };
   });
 

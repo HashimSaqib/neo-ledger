@@ -46,11 +46,11 @@ export const PDF_STYLES = {
     fontSize: 12,
   },
 
-  // Totals row styles
+  // Totals row styles (horizontal lines only, matches transactionTable)
   totals: {
     fontStyle: "bold",
     lineColor: [200, 200, 200],
-    lineWidth: 0.1,
+    lineWidth: { top: 0, right: 0, bottom: 0.1, left: 0 },
   },
 
   // Compact table styles for reports with many columns
@@ -82,6 +82,37 @@ export const PDF_STYLES = {
     textColor: [0, 0, 0],
     lineColor: [200, 200, 200],
     lineWidth: 0.1,
+  },
+
+  // Condensed transaction table (clean, minimal vertical spacing, horizontal lines only)
+  transactionTable: {
+    styles: {
+      fontSize: 8,
+      cellPadding: 2,
+      lineColor: [200, 200, 200],
+      lineWidth: { top: 0, right: 0, bottom: 0.1, left: 0 },
+      overflow: "linebreak",
+    },
+    headStyles: {
+      textColor: [0, 0, 0],
+      fontStyle: "bold",
+      lineColor: [200, 200, 200],
+      lineWidth: { top: 0, right: 0, bottom: 0.1, left: 0 },
+    },
+    bodyStyles: {
+      lineColor: [200, 200, 200],
+      lineWidth: { top: 0, right: 0, bottom: 0.1, left: 0 },
+      valign: "top",
+    },
+    theme: "plain",
+  },
+
+  // Max widths (mm) for text columns that should wrap in PDF; column name -> max width
+  pdfWrapColumnMaxWidth: {
+    description: 35,
+    notes: 25,
+    name: 30,
+    address: 35,
   },
 };
 
@@ -335,6 +366,92 @@ export const downloadReport = (filteredResults, columns, totals = null) => {
   writeFile(workbook, "ARreport.xlsx", { compression: true });
 };
 
+// Get text width in mm for current font (used for column min-width)
+function getTextWidthMm(doc, text) {
+  if (!text) return 0;
+  const unitWidth = doc.getTextWidth(String(text));
+  // jsPDF 3 returns width in doc's unit; default is mm
+  return unitWidth;
+}
+
+// Build column widths for PDF: each column at least as wide as its title;
+// wrap columns (description, notes, name, address) get a max width and line breaks
+function buildPdfColumnStyles(doc, columns, tableWidthMm) {
+  const fontSize = PDF_STYLES.transactionTable.styles.fontSize;
+  doc.setFontSize(fontSize);
+  doc.setFont(undefined, "normal");
+
+  const wrapMax = PDF_STYLES.pdfWrapColumnMaxWidth || {};
+  const numberColumns = [
+    "amount",
+    "netamount",
+    "paid",
+    "tax",
+    "paymentdiff",
+    "due",
+    "debit",
+    "credit",
+    "balance",
+  ];
+
+  const paddingMm = 2;
+  const minWidths = columns.map((col) => {
+    const w = getTextWidthMm(doc, col.label);
+    return Math.max(w + paddingMm, 8);
+  });
+
+  const wrapIndices = [];
+  const wrapWidths = [];
+  const fixedWidths = [];
+  columns.forEach((col, i) => {
+    const maxMm = wrapMax[col.name];
+    if (maxMm != null) {
+      wrapIndices.push(i);
+      wrapWidths.push(Math.max(minWidths[i], Math.min(maxMm, 40)));
+    } else {
+      fixedWidths.push({ i, minW: minWidths[i] });
+    }
+  });
+
+  const totalWrap = wrapWidths.reduce((a, b) => a + b, 0);
+  let remaining = Math.max(0, tableWidthMm - totalWrap);
+  const totalMinFixed = fixedWidths.reduce((acc, { minW }) => acc + minW, 0);
+
+  // Distribute remaining width to non-wrap columns; each stays at least minW
+  const fixedAssignments =
+    totalMinFixed <= 0
+      ? fixedWidths.map(({ i, minW }) => ({ i, w: minW }))
+      : remaining <= totalMinFixed
+        ? fixedWidths.map(({ i, minW }) => ({ i, w: minW }))
+        : fixedWidths.map(({ i, minW }) => ({
+            i,
+            w: minW + (remaining - totalMinFixed) * (minW / totalMinFixed),
+          }));
+
+  const widthByIndex = {};
+  wrapIndices.forEach((idx, j) => {
+    widthByIndex[idx] = wrapWidths[j];
+  });
+  fixedAssignments.forEach(({ i, w }) => {
+    widthByIndex[i] = Math.max(minWidths[i], w);
+  });
+
+  const columnStyles = {};
+  columns.forEach((col, index) => {
+    const w = widthByIndex[index];
+    const isNumber = numberColumns.includes(col.name);
+    columnStyles[index] = {
+      cellWidth: w,
+      overflow: isNumber ? "hidden" : "linebreak",
+      minCellWidth: minWidths[index],
+    };
+    if (isNumber) {
+      columnStyles[index].halign = "right";
+    }
+  });
+  return columnStyles;
+}
+
 // Create a PDF report from the provided data
 export const createPDF = (
   filteredResults,
@@ -346,6 +463,9 @@ export const createPDF = (
   const doc = new jsPDF({ orientation: "landscape" });
   let yPosition = 10;
   const leftPadding = 15;
+  const rightPadding = 15;
+  const tableWidthMm =
+    doc.internal.pageSize.getWidth() - leftPadding - rightPadding;
 
   // Add title using centralized styles
   if (title) {
@@ -375,6 +495,7 @@ export const createPDF = (
     "paid",
     "tax",
     "paymentdiff",
+    "due",
     "debit",
     "credit",
     "balance",
@@ -394,10 +515,11 @@ export const createPDF = (
   let totalsRow = null;
   if (hasTotals) {
     totalsRow = columns.map((col) => {
-      if (numberColumns.includes(col.name) || col.name === "description") {
-        return totals[col.name] ? formatAmount(totals[col.name]) : "";
-      } else if (col.name === "description") {
+      if (col.name === "description") {
         return "Totals";
+      }
+      if (numberColumns.includes(col.name)) {
+        return totals[col.name] ? formatAmount(totals[col.name]) : "";
       }
       return "";
     });
@@ -406,24 +528,30 @@ export const createPDF = (
   const tableData = [...dataRows];
   if (totalsRow) tableData.push(totalsRow);
 
-  // Use centralized PDF styles for tabular layout with grey lines
+  const columnStyles = buildPdfColumnStyles(doc, columns, tableWidthMm);
+
+  const bodyRowCount = tableData.length;
   autoTable(doc, {
     startY: yPosition,
+    tableWidth: tableWidthMm,
+    margin: { left: leftPadding },
     head: [headerRow],
     body: tableData,
-    ...PDF_STYLES.table,
-    columnStyles: Object.fromEntries(
-      columns.map((col, index) => [
-        index,
-        numberColumns.includes(col.name) ? { halign: "right" } : {},
-      ])
-    ),
+    ...PDF_STYLES.transactionTable,
+    columnStyles,
+    didParseCell: (data) => {
+      // Bold totals row
+      if (data.section === "body" && data.row.index === bodyRowCount - 1) {
+        data.cell.styles.fontStyle = "bold";
+      }
+    },
   });
 
   doc.save(`${title}.pdf`);
 };
 
-// Helper function to create PDF with custom styling options
+// Helper function to create PDF with custom styling options.
+// Uses condensed transactionTable styling (horizontal lines only, minimal padding) by default.
 export const createPDFWithCustomStyles = (
   doc,
   headerRow,
@@ -432,7 +560,7 @@ export const createPDFWithCustomStyles = (
 ) => {
   const defaultStyles = {
     startY: 20,
-    ...PDF_STYLES.table,
+    ...PDF_STYLES.transactionTable,
     columnStyles: {},
   };
 

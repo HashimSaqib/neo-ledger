@@ -1085,12 +1085,13 @@ const createPDF = () => {
   const headerRow = displayColumns.value.map((col) => col.label);
   const exportData = [];
 
-  // Prepare columnStyles: numeric columns right aligned, others left aligned.
+  // Prepare columnStyles: numeric columns right aligned, no line break; others left aligned.
   const numericColumns = ["debit", "credit", "taxAmount", "balance"];
   const columnStyles = {};
   displayColumns.value.forEach((col, index) => {
-    columnStyles[index] = numericColumns.includes(col.name)
-      ? { halign: "right" }
+    const isNumeric = numericColumns.includes(col.name);
+    columnStyles[index] = isNumeric
+      ? { halign: "right", overflow: "hidden" }
       : { halign: "left" };
   });
 

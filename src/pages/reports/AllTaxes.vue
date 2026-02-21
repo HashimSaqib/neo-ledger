@@ -811,7 +811,7 @@ const exportToPDF = () => {
     formatAmount(row.total.tax),
   ]);
 
-  // Generate summary table using centralized styles for tabular layout with grey lines
+  // Generate summary table (condensed layout, horizontal lines only)
   createPDFWithCustomStyles(
     doc,
     [
@@ -832,18 +832,22 @@ const exportToPDF = () => {
     summaryTableData,
     {
       startY: yPosition,
-      styles: { fontSize: 7, cellPadding: 1 },
+      styles: {
+        ...PDF_STYLES.transactionTable.styles,
+        fontSize: 7,
+        cellPadding: 1,
+      },
       columnStyles: {
-        1: { halign: "right" },
-        2: { halign: "right" },
-        3: { halign: "right" },
-        4: { halign: "right" },
-        5: { halign: "right" },
-        6: { halign: "right" },
-        7: { halign: "right" },
-        8: { halign: "right" },
-        9: { halign: "right" },
-        10: { halign: "right" },
+        1: { halign: "right", overflow: "hidden" },
+        2: { halign: "right", overflow: "hidden" },
+        3: { halign: "right", overflow: "hidden" },
+        4: { halign: "right", overflow: "hidden" },
+        5: { halign: "right", overflow: "hidden" },
+        6: { halign: "right", overflow: "hidden" },
+        7: { halign: "right", overflow: "hidden" },
+        8: { halign: "right", overflow: "hidden" },
+        9: { halign: "right", overflow: "hidden" },
+        10: { halign: "right", overflow: "hidden" },
       },
     }
   );
@@ -924,7 +928,7 @@ const exportToPDF = () => {
     ]);
   });
 
-  // Generate detailed table using centralized styles for tabular layout with grey lines
+  // Generate detailed table (condensed layout, horizontal lines only)
   createPDFWithCustomStyles(
     doc,
     [
@@ -942,11 +946,15 @@ const exportToPDF = () => {
     tableData,
     {
       startY: yPosition,
-      styles: { fontSize: 7, cellPadding: 1 },
+      styles: {
+        ...PDF_STYLES.transactionTable.styles,
+        fontSize: 7,
+        cellPadding: 1,
+      },
       columnStyles: {
-        4: { halign: "right" },
-        5: { halign: "right" },
-        6: { halign: "right" },
+        4: { halign: "right", overflow: "hidden" },
+        5: { halign: "right", overflow: "hidden" },
+        6: { halign: "right", overflow: "hidden" },
       },
     }
   );
