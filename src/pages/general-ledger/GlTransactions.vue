@@ -431,9 +431,10 @@ import {
   formatUpdatedTimestamp,
 } from "src/helpers/utils";
 import { utils, writeFile } from "xlsx";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import FileList from "src/components/FileList.vue";
 const route = useRoute();
+const router = useRouter();
 const updateTitle = inject("updateTitle");
 const triggerPrint = inject("triggerPrint");
 const { t } = useI18n();
@@ -869,6 +870,13 @@ const loadParams = () => {
     }
   });
 
+  // Restore split ledger from URL so callback/refresh keeps the setting
+  if (query.split === "1" || query.split === 1) {
+    splitLedger.value = true;
+  } else if (query.split === "0" || query.split === 0) {
+    splitLedger.value = false;
+  }
+
   // Auto-trigger search if "search" equals "1"
   if (query.search === "1") {
     search();
@@ -900,6 +908,14 @@ const search = async () => {
     appliedSplitLedger.value = splitLedger.value;
     results.value = appliedSplitLedger.value ? groupData(data) : data;
     tableKey.value++;
+    // Update URL with search params, split ledger, and preserve callback so links keep it
+    const query = {
+      ...params,
+      search: 1,
+      split: splitLedger.value ? 1 : 0,
+    };
+    if (route.query.callback) query.callback = route.query.callback;
+    router.replace({ query });
   } catch (error) {
     results.value = [];
     if (error.response) {
@@ -985,12 +1001,14 @@ const getPath = (row) => {
       : createLink("vendor.transaction");
   }
   const flatParams = flattenParams(formData.value);
+  const defaultCallback = createLink("base") + `/gl/reports`;
   return {
     path,
     query: {
       id: row.id,
       ...flatParams,
-      callback: createLink("base") + `/gl/reports`,
+      callback: route.query.callback || defaultCallback,
+      split: appliedSplitLedger.value ? 1 : 0,
     },
   };
 };
