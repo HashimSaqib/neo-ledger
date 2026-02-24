@@ -95,6 +95,10 @@ const props = defineProps({
     type: String,
     default: "invoice",
   },
+  email_message: {
+    type: String,
+    default: "",
+  },
 });
 
 const emit = defineEmits(["close"]);
@@ -120,9 +124,10 @@ watch(
       emailData.value.email = newCustomer.email || "";
       emailData.value.cc = newCustomer.cc || "";
       emailData.value.bcc = newCustomer.bcc || "";
+      emailData.value.message = props.email_message || "";
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 // Watch for changes in invId
@@ -133,7 +138,7 @@ watch(
       emailData.value.invId = newId;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Watch for changes in invNumber and invType
@@ -146,7 +151,7 @@ watch(
       emailData.value.subject = `${type} ${newInvNumber}`;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Send Email function

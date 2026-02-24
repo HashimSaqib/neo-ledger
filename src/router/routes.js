@@ -29,6 +29,7 @@ const AllTaxes = () => import("src/pages/reports/AllTaxes.vue");
 const Reconciliation = () => import("src/pages/cash/Reconciliation.vue");
 const Payments = () => import("src/pages/cash/Payments.vue");
 const SysCurrencies = () => import("src/pages/system/Currencies.vue");
+const SysMessages = () => import("src/pages/system/Messages.vue");
 const SysDefaults = () => import("src/pages/system/Defaults.vue");
 const SysAiPrompts = () => import("src/pages/system/AiPrompts.vue");
 const ListAccounts = () => import("src/pages/system/chart/ListAccounts.vue");
@@ -330,6 +331,11 @@ const getRoutes = async () => {
           path: "system/currencies",
           component: SysCurrencies,
           meta: { permission: "system.currencies" },
+        },
+        {
+          path: "system/messages",
+          component: SysMessages,
+          meta: { permission: "system.messages" },
         },
         {
           path: "system/defaults",

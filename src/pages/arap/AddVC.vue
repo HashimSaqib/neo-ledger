@@ -136,6 +136,33 @@
               type="email"
               class="q-mb-sm"
             />
+            <s-select
+              v-if="languages.length > 0"
+              v-model="form.language_code"
+              name="language_code"
+              :options="languages"
+              option-value="code"
+              option-label="description"
+              emit-value
+              map-options
+              :label="t('Language')"
+              outlined
+              dense
+              clearable
+              class="q-mb-sm"
+            />
+
+            <!-- Message (customers only) -->
+            <div v-if="componentType === 'customer'" class="q-mb-sm">
+              <MessageVariableInput
+                type="invoice_send"
+                :message-rows="customerMessageRows"
+                :active-message-language="activeMessageLanguage"
+                :label="t('Message')"
+                @update:message-rows="onCustomerMessageRowsUpdate"
+                @update:active-message-language="activeMessageLanguage = $event"
+              />
+            </div>
 
             <!-- Tax Section -->
             <div class="q-mb-md row">
@@ -482,6 +509,7 @@ import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 import BankAccountForm from "src/components/BankAccountForm.vue";
+import MessageVariableInput from "src/components/MessageVariableInput.vue";
 
 // Define props so the component can work as an embedded component
 const props = defineProps({
@@ -564,8 +592,10 @@ const form = ref({
   discount: "",
   taxnumber: "",
   sic_code: "",
+  language_code: "",
   notes: "",
   taxincluded: false,
+  message: "",
   // Hidden fields
   discount_accno: "",
   cashdiscount: "",
@@ -587,7 +617,27 @@ const recordAccounts = ref([]);
 const defaultRecordAccount = ref(null);
 const paymentAccounts = ref([]);
 const taxAccounts = ref([]);
+const languages = ref([]);
 const arap = ref("");
+
+// Message (customer only): single template stored in form.message, shown as one row
+const activeMessageLanguage = ref("");
+const customerMessageRows = computed(() => {
+  const lang = form.value.language_code || languages.value[0]?.code || "en";
+  const desc = languages.value.find((l) => l.code === lang)?.description ?? "";
+  return [
+    {
+      language_code: lang,
+      description: desc,
+      content: form.value.message ?? "",
+    },
+  ];
+});
+function onCustomerMessageRowsUpdate(rows) {
+  if (rows && rows.length > 0) {
+    form.value.message = rows[0].content ?? "";
+  }
+}
 
 // Helper: Format account options for q-select
 const formatAccountOption = (account) => ({
@@ -802,6 +852,18 @@ watch(
   () => updateVCSettings(),
 );
 
+// Keep message tab in sync with VC language (customer only)
+watch(
+  [() => form.value.language_code, languages],
+  () => {
+    if (componentType.value === "customer") {
+      activeMessageLanguage.value =
+        form.value.language_code || languages.value[0]?.code || "en";
+    }
+  },
+  { immediate: true },
+);
+
 const currencies = ref();
 const fetchLinks = async () => {
   try {
@@ -835,7 +897,11 @@ const fetchLinks = async () => {
     taxAccounts.value.forEach((tax) => {
       form.value[`tax_${tax.id}`] = 0;
     });
-    form.value.terms = response.data.term_days || 0;
+    form.value.terms = response.data.term_days ?? form.value.terms;
+
+    // Languages for dropdown (optional; hide dropdown when empty or missing)
+    const raw = response.data.languages;
+    languages.value = Array.isArray(raw) && raw.length > 0 ? raw : [];
   } catch (error) {
     console.error(error);
   }

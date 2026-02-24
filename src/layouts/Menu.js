@@ -372,6 +372,11 @@ const getMenuLinks = async () => {
           perm: "system.currencies",
         },
         {
+          title: "Messages",
+          link: "/system/messages",
+          perm: "system.messages",
+        },
+        {
           title: "Projects",
           link: "/system/projects",
           perm: "system.projects",

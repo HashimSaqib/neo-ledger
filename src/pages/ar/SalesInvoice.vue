@@ -929,6 +929,7 @@
             :invId="invId"
             :invNumber="invNumber"
             :type="invType"
+            :email_message="email_message"
             vc="customer"
           />
         </q-card-section>
@@ -996,7 +997,7 @@ const loadPdfForPrintMode = async () => {
   try {
     const response = await api.get(
       `/print_invoice?id=${route.query.id}&vc=customer&template=invoice&format=tex`,
-      { responseType: "blob" }
+      { responseType: "blob" },
     );
     const blob = new Blob([response.data], { type: "application/pdf" });
     pdfUrl.value = window.URL.createObjectURL(blob);
@@ -1073,7 +1074,7 @@ if (route.params.type === "credit_invoice") {
   updateTitle(t("Credit Invoice"));
 }
 const invType = ref(
-  route.params.type === "credit_invoice" ? "credit_invoice" : "invoice"
+  route.params.type === "credit_invoice" ? "credit_invoice" : "invoice",
 );
 
 const templates = [
@@ -1165,7 +1166,7 @@ const fetchAccounts = async () => {
     const accounts = response.data;
     recordAccounts.value = accounts.filter((account) => account.link === "AR");
     paymentAccounts.value = accounts.filter((account) =>
-      account.link.split(":").includes("AR_paid")
+      account.link.split(":").includes("AR_paid"),
     );
     defaultPaymentAccount.value = paymentAccounts.value[0];
     recordAccount.value = openRecordAccounts.value[0];
@@ -1179,10 +1180,10 @@ const fetchAccounts = async () => {
   }
 };
 const openRecordAccounts = computed(() =>
-  recordAccounts.value.filter((account) => account.closed === 0)
+  recordAccounts.value.filter((account) => account.closed === 0),
 );
 const openPaymentAccounts = computed(() =>
-  paymentAccounts.value.filter((account) => account.closed === 0)
+  paymentAccounts.value.filter((account) => account.closed === 0),
 );
 // Links & Currencies & Projects
 const departments = ref([]);
@@ -1222,7 +1223,7 @@ const fetchLinks = async () => {
     taxes.value = response.data.tax_accounts;
     if (currencies.value) {
       selectedCurrency.value = currencies.value.find(
-        (currency) => currency.rn === 1
+        (currency) => currency.rn === 1,
       );
     }
     projects.value = response.data.projects;
@@ -1348,7 +1349,7 @@ const handleLineItemChange = (newValue, index) => {
       line.extended = calculateExtended(
         line.qty || 1,
         line.price,
-        line.discount || 0
+        line.discount || 0,
       );
     } else {
       const line = lines.value[index];
@@ -1378,12 +1379,12 @@ watch(
       line.extended = calculateExtended(
         line.qty || 1,
         line.price,
-        line.discount || 0
+        line.discount || 0,
       );
     });
     calculateTaxes();
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Add watcher for invoice date changes
@@ -1412,7 +1413,7 @@ const calculateTaxes = () => {
       return;
     }
     const selectedItem = items.value.find(
-      (item) => item.id === line.partnumber.id
+      (item) => item.id === line.partnumber.id,
     );
     if (selectedItem && selectedItem.taxaccounts) {
       selectedItem.taxaccounts.forEach((taxAccount) => {
@@ -1452,7 +1453,7 @@ const calculateTaxes = () => {
             taxAmount = netAmount * taxRate;
           }
           const existingTax = invoiceTaxes.value.find(
-            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(2)}%`
+            (tax) => tax.name === `${name} ${(taxRate * 100).toFixed(2)}%`,
           );
           if (existingTax) {
             existingTax.amount += parseFloat(taxAmount.toFixed(2));
@@ -1531,7 +1532,7 @@ const addPaymentAt = (index) => {
     amount: 0,
     account: paymentmethod_id.value
       ? openPaymentAccounts.value.find(
-          (acc) => acc.id == paymentmethod_id.value
+          (acc) => acc.id == paymentmethod_id.value,
         )
       : defaultPaymentAccount.value,
   };
@@ -1568,6 +1569,7 @@ const removePayment = (index) => {
 // =====================
 // Customer Update & Invoice Loading Functions
 // =====================
+const email_message = ref("");
 const customerUpdate = async (newValue) => {
   if (!newValue) {
     customer.value = {};
@@ -1579,7 +1581,7 @@ const customerUpdate = async (newValue) => {
   const recordAccountAccno = customer.value?.AR?.split("--")[0] ?? "";
   if (recordAccountAccno) {
     const matchingRecord = recordAccounts.value.find(
-      (account) => account.accno === recordAccountAccno
+      (account) => account.accno === recordAccountAccno,
     );
     if (matchingRecord) {
       recordAccount.value = matchingRecord;
@@ -1590,30 +1592,31 @@ const customerUpdate = async (newValue) => {
   if (!paymentmethod_id.value) {
     defaultPaymentAccount.value =
       paymentAccounts.value.find(
-        (account) => account.accno === paymentAccountAccno
+        (account) => account.accno === paymentAccountAccno,
       ) || paymentAccounts.value[0];
   } else {
     defaultPaymentAccount.value =
       paymentAccounts.value.find(
-        (account) => account.id === paymentmethod_id.value
+        (account) => account.id === paymentmethod_id.value,
       ) || paymentAccounts.value[0];
   }
   payments.value.forEach(
     (payment) =>
-      payment.amount === 0 && (payment.account = defaultPaymentAccount.value)
+      payment.amount === 0 && (payment.account = defaultPaymentAccount.value),
   );
   if (customer.value?.currency) {
     const customerCurrency = currencies.value.find(
-      (curr) => curr.curr === customer.value.currency
+      (curr) => curr.curr === customer.value.currency,
     );
     if (customerCurrency) {
       selectedCurrency.value = customerCurrency;
     } else {
       console.warn(
-        `No matching currency found for: ${customer.value.currency}`
+        `No matching currency found for: ${customer.value.currency}`,
       );
     }
   }
+  email_message.value = customer.value?.email_message || "";
   if (invDate.value) {
     const terms = customer.value?.terms ?? 0;
     const newDueDate = date.addToDate(invDate.value, { days: terms });
@@ -1649,7 +1652,7 @@ const loadInvoice = async (invoice) => {
     ]);
   }
   selectedCustomer.value = customers.value.find(
-    (cust) => cust.customernumber === invoice.customernumber
+    (cust) => cust.customernumber === invoice.customernumber,
   );
   if (!selectedCustomer.value) {
     Notify.create({
@@ -1661,7 +1664,7 @@ const loadInvoice = async (invoice) => {
   }
   await customerUpdate(selectedCustomer.value);
   recordAccount.value = recordAccounts.value.find(
-    (account) => account.accno == invoice.recordAccount
+    (account) => account.accno == invoice.recordAccount,
   );
   if (!recordAccount.value) {
     Notify.create({
@@ -1673,7 +1676,7 @@ const loadInvoice = async (invoice) => {
   }
   if (departments.value?.length) {
     selectedDepartment.value = departments.value.find(
-      (dpt) => dpt.id === invoice.department_id
+      (dpt) => dpt.id === invoice.department_id,
     );
   }
   shippingPoint.value = invoice.shippingPoint;
@@ -1697,7 +1700,7 @@ const loadInvoice = async (invoice) => {
   }
   if (invoice.currency) {
     selectedCurrency.value = currencies.value.find(
-      (curr) => curr.curr === invoice.currency
+      (curr) => curr.curr === invoice.currency,
     );
   }
   exchangeRate.value = invoice.exchangerate || 1;
@@ -1732,7 +1735,7 @@ const loadInvoice = async (invoice) => {
       noupdate: true,
       project: (() => {
         const foundProject = projects.value.find(
-          (project) => project.id === line.project
+          (project) => project.id === line.project,
         );
         return foundProject
           ? `${foundProject.projectnumber}--${foundProject.id}`
@@ -1743,7 +1746,7 @@ const loadInvoice = async (invoice) => {
   calculateTaxes();
   payments.value = invoice.payments.map((payment) => {
     const account = paymentAccounts.value.find(
-      (acc) => acc.id === payment.account || acc.label === payment.account
+      (acc) => acc.id === payment.account || acc.label === payment.account,
     );
     if (!account) {
       Notify.create({
@@ -1805,7 +1808,7 @@ const printInvoice = async () => {
       `/print_invoice?id=${invId.value}&vc=customer&template=${printOptions.value.template}&format=${printOptions.value.format}`,
       {
         responseType: "blob",
-      }
+      },
     );
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url = window.URL.createObjectURL(blob);
@@ -1841,7 +1844,7 @@ const deleteInvoice = async () => {
     const confirmed = await confirmDelete({
       title: t("Confirm Deletion"),
       message: t(
-        "Are you sure you want to delete this invoice? This action cannot be undone."
+        "Are you sure you want to delete this invoice? This action cannot be undone.",
       ),
     });
 
@@ -2021,7 +2024,7 @@ const postInvoice = async (save = false, isNew = false) => {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
     Notify.create({
       message: t("Transaction posted successfully"),
@@ -2150,11 +2153,11 @@ const canPost = computed(
     (!closedto.value ||
       !originalInvDate.value ||
       originalInvDate.value > closedto.value) &&
-    (!closedto.value || invDate.value > closedto.value)
+    (!closedto.value || invDate.value > closedto.value),
 );
 
 const canPostAsNew = computed(
-  () => !closedto.value || invDate.value > closedto.value
+  () => !closedto.value || invDate.value > closedto.value,
 );
 
 const canDelete = computed(
@@ -2163,7 +2166,7 @@ const canDelete = computed(
     (!closedto.value ||
       !originalInvDate.value ||
       originalInvDate.value > closedto.value) &&
-    revtrans.value != 1
+    revtrans.value != 1,
 );
 
 // Add originalInvDate ref to track the original invoice date for existing invoices
@@ -2278,11 +2281,15 @@ const originalInvDate = ref(null);
 
 /* Mode transition - slide effect */
 .mode-fade-enter-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .mode-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .mode-fade-enter-from {
