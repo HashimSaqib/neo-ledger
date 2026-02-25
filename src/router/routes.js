@@ -13,6 +13,8 @@ const ArReminder = () => import("src/pages/arap/ArReminder.vue");
 const SalesInvoice = () => import("src/pages/ar/SalesInvoice.vue");
 const ConsolidateInvoices = () =>
   import("src/pages/ar/ConsolidateInvoices.vue");
+const RecurringInvoices = () =>
+  import("src/pages/ar/RecurringInvoices.vue");
 const AddVC = () => import("src/pages/arap/AddVC.vue");
 const VcHistory = () => import("src/pages/arap/VcHistory.vue");
 const SearchVC = () => import("src/pages/arap/SearchVC.vue");
@@ -240,6 +242,11 @@ const getRoutes = async () => {
           path: "ar/consolidate-invoices",
           component: ConsolidateInvoices,
           meta: { permission: "customer.consolidate" },
+        },
+        {
+          path: "ar/recurring-invoices",
+          component: RecurringInvoices,
+          meta: { permission: "customer.transactions" },
         },
         {
           path: "pos/sale",

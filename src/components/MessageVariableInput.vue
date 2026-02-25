@@ -39,7 +39,7 @@
       </q-list>
     </div>
   </div>
-  <div class="row q-gutter-xs">
+  <div v-if="!simple" class="row q-gutter-xs">
     <q-btn
       v-for="row in messageRows"
       :key="row.language_code"
@@ -70,6 +70,16 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  /** When true, binds to a plain string via v-model and hides language tabs. */
+  simple: {
+    type: Boolean,
+    default: false,
+  },
+  /** Used when simple=true: the plain string message content. */
+  modelValue: {
+    type: String,
+    default: "",
+  },
   /** Rows per language: { language_code, description?, content } */
   messageRows: {
     type: Array,
@@ -88,6 +98,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
+  "update:modelValue",
   "update:messageRows",
   "update:activeMessageLanguage",
 ]);
@@ -123,6 +134,7 @@ const VARIABLE_SETS = {
     "month+1",
     "year",
   ],
+  invoice_fields: ["month", "month-1", "month+1", "year"],
 };
 
 const VARIABLES = computed(() => {
@@ -142,12 +154,17 @@ const variableContentSnapshot = ref("");
 
 const currentMessageContent = computed({
   get() {
+    if (props.simple) return props.modelValue;
     const row = props.messageRows.find(
       (r) => r.language_code === props.activeMessageLanguage,
     );
     return row ? row.content : "";
   },
   set(val) {
+    if (props.simple) {
+      emit("update:modelValue", val);
+      return;
+    }
     const rows = props.messageRows.map((r) =>
       r.language_code === props.activeMessageLanguage
         ? { ...r, content: val }
@@ -255,22 +272,28 @@ function onMessageKeydown(e) {
 }
 
 function onSelectVariable(variableName) {
-  const row = props.messageRows.find(
-    (r) => r.language_code === props.activeMessageLanguage,
-  );
-  if (!row) return;
   const content = variableContentSnapshot.value;
   const start = variableCaretStart.value;
   const end = variableCaretEnd.value;
   const beforeCaret = content.slice(0, start);
   const afterCaret = content.slice(end);
   const newContent = beforeCaret + "{" + variableName + "} " + afterCaret;
-  const rows = props.messageRows.map((r) =>
-    r.language_code === props.activeMessageLanguage
-      ? { ...r, content: newContent }
-      : { ...r },
-  );
-  emit("update:messageRows", rows);
+
+  if (props.simple) {
+    emit("update:modelValue", newContent);
+  } else {
+    const row = props.messageRows.find(
+      (r) => r.language_code === props.activeMessageLanguage,
+    );
+    if (!row) return;
+    const rows = props.messageRows.map((r) =>
+      r.language_code === props.activeMessageLanguage
+        ? { ...r, content: newContent }
+        : { ...r },
+    );
+    emit("update:messageRows", rows);
+  }
+
   variableMenuOpen.value = false;
   variableMenuFilter.value = "";
   nextTick(() => {

@@ -70,6 +70,11 @@ const getMenuLinks = async () => {
               link: "/ar/consolidate-invoices",
               perm: "customer.consolidate",
             },
+            {
+              title: "Recurring Invoices",
+              link: "/ar/recurring-invoices",
+              perm: "customer.transactions",
+            },
           ],
         },
         {
