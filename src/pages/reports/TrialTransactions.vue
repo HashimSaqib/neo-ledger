@@ -79,6 +79,9 @@
                 >
                   {{ formatAmount(props.row[col.field]) }}
                 </template>
+                <template v-else-if="col.name === 'transdate'">
+                  {{ formatDate(props.row.transdate) }}
+                </template>
                 <template v-else>
                   {{ props.row[col.field] }}
                 </template>
@@ -119,7 +122,7 @@
 /* Imports & Dependencies */
 import { ref, computed, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
-import { formatAmount, createPDF } from "src/helpers/utils";
+import { formatAmount, formatDate, createPDF } from "src/helpers/utils";
 import { useRoute } from "vue-router";
 import { utils, writeFile } from "xlsx";
 import { useI18n } from "vue-i18n";
@@ -361,6 +364,7 @@ const downloadExcel = () => {
       if (["debit", "credit", "balance"].includes(col.name)) {
         return row[col.field] ? parseFloat(row[col.field]) : 0;
       }
+      if (col.name === "transdate") return formatDate(row.transdate) || "";
       return row[col.field] || "";
     });
     exportData.push(dataRow);

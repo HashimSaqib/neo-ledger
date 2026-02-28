@@ -366,7 +366,7 @@
                   formatAmount(
                     typeof col.field === "function"
                       ? col.field(props.row)
-                      : props.row[col.field]
+                      : props.row[col.field],
                   )
                 }}
               </span>
@@ -631,7 +631,7 @@ const selectedColumns = ref(
   baseColumns.value.reduce((acc, column) => {
     acc[column.name] = column.default;
     return acc;
-  }, {})
+  }, {}),
 );
 
 function processFilters() {
@@ -695,7 +695,7 @@ watch(
       console.error("Error saving filters to cookies:", error);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Compute display columns based on selected columns and add a "Balance" column if needed.
@@ -715,34 +715,42 @@ const displayColumns = computed(() => {
   return cols.map((col) => ({ ...col, label: t(col.label) }));
 });
 
-// Helper function that groups the data if grouping is desired at search time
+// Helper function that groups the data if grouping is desired at search time.
+// When l_splitledger=1 the backend stamps an opening balance on every row for
+// that account (same value for all rows of the same account). We use that as
+// the starting point and accumulate debit - credit forward.
 function groupData(data) {
+  // Preserve the backend's accno-first ordering by collecting groups in
+  // insertion order rather than re-sorting them.
+  const groupOrder = [];
   const groups = {};
   data.forEach((row) => {
-    if (!groups[row.accno]) groups[row.accno] = [];
+    if (!groups[row.accno]) {
+      groups[row.accno] = [];
+      groupOrder.push(row.accno);
+    }
     groups[row.accno].push(row);
   });
-  const sortedGroups = Object.values(groups).sort(
-    (groupA, groupB) =>
-      new Date(groupA[0].transdate) - new Date(groupB[0].transdate)
-  );
+
   const finalRows = [];
-  sortedGroups.forEach((group) => {
-    const acc = group[0].accno;
+  groupOrder.forEach((acc) => {
+    const group = groups[acc];
     finalRows.push({
       isGroupHeader: true,
       accno: acc,
       account_description: group[0].account_description,
       groupLabel: `${acc} -- ${group[0].account_description}`,
     });
-    let runningBalance = 0;
-    const sortedGroup = group.sort(
-      (a, b) => new Date(a.transdate) - new Date(b.transdate)
-    );
-    sortedGroup.forEach((row) => {
-      runningBalance += -Number(row.amount);
+
+    // Use the opening balance provided by the backend (same on every row for
+    // this account). Fall back to 0 if the field is absent (non-split mode).
+    let runningBalance = Number(group[0].balance) * -1 || 0;
+
+    group.forEach((row) => {
+      runningBalance += Number(row.debit) - Number(row.credit);
       finalRows.push({ ...row, balance: runningBalance });
     });
+
     finalRows.push({
       isSubtotal: true,
       accno: acc,
@@ -751,7 +759,7 @@ function groupData(data) {
       credit: group.reduce((sum, r) => sum + Number(r.credit), 0),
       taxAmount: group.reduce(
         (sum, r) => sum + (Number(r.linetaxamount) || 0),
-        0
+        0,
       ),
       balance: runningBalance,
     });
@@ -823,7 +831,7 @@ const loadParams = () => {
   if (query.department) {
     const [desc, id] = query.department.split("--");
     const dept = departments.find(
-      (d) => d.id.toString() === id && d.description === desc
+      (d) => d.id.toString() === id && d.description === desc,
     );
     formData.value.selectedDepartment = dept || { description: desc, id };
   }
@@ -837,7 +845,7 @@ const loadParams = () => {
   // Load account numbers for "accnofrom" and "accnoto"
   if (query.accnofrom) {
     const accountFrom = accounts.value.find(
-      (acc) => acc.accno === query.accnofrom
+      (acc) => acc.accno === query.accnofrom,
     );
     formData.value.accnofrom = accountFrom || query.accnofrom;
   }
@@ -902,6 +910,9 @@ const search = async () => {
     const params = flattenParams(formData.value);
 
     // Use the flattened parameters in your API call.
+    if (splitLedger.value) {
+      params.l_splitledger = 1;
+    }
     const response = await api.get("/gl/transactions/lines", { params });
     filtersOpen.value = false;
     const data = response.data;
@@ -955,16 +966,14 @@ const tableRows = computed(() => results.value);
 // Now using appliedSplitLedger so totals reflect the state at search time.
 const overallTotals = computed(() => {
   if (!appliedSplitLedger.value) return null;
-  const data = results.value.filter(
-    (row) => !row.isGroupHeader && !row.isSubtotal
+  const subtotals = results.value.filter((row) => row.isSubtotal);
+  let totalDebit = subtotals.reduce((sum, r) => sum + Number(r.debit), 0);
+  let totalCredit = subtotals.reduce((sum, r) => sum + Number(r.credit), 0);
+  let totalTax = subtotals.reduce(
+    (sum, r) => sum + (Number(r.taxAmount) || 0),
+    0,
   );
-  let totalDebit = data.reduce((sum, r) => sum + Number(r.debit), 0);
-  let totalCredit = data.reduce((sum, r) => sum + Number(r.credit), 0);
-  let totalTax = data.reduce(
-    (sum, r) => sum + (Number(r.linetaxamount) || 0),
-    0
-  );
-  let totalBalance = -data.reduce((sum, r) => sum + Number(r.amount), 0);
+  let totalBalance = subtotals.reduce((sum, r) => sum + Number(r.balance), 0);
   return { totalDebit, totalCredit, totalTax, totalBalance };
 });
 
@@ -993,8 +1002,8 @@ const getPath = (row) => {
     path = row.till
       ? createLink("customer.pos")
       : row.invoice
-      ? createLink("customer.invoice")
-      : createLink("customer.transaction");
+        ? createLink("customer.invoice")
+        : createLink("customer.transaction");
   } else if (row.type === "ap") {
     path = row.invoice
       ? createLink("vendor.invoice")
@@ -1052,7 +1061,7 @@ const downloadTransactions = () => {
         if (col.name === "transdate") return formatDate(row.transdate);
         if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
           return roundAmount(
-            typeof col.field === "function" ? col.field(row) : row[col.field]
+            typeof col.field === "function" ? col.field(row) : row[col.field],
           );
         }
         if (col.name === "created") return formatTimestamp(row.created);
@@ -1073,7 +1082,7 @@ const downloadTransactions = () => {
       const cellValue = row[index];
       maxLength = Math.max(
         maxLength,
-        cellValue ? cellValue.toString().length : 0
+        cellValue ? cellValue.toString().length : 0,
       );
     });
     return { wch: maxLength + 2 };
@@ -1130,7 +1139,7 @@ const createPDF = () => {
             return formatAmount(row[col.name]);
           if (col.name === "accno") return row.accno;
           return "";
-        })
+        }),
       );
     } else {
       exportData.push(
@@ -1140,7 +1149,7 @@ const createPDF = () => {
           if (col.name === "transdate") return formatDate(row.transdate);
           if (numericColumns.includes(col.name)) {
             return formatAmount(
-              typeof col.field === "function" ? col.field(row) : row[col.field]
+              typeof col.field === "function" ? col.field(row) : row[col.field],
             );
           }
           if (col.name === "created") return formatTimestamp(row.created);
@@ -1148,7 +1157,7 @@ const createPDF = () => {
           return typeof col.field === "function"
             ? col.field(row)
             : row[col.field];
-        })
+        }),
       );
     }
   });
