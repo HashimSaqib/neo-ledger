@@ -285,6 +285,35 @@
                   hide-bottom-space
                   class="col-sm-5 col-12 q-mb-sm"
                 />
+                <div v-if="filteredProjects.length > 0" class="row items-center col-sm-5 col-12 q-mb-sm">
+                  <s-select
+                    outlined
+                    v-model="headerProject"
+                    :options="filteredProjects"
+                    option-label="description"
+                    option-value="value"
+                    emit-value
+                    map-options
+                    :label="t('Project')"
+                    dense
+                    clearable
+                    search="description"
+                    autogrow
+                    hide-bottom-space
+                    class="col"
+                    @update:model-value="applyHeaderProject"
+                  />
+                  <q-icon
+                    name="help"
+                    class="q-ml-xs text-grey-6"
+                    size="18px"
+                    style="cursor: default"
+                  >
+                    <q-tooltip max-width="240px">
+                      {{ t("Selecting a project will apply it to all current line items and any new lines added. Only the line item project is saved.") }}
+                    </q-tooltip>
+                  </q-icon>
+                </div>
                 <div v-if="dcn">
                   {{ dcn }}
                 </div>
@@ -1277,6 +1306,12 @@ const departments = ref([]);
 const selectedDepartment = ref();
 const projects = ref([]);
 const filteredProjects = ref([]);
+const headerProject = ref(null);
+const applyHeaderProject = (projectValue) => {
+  lines.value.forEach((line) => {
+    line.project = projectValue;
+  });
+};
 
 const currencies = ref([]);
 const exchangeRate = ref();
@@ -1390,6 +1425,7 @@ const addLineAt = (index) => {
     unit: "",
     price: 0,
     discount: 0,
+    project: headerProject.value ?? undefined,
   };
   lines.value.splice(index + 1, 0, newLine);
   nextTick(() => {
