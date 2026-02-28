@@ -383,6 +383,30 @@
           account
           option-label="label"
         />
+        <s-select
+          v-model="form.ar_payment"
+          :options="arPaymentOptions"
+          item-label="label"
+          :label="t('AR Payment')"
+          outlined
+          dense
+          class="lightbg input-box col-12 col-md-5"
+          search="label"
+          account
+          option-label="label"
+        />
+        <s-select
+          v-model="form.ap_payment"
+          :options="apPaymentOptions"
+          item-label="label"
+          :label="t('AP Payment')"
+          outlined
+          dense
+          class="lightbg input-box col-12 col-md-5"
+          search="label"
+          account
+          option-label="label"
+        />
         <q-input
           v-model="form.clearing"
           name="clearing"
@@ -762,6 +786,8 @@ const form = ref({
   cash_over_short_account: null,
   ar_account: null,
   ap_account: null,
+  ar_payment: null,
+  ap_payment: null,
   clearing: "",
   transition: "",
   glnumber: "",
@@ -812,6 +838,8 @@ const fxgainlossOptions = ref([]);
 const cashovershortOptions = ref([]);
 const arOptions = ref([]);
 const apOptions = ref([]);
+const arPaymentOptions = ref([]);
+const apPaymentOptions = ref([]);
 
 // Turn the original account into { ...acc, label: "accno--desc" }
 // We keep the rest of the fields (like id, accno, description).
@@ -884,6 +912,22 @@ function filterAPAccounts(accounts) {
     if (!acc.link) return false;
     const link = acc.link.split(":");
     return link.some((link) => link === "AP");
+  });
+}
+
+function filterARPaymentAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some((link) => link === "AR_paid");
+  });
+}
+
+function filterAPPaymentAccounts(accounts) {
+  return accounts.filter((acc) => {
+    if (!acc.link) return false;
+    const link = acc.link.split(":");
+    return link.some((link) => link === "AP_paid");
   });
 }
 
@@ -1051,6 +1095,12 @@ async function loadDefaults() {
     );
     arOptions.value = parseAccountOptions(filterARAccounts(data.all_accounts));
     apOptions.value = parseAccountOptions(filterAPAccounts(data.all_accounts));
+    arPaymentOptions.value = parseAccountOptions(
+      filterARPaymentAccounts(data.all_accounts),
+    );
+    apPaymentOptions.value = parseAccountOptions(
+      filterAPPaymentAccounts(data.all_accounts),
+    );
 
     // Company Info
     form.value.company = data.company_info?.name || "";
@@ -1126,6 +1176,16 @@ async function loadDefaults() {
       findAccountById(
         data.all_accounts,
         data.account_defaults?.ap_account_id,
+      ) || null;
+    form.value.ar_payment =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.ar_payment_id,
+      ) || null;
+    form.value.ap_payment =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.ap_payment_id,
       ) || null;
 
     // Number Sequences
@@ -1227,6 +1287,8 @@ async function submitForm() {
           form.value.cash_over_short_account?.id || null,
         ar_account_id: form.value.ar_account?.id || null,
         ap_account_id: form.value.ap_account?.id || null,
+        ar_payment_id: form.value.ar_payment?.id || null,
+        ap_payment_id: form.value.ap_payment?.id || null,
       },
 
       number_sequences: {

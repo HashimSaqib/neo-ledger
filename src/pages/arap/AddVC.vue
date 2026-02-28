@@ -616,6 +616,7 @@ const accounts = ref([]);
 const recordAccounts = ref([]);
 const defaultRecordAccount = ref(null);
 const paymentAccounts = ref([]);
+const defaultPaymentAccount = ref(null);
 const taxAccounts = ref([]);
 const languages = ref([]);
 const arap = ref("");
@@ -664,24 +665,33 @@ const updateVCSettings = async () => {
     const paymentLink = isCustomer ? "AR_paid" : "AP_paid";
 
     // Filter and format accounts for dropdowns
-    recordAccounts.value = accounts.value
-      .filter((account) => account.link === linkType)
-      .map(formatAccountOption);
+    const filteredRecordAccounts = accounts.value.filter(
+      (account) => account.link === linkType,
+    );
+    recordAccounts.value = filteredRecordAccounts.map(formatAccountOption);
 
-    console.log(defaultRecordAccount.value);
+    const defaultRecord = defaultRecordAccount.value
+      ? filteredRecordAccounts.find(
+          (acc) => String(acc.id) === String(defaultRecordAccount.value),
+        )
+      : null;
+    form.value.arap_accno = defaultRecord
+      ? formatAccountOption(defaultRecord)
+      : recordAccounts.value[0];
 
-    if (!defaultRecordAccount.value) {
-      defaultRecordAccount.value = recordAccounts.value[0].id;
-    }
-    if (defaultRecordAccount.value) {
-      form.value.arap_accno = recordAccounts.value.find(
-        (acc) => acc.value.id == defaultRecordAccount.value.id,
-      );
-    }
+    const filteredPaymentAccounts = accounts.value.filter((account) =>
+      account.link.split(":").includes(paymentLink),
+    );
+    paymentAccounts.value = filteredPaymentAccounts.map(formatAccountOption);
 
-    paymentAccounts.value = accounts.value
-      .filter((account) => account.link.split(":").includes(paymentLink))
-      .map(formatAccountOption);
+    const defaultPayment = defaultPaymentAccount.value
+      ? filteredPaymentAccounts.find(
+          (acc) => String(acc.id) === String(defaultPaymentAccount.value),
+        )
+      : null;
+    form.value.payment_accno = defaultPayment
+      ? formatAccountOption(defaultPayment)
+      : paymentAccounts.value[0];
 
     // Initialize tax checkboxes in form
     taxAccounts.value.forEach((tax) => {
@@ -870,6 +880,7 @@ const fetchLinks = async () => {
     const response = await api.get(`/create_links/${componentType.value}`);
     accounts.value = response.data.accounts.all;
     defaultRecordAccount.value = response.data.record || null;
+    defaultPaymentAccount.value = response.data.payment || null;
     currencies.value = response.data.currencies;
 
     // Determine AR or AP based on componentType
