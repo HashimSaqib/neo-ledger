@@ -724,6 +724,93 @@
         </div>
       </div>
 
+      <!-- Heading: SMTP Settings -->
+      <div class="text-h6 q-mt-md">{{ t("SMTP Settings") }}</div>
+      <div class="maintext q-my-none q-mb-sm">
+        {{ t("Configure outgoing email settings for sending invoices, statements, and other documents.") }}
+      </div>
+      <div class="row q-mb-sm q-gutter-md">
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.smtp_host"
+            name="smtp_host"
+            :label="t('SMTP Host')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.smtp_port"
+            name="smtp_port"
+            :label="t('SMTP Port')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.smtp_username"
+            name="smtp_username"
+            :label="t('SMTP Username')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.smtp_password"
+            name="smtp_password"
+            :label="t('SMTP Password')"
+            :type="showSmtpPassword ? 'text' : 'password'"
+            outlined
+            dense
+            class="lightbg input-box"
+          >
+            <template #append>
+              <q-icon
+                :name="showSmtpPassword ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="showSmtpPassword = !showSmtpPassword"
+              />
+            </template>
+          </q-input>
+        </div>
+        <div class="col-12 col-md-5">
+          <q-input
+            v-model="form.smtp_from_name"
+            name="smtp_from_name"
+            :label="t('From Name')"
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-12 col-md-5">
+          <q-select
+            v-model="form.smtp_ssl"
+            name="smtp_ssl"
+            :label="t('SSL/TLS')"
+            :options="smtpSslOptions"
+            emit-value
+            map-options
+            outlined
+            dense
+            class="lightbg input-box"
+          />
+        </div>
+        <div class="col-auto">
+          <q-checkbox
+            v-model="form.smtp_sasl"
+            name="smtp_sasl"
+            :label="t('SASL Authentication')"
+          />
+        </div>
+      </div>
+
       <!-- Submit Button -->
       <div class="row q-mt-md">
         <div class="col-auto">
@@ -813,7 +900,16 @@ const form = ref({
   lock_customernumber: false,
   vendornumber: "",
   lock_vendornumber: false,
+  smtp_host: "",
+  smtp_port: "",
+  smtp_username: "",
+  smtp_password: "",
+  smtp_from_name: "",
+  smtp_ssl: "",
+  smtp_sasl: false,
 });
+
+const showSmtpPassword = ref(false);
 
 // Options
 const roundOptions = [
@@ -828,6 +924,13 @@ const roundOptions = [
 const typeofcontactOptions = [
   { label: "Company", value: "" },
   { label: "Person", value: "person" },
+];
+
+const smtpSslOptions = [
+  { label: t("None"), value: "" },
+  { label: "SSL", value: "ssl" },
+  { label: "TLS", value: "tls" },
+  { label: "STARTTLS", value: "starttls" },
 ];
 
 // s-select items (arrays of objects)
@@ -1220,6 +1323,16 @@ async function loadDefaults() {
     form.value.vendornumber = data.number_sequences?.vendor?.pattern || "";
     form.value.lock_vendornumber =
       data.number_sequences?.vendor?.locked || false;
+
+    // SMTP Settings
+    form.value.smtp_host = data.smtp?.host || "";
+    form.value.smtp_port = data.smtp?.port || "";
+    form.value.smtp_username = data.smtp?.username || "";
+    form.value.smtp_from_name = data.smtp?.from_name || "";
+    form.value.smtp_ssl = data.smtp?.ssl || "";
+    form.value.smtp_sasl = data.smtp?.sasl ? true : false;
+    // Password is not returned from the API for security; leave blank unless user types a new one
+    form.value.smtp_password = "";
   } catch (err) {
     console.error("Error loading company defaults", err);
   }
@@ -1348,6 +1461,16 @@ async function submitForm() {
           pattern: form.value.projectnumber,
           locked: false,
         },
+      },
+
+      smtp: {
+        host: form.value.smtp_host,
+        port: form.value.smtp_port,
+        username: form.value.smtp_username,
+        password: form.value.smtp_password,
+        from_name: form.value.smtp_from_name,
+        ssl: form.value.smtp_ssl,
+        sasl: form.value.smtp_sasl,
       },
     };
 
