@@ -1320,7 +1320,7 @@ const getPath = (accno, period) => {
 
 const downloadExcel = () => {
   const includeAccNo = formData.value.l_accno;
-  let headerRow = ["Account"];
+  let headerRow = includeAccNo ? ["Acc No", "Account"] : ["Account"];
   const periods = results.value.periods || [];
   periods.forEach((period) => headerRow.push(formatPeriodLabel(period.label)));
   if (periods.length >= 2) {
@@ -1334,11 +1334,12 @@ const downloadExcel = () => {
 
   const addAccountRow = (account, type) => {
     let row = [];
-    const name =
-      includeAccNo && account.accno
-        ? `${account.accno} - ${account.description}`
-        : account.description;
-    row.push(name);
+    if (includeAccNo) {
+      row.push(account.accno || "");
+      row.push(account.description);
+    } else {
+      row.push(account.description);
+    }
     periods.forEach((period) => {
       const amt = account.periods[period.label]?.amount || 0;
       row.push(roundAmount(amt));
@@ -1350,10 +1351,14 @@ const downloadExcel = () => {
     exportData.push(row);
   };
 
-  exportData.push(["Assets"]);
+  const addLabelRow = (label) => {
+    exportData.push(includeAccNo ? ["", label] : [label]);
+  };
+
+  addLabelRow("Assets");
   assetAccounts.value.forEach((a) => addAccountRow(a, "A"));
 
-  let assetsTotalRow = ["Total Assets"];
+  let assetsTotalRow = includeAccNo ? ["", "Total Assets"] : ["Total Assets"];
   periods.forEach((p) =>
     assetsTotalRow.push(
       roundAmount(sumAllAccounts(completeAssetAccounts.value, p.label)),
@@ -1368,10 +1373,12 @@ const downloadExcel = () => {
   exportData.push(assetsTotalRow);
 
   exportData.push([]);
-  exportData.push(["Liabilities"]);
+  addLabelRow("Liabilities");
   liabilityAccounts.value.forEach((a) => addAccountRow(a, "L"));
 
-  let liabTotalRow = ["Total Liabilities"];
+  let liabTotalRow = includeAccNo
+    ? ["", "Total Liabilities"]
+    : ["Total Liabilities"];
   periods.forEach((p) =>
     liabTotalRow.push(
       roundAmount(sumAllAccounts(completeLiabilityAccounts.value, p.label)),
@@ -1386,10 +1393,12 @@ const downloadExcel = () => {
   exportData.push(liabTotalRow);
 
   exportData.push([]);
-  exportData.push(["Equity"]);
+  addLabelRow("Equity");
   equityAccounts.value.forEach((a) => addAccountRow(a, "Q"));
 
-  let earningsRow = ["Current Earnings"];
+  let earningsRow = includeAccNo
+    ? ["", "Current Earnings"]
+    : ["Current Earnings"];
   periods.forEach((p) =>
     earningsRow.push(roundAmount(getCurrentEarnings(p.label))),
   );
@@ -1399,7 +1408,7 @@ const downloadExcel = () => {
   }
   exportData.push(earningsRow);
 
-  let equityTotalRow = ["Total Equity"];
+  let equityTotalRow = includeAccNo ? ["", "Total Equity"] : ["Total Equity"];
   periods.forEach((p) =>
     equityTotalRow.push(roundAmount(getTotalEquity(p.label))),
   );
@@ -1411,7 +1420,9 @@ const downloadExcel = () => {
   }
   exportData.push(equityTotalRow);
 
-  let liabilitiesEquityTotalRow = ["Total Liabilities + Equity"];
+  let liabilitiesEquityTotalRow = includeAccNo
+    ? ["", "Total Liabilities + Equity"]
+    : ["Total Liabilities + Equity"];
   periods.forEach((p) =>
     liabilitiesEquityTotalRow.push(
       roundAmount(getTotalLiabilitiesAndEquity(p.label)),

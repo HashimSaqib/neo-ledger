@@ -1339,7 +1339,7 @@ const getPath = (accno, period) => {
 
 const downloadExcel = () => {
   const includeAccNo = formData.value.l_accno;
-  let headerRow = ["Account"];
+  let headerRow = includeAccNo ? ["Acc No", "Account"] : ["Account"];
   const periods = results.value.periods || [];
   periods.forEach((period) => headerRow.push(period.label));
   if (periods.length >= 2) {
@@ -1353,11 +1353,12 @@ const downloadExcel = () => {
 
   const addAccountRow = (account) => {
     let row = [];
-    const name =
-      includeAccNo && account.accno
-        ? `${account.accno} - ${account.description}`
-        : account.description;
-    row.push(name);
+    if (includeAccNo) {
+      row.push(account.accno || "");
+      row.push(account.description);
+    } else {
+      row.push(account.description);
+    }
     periods.forEach((period) => {
       const amt = account.periods[period.label]?.amount || 0;
       row.push(roundAmount(amt));
@@ -1369,10 +1370,14 @@ const downloadExcel = () => {
     exportData.push(row);
   };
 
-  exportData.push(["Income"]);
+  const addLabelRow = (label) => {
+    exportData.push(includeAccNo ? ["", label] : [label]);
+  };
+
+  addLabelRow("Income");
   incomeAccounts.value.forEach((a) => addAccountRow(a));
 
-  let incomeTotalRow = ["Total Income"];
+  let incomeTotalRow = includeAccNo ? ["", "Total Income"] : ["Total Income"];
   periods.forEach((p) =>
     incomeTotalRow.push(
       roundAmount(sumAllAccounts(completeIncomeAccounts.value, p.label)),
@@ -1387,10 +1392,12 @@ const downloadExcel = () => {
   exportData.push(incomeTotalRow);
 
   exportData.push([]);
-  exportData.push(["Expenses"]);
+  addLabelRow("Expenses");
   expenseAccounts.value.forEach((a) => addAccountRow(a));
 
-  let expenseTotalRow = ["Total Expenses"];
+  let expenseTotalRow = includeAccNo
+    ? ["", "Total Expenses"]
+    : ["Total Expenses"];
   periods.forEach((p) =>
     expenseTotalRow.push(
       roundAmount(sumAllAccounts(completeExpenseAccounts.value, p.label)),
@@ -1405,7 +1412,7 @@ const downloadExcel = () => {
   exportData.push(expenseTotalRow);
 
   exportData.push([]);
-  let netIncomeRow = ["Net Income"];
+  let netIncomeRow = includeAccNo ? ["", "Net Income"] : ["Net Income"];
   periods.forEach((p) => netIncomeRow.push(roundAmount(netIncome(p.label))));
   if (periods.length >= 2) {
     netIncomeRow.push(getNetIncomeVariance() || 0);
