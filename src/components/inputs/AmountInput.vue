@@ -1,5 +1,5 @@
 <template>
-  <div class="input-container">
+  <div class="input-container" ref="containerRef">
     <q-input
       :model-value="displayValue"
       @update:model-value="onInput"
@@ -9,12 +9,16 @@
       dense
       bg-color="input"
       :label="label"
-    />
+    >
+      <template v-for="(_, name) in $slots" #[name]="slotProps">
+        <slot :name="name" v-bind="slotProps ?? {}" />
+      </template>
+    </q-input>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { formatAmount, parseAmount } from "src/helpers/utils";
 
 /**
@@ -48,6 +52,7 @@ const emit = defineEmits(["update:modelValue"]);
  */
 const isEditing = ref(false);
 const rawValue = ref("");
+const containerRef = ref(null);
 
 /**
  * displayValue is what we actually pass to <q-input>.
@@ -68,13 +73,32 @@ function onFocus() {
 }
 
 /**
- * Handle blur: parse the user's input and emit the new value
+ * Handle blur: parse the user's input and emit the new value.
+ * If focus moved to an element inside this component (e.g. the append icon),
+ * skip the emit so an external modelValue update isn't overwritten.
  */
-function onBlur() {
+function onBlur(event) {
+  const relatedTarget = event.relatedTarget;
+  if (
+    relatedTarget &&
+    containerRef.value &&
+    containerRef.value.contains(relatedTarget)
+  ) {
+    return;
+  }
   isEditing.value = false;
   const newVal = parseAmount(rawValue.value);
   emit("update:modelValue", newVal);
 }
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (isEditing.value) {
+      rawValue.value = formatAmount(newVal);
+    }
+  },
+);
 
 /**
  * Sync the rawValue as user types (when focused).

@@ -285,7 +285,10 @@
                   hide-bottom-space
                   class="col-sm-5 col-12 q-mb-sm"
                 />
-                <div v-if="filteredProjects.length > 0" class="row items-center col-sm-5 col-12 q-mb-sm">
+                <div
+                  v-if="filteredProjects.length > 0"
+                  class="row items-center col-sm-5 col-12 q-mb-sm"
+                >
                   <s-select
                     outlined
                     v-model="headerProject"
@@ -310,7 +313,11 @@
                     style="cursor: default"
                   >
                     <q-tooltip max-width="240px">
-                      {{ t("Selecting a project will apply it to all current line items and any new lines added. Only the line item project is saved.") }}
+                      {{
+                        t(
+                          "Selecting a project will apply it to all current line items and any new lines added. Only the line item project is saved.",
+                        )
+                      }}
                     </q-tooltip>
                   </q-icon>
                 </div>
@@ -816,35 +823,33 @@
               dense
               @keyup.enter="handlePaymentEnter(index, $event)"
             />
-            <div class="flex items-end q-gutter-xs">
-              <fn-input
-                outlined
-                v-model="payment.amount"
-                :label="t('Amount')"
-                class="q-mt-sm"
-                bg-color="input"
-                label-color="secondary"
-                dense
-                @keyup.enter="handlePaymentEnter(index, $event)"
-              />
-              <q-btn
+            <fn-input
+              outlined
+              v-model="payment.amount"
+              :label="t('Amount')"
+              class="q-mt-sm"
+              bg-color="input"
+              label-color="secondary"
+              dense
+              @keyup.enter="handlePaymentEnter(index, $event)"
+            >
+              <template
                 v-if="index === payments.length - 1 && balance !== 0"
-                flat
-                dense
-                round
-                icon="content_copy"
-                color="primary"
-                size="sm"
-                class="q-mb-xs"
-                @click="copyRemainingBalanceToPayment(index)"
+                #append
               >
-                <q-tooltip
-                  >{{ t("Copy remaining balance") }} ({{
-                    formatAmount(balance)
-                  }})</q-tooltip
+                <q-icon
+                  name="arrow_downward"
+                  class="cursor-pointer text-primary"
+                  size="18px"
+                  @mousedown.prevent="copyRemainingBalanceToPayment(index)"
                 >
-              </q-btn>
-            </div>
+                  <q-tooltip
+                    >{{ t("Copy remaining balance") }}:
+                    {{ formatAmount(balance) }}</q-tooltip
+                  >
+                </q-icon>
+              </template>
+            </fn-input>
             <fn-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
               outlined
@@ -903,17 +908,17 @@
           <template v-if="isRecurring">
             <q-btn
               color="primary"
-              :label="recurringId ? t('Update recurring invoice') : t('Save recurring invoice')"
+              :label="
+                recurringId
+                  ? t('Update recurring invoice')
+                  : t('Save recurring invoice')
+              "
               icon="save"
               :loading="loading"
               @click="saveRecurringInvoice"
               class="q-mr-md"
             />
-            <q-btn
-              flat
-              :label="t('Cancel')"
-              @click="goToRecurringList"
-            />
+            <q-btn flat :label="t('Cancel')" @click="goToRecurringList" />
           </template>
           <template v-else>
             <s-button
@@ -952,7 +957,11 @@
           </template>
         </div>
 
-        <q-separator class="q-my-sm q-mt-md" size="2px" v-if="invId && !isRecurring" />
+        <q-separator
+          class="q-my-sm q-mt-md"
+          size="2px"
+          v-if="invId && !isRecurring"
+        />
 
         <div class="row q-gutter-x-md" v-if="invId && !isRecurring">
           <s-select
@@ -1089,9 +1098,7 @@ const recurringName = ref("");
 const recurringFrequency = ref("monthly");
 const recurringDeliveryTime = ref("09:00");
 const recurringCustomSchedule = ref(null);
-const recurringStartDate = ref(
-  date.formatDate(new Date(), "YYYY-MM-DD"),
-);
+const recurringStartDate = ref(date.formatDate(new Date(), "YYYY-MM-DD"));
 const recurringEndDate = ref("");
 const recurringDueDateDays = ref(30);
 const recurringSendEmail = ref(false);
@@ -1970,29 +1977,39 @@ async function loadRecurringIntoForm(row) {
     recurringDeliveryTime.value = "09:00";
   }
   const rawSchedule = row.custom_schedule;
-  if (rawSchedule && typeof rawSchedule === "object" && Array.isArray(rawSchedule.days)) {
+  if (
+    rawSchedule &&
+    typeof rawSchedule === "object" &&
+    Array.isArray(rawSchedule.days)
+  ) {
     recurringCustomSchedule.value = { days: [...rawSchedule.days] };
   } else if (rawSchedule && typeof rawSchedule === "string") {
     try {
       const parsed = JSON.parse(rawSchedule);
-      recurringCustomSchedule.value = parsed?.days ? { days: [...parsed.days] } : null;
+      recurringCustomSchedule.value = parsed?.days
+        ? { days: [...parsed.days] }
+        : null;
     } catch {
-      recurringCustomSchedule.value = recurringFrequency.value !== "daily" ? { days: [] } : null;
+      recurringCustomSchedule.value =
+        recurringFrequency.value !== "daily" ? { days: [] } : null;
     }
   } else {
     recurringCustomSchedule.value =
       recurringFrequency.value === "daily" ? null : { days: [] };
   }
-  recurringStartDate.value = row.start_date || date.formatDate(new Date(), "YYYY-MM-DD");
+  recurringStartDate.value =
+    row.start_date || date.formatDate(new Date(), "YYYY-MM-DD");
   recurringEndDate.value = row.end_date || "";
   recurringSendEmail.value = !!row.send_email;
   recurringMessage.value = row.message || "";
   recurringEmailTo.value = row.email_to || "";
-  const payload = row.invoice_payload && typeof row.invoice_payload === "object"
-    ? row.invoice_payload
-    : {};
+  const payload =
+    row.invoice_payload && typeof row.invoice_payload === "object"
+      ? row.invoice_payload
+      : {};
   const dueDays = payload.dueDateDays;
-  recurringDueDateDays.value = dueDays != null && String(dueDays).match(/^\d+$/) ? Number(dueDays) : 30;
+  recurringDueDateDays.value =
+    dueDays != null && String(dueDays).match(/^\d+$/) ? Number(dueDays) : 30;
   const synthetic = buildSyntheticInvoiceFromPayload(payload);
   if (synthetic) {
     invId.value = "";
@@ -2062,19 +2079,35 @@ function buildInvoicePayloadForRecurring() {
 
 async function saveRecurringInvoice() {
   if (!selectedCustomer.value) {
-    Notify.create({ message: t("Customer is required."), type: "negative", position: "center" });
+    Notify.create({
+      message: t("Customer is required."),
+      type: "negative",
+      position: "center",
+    });
     return;
   }
   if (!recordAccount.value) {
-    Notify.create({ message: t("Account is required."), type: "negative", position: "center" });
+    Notify.create({
+      message: t("Account is required."),
+      type: "negative",
+      position: "center",
+    });
     return;
   }
   if (!selectedCurrency.value) {
-    Notify.create({ message: t("Currency is required."), type: "negative", position: "center" });
+    Notify.create({
+      message: t("Currency is required."),
+      type: "negative",
+      position: "center",
+    });
     return;
   }
   if (!lines.value.some((line) => line.partnumber && line.partnumber.id)) {
-    Notify.create({ message: t("At least one line item is required."), type: "negative", position: "center" });
+    Notify.create({
+      message: t("At least one line item is required."),
+      type: "negative",
+      position: "center",
+    });
     return;
   }
   const deliveryTime =
@@ -2082,11 +2115,16 @@ async function saveRecurringInvoice() {
       ? `${recurringDeliveryTime.value}:00`
       : recurringDeliveryTime.value;
   if (!deliveryTime || !/^\d{1,2}:\d{2}(:\d{2})?$/.test(deliveryTime)) {
-    Notify.create({ message: t("Run at (time) is required."), type: "negative", position: "center" });
+    Notify.create({
+      message: t("Run at (time) is required."),
+      type: "negative",
+      position: "center",
+    });
     return;
   }
   if (
-    (recurringFrequency.value === "weekly" || recurringFrequency.value === "monthly") &&
+    (recurringFrequency.value === "weekly" ||
+      recurringFrequency.value === "monthly") &&
     recurringCustomSchedule.value?.days?.length === 0
   ) {
     Notify.create({
@@ -2112,25 +2150,39 @@ async function saveRecurringInvoice() {
       email_to: recurringEmailTo.value || undefined,
     };
     if (
-      (recurringFrequency.value === "weekly" || recurringFrequency.value === "monthly") &&
+      (recurringFrequency.value === "weekly" ||
+        recurringFrequency.value === "monthly") &&
       recurringCustomSchedule.value?.days?.length > 0
     ) {
       body.custom_schedule = { days: recurringCustomSchedule.value.days };
     }
     if (recurringId.value) {
       await api.put(`/recurring-invoices/${recurringId.value}`, body);
-      Notify.create({ message: t("Recurring invoice updated."), type: "positive", position: "top-right" });
+      Notify.create({
+        message: t("Recurring invoice updated."),
+        type: "positive",
+        position: "top-right",
+      });
     } else {
       const { data } = await api.post("/recurring-invoices", body);
-      Notify.create({ message: t("Recurring invoice created."), type: "positive", position: "top-right" });
+      Notify.create({
+        message: t("Recurring invoice created."),
+        type: "positive",
+        position: "top-right",
+      });
       router.replace({
         path: route.path,
-        query: { ...route.query, recurringId: String(data.id), recurring: undefined },
+        query: {
+          ...route.query,
+          recurringId: String(data.id),
+          recurring: undefined,
+        },
       });
     }
   } catch (e) {
     Notify.create({
-      message: e.response?.data?.error || t("Failed to save recurring invoice."),
+      message:
+        e.response?.data?.error || t("Failed to save recurring invoice."),
       type: "negative",
       position: "center",
     });
@@ -2498,7 +2550,8 @@ onMounted(async () => {
       await loadRecurringIntoForm(row);
     } catch (e) {
       Notify.create({
-        message: e.response?.data?.error || t("Failed to load recurring invoice."),
+        message:
+          e.response?.data?.error || t("Failed to load recurring invoice."),
         type: "negative",
         position: "center",
       });

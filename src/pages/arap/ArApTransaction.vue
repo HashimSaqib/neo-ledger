@@ -581,37 +581,35 @@
                   dense
                   @keyup.enter="() => handlePaymentEnter(index)"
                 />
-                <div class="flex items-end q-gutter-xs">
-                  <fn-input
-                    outlined
-                    v-model="payment.amount"
-                    :label="t('Amount')"
-                    class="q-mt-sm"
-                    label-color="secondary"
-                    bg-color="input"
-                    dense
-                    @keyup.enter="() => handlePaymentEnter(index)"
-                  />
-                  <q-btn
+                <fn-input
+                  outlined
+                  v-model="payment.amount"
+                  :label="t('Amount')"
+                  class="q-mt-sm"
+                  label-color="secondary"
+                  bg-color="input"
+                  dense
+                  @keyup.enter="() => handlePaymentEnter(index)"
+                >
+                  <template
                     v-if="
                       index === payments.length - 1 && remainingBalance !== 0
                     "
-                    flat
-                    dense
-                    round
-                    icon="content_copy"
-                    color="primary"
-                    size="sm"
-                    class="q-mb-xs"
-                    @click="copyRemainingBalanceToPayment(index)"
+                    #append
                   >
-                    <q-tooltip
-                      >{{ t("Copy remaining balance") }} ({{
-                        formatAmount(remainingBalance)
-                      }})</q-tooltip
+                    <q-icon
+                      name="arrow_downward"
+                      class="cursor-pointer text-primary"
+                      size="18px"
+                      @mousedown.prevent="copyRemainingBalanceToPayment(index)"
                     >
-                  </q-btn>
-                </div>
+                      <q-tooltip
+                        >{{ t("Copy remaining balance") }}:
+                        {{ formatAmount(remainingBalance) }}</q-tooltip
+                      >
+                    </q-icon>
+                  </template>
+                </fn-input>
                 <fn-input
                   v-if="selectedCurrency && selectedCurrency.rn != 1"
                   outlined
