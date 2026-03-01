@@ -741,12 +741,11 @@ const formData = ref({
   previousyear: "0",
   reversedisplay: false,
   accounttype: "standard",
-  periodMode: "current",
+  periodMode: "yearly",
   periods: [],
 });
 
 const periodModeOptions = [
-  { label: t("Current"), value: "current" },
   { label: t("Monthly"), value: "monthly" },
   { label: t("Quarterly"), value: "quarterly" },
   { label: t("Yearly"), value: "yearly" },
