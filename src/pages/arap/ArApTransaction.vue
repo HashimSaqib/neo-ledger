@@ -204,13 +204,13 @@
                       label-color="secondary"
                     />
 
-                    <text-input
+                    <exchange-rate-input
                       v-if="selectedCurrency && selectedCurrency.rn != 1"
-                      class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm"
-                      :label="t('Exchange Rate')"
-                      outlined
-                      dense
                       v-model="exchangeRate"
+                      :currency="selectedCurrency?.curr"
+                      :transdate="invDate"
+                      :label="t('Exchange Rate')"
+                      class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm"
                     />
                   </div>
                   <div class="row q-mb-sm">
@@ -610,16 +610,13 @@
                     </q-icon>
                   </template>
                 </fn-input>
-                <fn-input
+                <exchange-rate-input
                   v-if="selectedCurrency && selectedCurrency.rn != 1"
-                  outlined
                   v-model="payment.exchangerate"
-                  :label="t('Exhcnage Rate')"
+                  :currency="selectedCurrency?.curr"
+                  :transdate="payment.date || invDate"
+                  :label="t('Exchange Rate')"
                   class="q-mt-sm"
-                  bg-color="input"
-                  label-color="secondary"
-                  dense
-                  @keyup.enter="() => handlePaymentEnter(index)"
                 />
                 <s-select
                   outlined

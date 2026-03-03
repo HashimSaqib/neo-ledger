@@ -27,15 +27,13 @@
           bg-color="input"
           label-color="secondary"
         />
-        <text-input
+        <exchange-rate-input
           v-if="formData.currency.rn != 1"
-          class="col-2"
-          :label="t('Exchange Rate')"
-          bg-color="input"
-          label-color="secondary"
-          outlined
-          dense
           v-model="formData.exchangeRate"
+          :currency="formData.currency?.curr"
+          :transdate="formData.transdate"
+          :label="t('Exchange Rate')"
+          class="col-2"
         />
         <s-select
           v-if="departments.length > 0"

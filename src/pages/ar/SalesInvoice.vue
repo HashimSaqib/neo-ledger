@@ -218,14 +218,13 @@
                   :label="t('Currency')"
                   class="q-mb-sm col-sm-5 col-12"
                 />
-                <text-input
+                <exchange-rate-input
                   v-if="selectedCurrency && selectedCurrency.rn != 1"
-                  class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
-                  :label="t('Exchange Rate')"
-                  outlined
-                  bg-color="input"
-                  dense
                   v-model="exchangeRate"
+                  :currency="selectedCurrency?.curr"
+                  :transdate="invDate"
+                  :label="t('Exchange Rate')"
+                  class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
                 />
               </div>
 
@@ -850,14 +849,13 @@
                 </q-icon>
               </template>
             </fn-input>
-            <fn-input
+            <exchange-rate-input
               v-if="selectedCurrency && selectedCurrency.rn != 1"
-              outlined
               v-model="payment.exchangerate"
-              :label="t('Exch')"
+              :currency="selectedCurrency?.curr"
+              :transdate="payment.date || invDate"
+              :label="t('Exchange Rate')"
               class="q-mt-sm col-1"
-              dense
-              @keyup.enter="handlePaymentEnter(index, $event)"
             />
             <s-select
               outlined

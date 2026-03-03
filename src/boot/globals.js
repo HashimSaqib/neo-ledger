@@ -5,6 +5,7 @@ import TextInput from "src/components/inputs/TextInput.vue";
 import DateInput from "src/components/inputs/DateInput.vue";
 import Button from "src/components/Button.vue";
 import CountryInput from "src/components/inputs/CountryInput.vue";
+import ExchangeRateInput from "src/components/inputs/ExchangeRateInput.vue";
 
 export default boot(({ app }) => {
   // Register globally so you can <search-select> anywhere
@@ -14,4 +15,5 @@ export default boot(({ app }) => {
   app.component("date-input", DateInput);
   app.component("s-button", Button);
   app.component("country-input", CountryInput);
+  app.component("exchange-rate-input", ExchangeRateInput);
 });
