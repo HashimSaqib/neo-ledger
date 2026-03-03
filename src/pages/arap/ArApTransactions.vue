@@ -238,12 +238,6 @@
                 color="primary"
               />
               <q-toggle
-                :model-value="formData.open === 'Y'"
-                @update:model-value="(val) => (formData.open = val ? 'Y' : '')"
-                :label="t('Open')"
-                color="primary"
-              />
-              <q-toggle
                 :model-value="formData.closed === 'Y'"
                 @update:model-value="
                   (val) => (formData.closed = val ? 'Y' : '')
@@ -489,10 +483,10 @@ const type = ref(route.params.type || "customer");
 
 // Computed labels for party selection and number
 const partyListLabel = computed(() =>
-  type.value === "customer" ? t("Customers") : t("Vendors")
+  type.value === "customer" ? t("Customers") : t("Vendors"),
 );
 const partyNumberLabel = computed(() =>
-  type.value === "customer" ? t("Customer Number") : t("Vendor Number")
+  type.value === "customer" ? t("Customer Number") : t("Vendor Number"),
 );
 
 // Form data (with defaults)
@@ -515,10 +509,10 @@ const formData = ref({
   shippingpoint: "",
   shipvia: "",
   waybill: "",
-  open: "Y",
+  open: "",
   summary: "1",
-  outstanding: "",
-  closed: "Y",
+  outstanding: "Y",
+  closed: "",
   paidlate: "",
   paidearly: "",
   onhold: "",
@@ -704,14 +698,14 @@ const baseColumns = ref([
     name: "amount",
     label: t("Total"),
     field: "amount",
-    default: false,
+    default: true,
     align: "right",
   },
   {
     name: "paid",
     label: t("Paid"),
     field: "paid",
-    default: false,
+    default: true,
     align: "right",
   },
   {
@@ -769,13 +763,13 @@ const selectedColumns = ref(
   baseColumns.value.reduce((acc, column) => {
     acc[column.name] = column.default;
     return acc;
-  }, {})
+  }, {}),
 );
 
 // Process filters from cookies (unchanged)
 function processFilters() {
   const savedFilters = LocalStorage.getItem(
-    `${type.value}_transactions_filters`
+    `${type.value}_transactions_filters`,
   );
 
   if (savedFilters) {
@@ -835,7 +829,7 @@ watch(
       console.error("Error saving filters to cookies:", error);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 const columns = computed(() => {
@@ -870,7 +864,7 @@ const fetchAccounts = async () => {
     const accounts = response.data;
     // Filter by AR for customer transactions, AP for vendor transactions.
     recordAccounts.value = accounts.filter(
-      (account) => account.link === (type.value === "customer" ? "AR" : "AP")
+      (account) => account.link === (type.value === "customer" ? "AR" : "AP"),
     );
   } catch (error) {
     console.error(error);
@@ -912,7 +906,7 @@ const flattenParams = (obj, prefix = "") => {
     } else if (typeof value === "object" && !Array.isArray(value)) {
       Object.assign(
         flattened,
-        flattenParams(value, prefix ? `${prefix}[${key}]` : key)
+        flattenParams(value, prefix ? `${prefix}[${key}]` : key),
       );
     } else {
       const paramKey = prefix ? `${prefix}[${key}]` : key;
@@ -937,7 +931,7 @@ const loadParams = (triggerSearch = true) => {
   // Load account using "accno"
   if (query.accno) {
     const account = recordAccounts.value.find(
-      (acc) => acc.accno === query.accno
+      (acc) => acc.accno === query.accno,
     );
     formData.value.account = account || {
       accno: query.accno,
@@ -949,7 +943,7 @@ const loadParams = (triggerSearch = true) => {
   if (query.customernumber) {
     const cust = customers.value.find(
       (c) =>
-        c.customernumber.toLowerCase() === query.customernumber.toLowerCase()
+        c.customernumber.toLowerCase() === query.customernumber.toLowerCase(),
     );
     formData.value.customer = cust || query.customer;
   }
@@ -1020,9 +1014,7 @@ const search = async () => {
 
 const clearForm = () => {
   Object.keys(formData.value).forEach((key) => {
-    if (key === "open") {
-      formData.value[key] = "Y";
-    } else if (key === "summary") {
+    if (key === "summary") {
       formData.value[key] = "1";
     } else if (key === "interval") {
       formData.value[key] = "0";
@@ -1068,12 +1060,12 @@ const downloadPDF = () => {
     columns.value,
     totals.value,
     title.value,
-    params
+    params,
   );
 };
 onMounted(async () => {
   updateTitle(
-    type.value === "customer" ? "Customer Transactions" : "Vendor Transactions"
+    type.value === "customer" ? "Customer Transactions" : "Vendor Transactions",
   );
   processFilters();
   loadParams(true);
