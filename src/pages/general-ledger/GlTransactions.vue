@@ -293,14 +293,22 @@
         <template v-slot:body="props">
           <!-- Group Header Row -->
           <q-tr v-if="props.row.isGroupHeader" class="group-header">
-            <q-td :colspan="displayColumns.length" class="text-left">
+            <q-td
+              v-for="(col, colIndex) in displayColumns"
+              :key="col.name"
+              :class="getCellClass(col)"
+            >
               <router-link
+                v-if="colIndex === 0"
                 to="#"
                 @click.prevent="filterByAccno(props.row.accno)"
                 class="text-primary"
               >
                 <strong>{{ props.row.groupLabel }}</strong>
               </router-link>
+              <span v-else-if="col.name === 'balance'">{{
+                props.row.balance != null ? formatAmount(props.row.balance) : '—'
+              }}</span>
             </q-td>
           </q-tr>
           <!-- Subtotal Row -->
@@ -720,8 +728,6 @@ const displayColumns = computed(() => {
 // that account (same value for all rows of the same account). We use that as
 // the starting point and accumulate debit - credit forward.
 function groupData(data) {
-  // Preserve the backend's accno-first ordering by collecting groups in
-  // insertion order rather than re-sorting them.
   const groupOrder = [];
   const groups = {};
   data.forEach((row) => {
@@ -735,17 +741,18 @@ function groupData(data) {
   const finalRows = [];
   groupOrder.forEach((acc) => {
     const group = groups[acc];
+    // Opening balance from API, flipped for display
+    const openingBalance =
+      group[0].balance != null ? -Number(group[0].balance) : null;
     finalRows.push({
       isGroupHeader: true,
       accno: acc,
       account_description: group[0].account_description,
       groupLabel: `${acc} -- ${group[0].account_description}`,
+      balance: openingBalance,
     });
 
-    // Use the opening balance provided by the backend (same on every row for
-    // this account). Fall back to 0 if the field is absent (non-split mode).
     let runningBalance = Number(group[0].balance) * -1 || 0;
-
     group.forEach((row) => {
       runningBalance += Number(row.debit) - Number(row.credit);
       finalRows.push({ ...row, balance: runningBalance });
@@ -962,18 +969,17 @@ const formatTaxAcc = (row) => {
 // Use results directly for your table rows
 const tableRows = computed(() => results.value);
 
-// Compute overall totals (this example computes totals on ungrouped data; adjust as needed)
-// Now using appliedSplitLedger so totals reflect the state at search time.
+// Overall totals for split ledger
 const overallTotals = computed(() => {
   if (!appliedSplitLedger.value) return null;
   const subtotals = results.value.filter((row) => row.isSubtotal);
-  let totalDebit = subtotals.reduce((sum, r) => sum + Number(r.debit), 0);
-  let totalCredit = subtotals.reduce((sum, r) => sum + Number(r.credit), 0);
-  let totalTax = subtotals.reduce(
+  const totalDebit = subtotals.reduce((sum, r) => sum + Number(r.debit), 0);
+  const totalCredit = subtotals.reduce((sum, r) => sum + Number(r.credit), 0);
+  const totalTax = subtotals.reduce(
     (sum, r) => sum + (Number(r.taxAmount) || 0),
     0,
   );
-  let totalBalance = subtotals.reduce((sum, r) => sum + Number(r.balance), 0);
+  const totalBalance = subtotals.reduce((sum, r) => sum + Number(r.balance), 0);
   return { totalDebit, totalCredit, totalTax, totalBalance };
 });
 
