@@ -3,416 +3,534 @@
     <q-form
       @submit.prevent="submitForm"
       ref="formRef"
-      class="q-px-md container"
-      :class="haveProps ? 'q-py-sm' : 'q-py-sm'"
+      class="q-px-md add-vc-form"
+      :class="[
+        haveProps ? 'q-py-sm add-vc-form--full-width' : 'q-py-sm container',
+      ]"
     >
       <div class="">
         <!-- Type Selection -->
-        <div class="row q-mb-sm">
-          <q-radio v-model="form.typeofcontact" val="company" label="Company" />
-          <q-radio v-model="form.typeofcontact" val="person" label="Person" />
+        <div class="row q-gutter-md q-mb-sm items-center">
+          <q-radio v-model="form.typeofcontact" val="company">
+            <template #default>
+              <q-icon name="business" size="sm" class="q-mr-xs" />
+              <span>{{ t("Company") }}</span>
+            </template>
+          </q-radio>
+          <q-radio v-model="form.typeofcontact" val="person">
+            <template #default>
+              <q-icon name="person" size="sm" class="q-mr-xs" />
+              <span>{{ t("Person") }}</span>
+            </template>
+          </q-radio>
         </div>
 
-        <!-- Section Toggles -->
-        <div class="row q-mb-md q-gutter-sm">
-          <q-checkbox
-            v-model="showAdditionalInfo"
-            :label="t('Additional Information')"
-            dense
+        <!-- Tab Navigation -->
+        <q-tabs
+          v-model="activeTab"
+          dense
+          class="add-vc-tabs q-mb-none q-pa-md"
+          active-color="white"
+          inactive-color="grey-7"
+          indicator-color="primary"
+          align="left"
+        >
+          <q-tab name="customer" :label="vcType" />
+          <q-tab name="contact" :label="t('Contact Person')" />
+          <q-tab name="vat" :label="t('VAT')" />
+          <q-tab
+            v-if="componentType === 'customer'"
+            name="communication"
+            :label="t('Communication')"
           />
-          <q-checkbox
-            v-model="showContactPerson"
-            :label="t('Contact Person')"
-            dense
-          />
-          <q-checkbox
-            v-model="showBankAccounts"
-            :label="t('Bank Accounts')"
-            dense
-            :disable="!isEditMode"
-          />
+          <q-tab name="accounting" :label="t('Accounting')" />
+          <q-tab name="bank" :label="t('Bank Accounts')" />
+        </q-tabs>
+
+        <div class="q-px-md">
+          <q-separator class="q-my-md" />
         </div>
 
-        <div class="row full-width">
-          <!-- First Column - Mandatory Fields -->
-          <div class="col-12 col-md-3 container-bg q-pa-md q-pr-sm">
-            <text-input
-              v-model="form.vcnumber"
-              name="vcnumber"
-              :label="t(`${vcType} Number`)"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.name"
-              name="name"
-              :label="t(`${vcType}`)"
-              outlined
-              dense
-              required
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.address1"
-              name="address1"
-              :label="t('Street Name')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.street"
-              name="street"
-              :label="t('Street Number')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.address2"
-              name="address2"
-              :label="t('Address 2')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.post_office"
-              name="post_office"
-              :label="t('Postal Office')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.city"
-              name="city"
-              :label="t('City')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.zipcode"
-              name="zipcode"
-              :label="t('Zip/Postal Code')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <country-input
-              v-model="form.country"
-              name="country"
-              :label="t('Country')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.email"
-              name="email"
-              :label="t('E-mail')"
-              outlined
-              dense
-              type="email"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.cc"
-              name="cc"
-              :label="t('Cc')"
-              outlined
-              dense
-              type="email"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.bcc"
-              name="bcc"
-              :label="t('Bcc')"
-              outlined
-              dense
-              type="email"
-              class="q-mb-sm"
-            />
-            <s-select
-              v-if="languages.length > 0"
-              v-model="form.language_code"
-              name="language_code"
-              :options="languages"
-              option-value="code"
-              option-label="description"
-              emit-value
-              map-options
-              :label="t('Language')"
-              outlined
-              dense
-              clearable
-              class="q-mb-sm"
-            />
-
-            <!-- Message (customers only) -->
-            <div v-if="componentType === 'customer'" class="q-mb-sm">
-              <MessageVariableInput
-                type="invoice_send"
-                :message-rows="customerMessageRows"
-                :active-message-language="activeMessageLanguage"
-                :label="t('Message')"
-                @update:message-rows="onCustomerMessageRowsUpdate"
-                @update:active-message-language="activeMessageLanguage = $event"
-              />
+        <q-tab-panels v-model="activeTab" animated class="q-pa-md">
+          <!-- Customer tab -->
+          <q-tab-panel name="customer" class="q-pa-none">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-8">
+                <text-input
+                  v-model="form.name"
+                  name="name"
+                  :label="t(`${vcType} Name`)"
+                  outlined
+                  dense
+                  required
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <text-input
+                  v-model="form.vcnumber"
+                  name="vcnumber"
+                  :label="t(`${vcType} Number`)"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
             </div>
 
-            <!-- Tax Section -->
-            <div class="q-mb-md row">
-              <div v-for="tax in taxAccounts" :key="tax.id">
+            <div
+              class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
+            >
+              {{ t("Address") }}
+            </div>
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-8">
+                <text-input
+                  v-model="form.address1"
+                  name="address1"
+                  :label="t('Street Name')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <text-input
+                  v-model="form.street"
+                  name="street"
+                  :label="t('Street Number')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12">
+                <text-input
+                  v-model="form.address2"
+                  name="address2"
+                  :label="t('Address 2')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12">
+                <text-input
+                  v-model="form.post_office"
+                  name="post_office"
+                  :label="t('Postal Office')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.zipcode"
+                  name="zipcode"
+                  :label="t('Zip/Postal Code')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.city"
+                  name="city"
+                  :label="t('City')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.state"
+                  name="state"
+                  :label="t('State/Province')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <country-input
+                  v-model="form.country"
+                  name="country"
+                  :label="t('Country')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+            </div>
+
+            <div
+              class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
+            >
+              {{ t("Contact") }}
+            </div>
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.phone"
+                  name="phone"
+                  :label="t('Phone')"
+                  outlined
+                  dense
+                  type="tel"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.mobile"
+                  name="mobile"
+                  :label="t('Mobile')"
+                  outlined
+                  dense
+                  type="tel"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.email"
+                  name="email"
+                  :label="t('E-mail')"
+                  outlined
+                  dense
+                  type="email"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.cc"
+                  name="cc"
+                  :label="t('Cc')"
+                  outlined
+                  dense
+                  type="email"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12">
+                <text-input
+                  v-model="form.bcc"
+                  name="bcc"
+                  :label="t('Bcc')"
+                  outlined
+                  dense
+                  type="email"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.fax"
+                  name="fax"
+                  :label="t('Fax')"
+                  outlined
+                  dense
+                  type="tel"
+                  class="q-mb-sm"
+                />
+              </div>
+            </div>
+
+            <div
+              class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
+            >
+              {{ t("Additional") }}
+            </div>
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.taxnumber"
+                  name="taxnumber"
+                  :label="t('Tax Number / SSN')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.sic_code"
+                  name="sic_code"
+                  :label="t('SIC')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12">
+                <text-input
+                  v-model="form.notes"
+                  name="notes"
+                  :label="t('Notes')"
+                  type="textarea"
+                  outlined
+                  rows="3"
+                  class="q-mb-sm"
+                />
+              </div>
+            </div>
+            <q-separator class="q-mt-md" />
+          </q-tab-panel>
+
+          <!-- Contact Person tab -->
+          <q-tab-panel name="contact" class="q-pa-none">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6 q-col-gutter-md">
+                <text-input
+                  v-model="form.salutation"
+                  name="salutation"
+                  :label="t('Salutation')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <text-input
+                  v-model="form.firstname"
+                  name="firstname"
+                  :label="t('First Name')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <text-input
+                  v-model="form.occupation"
+                  name="occupation"
+                  :label="t('Occupation')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6 q-col-gutter-md">
+                <text-input
+                  v-model="form.contacttitle"
+                  name="contacttitle"
+                  :label="t('Title')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <text-input
+                  v-model="form.lastname"
+                  name="lastname"
+                  :label="t('Last Name')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <div class="q-mb-sm">
+                  <q-radio
+                    v-model="form.gender"
+                    name="gender"
+                    val="M"
+                    :label="t('Male')"
+                  />
+                  <q-radio
+                    v-model="form.gender"
+                    name="gender"
+                    val="F"
+                    :label="t('Female')"
+                  />
+                </div>
+              </div>
+            </div>
+          </q-tab-panel>
+
+          <!-- VAT tab -->
+          <q-tab-panel name="vat" class="q-pa-none">
+            <div class="text-subtitle2 text-weight-medium q-mb-sm">
+              {{ t("VAT Rates") }}
+            </div>
+            <div class="q-col-gutter-sm">
+              <div
+                v-for="tax in taxAccounts"
+                :key="tax.id"
+                class="col-12 col-sm-6 col-md-4"
+              >
                 <q-checkbox
                   v-model="form[`tax_${tax.id}`]"
                   :name="`tax_${tax.id}`"
                   :label="tax.description"
                   :false-value="0"
                   :true-value="1"
+                  dense
                 />
               </div>
-              <q-checkbox
-                v-model="form.taxincluded"
-                name="taxincluded"
-                :label="t('Tax Included')"
-              />
             </div>
-          </div>
+            <q-separator class="q-mt-md" />
+            <q-checkbox
+              v-model="form.taxincluded"
+              name="taxincluded"
+              :label="t('Tax Included')"
+              class="q-mt-md"
+              dense
+            />
+            <q-separator class="q-mt-md" />
+          </q-tab-panel>
 
-          <!-- Second Column - Additional Information (when enabled) -->
-          <div
-            v-show="showAdditionalInfo"
-            class="col-12 col-md-3 container-bg q-pa-md q-px-sm"
+          <!-- Communication tab -->
+          <q-tab-panel
+            v-if="componentType === 'customer'"
+            name="communication"
+            class="q-pa-none"
           >
-            <text-input
-              v-model="form.state"
-              name="state"
-              :label="t('State/Province')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.notes"
-              name="notes"
-              :label="t('Notes')"
-              type="textarea"
-              outlined
-              rows="3"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.phone"
-              name="phone"
-              :label="t('Phone')"
-              outlined
-              dense
-              type="tel"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.fax"
-              name="fax"
-              :label="t('Fax')"
-              outlined
-              dense
-              type="tel"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.mobile"
-              name="mobile"
-              :label="t('Mobile')"
-              outlined
-              dense
-              type="tel"
-              class="q-mb-sm"
-            />
-
-            <!-- Account Information -->
-            <div class="row items-center q-mb-sm">
-              <div class="col-4">{{ arap }}</div>
-              <q-select
-                v-model="form.arap_accno"
-                name="arap_accno"
-                :options="recordAccounts"
-                outlined
-                dense
-                class="col-8"
-              />
+            <div class="row q-col-gutter-md">
+              <div class="col-12" v-if="languages.length > 0">
+                <s-select
+                  v-model="form.language_code"
+                  name="language_code"
+                  :options="languages"
+                  option-value="code"
+                  option-label="description"
+                  emit-value
+                  map-options
+                  :label="t('Language')"
+                  outlined
+                  dense
+                  clearable
+                  class="q-mb-sm"
+                />
+              </div>
+              <div v-if="componentType === 'customer'" class="col-12">
+                <MessageVariableInput
+                  type="invoice_send"
+                  :message-rows="customerMessageRows"
+                  :active-message-language="activeMessageLanguage"
+                  :label="t('Message')"
+                  @update:message-rows="onCustomerMessageRowsUpdate"
+                  @update:active-message-language="
+                    activeMessageLanguage = $event
+                  "
+                />
+              </div>
             </div>
+            <q-separator class="q-mt-md" />
+          </q-tab-panel>
 
-            <div class="row items-center q-mb-sm">
-              <div class="col-4">{{ t("Payment") }}</div>
-              <q-select
-                v-model="form.payment_accno"
-                name="payment_accno"
-                :options="paymentAccounts"
-                outlined
-                dense
-                class="col-8"
-              />
+          <!-- Accounting tab -->
+          <q-tab-panel name="accounting" class="q-pa-none">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <div class="text-caption text-weight-medium q-mb-xs">
+                  {{ arap }} {{ t("Account") }}
+                </div>
+                <q-select
+                  v-model="form.arap_accno"
+                  name="arap_accno"
+                  :options="recordAccounts"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="text-caption text-weight-medium q-mb-xs">
+                  {{ t("Payment Account") }}
+                </div>
+                <q-select
+                  v-model="form.payment_accno"
+                  name="payment_accno"
+                  :options="paymentAccounts"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <fn-input
+                  v-model="form.creditlimit"
+                  name="creditlimit"
+                  :label="t('Credit Limit')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.threshold"
+                  name="threshold"
+                  :label="t('Threshold')"
+                  outlined
+                  dense
+                  type="number"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.terms"
+                  name="terms"
+                  :label="t('Terms (days)')"
+                  outlined
+                  dense
+                  type="number"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-select
+                  v-model="form.curr"
+                  name="curr"
+                  :options="currencies"
+                  :label="t('Currency')"
+                  option-value="curr"
+                  option-label="curr"
+                  emit-value
+                  map-options
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12">
+                <text-input
+                  v-model="form.discount"
+                  name="discount"
+                  :label="t('Discount (%)')"
+                  outlined
+                  dense
+                  type="number"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.startdate"
+                  name="startdate"
+                  :label="t('Start Date')"
+                  outlined
+                  dense
+                  type="date"
+                  class="q-mb-sm"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.enddate"
+                  name="enddate"
+                  :label="t('End Date')"
+                  outlined
+                  dense
+                  type="date"
+                  class="q-mb-sm"
+                />
+              </div>
             </div>
+            <q-separator class="q-mt-md" />
+          </q-tab-panel>
 
-            <!-- Additional Fields -->
-            <fn-input
-              v-model="form.creditlimit"
-              name="creditlimit"
-              :label="t('Credit Limit')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.threshold"
-              name="threshold"
-              :label="t('Threshold')"
-              outlined
-              dense
-              type="number"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.terms"
-              name="terms"
-              :label="t('Terms (days)')"
-              outlined
-              dense
-              type="number"
-              class="q-mb-sm"
-            />
-
-            <!-- Currency and Dates -->
-            <q-select
-              v-model="form.curr"
-              name="curr"
-              :options="currencies"
-              :label="t('Currency')"
-              option-value="curr"
-              option-label="curr"
-              emit-value
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.startdate"
-              name="startdate"
-              :label="t('Start Date')"
-              outlined
-              dense
-              type="date"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.enddate"
-              name="enddate"
-              :label="t('End Date')"
-              outlined
-              dense
-              type="date"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.discount"
-              name="discount"
-              :label="t('Discount (%)')"
-              outlined
-              dense
-              type="number"
-              class="q-mb-sm"
-            />
-
-            <!-- Tax Information -->
-            <text-input
-              v-model="form.taxnumber"
-              name="taxnumber"
-              :label="t('Tax Number / SSN')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.sic_code"
-              name="sic_code"
-              :label="t('SIC')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-          </div>
-
-          <!-- Third Column - Contact Person (when enabled) -->
-          <div
-            v-show="showContactPerson"
-            class="col-12 col-md-3 container-bg q-pa-md q-px-sm"
-          >
-            <text-input
-              v-model="form.salutation"
-              name="salutation"
-              :label="t('Salutation')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.firstname"
-              name="firstname"
-              :label="t('First Name')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.lastname"
-              name="lastname"
-              :label="t('Last Name')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.contacttitle"
-              name="contacttitle"
-              :label="t('Title')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.occupation"
-              name="occupation"
-              :label="t('Occupation')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-
-            <div class="q-mb-sm">
-              <q-radio
-                v-model="form.gender"
-                name="gender"
-                val="M"
-                label="Male"
-              />
-              <q-radio
-                v-model="form.gender"
-                name="gender"
-                val="F"
-                label="Female"
-              />
-            </div>
-          </div>
-
-          <!-- Fourth Column - Bank Accounts (when enabled) -->
-          <div
-            v-show="showBankAccounts"
-            class="col-12 col-md-3 container-bg q-pa-md q-pl-sm"
-          >
+          <!-- Bank Accounts tab -->
+          <q-tab-panel name="bank" class="q-pa-none">
             <div class="row items-center justify-between q-mb-sm">
               <div class="text-subtitle2 text-weight-medium">
                 {{ t("Bank Accounts") }}
@@ -424,6 +542,7 @@
                 icon="add"
                 size="sm"
                 color="primary"
+                :disable="!isEditMode"
                 @click="openAddBankDialog"
               />
             </div>
@@ -467,9 +586,26 @@
 
             <div v-else class="text-center q-py-xl text-grey-6">
               <q-icon name="account_balance" size="3rem" class="q-mb-sm" />
-              <div class="text-body2">{{ t("No bank accounts") }}</div>
+              <div class="text-body2">
+                {{ t("No bank accounts added yet.") }}
+              </div>
+              <q-btn
+                flat
+                :label="t('Add Bank Account')"
+                icon="add"
+                color="primary"
+                class="q-mt-sm"
+                :disable="!isEditMode"
+                @click="openAddBankDialog"
+              />
             </div>
-          </div>
+          </q-tab-panel>
+        </q-tab-panels>
+
+        <!-- Action Buttons -->
+
+        <div class="row q-px-md">
+          <s-button type="save" @click="submitForm()" :loading="loading" />
         </div>
       </div>
 
@@ -488,18 +624,6 @@
       @saved="handleBankAccountSaved"
       @close="handleBankFormClose"
     />
-
-    <!-- Action Buttons -->
-    <div class="row justify-start q-mt-md">
-      <q-btn
-        :label="t('Save')"
-        type="submit"
-        color="primary"
-        :loading="loading"
-        :disable="loading"
-        @click="submitForm()"
-      />
-    </div>
   </q-page>
 </template>
 <script setup>
@@ -544,10 +668,8 @@ const vcType = computed(() =>
   componentType.value === "customer" ? "Customer" : "Vendor",
 );
 
-// Section visibility toggles
-const showAdditionalInfo = ref(false);
-const showContactPerson = ref(false);
-const showBankAccounts = ref(false);
+// Active tab for tabular navigation
+const activeTab = ref("customer");
 
 // Bank account management
 const showBankFormDialog = ref(false);
@@ -931,6 +1053,30 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.add-vc-form {
+  width: 80%;
+}
+
+.add-vc-form--full-width {
+  width: 100%;
+}
+
+/* Tab styling: active tab with filled background like screenshot */
+.add-vc-tabs :deep(.q-tab) {
+  border-radius: 4px;
+  margin-right: 4px;
+  text-transform: none;
+}
+
+.add-vc-tabs :deep(.q-tab--active) {
+  background: var(--q-primary);
+  color: white;
+}
+
+.add-vc-tabs :deep(.q-tab__indicator) {
+  display: none;
+}
+
 .bank-item {
   transition: all 0.2s ease;
 }

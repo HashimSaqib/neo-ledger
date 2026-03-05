@@ -1,820 +1,887 @@
 <template>
-  <q-page class="q-px-md q-py-md">
-    <q-form ref="formRef" class="q-pa-md mainbg" @submit.prevent="submitForm">
-      <div class="row q-mb-sm q-gutter-md">
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.company"
-            name="company"
-            :label="t('Company Name')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.address"
-            name="address"
-            :label="t('Address')"
-            type="textarea"
-            outlined
-            dense
-            rows="2"
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.address1"
-            name="address1"
-            :label="t('Street Name')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.street"
-            name="street"
-            :label="t('Street Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.address2"
-            name="address2"
-            :label="t('Address 2')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.post_office"
-            name="post_office"
-            :label="t('Postal Office')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.city"
-            name="city"
-            :label="t('City')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.state"
-            name="state"
-            :label="t('State/Province')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.zip"
-            name="zip"
-            :label="t('ZIP/Postal Code')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <country-input
-            v-model="form.country"
-            name="country"
-            :label="t('Country')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.businessnumber"
-            name="businessnumber"
-            :label="t('Business Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.referenceurl"
-            name="referenceurl"
-            :label="t('Reference Documents')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.precision"
-            name="precision"
-            :label="t('Precision')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.annualinterest"
-            name="annualinterest"
-            :label="t('Annual Interest')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.tel"
-            name="tel"
-            :label="t('Phone')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.fax"
-            name="fax"
-            :label="t('Fax')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.companyemail"
-            name="companyemail"
-            :label="t('E-mail')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.companywebsite"
-            name="companywebsite"
-            :label="t('Website')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.latepaymentfee"
-            name="latepaymentfee"
-            :label="t('Late Payment Fee')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.restockingcharge"
-            name="restockingcharge"
-            :label="t('Restocking Charge')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.weightunit"
-            name="weightunit"
-            :label="t('Weight Unit')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.termdays"
-            name="termdays"
-            type="number"
-            :label="t('Term (days)')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.method"
-            name="method"
-            :label="t('Reporting Method (Cash)')"
-          />
-          <q-checkbox
-            v-model="form.checkinventory"
-            name="checkinventory"
-            :label="t('Check Inventory')"
-          />
-          <q-checkbox
-            v-model="form.forcewarehouse"
-            name="forcewarehouse"
-            :label="t('Force Warehouse')"
-          />
-          <q-checkbox
-            v-model="form.hideaccounts"
-            name="hideaccounts"
-            :label="t('Hide Closed Accounts')"
-          />
-          <q-checkbox
-            v-model="form.linetax"
-            name="linetax"
-            :label="t('Line Tax')"
-            :disable="locklinetax"
-          />
-          <q-checkbox
-            v-model="form.namesbynumber"
-            name="namesbynumber"
-            :label="t('Sort Names by Number')"
-          />
-          <q-checkbox
-            v-model="form.xelatex"
-            name="xelatex"
-            :label="t('XeLatex')"
-          />
-          <q-checkbox
-            v-model="form.paymentfile"
-            name="paymentfile"
-            :label="t('Payment File')"
-          />
-        </div>
-      </div>
-      <div class="row items-center">
-        <p class="q-my-none q-py-none">Round</p>
-        <q-option-group
-          v-model="form.roundchange"
-          name="roundchange"
-          type="radio"
-          inline
-          :options="roundOptions"
-          :label="t('Round')"
-        />
-      </div>
-      <div class="row">
-        <div>
-          <q-option-group
-            v-model="form.typeofcontact"
-            name="typeofcontact"
-            type="radio"
-            inline
-            :options="typeofcontactOptions"
-            :label="t('Type of Contact')"
-            class="col-12 col-md-5"
-          />
-        </div>
+  <q-page class="q-pa-md lightbg q-py-sm">
+    <q-form
+      ref="formRef"
+      class="q-px-md q-py-sm defaults-form container"
+      @submit.prevent="submitForm"
+    >
+      <!-- Tab Navigation -->
+      <q-tabs
+        v-model="activeTab"
+        dense
+        class="defaults-tabs q-mb-none q-pa-md"
+        active-color="white"
+        inactive-color="grey-7"
+        indicator-color="primary"
+        align="left"
+      >
+        <q-tab name="company" :label="t('Company')" />
+        <q-tab name="settings" :label="t('Settings')" />
+        <q-tab name="accounting" :label="t('Accounting')" />
+        <q-tab name="numbers" :label="t('Number Sequences')" />
+        <q-tab name="email" :label="t('Email')" />
+      </q-tabs>
+
+      <div class="q-px-md">
+        <q-separator class="q-my-md" />
       </div>
 
-      <!-- Heading: Default Accounts -->
-      <div class="text-h6 q-mt-md">{{ t("Default Accounts") }}</div>
-
-      <!-- Inventory & Income -->
-      <div class="row q-mb-sm q-gutter-md">
-        <s-select
-          v-model="form.inventory_account"
-          :options="inventoryOptions"
-          item-label="label"
-          :label="t('Inventory')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          option-label="label"
-          account
-        />
-        <s-select
-          v-model="form.income_account"
-          :options="incomeOptions"
-          item-label="label"
-          :label="t('Income')"
-          outlined
-          dense
-          search="label"
-          class="lightbg input-box col-12 col-md-5"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.expense_account"
-          :options="expenseOptions"
-          item-label="label"
-          :label="t('Expense')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.fx_gain_loss_account"
-          :options="fxgainlossOptions"
-          item-label="label"
-          :label="t('Foreign Exchange Gain/Loss')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.cash_over_short_account"
-          :options="cashovershortOptions"
-          item-label="label"
-          :label="t('Cash Over/Short')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.ar_account"
-          :options="arOptions"
-          item-label="label"
-          :label="t('AR Record')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.ap_account"
-          :options="apOptions"
-          item-label="label"
-          :label="t('AP Record')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.ar_payment"
-          :options="arPaymentOptions"
-          item-label="label"
-          :label="t('AR Payment')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <s-select
-          v-model="form.ap_payment"
-          :options="apPaymentOptions"
-          item-label="label"
-          :label="t('AP Payment')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-          search="label"
-          account
-          option-label="label"
-        />
-        <q-input
-          v-model="form.clearing"
-          name="clearing"
-          :label="t('Clearing Account')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-        />
-        <q-input
-          v-model="form.transition"
-          name="transition"
-          :label="t('Transition Account')"
-          outlined
-          dense
-          class="lightbg input-box col-12 col-md-5"
-        />
-      </div>
-
-      <!-- Heading: Last Numbers -->
-      <div class="text-h6 q-mt-md">{{ t("Last Numbers") }}</div>
-      <div class="maintext q-my-none">
-        {{
-          t(
-            "Next numbers combine fixed patterns with variables and auto-incrementing digits. Use variables like <%date%> or <%yy%><%mm%> together with numbers (e.g., 0001) to create custom numbering sequences that increment automatically.",
-          )
-        }}
-      </div>
-      <!-- Variable Chips for Defaults -->
-      <div class="row q-my-xs q-gutter-sm">
-        <template v-if="activeLastNumberField">
-          <q-chip
-            color="primary"
-            v-for="item in filteredTokens"
-            :key="item.token"
-            clickable
-            class="cursor-pointer"
-            @click="insertToken(item.token)"
-          >
-            {{ item.token }}
-            <q-tooltip>{{ item.tooltip }}</q-tooltip>
-          </q-chip>
-        </template>
-      </div>
-
-      <!-- GL Reference Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.glnumber"
-            name="glnumber"
-            :label="t('GL Reference Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('glnumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_glnumber"
-            name="lock_glnumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Sales Invoice/AR Transaction Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.sinumber"
-            name="sinumber"
-            :label="t('Sales Invoice/AR Transaction Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('sinumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_sinumber"
-            name="lock_sinumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Sales Order Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.sonumber"
-            name="sonumber"
-            :label="t('Sales Order Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('sonumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_sonumber"
-            name="lock_sonumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Vendor Invoice/AP Transaction Number -->
-      <div class="row q-mb-sm">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.vinumber"
-            name="vinumber"
-            :label="t('Vendor Invoice/AP Transaction Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('vinumber')"
-          />
-        </div>
-      </div>
-
-      <!-- Batch Number -->
-      <div class="row q-mb-sm">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.batchnumber"
-            name="batchnumber"
-            :label="t('Batch Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('batchnumber')"
-          />
-        </div>
-      </div>
-
-      <!-- Voucher Number -->
-      <div class="row q-mb-sm">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.vouchernumber"
-            name="vouchernumber"
-            :label="t('Voucher Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('vouchernumber')"
-          />
-        </div>
-      </div>
-
-      <!-- Purchase Order Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.ponumber"
-            name="ponumber"
-            :label="t('Purchase Order Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('ponumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_ponumber"
-            name="lock_ponumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Sales Quotation Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.sqnumber"
-            name="sqnumber"
-            :label="t('Sales Quotation Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('sqnumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_sqnumber"
-            name="lock_sqnumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- RFQ Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.rfqnumber"
-            name="rfqnumber"
-            :label="t('RFQ Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('rfqnumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_rfqnumber"
-            name="lock_rfqnumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Part Number -->
-      <div class="row q-mb-sm">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.partnumber"
-            name="partnumber"
-            :label="t('Part Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('partnumber')"
-          />
-        </div>
-      </div>
-
-      <!-- Job/Project Number -->
-      <div class="row q-mb-sm">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.projectnumber"
-            name="projectnumber"
-            :label="t('Job/Project Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('projectnumber')"
-          />
-        </div>
-      </div>
-
-      <!-- Employee Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.employeenumber"
-            name="employeenumber"
-            :label="t('Employee Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('employeenumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_employeenumber"
-            name="lock_employeenumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Customer Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.customernumber"
-            name="customernumber"
-            :label="t('Customer Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('customernumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_customernumber"
-            name="lock_customernumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Vendor Number + Lock -->
-      <div class="row q-mb-sm items-center">
-        <div class="col-12 col-md-6">
-          <q-input
-            v-model="form.vendornumber"
-            name="vendornumber"
-            :label="t('Vendor Number')"
-            outlined
-            dense
-            class="lightbg input-box"
-            @focus="setActiveLastNumberField('vendornumber')"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.lock_vendornumber"
-            name="lock_vendornumber"
-            :label="t('Lock')"
-          />
-        </div>
-      </div>
-
-      <!-- Heading: SMTP Settings -->
-      <div class="text-h6 q-mt-md">{{ t("SMTP Settings") }}</div>
-      <div class="maintext q-my-none q-mb-sm">
-        {{ t("Configure outgoing email settings for sending invoices, statements, and other documents.") }}
-      </div>
-      <div class="row q-mb-sm q-gutter-md">
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.smtp_host"
-            name="smtp_host"
-            :label="t('SMTP Host')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.smtp_port"
-            name="smtp_port"
-            :label="t('SMTP Port')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.smtp_username"
-            name="smtp_username"
-            :label="t('SMTP Username')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.smtp_password"
-            name="smtp_password"
-            :label="t('SMTP Password')"
-            :type="showSmtpPassword ? 'text' : 'password'"
-            outlined
-            dense
-            class="lightbg input-box"
-          >
-            <template #append>
-              <q-icon
-                :name="showSmtpPassword ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="showSmtpPassword = !showSmtpPassword"
+      <q-tab-panels v-model="activeTab" animated class="q-pa-md">
+        <!-- Company tab -->
+        <q-tab-panel name="company" class="q-pa-none">
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-8">
+              <q-input
+                v-model="form.company"
+                name="company"
+                :label="t('Company Name')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
               />
+            </div>
+            <div class="col-12 col-md-4">
+              <q-input
+                v-model="form.businessnumber"
+                name="businessnumber"
+                :label="t('Business Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+          </div>
+
+          <div
+            class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
+          >
+            {{ t("Address") }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12">
+              <q-input
+                v-model="form.address"
+                name="address"
+                :label="t('Address')"
+                type="textarea"
+                outlined
+                dense
+                rows="2"
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-8">
+              <q-input
+                v-model="form.address1"
+                name="address1"
+                :label="t('Street Name')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-4">
+              <q-input
+                v-model="form.street"
+                name="street"
+                :label="t('Street Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12">
+              <q-input
+                v-model="form.address2"
+                name="address2"
+                :label="t('Address 2')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12">
+              <q-input
+                v-model="form.post_office"
+                name="post_office"
+                :label="t('Postal Office')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.zip"
+                name="zip"
+                :label="t('ZIP/Postal Code')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.city"
+                name="city"
+                :label="t('City')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.state"
+                name="state"
+                :label="t('State/Province')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <country-input
+                v-model="form.country"
+                name="country"
+                :label="t('Country')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+          </div>
+
+          <div
+            class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
+          >
+            {{ t("Contact") }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.tel"
+                name="tel"
+                :label="t('Phone')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.companyemail"
+                name="companyemail"
+                :label="t('E-mail')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.companywebsite"
+                name="companywebsite"
+                :label="t('Website')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+          </div>
+        </q-tab-panel>
+
+        <!-- Settings tab -->
+        <q-tab-panel name="settings" class="q-pa-none">
+          <div
+            class="text-uppercase text-caption text-weight-bold text-grey-7 q-mb-sm"
+          >
+            {{ t("Financial") }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.precision"
+                name="precision"
+                :label="t('Precision')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.annualinterest"
+                name="annualinterest"
+                :label="t('Annual Interest')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.latepaymentfee"
+                name="latepaymentfee"
+                :label="t('Late Payment Fee')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.restockingcharge"
+                name="restockingcharge"
+                :label="t('Restocking Charge')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.weightunit"
+                name="weightunit"
+                :label="t('Weight Unit')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.termdays"
+                name="termdays"
+                type="number"
+                :label="t('Term (days)')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+          </div>
+
+          <div class="row items-center q-mt-md">
+            <span class="text-body2 q-mr-sm">{{ t("Round") }}</span>
+            <q-option-group
+              v-model="form.roundchange"
+              name="roundchange"
+              type="radio"
+              inline
+              :options="roundOptions"
+              :label="t('Round')"
+              dense
+            />
+          </div>
+
+          <div
+            class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
+          >
+            {{ t("System Options") }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12">
+              <q-option-group
+                v-model="form.typeofcontact"
+                name="typeofcontact"
+                type="radio"
+                inline
+                :options="typeofcontactOptions"
+                :label="t('Type of Contact')"
+                dense
+              />
+            </div>
+            <div class="col-12 q-mt-sm">
+              <q-checkbox
+                v-model="form.method"
+                name="method"
+                :label="t('Reporting Method (Cash)')"
+                dense
+              />
+              <q-checkbox
+                v-model="form.checkinventory"
+                name="checkinventory"
+                :label="t('Check Inventory')"
+                dense
+                class="q-ml-md"
+              />
+              <q-checkbox
+                v-model="form.forcewarehouse"
+                name="forcewarehouse"
+                :label="t('Force Warehouse')"
+                dense
+                class="q-ml-md"
+              />
+              <q-checkbox
+                v-model="form.hideaccounts"
+                name="hideaccounts"
+                :label="t('Hide Closed Accounts')"
+                dense
+                class="q-ml-md"
+              />
+            </div>
+            <div class="col-12">
+              <q-checkbox
+                v-model="form.linetax"
+                name="linetax"
+                :label="t('Line Tax')"
+                :disable="locklinetax"
+                dense
+              />
+              <q-checkbox
+                v-model="form.namesbynumber"
+                name="namesbynumber"
+                :label="t('Sort Names by Number')"
+                dense
+                class="q-ml-md"
+              />
+              <q-checkbox
+                v-model="form.xelatex"
+                name="xelatex"
+                :label="t('XeLatex')"
+                dense
+                class="q-ml-md"
+              />
+              <q-checkbox
+                v-model="form.paymentfile"
+                name="paymentfile"
+                :label="t('Payment File')"
+                dense
+                class="q-ml-md"
+              />
+            </div>
+          </div>
+        </q-tab-panel>
+
+        <!-- Accounting tab -->
+        <q-tab-panel name="accounting" class="q-pa-none">
+          <div class="text-caption text-grey-7 q-mb-md">
+            {{
+              t(
+                "Default ledger accounts used for inventory, income, expense, AR/AP, and related transactions.",
+              )
+            }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.inventory_account"
+                :options="inventoryOptions"
+                item-label="label"
+                :label="t('Inventory')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                option-label="label"
+                account
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.income_account"
+                :options="incomeOptions"
+                item-label="label"
+                :label="t('Income')"
+                outlined
+                dense
+                search="label"
+                class="lightbg input-box q-mb-sm"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.expense_account"
+                :options="expenseOptions"
+                item-label="label"
+                :label="t('Expense')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.fx_gain_loss_account"
+                :options="fxgainlossOptions"
+                item-label="label"
+                :label="t('Foreign Exchange Gain/Loss')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.cash_over_short_account"
+                :options="cashovershortOptions"
+                item-label="label"
+                :label="t('Cash Over/Short')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.ar_account"
+                :options="arOptions"
+                item-label="label"
+                :label="t('AR Record')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.ap_account"
+                :options="apOptions"
+                item-label="label"
+                :label="t('AP Record')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.ar_payment"
+                :options="arPaymentOptions"
+                item-label="label"
+                :label="t('AR Payment')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.ap_payment"
+                :options="apPaymentOptions"
+                item-label="label"
+                :label="t('AP Payment')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.clearing"
+                name="clearing"
+                :label="t('Clearing Account')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.transition"
+                name="transition"
+                :label="t('Transition Account')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+          </div>
+        </q-tab-panel>
+
+        <!-- Number Sequences tab -->
+        <q-tab-panel name="numbers" class="q-pa-none">
+          <div class="maintext q-mb-md">
+            {{
+              t(
+                "Next numbers combine fixed patterns with variables and auto-incrementing digits. Use variables like <%date%> or <%yy%><%mm%> together with numbers (e.g., 0001) to create custom numbering sequences that increment automatically.",
+              )
+            }}
+          </div>
+          <div class="row q-my-xs q-gutter-sm q-mb-md">
+            <template v-if="activeLastNumberField">
+              <q-chip
+                v-for="item in filteredTokens"
+                :key="item.token"
+                color="primary"
+                clickable
+                class="cursor-pointer"
+                @click="insertToken(item.token)"
+              >
+                {{ item.token }}
+                <q-tooltip>{{ item.tooltip }}</q-tooltip>
+              </q-chip>
             </template>
-          </q-input>
-        </div>
-        <div class="col-12 col-md-5">
-          <q-input
-            v-model="form.smtp_from_name"
-            name="smtp_from_name"
-            :label="t('From Name')"
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-12 col-md-5">
-          <q-select
-            v-model="form.smtp_ssl"
-            name="smtp_ssl"
-            :label="t('SSL/TLS')"
-            :options="smtpSslOptions"
-            emit-value
-            map-options
-            outlined
-            dense
-            class="lightbg input-box"
-          />
-        </div>
-        <div class="col-auto">
-          <q-checkbox
-            v-model="form.smtp_sasl"
-            name="smtp_sasl"
-            :label="t('SASL Authentication')"
-          />
-        </div>
+          </div>
+
+          <div class="row q-col-gutter-md">
+            <!-- Column 1: Number sequences with Lock -->
+            <div class="col-12 col-md-6">
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.glnumber"
+                    name="glnumber"
+                    :label="t('GL Reference Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('glnumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_glnumber"
+                    name="lock_glnumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.sinumber"
+                    name="sinumber"
+                    :label="t('Sales Invoice/AR Transaction Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('sinumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_sinumber"
+                    name="lock_sinumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.sonumber"
+                    name="sonumber"
+                    :label="t('Sales Order Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('sonumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_sonumber"
+                    name="lock_sonumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.ponumber"
+                    name="ponumber"
+                    :label="t('Purchase Order Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('ponumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_ponumber"
+                    name="lock_ponumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.sqnumber"
+                    name="sqnumber"
+                    :label="t('Sales Quotation Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('sqnumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_sqnumber"
+                    name="lock_sqnumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.rfqnumber"
+                    name="rfqnumber"
+                    :label="t('RFQ Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('rfqnumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_rfqnumber"
+                    name="lock_rfqnumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.employeenumber"
+                    name="employeenumber"
+                    :label="t('Employee Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('employeenumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_employeenumber"
+                    name="lock_employeenumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.customernumber"
+                    name="customernumber"
+                    :label="t('Customer Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('customernumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_customernumber"
+                    name="lock_customernumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+              <div class="row items-center q-mb-sm">
+                <div class="col">
+                  <q-input
+                    v-model="form.vendornumber"
+                    name="vendornumber"
+                    :label="t('Vendor Number')"
+                    outlined
+                    dense
+                    class="lightbg input-box"
+                    @focus="setActiveLastNumberField('vendornumber')"
+                  />
+                </div>
+                <div class="col-auto q-pl-sm">
+                  <q-checkbox
+                    v-model="form.lock_vendornumber"
+                    name="lock_vendornumber"
+                    :label="t('Lock')"
+                    dense
+                  />
+                </div>
+              </div>
+            </div>
+            <!-- Column 2: Number sequences without Lock -->
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.vinumber"
+                name="vinumber"
+                :label="t('Vendor Invoice/AP Transaction Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                @focus="setActiveLastNumberField('vinumber')"
+              />
+              <q-input
+                v-model="form.batchnumber"
+                name="batchnumber"
+                :label="t('Batch Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                @focus="setActiveLastNumberField('batchnumber')"
+              />
+              <q-input
+                v-model="form.vouchernumber"
+                name="vouchernumber"
+                :label="t('Voucher Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                @focus="setActiveLastNumberField('vouchernumber')"
+              />
+              <q-input
+                v-model="form.partnumber"
+                name="partnumber"
+                :label="t('Part Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                @focus="setActiveLastNumberField('partnumber')"
+              />
+              <q-input
+                v-model="form.projectnumber"
+                name="projectnumber"
+                :label="t('Job/Project Number')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                @focus="setActiveLastNumberField('projectnumber')"
+              />
+            </div>
+          </div>
+        </q-tab-panel>
+
+        <!-- Email tab -->
+        <q-tab-panel name="email" class="q-pa-none">
+          <div class="maintext q-mb-md">
+            {{
+              t(
+                "Configure outgoing email settings for sending invoices, statements, and other documents.",
+              )
+            }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.smtp_host"
+                name="smtp_host"
+                :label="t('SMTP Host')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.smtp_port"
+                name="smtp_port"
+                :label="t('SMTP Port')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.smtp_username"
+                name="smtp_username"
+                :label="t('SMTP Username')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.smtp_password"
+                name="smtp_password"
+                :label="t('SMTP Password')"
+                :type="showSmtpPassword ? 'text' : 'password'"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              >
+                <template #append>
+                  <q-icon
+                    :name="showSmtpPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="showSmtpPassword = !showSmtpPassword"
+                  />
+                </template>
+              </q-input>
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="form.smtp_from_name"
+                name="smtp_from_name"
+                :label="t('From Name')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="form.smtp_ssl"
+                name="smtp_ssl"
+                :label="t('SSL/TLS')"
+                :options="smtpSslOptions"
+                emit-value
+                map-options
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+              />
+            </div>
+            <div class="col-12">
+              <q-checkbox
+                v-model="form.smtp_sasl"
+                name="smtp_sasl"
+                :label="t('SASL Authentication')"
+                dense
+              />
+            </div>
+          </div>
+        </q-tab-panel>
+      </q-tab-panels>
+      <div class="q-px-md">
+        <q-separator class="q-mb-md" />
       </div>
 
-      <!-- Submit Button -->
-      <div class="row q-mt-md">
+      <div class="row q-mt-md justify-start q-px-md">
         <div class="col-auto">
-          <q-btn :label="t('Save')" type="submit" color="primary" />
+          <s-button type="save" @click="submitForm" />
         </div>
       </div>
     </q-form>
@@ -831,6 +898,7 @@ const { t } = useI18n();
 updateTitle(t("Company Defaults"));
 
 const formRef = ref(null);
+const activeTab = ref("company");
 
 const form = ref({
   company: "",
@@ -1499,6 +1567,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.defaults-form {
+  width: 80%;
+}
+
+.defaults-tabs :deep(.q-tab) {
+  border-radius: 4px;
+  margin-right: 4px;
+  text-transform: none;
+}
+
+.defaults-tabs :deep(.q-tab--active) {
+  background: var(--q-primary);
+  color: white;
+}
+
+.defaults-tabs :deep(.q-tab__indicator) {
+  display: none;
+}
+
 .row.items-center > .col-auto {
   display: flex;
   align-items: center;
