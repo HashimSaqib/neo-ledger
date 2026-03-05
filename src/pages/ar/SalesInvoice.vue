@@ -767,6 +767,22 @@
                   <p class="q-my-xs">{{ formatAmount(tax.amount) }}</p>
                 </div>
               </div>
+              <div class="row justify-end items-center">
+                <div class="q-mr-xl">
+                  <p class="q-my-xs maintext">
+                    <strong>{{ t("Rounding") }}</strong>
+                  </p>
+                </div>
+                <div>
+                  <text-input
+                    v-model="rounding"
+                    dense
+                    outlined
+                    type="number"
+                    style="width: 120px"
+                  />
+                </div>
+              </div>
               <div class="row justify-end">
                 <div class="q-mr-xl">
                   <p class="q-my-xs maintext">
@@ -1530,6 +1546,7 @@ watch(partDialog, () => {
 // Taxes & Totals Calculation
 // =====================
 const taxIncluded = ref(false);
+const rounding = ref(0);
 const invoiceTaxes = ref([]);
 const calculateTaxes = () => {
   if (!customer.value) {
@@ -1623,6 +1640,7 @@ const total = computed(() => {
   if (!taxIncluded.value) {
     totalValue += totalTaxes;
   }
+  totalValue += parseFloat(rounding.value) || 0;
   return parseFloat(totalValue.toFixed(2));
 });
 const totalPaid = computed(() => {
@@ -1839,6 +1857,7 @@ const loadInvoice = async (invoice) => {
   }
   exchangeRate.value = invoice.exchangerate || 1;
   taxIncluded.value = !!invoice.taxincluded;
+  rounding.value = invoice.rounding ?? 0;
   lines.value = invoice.lines.map((line) => {
     return {
       id: lineId++,
@@ -2385,6 +2404,7 @@ const postInvoice = async (save = false, isNew = false) => {
         cost: line.cost,
         project: line.project,
       })),
+    rounding: parseFloat(rounding.value) || 0,
     shipto: shipto.value,
     payments: payments.value.map((payment) => ({
       date: payment.date,
