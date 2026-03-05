@@ -1893,6 +1893,15 @@ const loadInvoice = async (invoice) => {
     };
   });
   calculateTaxes();
+  await nextTick();
+  if (invoice.taxes && invoice.taxes.length > 0) {
+    invoiceTaxes.value.forEach((tax) => {
+      const apiTax = invoice.taxes.find((t) => t.accno === tax.acc);
+      if (apiTax !== undefined) {
+        tax.amount = apiTax.amount;
+      }
+    });
+  }
   payments.value = invoice.payments.map((payment) => {
     const account = paymentAccounts.value.find(
       (acc) => acc.id === payment.account || acc.label === payment.account,
