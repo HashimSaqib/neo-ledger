@@ -219,11 +219,6 @@
                 </div>
               </div>
               <div class="container">
-                <q-checkbox
-                  v-model="splitLedger"
-                  :label="t('Split Ledger')"
-                  size="2rem"
-                />
                 <draggable
                   v-model="baseColumns"
                   item-key="name"
@@ -398,7 +393,7 @@
           </q-tr>
         </template>
         <!-- Footer slot for overall totals when in split ledger mode -->
-        <template v-slot:footer v-if="splitLedger && overallTotals">
+        <template v-slot:footer v-if="overallTotals">
           <q-tr class="totals-row">
             <q-td
               v-for="col in displayColumns"
@@ -453,8 +448,8 @@ const formData = ref({});
 const filtersOpen = route.query.search == 1 ? ref(false) : ref(true);
 const results = ref([]);
 
-// Flag for split ledger mode (user selectable)
-const splitLedger = ref(false);
+// Split ledger is always on (toggle removed from UI)
+const splitLedger = ref(true);
 // New variable to "freeze" the grouping mode at search time
 const appliedSplitLedger = ref(splitLedger.value);
 
@@ -741,6 +736,12 @@ function groupData(data) {
   const finalRows = [];
   groupOrder.forEach((acc) => {
     const group = groups[acc];
+    // Sort each account's transactions by transdate, then by id
+    group.sort((a, b) => {
+      const dateCompare = (a.transdate || "").localeCompare(b.transdate || "");
+      if (dateCompare !== 0) return dateCompare;
+      return (Number(a.id) || 0) - (Number(b.id) || 0);
+    });
     // Opening balance from API, flipped for display
     const openingBalance =
       group[0].balance != null ? -Number(group[0].balance) : null;
@@ -884,13 +885,6 @@ const loadParams = () => {
       formData.value[key] = query[key];
     }
   });
-
-  // Restore split ledger from URL so callback/refresh keeps the setting
-  if (query.split === "1" || query.split === 1) {
-    splitLedger.value = true;
-  } else if (query.split === "0" || query.split === 0) {
-    splitLedger.value = false;
-  }
 
   // Auto-trigger search if "search" equals "1"
   if (query.search === "1") {
