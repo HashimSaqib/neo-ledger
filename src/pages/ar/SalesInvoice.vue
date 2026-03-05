@@ -768,13 +768,9 @@
                 </div>
               </div>
               <div class="row justify-end items-center">
-                <div class="q-mr-xl">
-                  <p class="q-my-xs maintext">
-                    <strong>{{ t("Rounding") }}</strong>
-                  </p>
-                </div>
                 <div>
                   <text-input
+                    label="Rounding"
                     v-model="rounding"
                     dense
                     outlined
