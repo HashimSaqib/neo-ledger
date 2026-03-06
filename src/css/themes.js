@@ -1,7 +1,7 @@
 export const themes = {
   light: {
     menubg: "#1F2937",
-    primary: "#3c83f6",
+    primary: "#06CEE0",
     tint: "#F9FAFC",
     highlight: "#F5F9FF",
     border: "#E1E7EF",

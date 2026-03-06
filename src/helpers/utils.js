@@ -287,7 +287,7 @@ export const displayDate = (datestring) => {
   return `${day}-${month}-${year}`;
 };
 
-// Format a PostgreSQL timestamp to "yyyy-mm-dd HH:mm" format
+// Format a PostgreSQL timestamp to "dd.mm.yyyy HH:mm" format
 export const formatTimestamp = (timestamp) => {
   if (!timestamp) return "";
 
@@ -301,7 +301,7 @@ export const formatTimestamp = (timestamp) => {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
 
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
   } catch (error) {
     return "";
   }

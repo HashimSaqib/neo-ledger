@@ -153,13 +153,13 @@ const isOutline = computed(() => {
   padding: 0.5rem 1rem;
 
   &--primary {
-    background-color: #3c83f6;
-    border: 1px solid #3c83f6;
+    background-color: #06cee0;
+    border: 1px solid #06cee0;
     color: white;
 
     &:hover {
-      background-color: color-mix(in srgb, #3c83f6 80%, black 5%);
-      border-color: color-mix(in srgb, #3c83f6 80%, black 5%);
+      background-color: color-mix(in srgb, #06cee0 80%, black 5%);
+      border-color: color-mix(in srgb, #06cee0 80%, black 5%);
     }
 
     .text-color {
