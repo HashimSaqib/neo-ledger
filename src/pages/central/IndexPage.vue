@@ -105,7 +105,7 @@
         </q-banner>
 
         <!-- Search and Create Dataset Bar -->
-        <div class="container q-mb-md">
+        <div class="q-mb-md">
           <div
             v-if="!loading && !error"
             class="row q-mb-none items-center q-gutter-md"
@@ -179,13 +179,16 @@
                         }}</span>
                       </q-item-label>
                       <q-item-label caption class="q-mt-xs">
-                        <q-badge color="blue-grey" class="q-mr-sm">
+                        <span
+                          class="status-pill q-mr-sm"
+                          :class="`status-pill--${getAccessLevelPillClass(invite.access_level)}`"
+                        >
                           {{ invite.access_level }}
-                        </q-badge>
+                        </span>
                         <template v-if="invite.role">
-                          <q-badge color="teal">
+                          <span class="status-pill status-pill--role">
                             {{ invite.role }}
-                          </q-badge>
+                          </span>
                         </template>
                       </q-item-label>
                     </q-item-section>
@@ -246,137 +249,128 @@
         <!-- TABLE VIEW MODE -->
         <div
           v-if="!loading && !error && filteredDatasets.length > 0"
-          class="container"
+          class="table-styling"
         >
-          <q-card flat bordered>
-            <q-table
-              :rows="filteredDatasets"
-              :columns="datasetColumns"
-              row-key="id"
-              flat
-              bordered
-              dense
-              :pagination="{ rowsPerPage: 0 }"
-              hide-pagination
-            >
-              <!-- Name column -->
-              <template v-slot:body-cell-name="props">
-                <q-td
-                  :props="props"
-                  class="cursor-pointer"
-                  @click="navigateToDataset(props.row)"
+          <q-table
+            :rows="filteredDatasets"
+            :columns="datasetColumns"
+            row-key="id"
+            flat
+            bordered
+            dense
+            :pagination="{ rowsPerPage: 0 }"
+            hide-pagination
+          >
+            <!-- Name column -->
+            <template v-slot:body-cell-name="props">
+              <q-td
+                :props="props"
+                class="cursor-pointer"
+                @click="navigateToDataset(props.row)"
+              >
+                <div class="text-weight-medium">
+                  {{ props.row.name }}
+                </div>
+                <div
+                  class="text-caption"
+                  v-if="emailDomain && emailDomain !== ''"
                 >
-                  <div class="text-weight-medium">
-                    {{ props.row.name }}
-                  </div>
-                  <div
-                    class="text-caption"
-                    v-if="emailDomain && emailDomain !== ''"
-                  >
-                    {{ `${props.row.db_name}@${emailDomain}` }}
-                  </div>
-                </q-td>
-              </template>
+                  {{ `${props.row.db_name}@${emailDomain}` }}
+                </div>
+              </q-td>
+            </template>
 
-              <!-- Access Level column -->
-              <template v-slot:body-cell-access_level="props">
-                <q-td :props="props">
-                  <q-badge
-                    :color="
-                      props.row.access_level === 'owner'
-                        ? 'positive'
-                        : props.row.access_level === 'admin'
-                        ? 'primary'
-                        : 'blue-grey'
-                    "
-                  >
-                    {{ props.row.access_level }}
-                  </q-badge>
-                </q-td>
-              </template>
-
-              <!-- Users count column -->
-              <template v-slot:body-cell-users="props">
-                <q-td :props="props">
-                  <div class="row items-center justify-center q-gutter-xs">
-                    <span>{{
-                      props.row.users ? props.row.users.length : 0
-                    }}</span>
-                    <q-btn
-                      v-if="
-                        props.row.access_level === 'admin' ||
-                        props.row.access_level === 'owner'
-                      "
-                      flat
-                      round
-                      dense
-                      size="xs"
-                      color="primary"
-                      icon="add"
-                      @click.stop="openInviteDialog(props.row)"
-                    >
-                      <q-tooltip>{{ t("Invite User") }}</q-tooltip>
-                    </q-btn>
-                  </div>
-                </q-td>
-              </template>
-
-              <!-- Roles count column -->
-              <template v-slot:body-cell-roles="props">
-                <q-td :props="props">
-                  {{ props.row.roles ? props.row.roles.length : 0 }}
-                </q-td>
-              </template>
-
-              <!-- Pending count column (only shown if ai_plugin is enabled) -->
-              <template v-slot:body-cell-pending_count="props">
-                <q-td
-                  :props="props"
-                  :class="
-                    props.row.workstations?.has_stations
-                      ? 'cursor-pointer '
-                      : ''
-                  "
-                  @click="
-                    props.row.workstations?.has_stations
-                      ? navigateToStation(props.row)
-                      : null
-                  "
+            <!-- Access Level column -->
+            <template v-slot:body-cell-access_level="props">
+              <q-td :props="props">
+                <span
+                  class="status-pill"
+                  :class="`status-pill--${getAccessLevelPillClass(props.row.access_level)}`"
                 >
-                  <div class="row items-center justify-center">
-                    <template v-if="!props.row.workstations?.has_stations">
-                      -
-                    </template>
-                    <template v-else>
-                      <div class="text-weight-medium">
-                        {{ props.row.workstations.pending_count || 0 }}
-                        {{ t("Invoice(s)") }}
-                      </div>
-                    </template>
-                  </div>
-                </q-td>
-              </template>
+                  {{ props.row.access_level }}
+                </span>
+              </q-td>
+            </template>
 
-              <!-- Actions column -->
-              <template v-slot:body-cell-actions="props">
-                <q-td :props="props">
+            <!-- Users count column -->
+            <template v-slot:body-cell-users="props">
+              <q-td :props="props">
+                <div class="row items-center justify-center q-gutter-xs">
+                  <span>{{
+                    props.row.users ? props.row.users.length : 0
+                  }}</span>
                   <q-btn
-                    v-if="props.row.admin === 1"
+                    v-if="
+                      props.row.access_level === 'admin' ||
+                      props.row.access_level === 'owner'
+                    "
                     flat
                     round
                     dense
+                    size="xs"
                     color="primary"
-                    icon="settings"
-                    @click.stop="openManageDialog(props.row)"
-                    size="sm"
+                    icon="add"
+                    @click.stop="openInviteDialog(props.row)"
                   >
-                    <q-tooltip>{{ t("Manage Dataset") }}</q-tooltip>
+                    <q-tooltip>{{ t("Invite User") }}</q-tooltip>
                   </q-btn>
-                  <span v-else>-</span>
-                </q-td>
-              </template>
-            </q-table>
-          </q-card>
+                </div>
+              </q-td>
+            </template>
+
+            <!-- Roles count column -->
+            <template v-slot:body-cell-roles="props">
+              <q-td :props="props">
+                {{ props.row.roles ? props.row.roles.length : 0 }}
+              </q-td>
+            </template>
+
+            <!-- Pending count column (only shown if ai_plugin is enabled) -->
+            <template v-slot:body-cell-pending_count="props">
+              <q-td
+                :props="props"
+                :class="
+                  props.row.workstations?.has_stations ? 'cursor-pointer ' : ''
+                "
+                @click="
+                  props.row.workstations?.has_stations
+                    ? navigateToStation(props.row)
+                    : null
+                "
+              >
+                <div class="row items-center justify-center">
+                  <template v-if="!props.row.workstations?.has_stations">
+                    -
+                  </template>
+                  <template v-else>
+                    <div class="text-weight-medium">
+                      {{ props.row.workstations.pending_count || 0 }}
+                      {{ t("Invoice(s)") }}
+                    </div>
+                  </template>
+                </div>
+              </q-td>
+            </template>
+
+            <!-- Actions column -->
+            <template v-slot:body-cell-actions="props">
+              <q-td :props="props">
+                <q-btn
+                  v-if="props.row.admin === 1"
+                  flat
+                  round
+                  dense
+                  color="primary"
+                  icon="settings"
+                  @click.stop="openManageDialog(props.row)"
+                  size="sm"
+                >
+                  <q-tooltip>{{ t("Manage Dataset") }}</q-tooltip>
+                </q-btn>
+                <span v-else>-</span>
+              </q-td>
+            </template>
+          </q-table>
         </div>
 
         <!-- Manage Dataset Dialog -->
@@ -435,22 +429,22 @@
                     {{ selectedDatasetForManage.db_name }}
                   </div>
                   <div class="row items-center q-mt-xs q-gutter-sm">
-                    <q-badge color="primary">
+                    <span class="status-pill status-pill--info">
                       {{
                         selectedDatasetForManage.users
                           ? selectedDatasetForManage.users.length
                           : 0
                       }}
                       {{ t("Users") }}
-                    </q-badge>
-                    <q-badge color="primary">
+                    </span>
+                    <span class="status-pill status-pill--info">
                       {{
                         selectedDatasetForManage.roles
                           ? selectedDatasetForManage.roles.length
                           : 0
                       }}
                       {{ t("Roles") }}
-                    </q-badge>
+                    </span>
                   </div>
                 </div>
                 <q-space />
@@ -542,7 +536,7 @@
                             @click.stop="
                               openEditUserDialog(
                                 selectedDatasetForManage,
-                                props.row
+                                props.row,
                               )
                             "
                           >
@@ -563,7 +557,7 @@
                             @click.stop="
                               confirmRemoveAccess(
                                 selectedDatasetForManage,
-                                props.row
+                                props.row,
                               )
                             "
                             :disabled="props.row.access_level === 'owner'"
@@ -643,7 +637,7 @@
                             @click.stop="
                               openEditRolePopup(
                                 selectedDatasetForManage,
-                                props.row
+                                props.row,
                               )
                             "
                           >
@@ -707,7 +701,7 @@
                     <q-list separator bordered>
                       <q-item
                         v-for="invite in getDatasetInvites(
-                          selectedDatasetForManage.id
+                          selectedDatasetForManage.id,
                         )"
                         :key="invite.id"
                         class="q-py-md"
@@ -718,13 +712,16 @@
                             {{ invite.recipient_email }}
                           </q-item-label>
                           <q-item-label caption class="q-mt-sm">
-                            <q-badge color="blue-grey" class="q-mr-sm">
+                            <span
+                              class="status-pill q-mr-sm"
+                              :class="`status-pill--${getAccessLevelPillClass(invite.access_level)}`"
+                            >
                               {{ invite.access_level }}
-                            </q-badge>
+                            </span>
                             <template v-if="invite.role_id">
-                              <q-badge color="teal">
+                              <span class="status-pill status-pill--role">
                                 {{ invite.role }}
-                              </q-badge>
+                              </span>
                             </template>
                           </q-item-label>
                         </q-item-section>
@@ -1143,14 +1140,14 @@
               <p class="q-mb-sm">
                 {{
                   t(
-                    "This action will permanently delete the dataset and all templates and cannot be undone. Only the owner can perform this operation."
+                    "This action will permanently delete the dataset and all templates and cannot be undone. Only the owner can perform this operation.",
                   )
                 }}
               </p>
               <p class="text-body2 text-negative q-mb-md">
                 {{
                   t(
-                    "Please enter your password to confirm this irreversible action."
+                    "Please enter your password to confirm this irreversible action.",
                   )
                 }}
               </p>
@@ -1267,7 +1264,7 @@ const deletePw = ref("");
 const handleDelete = async (dataset) => {
   try {
     const response = await api.delete(
-      `dataset?id=${dataset.id}&owner_pw=${deletePw.value}`
+      `dataset?id=${dataset.id}&owner_pw=${deletePw.value}`,
     );
     deletePw.value = "";
     Notify.create({
@@ -1319,7 +1316,7 @@ const downloadTemplates = async (dataset) => {
     // Use dataset.dbName if available, otherwise fallback to dataset.id
     link.setAttribute(
       "download",
-      `${dataset.dbName || dataset.id}_templates.zip`
+      `${dataset.dbName || dataset.id}_templates.zip`,
     );
     link.href = url;
     document.body.appendChild(link);
@@ -1421,7 +1418,7 @@ const languages = computed(() => [
 
 const selectedLanguage = ref(
   languages.value.find((lang) => lang.value === i18n.global.locale.value) ||
-    languages.value[0]
+    languages.value[0],
 );
 
 // Columns for Roles table
@@ -1504,7 +1501,7 @@ const filteredDatasets = computed(() => {
 
   const query = searchQuery.value.toLowerCase();
   return datasets.value.filter((dataset) =>
-    dataset.db_name.toLowerCase().includes(query)
+    dataset.db_name.toLowerCase().includes(query),
   );
 });
 
@@ -1728,7 +1725,7 @@ const acceptInvite = async (inviteId) => {
     await api.post(`/invite/${inviteId}/accept`);
 
     receivedInvites.value = receivedInvites.value.filter(
-      (invite) => invite.id !== inviteId
+      (invite) => invite.id !== inviteId,
     );
 
     Notify.create({
@@ -1758,7 +1755,7 @@ const declineInvite = async (inviteId) => {
 
     // Remove from received invites
     receivedInvites.value = receivedInvites.value.filter(
-      (invite) => invite.id !== inviteId
+      (invite) => invite.id !== inviteId,
     );
 
     Notify.create({
@@ -1786,7 +1783,7 @@ const cancelInvite = async (inviteId) => {
 
     // Remove from sent invites list
     sentInvites.value = sentInvites.value.filter(
-      (invite) => invite.id !== inviteId
+      (invite) => invite.id !== inviteId,
     );
 
     Notify.create({
@@ -1854,7 +1851,7 @@ const sendInvite = async () => {
 
     await api.post(
       `/client/${selectedDatasetForInvite.value.db_name}/invite`,
-      payload
+      payload,
     );
 
     Notify.create({
@@ -1932,7 +1929,7 @@ const saveUserAccess = async () => {
 
     await api.post(
       `/client/${selectedDatasetForUserEdit.value.db_name}/access/${selectedUser.value.profile_id}`,
-      payload
+      payload,
     );
 
     Notify.create({
@@ -1949,7 +1946,7 @@ const saveUserAccess = async () => {
       selectedDatasetForUserEdit.value.users
     ) {
       const userIndex = selectedDatasetForUserEdit.value.users.findIndex(
-        (u) => u.profile_id === selectedUser.value.profile_id
+        (u) => u.profile_id === selectedUser.value.profile_id,
       );
 
       if (userIndex !== -1) {
@@ -1991,7 +1988,7 @@ const removeUserAccess = async () => {
   try {
     await api.post(
       `/client/${selectedDatasetForUserEdit.value.db_name}/access/${selectedUser.value.profile_id}`,
-      { delete: true }
+      { delete: true },
     );
 
     Notify.create({
@@ -2007,7 +2004,7 @@ const removeUserAccess = async () => {
     ) {
       selectedDatasetForUserEdit.value.users =
         selectedDatasetForUserEdit.value.users.filter(
-          (u) => u.profile_id !== selectedUser.value.profile_id
+          (u) => u.profile_id !== selectedUser.value.profile_id,
         );
     }
 
@@ -2100,7 +2097,7 @@ const saveRole = async () => {
     if (isEditMode.value) {
       await api.post(
         `/client/${selectedDataset.value.db_name}/system/roles/${selectedRole.value.id}`,
-        payload
+        payload,
       );
       Notify.create({
         message: t("Role updated successfully"),
@@ -2110,7 +2107,7 @@ const saveRole = async () => {
     } else {
       await api.post(
         `/client/${selectedDataset.value.db_name}/system/roles${clientParam}`,
-        payload
+        payload,
       );
       Notify.create({
         message: t("Role added successfully"),
@@ -2204,4 +2201,46 @@ const navigateToDataset = (dataset) => {
 const navigateToStation = (dataset) => {
   window.open(`/client/${dataset.db_name}/stations/user`, "_blank");
 };
+
+// Pill class for access level (matches DocumentInbox/DocumentListTable status-pill styling)
+function getAccessLevelPillClass(accessLevel) {
+  const map = { owner: "owner", admin: "admin", member: "member" };
+  return map[accessLevel] || "member";
+}
 </script>
+
+<style scoped>
+.status-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: none;
+}
+
+.status-pill--owner {
+  background-color: #e6f7ed;
+  color: #28a745;
+}
+
+.status-pill--admin {
+  background-color: #ebf4ff;
+  color: #007bff;
+}
+
+.status-pill--member {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.status-pill--role {
+  background-color: #e0f2f1;
+  color: #00897b;
+}
+
+.status-pill--info {
+  background-color: #ebf4ff;
+  color: #007bff;
+}
+</style>

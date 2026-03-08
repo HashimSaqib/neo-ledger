@@ -1,5 +1,6 @@
 <template>
   <div class="input-container">
+    <label v-if="label && !noLabel" class="input-label">{{ label }}</label>
     <q-input
       :model-value="displayValue"
       @update:model-value="onInput"
@@ -8,7 +9,6 @@
       outlined
       dense
       type="date"
-      :label="label"
     />
   </div>
 </template>
@@ -31,6 +31,10 @@ const props = defineProps({
     default: "",
   },
   inlinelabel: {
+    type: Boolean,
+    default: false,
+  },
+  noLabel: {
     type: Boolean,
     default: false,
   },

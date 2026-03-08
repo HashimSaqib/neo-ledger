@@ -12,6 +12,7 @@
           dense
           v-model="formData.reference"
           :disable="lockNumber"
+          :placeholder="t('Auto-generated')"
         />
 
         <s-select
@@ -206,6 +207,23 @@
         <s-button type="add-line" @click="addLine" />
       </div>
 
+      <!-- Line Item Column Headers -->
+      <div
+        class="row justify-between items-center q-px-sm line-item-headers q-mb-sm"
+      >
+        <div class="col-3 line-item-header">{{ t("Account") }}</div>
+        <div class="col-2 line-item-header">{{ t("Debit") }}</div>
+        <div class="col-2 line-item-header">{{ t("Credit") }}</div>
+        <div v-if="lineTax" class="col-2 line-item-header">
+          {{ t("Tax Accno") }}
+        </div>
+        <div v-if="lineTax" class="col-2 line-item-header">
+          {{ t("Tax Amount") }}
+        </div>
+        <div style="width: 40px" />
+        <div style="width: 40px" />
+      </div>
+
       <div
         v-for="(line, index) in lines"
         :key="index"
@@ -220,6 +238,7 @@
             :options="filteredOpenAccounts"
             :label="t('Account')"
             dense
+            no-label
             class="col-3"
             popup-content-class="mainbg maintext"
             bg-color="input"
@@ -227,6 +246,7 @@
             search="label"
             account
             :ref="(el) => setAccountRef(el, index)"
+            :placeholder="t('Select Account')"
           />
           <!-- Debit input -->
           <fn-input
@@ -237,6 +257,7 @@
             label-color="secondary"
             outlined
             dense
+            no-label
             @keydown.enter="handleEnter($event, index)"
             @update:model-value="
               () =>
@@ -254,6 +275,7 @@
             label-color="secondary"
             outlined
             dense
+            no-label
             @keydown.enter="handleEnter($event, index)"
             @update:model-value="
               () =>
@@ -273,6 +295,7 @@
               L
               :label="t('Tax Accno')"
               dense
+              no-label
               class="col-2"
               popup-content-class="mainbg maintext"
               bg-color="input"
@@ -280,6 +303,7 @@
               account
               search="label"
               @update:model-value="(val) => updateTaxAmount(val, index)"
+              :placeholder="t('Select Tax')"
             />
             <fn-input
               v-model="line.linetaxamount"
@@ -289,6 +313,7 @@
               label-color="secondary"
               outlined
               dense
+              no-label
               @keydown.enter="handleEnter($event, index)"
             />
           </template>
@@ -325,7 +350,9 @@
             bg-color="input"
             label-color="secondary"
             dense
+            no-label
             search="description"
+            :placeholder="t('Select Project')"
           />
           <text-input
             v-model="line.source"
@@ -333,7 +360,9 @@
             class="col-3"
             outlined
             dense
+            no-label
             @keydown.enter="handleEnter($event, index)"
+            :placeholder="t('Source')"
           />
           <text-input
             v-model="line.memo"
@@ -341,7 +370,9 @@
             class="col-3"
             outlined
             dense
+            no-label
             @keydown.enter="handleEnter($event, index)"
+            :placeholder="t('Memo')"
           />
         </div>
       </div>
@@ -1407,6 +1438,10 @@ onMounted(async () => {
 });
 </script>
 <style>
+.line-item-header {
+  font-size: 0.75rem;
+}
+
 .total-row {
   background-color: var(--q-highlight);
   border-radius: 10px;

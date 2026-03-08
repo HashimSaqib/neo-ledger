@@ -25,20 +25,20 @@
             </div>
           </div>
 
-          <div class="print-preview__sidebar">
-            <div class="print-preview__toolbar">
+          <div class="print-preview__sidebar q-mb-md">
+            <div class="row justify-between q-mb-md">
+              <div class="row q-gutter-x-md">
+                <s-button type="email" @click="toggleEmailDialog" />
+                <s-button type="print" @click="downloadPdf" />
+                <s-button
+                  type="reversal"
+                  @click="reverseTransactionFromPrint"
+                />
+              </div>
               <s-button type="edit" @click="exitPrintMode" />
-              <s-button
-                type="secondary"
-                :label="t('Reversal')"
-                icon="swap_horiz"
-                @click="reverseTransactionFromPrint"
-              />
-              <s-button type="email" @click="toggleEmailDialog" />
-              <s-button type="download" @click="downloadPdf" />
             </div>
-            <h6 class="print-preview__sidebar-title">
-              {{ t("Recent Transactions") }}
+            <h6 class="container-title q-mt-lg">
+              {{ t("RECENT TRANSACTIONS") }}
             </h6>
             <LastTransactions
               type="ar"
@@ -429,7 +429,7 @@
         <!-- Line Items Section -->
         <div class="container">
           <div class="row justify-between items-center">
-            <h6 class="container-title q-my-none q-ml-sm q-mb-md">
+            <h6 class="container-title q-ml-sm q-mb-md">
               {{ t("LINE ITEMS") }}
             </h6>
 
@@ -778,7 +778,7 @@
                 :placeholder="t('Visible to customer on the invoice')"
               />
               <text-input
-                v-else
+                v-elsethe
                 dense
                 outlined
                 class="col-sm-10 col-12"
@@ -823,18 +823,18 @@
                 />
               </div>
               <div class="totals-grid">
-                <template v-for="tax in invoiceTaxes" :key="tax.name">
-                  <span class="totals-label maintext">{{ tax.name }}</span>
-                  <span class="totals-value maintext">{{
-                    formatAmount(tax.amount)
-                  }}</span>
-                </template>
                 <span class="totals-label maintext"
                   ><strong>{{ t("Subtotal") }}</strong></span
                 >
                 <span class="totals-value maintext"
                   ><strong>{{ formatAmount(subtotal) }}</strong></span
                 >
+                <template v-for="tax in invoiceTaxes" :key="tax.name">
+                  <span class="totals-label maintext">{{ tax.name }}</span>
+                  <span class="totals-value maintext">{{
+                    formatAmount(tax.amount)
+                  }}</span>
+                </template>
                 <span class="totals-label maintext"
                   ><strong>{{ t("Rounding") }}</strong></span
                 >
@@ -2694,7 +2694,7 @@ const canDelete = computed(
 // Add originalInvDate ref to track the original invoice date for existing invoices
 const originalInvDate = ref(null);
 </script>
-<style scoped>
+<style>
 /* Print Preview Layout */
 .print-preview {
   display: flex;

@@ -1,5 +1,5 @@
 <template>
-  <div class="last-transactions">
+  <div class="table-styling">
     <q-table
       :rows="transactions"
       :columns="columns"
@@ -51,6 +51,11 @@
       <template v-slot:body-cell-paid="props">
         <q-td :props="props">
           {{ formatAmount(props.row.paid) }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-description="props">
+        <q-td :props="props">
+          <div class="wrapped-description">{{ props.row.description }}</div>
         </q-td>
       </template>
       <template v-slot:body-cell-transdate="props">
@@ -270,53 +275,3 @@ defineExpose({
   fetchTransactions,
 });
 </script>
-
-<style scoped lang="scss">
-.last-transactions {
-  :deep(.q-table__container) {
-    border-radius: 8px;
-    border: 1px solid var(--q-border);
-    overflow: hidden;
-  }
-
-  :deep(.q-table thead tr th) {
-    background-color: var(--q-tableheader);
-    color: var(--q-maintext);
-    font-weight: 400;
-    padding: 10px 14px;
-    border: none;
-    border-bottom: 1px solid var(--q-border);
-  }
-
-  :deep(.q-table tbody td) {
-    padding: 10px 14px;
-    border: none;
-    border-bottom: 1px solid var(--q-border);
-    color: var(--q-maintext);
-  }
-
-  :deep(.q-table tbody tr:last-child td) {
-    border-bottom: none;
-  }
-
-  :deep(.q-table) {
-    border: none;
-  }
-
-  :deep(.q-table thead tr th .q-icon),
-  :deep(.q-table thead tr th .q-table__sort-icon) {
-    color: var(--q-maintext);
-  }
-
-  /* Invoice/reference number links: light blue/teal */
-  :deep(a.text-primary) {
-    color: var(--q-primary) !important;
-    text-decoration: none;
-    font-weight: 400;
-  }
-
-  :deep(a.text-primary:hover) {
-    text-decoration: underline;
-  }
-}
-</style>

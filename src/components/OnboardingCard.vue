@@ -31,20 +31,21 @@
             <q-tooltip>{{ t("Completed") }}</q-tooltip>
           </q-btn>
           <div v-else class="button-group">
-            <q-btn
+            <s-button
               flat
               dense
+              type="outlined"
               class="action-btn action-btn--outlined"
               :label="t('Mark as Done')"
               icon="check"
               size="sm"
               @click="handleMarkAsDone"
             />
-            <q-btn
+            <s-button
               v-if="item.link"
               flat
               dense
-              class="action-btn action-btn--primary"
+              class="primary"
               :label="t('Open')"
               icon="arrow_forward"
               size="sm"

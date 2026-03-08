@@ -1,417 +1,434 @@
 <template>
-  <q-page class="q-pa-sm relative-position">
+  <q-page
+    class="q-pa-md lightbg relative-position"
+    :class="haveProps ? 'q-py-sm' : 'q-py-sm'"
+  >
     <q-form
       ref="formRef"
-      class="q-pa-sm container container-bg"
+      class="q-px-md add-part-form"
+      :class="[
+        haveProps ? 'q-py-sm add-part-form--full-width' : 'q-py-sm container',
+      ]"
       @submit.prevent="submitForm"
     >
-      <!-- Section Visibility Controls -->
-      <div class="row q-mb-md q-gutter-sm">
-        <div class="col-12">
-          <q-checkbox
-            v-model="showMandatory"
-            :label="t('Mandatory Fields')"
-            class="q-mr-md"
-            disable
-            checked
-          />
-          <q-checkbox
-            v-model="showAdditionalDetails"
-            :label="t('Additional Details')"
-            class="q-mr-md"
-          />
-          <q-checkbox
-            v-model="showInventoryDetails"
-            :label="t('Inventory Details')"
-            class="q-mr-md"
-          />
-        </div>
+      <!-- Tab Navigation -->
+      <q-tabs
+        v-model="activeTab"
+        dense
+        class="add-part-tabs q-mb-none q-pa-md"
+        active-color="white"
+        inactive-color="grey-7"
+        indicator-color="primary"
+        align="left"
+      >
+        <q-tab name="mandatory" :label="t('Mandatory Field')" />
+        <q-tab name="additional" :label="t('Additional Details')" />
+        <q-tab name="inventory" :label="t('Inventory Detail')" />
+      </q-tabs>
+
+      <div class="q-px-md">
+        <q-separator class="q-my-md" />
       </div>
 
-      <!-- Mandatory Fields Section -->
-      <div class="row q-mb-sm q-gutter-sm">
-        <div class="col-12 col-md-6">
-          <text-input
-            v-model="form.partnumber"
-            name="partnumber"
-            :label="t('Number')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-          />
-          <text-input
-            v-model="form.description"
-            name="description"
-            :label="t('Description')"
-            type="textarea"
-            outlined
-            dense
-            rows="2"
-            class="q-mb-sm"
-            label-color="secondary"
-            :rules="[requiredRule]"
-            hide-bottom-space
-          />
-          <text-input
-            v-model="form.unit"
-            name="unit"
-            :label="t('Unit')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-          />
-        </div>
-        <div class="col-12 col-md-6">
-          <text-input
-            v-model="form.sellprice"
-            name="sellprice"
-            :label="t('Sell Price')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-          />
-        </div>
-      </div>
-
-      <!-- Accounts Section (Always visible) -->
-      <div class="row q-mb-sm q-gutter-sm">
-        <div class="col-12 col-md-6">
-          <s-select
-            v-if="type == 'part'"
-            v-model="form.inventory"
-            :options="inventoryAccounts"
-            name="IC_inventory"
-            :label="t('Inventory')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-            search="label"
-            account
-            :rules="[requiredRule]"
-            hide-bottom-space
-            option-label="label"
-          />
-          <s-select
-            v-if="type == 'part'"
-            v-model="form.income"
-            :options="incomeAccounts"
-            name="IC_income"
-            :label="t('Income')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-            search="label"
-            account
-            :rules="[requiredRule]"
-            hide-bottom-space
-            option-label="label"
-          />
-          <s-select
-            v-if="type == 'part'"
-            v-model="form.cogs"
-            :options="cogsAccounts"
-            name="IC_expense"
-            :label="t('COGS')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-            search="label"
-            account
-            :rules="[requiredRule]"
-            hide-bottom-space
-            option-label="label"
-          />
-          <s-select
-            v-if="type == 'service'"
-            v-model="form.income"
-            :options="serviceIncomeAccounts"
-            name="IC_income"
-            :label="t('Income')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-            search="label"
-            account
-            :rules="[requiredRule]"
-            hide-bottom-space
-            option-label="label"
-          />
-          <s-select
-            v-if="type == 'service'"
-            v-model="form.expense"
-            :options="expenseAccounts"
-            name="IC_expense"
-            :label="t('Expense')"
-            outlined
-            dense
-            class="q-mb-sm"
-            label-color="secondary"
-            search="label"
-            account
-            :rules="[requiredRule]"
-            hide-bottom-space
-            option-label="label"
-          />
-        </div>
-        <div class="col-12 col-md-6">
-          <!-- Tax Accounts -->
-          <div class="row">
-            <div v-for="tax in taxAccounts" :key="tax.accno">
-              <q-checkbox
-                v-model="form.taxes[tax.accno]"
-                :name="`IC_tax_${tax.accno}`"
-                :label="t(tax.description)"
-              />
-            </div>
-          </div>
-          <text-input
-            v-model="form.notes"
-            name="notes"
-            :label="t('Notes')"
-            type="textarea"
-            outlined
-            dense
-            rows="2"
-            class="q-mb-sm"
-            label-color="secondary"
-          />
-        </div>
-      </div>
-
-      <!-- Additional Details Section -->
-      <div v-show="showAdditionalDetails" class="q-mb-sm">
-        <div class="text-weight-bold q-mb-xs">
-          {{ t("Additional Details") }}
-        </div>
-        <div class="row q-mb-sm q-gutter-sm">
-          <div class="col-12 col-md-6">
-            <text-input
-              v-model="form.drawing"
-              name="drawing"
-              :label="t('Drawing')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-model="form.microfiche"
-              name="microfiche"
-              :label="t('Microfiche')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-model="form.toolnumber"
-              name="toolnumber"
-              :label="t('Tool Number')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-model="form.priceupdate"
-              name="priceupdate"
-              :label="t('Updated')"
-              type="date"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-if="type == 'part'"
-              v-model="form.lot"
-              name="lot"
-              :label="t('Lot')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-          </div>
-          <div class="col-12 col-md-6">
-            <country-input
-              v-model="form.countryorigin"
-              name="countryorigin"
-              :label="t('Country of Origin')"
-              outlined
-              dense
-              class="q-mb-sm"
-            />
-            <text-input
-              v-model="form.tariff_hscode"
-              name="tariff_hscode"
-              :label="t('HS Code')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-model="form.barcode"
-              name="barcode"
-              :label="t('Barcode')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-          </div>
-        </div>
-
-        <!-- Make and Model (Not for service) -->
-        <div v-if="type !== 'service'" class="q-mb-sm">
-          <div class="text-weight-bold q-mb-xs">{{ t("Make and Model") }}</div>
-          <div
-            v-for="(line, index) in form.makeModelLines"
-            :key="'mm-' + index"
-            class="row q-mb-md q-gutter-sm items-center"
-          >
-            <div class="col-12 col-md-4">
+      <q-tab-panels v-model="activeTab" animated class="q-pa-md">
+        <!-- Mandatory Field tab -->
+        <q-tab-panel name="mandatory" class="q-pa-none">
+          <!-- Mandatory Fields Section -->
+          <div class="row q-mb-sm q-gutter-sm">
+            <div class="col-12 col-md-6">
               <text-input
-                v-model="line.make"
-                :name="`make_${index}`"
-                :label="t('Make')"
+                v-model="form.partnumber"
+                name="partnumber"
+                :label="t('Number')"
                 outlined
                 dense
                 class="q-mb-sm"
                 label-color="secondary"
-                @keyup.enter.prevent="handleMakeModelEnter(index)"
-                :ref="(el) => (makeInputRefs[index] = el)"
               />
-            </div>
-            <div class="col-12 col-md-4">
               <text-input
-                v-model="line.model"
-                :name="`model_${index}`"
-                :label="t('Model')"
+                v-model="form.description"
+                name="description"
+                :label="t('Description')"
+                type="textarea"
+                outlined
+                dense
+                rows="2"
+                class="q-mb-sm"
+                label-color="secondary"
+                :rules="[requiredRule]"
+                hide-bottom-space
+              />
+              <text-input
+                v-model="form.unit"
+                name="unit"
+                :label="t('Unit')"
                 outlined
                 dense
                 class="q-mb-sm"
                 label-color="secondary"
-                @keyup.enter.prevent="handleMakeModelEnter(index)"
               />
             </div>
-            <div class="col-auto">
-              <q-btn
-                color="negative"
-                icon="delete"
+            <div class="col-12 col-md-6">
+              <text-input
+                v-model="form.sellprice"
+                name="sellprice"
+                :label="t('Sell Price')"
+                outlined
                 dense
-                flat
-                @click="deleteMakeModelLine(index)"
+                class="q-mb-sm"
+                label-color="secondary"
               />
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Inventory Details Section -->
-      <div v-show="showInventoryDetails" class="q-mb-sm">
-        <div class="text-weight-bold q-mb-xs">{{ t("Inventory Details") }}</div>
-        <div class="row q-mb-sm q-gutter-sm">
-          <div class="col-12 col-md-6">
-            <text-input
-              v-if="type == 'part'"
-              v-model="form.expires"
-              name="expires"
-              :label="t('Expires')"
-              type="date"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-model="form.listprice"
-              name="listprice"
-              :label="t('List Price')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-model="form.lastcost"
-              name="lastcost"
-              :label="t('Last Cost')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-if="type !== 'service'"
-              v-model="form.averageCost"
-              name="averageCost"
-              :label="t('Average Cost')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-if="type !== 'service'"
-              v-model="form.weight"
-              name="weight"
-              :label="t('Weight (kg)')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
+          <!-- Accounts Section (Always visible) -->
+          <div class="row q-mb-sm q-gutter-sm">
+            <div class="col-12 col-md-6">
+              <s-select
+                v-if="type == 'part'"
+                v-model="form.inventory"
+                :options="inventoryAccounts"
+                name="IC_inventory"
+                :label="t('Inventory')"
+                outlined
+                dense
+                class="q-mb-sm"
+                label-color="secondary"
+                search="label"
+                account
+                :rules="[requiredRule]"
+                hide-bottom-space
+                option-label="label"
+              />
+              <s-select
+                v-if="type == 'part'"
+                v-model="form.income"
+                :options="incomeAccounts"
+                name="IC_income"
+                :label="t('Income')"
+                outlined
+                dense
+                class="q-mb-sm"
+                label-color="secondary"
+                search="label"
+                account
+                :rules="[requiredRule]"
+                hide-bottom-space
+                option-label="label"
+              />
+              <s-select
+                v-if="type == 'part'"
+                v-model="form.cogs"
+                :options="cogsAccounts"
+                name="IC_expense"
+                :label="t('COGS')"
+                outlined
+                dense
+                class="q-mb-sm"
+                label-color="secondary"
+                search="label"
+                account
+                :rules="[requiredRule]"
+                hide-bottom-space
+                option-label="label"
+              />
+              <s-select
+                v-if="type == 'service'"
+                v-model="form.income"
+                :options="serviceIncomeAccounts"
+                name="IC_income"
+                :label="t('Income')"
+                outlined
+                dense
+                class="q-mb-sm"
+                label-color="secondary"
+                search="label"
+                account
+                :rules="[requiredRule]"
+                hide-bottom-space
+                option-label="label"
+              />
+              <s-select
+                v-if="type == 'service'"
+                v-model="form.expense"
+                :options="expenseAccounts"
+                name="IC_expense"
+                :label="t('Expense')"
+                outlined
+                dense
+                class="q-mb-sm"
+                label-color="secondary"
+                search="label"
+                account
+                :rules="[requiredRule]"
+                hide-bottom-space
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <!-- Tax Accounts -->
+              <div class="row">
+                <div v-for="tax in taxAccounts" :key="tax.accno">
+                  <q-checkbox
+                    v-model="form.taxes[tax.accno]"
+                    :name="`IC_tax_${tax.accno}`"
+                    :label="t(tax.description)"
+                  />
+                </div>
+              </div>
+              <text-input
+                v-model="form.notes"
+                name="notes"
+                :label="t('Notes')"
+                type="textarea"
+                outlined
+                dense
+                rows="2"
+                class="q-mb-sm"
+                label-color="secondary"
+              />
+            </div>
           </div>
-          <div class="col-12 col-md-6">
-            <text-input
-              v-if="type !== 'service'"
-              v-model="form.onhand"
-              name="onhand"
-              :label="t('On Hand')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <q-checkbox
-              v-if="type !== 'service'"
-              v-model="form.checkinventory"
-              name="checkinventory"
-              :label="t('Check Inventory')"
-              class="q-mb-sm"
-            />
-            <text-input
-              v-if="type !== 'service'"
-              v-model="form.rop"
-              name="rop"
-              :label="t('ROP')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
-            <text-input
-              v-if="type !== 'service'"
-              v-model="form.bin"
-              name="bin"
-              :label="t('Bin')"
-              outlined
-              dense
-              class="q-mb-sm"
-              label-color="secondary"
-            />
+        </q-tab-panel>
+
+        <!-- Additional Details tab -->
+        <q-tab-panel name="additional" class="q-pa-none">
+          <!-- Additional Details Section -->
+          <div class="q-mb-sm">
+            <div class="text-weight-bold q-mb-xs">
+              {{ t("Additional Details") }}
+            </div>
+            <div class="row q-mb-sm q-gutter-sm">
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-model="form.drawing"
+                  name="drawing"
+                  :label="t('Drawing')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-model="form.microfiche"
+                  name="microfiche"
+                  :label="t('Microfiche')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-model="form.toolnumber"
+                  name="toolnumber"
+                  :label="t('Tool Number')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-model="form.priceupdate"
+                  name="priceupdate"
+                  :label="t('Updated')"
+                  type="date"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-if="type == 'part'"
+                  v-model="form.lot"
+                  name="lot"
+                  :label="t('Lot')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <country-input
+                  v-model="form.countryorigin"
+                  name="countryorigin"
+                  :label="t('Country of Origin')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                />
+                <text-input
+                  v-model="form.tariff_hscode"
+                  name="tariff_hscode"
+                  :label="t('HS Code')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-model="form.barcode"
+                  name="barcode"
+                  :label="t('Barcode')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+              </div>
+            </div>
+
+            <!-- Make and Model (Not for service) -->
+            <div v-if="type !== 'service'" class="q-mb-sm">
+              <div class="text-weight-bold q-mb-xs">
+                {{ t("Make and Model") }}
+              </div>
+              <div
+                v-for="(line, index) in form.makeModelLines"
+                :key="'mm-' + index"
+                class="row q-mb-md q-gutter-sm items-center"
+              >
+                <div class="col-12 col-md-4">
+                  <text-input
+                    v-model="line.make"
+                    :name="`make_${index}`"
+                    :label="t('Make')"
+                    outlined
+                    dense
+                    class="q-mb-sm"
+                    label-color="secondary"
+                    @keyup.enter.prevent="handleMakeModelEnter(index)"
+                    :ref="(el) => (makeInputRefs[index] = el)"
+                  />
+                </div>
+                <div class="col-12 col-md-4">
+                  <text-input
+                    v-model="line.model"
+                    :name="`model_${index}`"
+                    :label="t('Model')"
+                    outlined
+                    dense
+                    class="q-mb-sm"
+                    label-color="secondary"
+                    @keyup.enter.prevent="handleMakeModelEnter(index)"
+                  />
+                </div>
+                <div class="col-auto">
+                  <q-btn
+                    color="negative"
+                    icon="delete"
+                    dense
+                    flat
+                    @click="deleteMakeModelLine(index)"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </q-tab-panel>
+
+        <!-- Inventory Detail tab -->
+        <q-tab-panel name="inventory" class="q-pa-none">
+          <!-- Inventory Details Section -->
+          <div class="q-mb-sm">
+            <div class="text-weight-bold q-mb-xs">
+              {{ t("Inventory Details") }}
+            </div>
+            <div class="row q-mb-sm q-gutter-sm">
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-if="type == 'part'"
+                  v-model="form.expires"
+                  name="expires"
+                  :label="t('Expires')"
+                  type="date"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-model="form.listprice"
+                  name="listprice"
+                  :label="t('List Price')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-model="form.lastcost"
+                  name="lastcost"
+                  :label="t('Last Cost')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-if="type !== 'service'"
+                  v-model="form.averageCost"
+                  name="averageCost"
+                  :label="t('Average Cost')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-if="type !== 'service'"
+                  v-model="form.weight"
+                  name="weight"
+                  :label="t('Weight (kg)')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <text-input
+                  v-if="type !== 'service'"
+                  v-model="form.onhand"
+                  name="onhand"
+                  :label="t('On Hand')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <q-checkbox
+                  v-if="type !== 'service'"
+                  v-model="form.checkinventory"
+                  name="checkinventory"
+                  :label="t('Check Inventory')"
+                  class="q-mb-sm"
+                />
+                <text-input
+                  v-if="type !== 'service'"
+                  v-model="form.rop"
+                  name="rop"
+                  :label="t('ROP')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+                <text-input
+                  v-if="type !== 'service'"
+                  v-model="form.bin"
+                  name="bin"
+                  :label="t('Bin')"
+                  outlined
+                  dense
+                  class="q-mb-sm"
+                  label-color="secondary"
+                />
+              </div>
+            </div>
+          </div>
+        </q-tab-panel>
+      </q-tab-panels>
 
       <div class="row justify-start q-mt-md">
         <!-- Using type="submit" on buttons so that the q-form's validation is triggered -->
@@ -447,6 +464,7 @@ const props = defineProps({
   initialData: { type: Object, default: null },
 });
 const emit = defineEmits(["saved"]);
+const haveProps = computed(() => props.id != null || props.type != null);
 const componentId = computed(() => (props.type ? props.id : route.query.id));
 const componentType = computed(() => props.type ?? route.params.type);
 const type = ref(componentType.value || "part");
@@ -461,10 +479,8 @@ if (!props.type) {
 const formRef = ref(null);
 const saveAsNew = ref(false);
 
-// Section visibility controls
-const showMandatory = ref(true);
-const showAdditionalDetails = ref(false);
-const showInventoryDetails = ref(false);
+// Active tab for Mandatory / Additional / Inventory
+const activeTab = ref("mandatory");
 
 const form = ref({
   // Basic Information
@@ -603,29 +619,29 @@ const getLinks = async () => {
 
     form.value.inventory = getAccount(
       inventoryAccounts.value,
-      links.defaults.inventory_accno_id
+      links.defaults.inventory_accno_id,
     );
 
     form.value.income = getAccount(
       incomeAccounts.value,
-      links.defaults.income_accno_id
+      links.defaults.income_accno_id,
     );
 
     if (type.value === "service") {
       form.value.income = getAccount(
         serviceIncomeAccounts.value,
-        links.defaults.income_accno_id
+        links.defaults.income_accno_id,
       );
     }
 
     form.value.cogs = getAccount(
       cogsAccounts.value,
-      links.defaults.expense_accno_id
+      links.defaults.expense_accno_id,
     );
 
     form.value.expense = getAccount(
       expenseAccounts.value,
-      links.defaults.expense_accno_id
+      links.defaults.expense_accno_id,
     );
 
     currencies.value = links.currencies;
@@ -656,22 +672,22 @@ const loadData = async () => {
     form.value.description = data.description;
 
     form.value.inventory = inventoryAccounts.value.find(
-      (acc) => acc.id == data.inventory_accno_id
+      (acc) => acc.id == data.inventory_accno_id,
     );
     form.value.income = incomeAccounts.value.find(
-      (acc) => acc.id == data.income_accno_id
+      (acc) => acc.id == data.income_accno_id,
     );
 
     if (type.value === "service") {
       form.value.income = serviceIncomeAccounts.value.find(
-        (acc) => acc.id === data.income_accno_id
+        (acc) => acc.id === data.income_accno_id,
       );
     }
     form.value.cogs = cogsAccounts.value.find(
-      (acc) => acc.id == data.expense_accno_id
+      (acc) => acc.id == data.expense_accno_id,
     );
     form.value.expense = expenseAccounts.value.find(
-      (acc) => acc.id == data.expense_accno_id
+      (acc) => acc.id == data.expense_accno_id,
     );
     Object.keys(taxAccounts.value).forEach((key) => {
       const tax = taxAccounts.value[key];
@@ -711,7 +727,7 @@ const loadData = async () => {
         vendorPartNumber: vend.partnumber,
         vendorCost: vend.lastcost,
         vendorCurrency: currencies.value.find(
-          (c) => (c.curr = vend.vendorcurr)
+          (c) => (c.curr = vend.vendorcurr),
         ),
         vendorLeadtime: vend.leadtime,
       }));
@@ -724,7 +740,7 @@ const loadData = async () => {
         priceBreak: cust.pricebreak,
         customerPrice: cust.customerprice,
         customerCurrency: currencies.value.find(
-          (c) => (c.curr = cust.customercurr)
+          (c) => (c.curr = cust.customercurr),
         ),
         validFrom: cust.validfrom,
         validTo: cust.validto,
@@ -941,7 +957,7 @@ const applyInitialData = () => {
         ? serviceIncomeAccounts.value
         : incomeAccounts.value;
     const matchedAccount = accounts.find(
-      (acc) => String(acc.accno) === String(props.initialData.incomeAccno)
+      (acc) => String(acc.accno) === String(props.initialData.incomeAccno),
     );
     if (matchedAccount) {
       form.value.income = matchedAccount;
@@ -957,7 +973,7 @@ watch(
       applyInitialData();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(async () => {
@@ -972,3 +988,28 @@ onMounted(async () => {
   applyInitialData();
 });
 </script>
+
+<style scoped lang="scss">
+.add-part-form {
+  width: 80%;
+}
+
+.add-part-form--full-width {
+  width: 100%;
+}
+
+.add-part-tabs :deep(.q-tab) {
+  border-radius: 4px;
+  margin-right: 4px;
+  text-transform: none;
+}
+
+.add-part-tabs :deep(.q-tab--active) {
+  background: var(--q-primary);
+  color: white;
+}
+
+.add-part-tabs :deep(.q-tab__indicator) {
+  display: none;
+}
+</style>

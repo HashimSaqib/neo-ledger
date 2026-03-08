@@ -37,7 +37,7 @@
               />
               <s-button type="download" @click="downloadPdf" />
             </div>
-            <h6 class="print-preview__sidebar-title">
+            <h6 class="container-title">
               {{ t("Recent Transactions") }}
             </h6>
             <LastTransactions :type="db" ref="lastTransactionsRef" />
@@ -55,317 +55,396 @@
           <!-- Left Panel - Invoice Form -->
           <template v-slot:before>
             <div class="container q-mr-sm">
-              <div class="row justify-between full-width">
-                <div class="col-12 col-sm-5">
-                  <div class="row full-width">
-                    <s-select
-                      :label="t(vcLabel)"
-                      :options="vcList"
-                      option-label="label"
-                      :option-value="vcNumberField"
-                      v-model="selectedVc"
-                      dense
-                      outlined
-                      bg-color="input"
-                      label-color="secondary"
-                      class="q-mb-sm col-12 col-sm-9"
-                      @update:model-value="vcUpdate"
-                      search="label"
-                      account
-                    />
-                    <div
-                      class="q-ml-sm"
-                      style="display: flex; align-items: center"
-                    >
-                      <q-btn
-                        @click.prevent="openEditVc"
-                        class="text-primary q-mr-xs"
-                        style="text-decoration: none"
-                        v-if="selectedVc"
-                        icon="edit"
-                        flat
-                        dense
-                      />
-                      <q-btn
-                        @click.prevent="openAddVc"
-                        class="text-primary"
-                        style="margin-right: 0.5em; text-decoration: none"
-                        icon="add"
-                        flat
-                        dense
-                      />
-                    </div>
-                    <div class="col-sm-4 q-md-ml-md content-center" v-if="vc">
-                      <p class="q-px-sm maintext q-ma-none">
-                        <strong>{{ t("Credit Limit") }}</strong>
-                        <span class="text-primary q-mx-sm">
-                          {{ formatAmount(vc.creditlimit) }}
-                        </span>
-                        <strong>{{ t("Remaining") }}</strong>
-                        <span
-                          class="q-ml-sm"
-                          :class="
-                            vc.creditremaining > 0
-                              ? 'text-positive'
-                              : 'text-negative'
-                          "
-                        >
-                          {{ formatAmount(vc.creditremaining) }}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <div v-if="vc">
-                    <p class="q-mb-sm q-px-sm maintext">
-                      <strong>{{ t("Address") }}</strong> {{ vc.full_address }}
-                    </p>
-                  </div>
-                  <div class="row q-mb-sm" v-if="vcBankAccounts.length > 0">
-                    <div class="col-sm-9 col-12">
-                      <s-select
-                        outlined
-                        v-model="vcBankId"
-                        :options="vcBankAccounts"
-                        :label="t('Bank Account')"
-                        :option-label="getBankAccountLabel"
-                        option-value="id"
-                        map-options
-                        emit-value
-                        label-color="secondary"
-                        bg-color="input"
-                        dense
-                        clearable
-                      />
-                      <q-badge
-                        v-if="selectedBankHasQriban"
-                        color="primary"
-                        class="q-mt-xs"
-                        :label="t('QR-IBAN')"
-                      />
-                    </div>
-                    <div class="col-sm-auto q-ml-sm flex items-center">
-                      <q-btn
-                        flat
-                        round
-                        dense
-                        icon="add"
-                        size="sm"
-                        color="primary"
-                        @click="openAddBankDialog"
-                      />
-                      <q-btn
-                        flat
-                        round
-                        dense
-                        icon="edit"
-                        size="sme"
-                        color="primary"
-                        @click="openEditBankDialog"
-                        :disable="!vcBankId"
-                      />
-                    </div>
-                  </div>
-                  <div class="row q-gutter-sm" v-if="type === 'vendor'">
-                    <text-input
-                      outlined
-                      :label="t('DCN')"
-                      v-model="dcn"
-                      class="q-mb-sm col-sm-5 col-12"
-                      bg-color="input"
-                      label-color="secondary"
-                      dense
-                    />
-                  </div>
-                  <div class="row">
-                    <s-select
-                      outlined
-                      v-model="recordAccount"
-                      :options="openRecordAccounts"
-                      :label="t('Record In')"
-                      dense
-                      bg-color="input"
-                      label-color="secondary"
-                      class="q-mb-sm col-sm-9 col-12"
-                      search="label"
-                      option-label="label"
-                    />
-                  </div>
-                  <div v-if="currencies && currencies.length" class="row">
-                    <q-select
-                      outlined
-                      v-model="selectedCurrency"
-                      :options="currencies"
-                      option-value="curr"
-                      option-label="curr"
-                      :label="t('Currency')"
-                      dense
-                      class="q-mb-sm col-sm-5 col-12"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
+              <h6 class="container-title q-my-none q-mb-md">
+                {{ t("HEADER") }}
+              </h6>
 
-                    <exchange-rate-input
-                      v-if="selectedCurrency && selectedCurrency.rn != 1"
-                      v-model="exchangeRate"
-                      :currency="selectedCurrency?.curr"
-                      :transdate="invDate"
-                      :label="t('Exchange Rate')"
-                      class="lightbg q-mb-sm col-sm-5 col-12 q-ml-md-sm"
-                    />
-                  </div>
-                  <div class="row q-mb-sm">
-                    <text-input
+              <!-- Row 1: Vendor/customer, Bank (if vendor), Invoice Number, Order Number -->
+              <div class="row q-col-gutter-sm q-mb-md items-end">
+                <s-select
+                  :label="t(vcLabel)"
+                  :options="vcList"
+                  option-label="label"
+                  :option-value="vcNumberField"
+                  v-model="selectedVc"
+                  dense
+                  outlined
+                  bg-color="input"
+                  label-color="secondary"
+                  class="col"
+                  @update:model-value="vcUpdate"
+                  search="label"
+                  account
+                  :placeholder="t('Select ') + t(vcLabel)"
+                />
+                <div
+                  class="col-auto"
+                  style="display: flex; align-items: center"
+                >
+                  <q-btn
+                    @click.prevent="openEditVc"
+                    class="text-primary q-mr-xs"
+                    style="text-decoration: none"
+                    v-if="selectedVc"
+                    icon="edit"
+                    flat
+                    dense
+                  />
+                  <q-btn
+                    @click.prevent="openAddVc"
+                    class="text-primary"
+                    style="text-decoration: none"
+                    icon="add"
+                    flat
+                    dense
+                  />
+                </div>
+                <template v-if="type === 'vendor' && vcBankAccounts.length > 0">
+                  <div class="col-sm-2 col-12">
+                    <s-select
                       outlined
-                      :label="t('Description')"
-                      v-model="description"
-                      bg-color="input"
+                      v-model="vcBankId"
+                      :options="vcBankAccounts"
+                      :label="t('Bank Account')"
+                      :option-label="getBankAccountLabel"
+                      option-value="id"
+                      map-options
+                      emit-value
                       label-color="secondary"
-                      class="col-sm-11 col-12"
-                      dense
-                      type="input"
-                      autogrow
-                    />
-                  </div>
-                  <div class="row q-mb-sm">
-                    <q-select
-                      v-if="departments.length > 0"
-                      outlined
-                      v-model="selectedDepartment"
-                      :options="departments"
-                      option-value="description"
-                      option-label="description"
-                      :label="t('Department')"
-                      dense
                       bg-color="input"
-                      label-color="secondary"
+                      dense
                       clearable
-                      autogrow
-                      hide-bottom-space
-                      class="col-5"
                     />
                   </div>
-                  <div class="row">
-                    <q-file
-                      bg-color="input"
-                      label-color="secondary"
-                      filled
+                  <div
+                    class="col-auto"
+                    style="display: flex; align-items: center"
+                  >
+                    <q-btn
+                      flat
+                      round
                       dense
-                      outlined
-                      v-model="files"
-                      :label="t('Reference Documents')"
-                      multiple
-                      append
-                      use-chips
-                      :error="connection.error ? true : false"
-                      :disable="connection.error ? true : false"
-                      :error-message="connection.error"
-                      :hint="connection"
-                    >
-                      <template v-slot:prepend>
-                        <q-icon name="attachment" />
-                      </template>
-                    </q-file>
-                  </div>
-                  <div class="row q-mt-sm">
-                    <FileList
-                      :files="existingFiles"
-                      module="gl"
-                      :preview="true"
-                      @file-deleted="handleFileDeletion"
-                      @file-preview="handleFilePreview"
+                      icon="edit"
+                      size="sm"
+                      color="primary"
+                      @click="openEditBankDialog"
+                      :disable="!vcBankId"
                     />
-                  </div>
-                  <div class="row" v-if="link">
-                    <a :href="link" target="_blank" rel="noopener noreferrer">
-                      {{ t("View Document") }}
-                    </a>
-                  </div>
-                </div>
-                <div class="col-12 col-sm-6">
-                  <div class="row q-gutter-sm">
-                    <text-input
-                      outlined
-                      :label="t('Invoice Number')"
-                      v-model="invNumber"
-                      class="q-mb-sm col-sm-5 col-12"
-                      bg-color="input"
-                      label-color="secondary"
+                    <q-btn
+                      flat
+                      round
                       dense
-                      :disable="lockNumber"
-                    />
-                    <text-input
-                      outlined
-                      :label="t('Order Number')"
-                      v-model="ordNumber"
-                      class="q-mb-sm col-sm-5 col-12"
-                      bg-color="input"
-                      label-color="secondary"
-                      dense
+                      icon="add"
+                      size="sm"
+                      color="primary"
+                      @click="openAddBankDialog"
                     />
                   </div>
+                </template>
+                <text-input
+                  outlined
+                  :label="t('Invoice Number')"
+                  v-model="invNumber"
+                  class="col-sm-2 col-12"
+                  bg-color="input"
+                  label-color="secondary"
+                  dense
+                  :disable="lockNumber"
+                  :placeholder="t('Auto')"
+                />
+                <text-input
+                  outlined
+                  :label="t('Order Number')"
+                  v-model="ordNumber"
+                  class="col-sm-2 col-12"
+                  bg-color="input"
+                  label-color="secondary"
+                  dense
+                  :placeholder="t('Optional')"
+                />
+              </div>
 
-                  <div class="row q-gutter-sm">
-                    <text-input
-                      v-model="invDate"
-                      :label="t('Invoice Date')"
-                      class="q-mb-sm col-sm-5 col-12"
-                      bg-color="input"
-                      label-color="secondary"
-                      outlined
-                      dense
-                      type="date"
-                      @change="filterProjects"
-                    />
-                    <text-input
-                      v-model="dueDate"
-                      :label="t('Due Date')"
-                      class="lightbg q-mb-sm col-sm-5 col-12"
-                      input-class="maintext"
-                      label-color="secondary"
-                      outlined
-                      dense
-                      type="date"
-                      @change="executionDate = dueDate"
-                    />
-                  </div>
-                  <div class="row q-gutter-sm" v-if="type === 'vendor'">
-                    <text-input
-                      v-model="executionDate"
-                      :label="t('Execution Date')"
-                      class="lightbg q-mb-sm col-sm-5 col-12"
-                      input-class="maintext"
-                      label-color="secondary"
-                      outlined
-                      dense
-                      type="date"
-                    />
-                  </div>
+              <!-- VC info: Address, Credit limit; QR-IBAN badge under Bank Account column -->
+              <div
+                v-if="vc || (type === 'vendor' && selectedBankHasQriban)"
+                class="row q-col-gutter-sm q-mb-md items-start"
+              >
+                <div v-if="vc" class="col">
+                  <p class="q-mb-xs q-px-sm maintext q-my-none">
+                    <strong>{{ t("Address") }}</strong>
+                    {{ vc.full_address }}
+                  </p>
+                  <p class="q-px-sm maintext q-ma-none">
+                    <strong>{{ t("Credit Limit") }}</strong>
+                    <span class="text-primary q-mx-sm">
+                      {{ formatAmount(vc.creditlimit) }}
+                    </span>
+                    <strong>{{ t("Remaining") }}</strong>
+                    <span
+                      class="q-ml-sm"
+                      :class="
+                        vc.creditremaining > 0
+                          ? 'text-positive'
+                          : 'text-negative'
+                      "
+                    >
+                      {{ formatAmount(vc.creditremaining) }}
+                    </span>
+                  </p>
                 </div>
+                <template v-if="type === 'vendor' && vcBankAccounts.length > 0">
+                  <div v-if="!vc" class="col" />
+                  <div class="col-sm-2 col-12">
+                    <q-badge
+                      v-if="selectedBankHasQriban"
+                      color="primary"
+                      :label="t('QR-IBAN')"
+                    />
+                  </div>
+                  <div class="col-auto" />
+                  <div class="col-sm-2" />
+                  <div class="col-sm-2" />
+                </template>
+              </div>
+
+              <!-- Row 2: Invoice date, Due date, Execution date (if vendor), Currency, Exchange rate, Record In -->
+              <div class="row q-col-gutter-sm q-mb-md items-end">
+                <text-input
+                  v-model="invDate"
+                  :label="t('Invoice Date')"
+                  class="col-sm-2 col-6"
+                  bg-color="input"
+                  label-color="secondary"
+                  outlined
+                  dense
+                  type="date"
+                  @change="filterProjects"
+                />
+                <text-input
+                  v-model="dueDate"
+                  :label="t('Due Date')"
+                  class="col-sm-2 col-6"
+                  outlined
+                  dense
+                  type="date"
+                  @change="executionDate = dueDate"
+                />
+                <text-input
+                  v-if="type === 'vendor'"
+                  v-model="executionDate"
+                  :label="t('Execution Date')"
+                  class="col-sm-2 col-6"
+                  outlined
+                  dense
+                  type="date"
+                />
+                <s-select
+                  v-if="currencies && currencies.length"
+                  outlined
+                  v-model="selectedCurrency"
+                  :options="currencies"
+                  option-value="curr"
+                  option-label="curr"
+                  :label="t('Currency')"
+                  dense
+                  bg-color="input"
+                  label-color="secondary"
+                  class="col-sm-2 col-12"
+                  search="curr"
+                />
+                <exchange-rate-input
+                  v-if="selectedCurrency && selectedCurrency.rn != 1"
+                  v-model="exchangeRate"
+                  :currency="selectedCurrency?.curr"
+                  :transdate="invDate"
+                  :label="t('Exchange Rate')"
+                  class="col-sm-2 col-12"
+                />
+                <s-select
+                  outlined
+                  v-model="recordAccount"
+                  :options="openRecordAccounts"
+                  :label="t('Record In')"
+                  dense
+                  bg-color="input"
+                  label-color="secondary"
+                  class="col-sm-2 col-12"
+                  search="label"
+                  option-label="label"
+                  account
+                />
+              </div>
+
+              <!-- Row 3: Description, DCN (if vendor), Reference Documents -->
+              <div class="row q-col-gutter-sm q-mb-md items-end">
+                <div class="col-sm-5 col-12">
+                  <text-input
+                    outlined
+                    :label="t('Description')"
+                    v-model="description"
+                    bg-color="input"
+                    label-color="secondary"
+                    dense
+                    type="input"
+                    autogrow
+                    :placeholder="t('Transaction Description')"
+                  />
+                </div>
+                <text-input
+                  v-if="type === 'vendor'"
+                  outlined
+                  :label="t('DCN')"
+                  v-model="dcn"
+                  class="col-sm-2 col-12"
+                  bg-color="input"
+                  label-color="secondary"
+                  dense
+                  :placeholder="t('Document Control Number')"
+                />
+                <div class="col-sm-5 col-12">
+                  <div class="text-caption text-secondary q-mb-xs">
+                    {{ t("Reference Documents") }}
+                  </div>
+                  <q-file
+                    ref="filePicker"
+                    v-model="files"
+                    multiple
+                    append
+                    style="display: none"
+                    :disable="connection.error ? true : false"
+                  />
+                  <q-btn
+                    flat
+                    dense
+                    no-caps
+                    color="primary"
+                    icon="add"
+                    :label="t(' Add Reference Documents')"
+                    @click="filePicker?.pickFiles()"
+                    class="q-pa-none"
+                  />
+                  <div
+                    v-if="connection.error"
+                    class="text-caption text-negative q-mt-xs"
+                  >
+                    {{ connection.error }}
+                  </div>
+                  <div
+                    v-if="files && files.length"
+                    class="row q-gutter-xs q-mt-xs"
+                  >
+                    <q-chip
+                      v-for="(file, idx) in files"
+                      :key="idx"
+                      removable
+                      dense
+                      @remove="files.splice(idx, 1)"
+                    >
+                      {{ file.name }}
+                    </q-chip>
+                  </div>
+                  <FileList
+                    :files="existingFiles"
+                    module="gl"
+                    :preview="true"
+                    @file-deleted="handleFileDeletion"
+                    @file-preview="handleFilePreview"
+                  />
+                </div>
+              </div>
+
+              <!-- Department -->
+              <div
+                class="row q-col-gutter-sm q-mb-md"
+                v-if="departments.length > 0"
+              >
+                <q-select
+                  outlined
+                  v-model="selectedDepartment"
+                  :options="departments"
+                  option-value="description"
+                  option-label="description"
+                  :label="t('Department')"
+                  dense
+                  bg-color="input"
+                  label-color="secondary"
+                  clearable
+                  autogrow
+                  hide-bottom-space
+                  class="col-sm-3 col-12"
+                />
+              </div>
+
+              <div class="row" v-if="link">
+                <a :href="link" target="_blank" rel="noopener noreferrer">
+                  {{ t("View Document") }}
+                </a>
               </div>
             </div>
 
             <!-- Items Section -->
             <div class="container q-mr-sm">
-              <div class="row q-mb-md">
-                <h6 class="q-my-none q-pa-none text-secondary">
-                  {{ t("Items") }}
+              <div class="row justify-between items-center q-mb-md">
+                <h6 class="container-title q-my-none q-ml-sm">
+                  {{ t("LINE ITEMS") }}
                 </h6>
                 <s-button type="add-line" @click="addLine" class="q-ml-md" />
+              </div>
+              <!-- Line Item Column Headers -->
+              <div
+                class="row justify-between items-center q-px-sm line-item-headers q-mb-sm"
+              >
+                <div
+                  :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
+                  class="line-item-header"
+                >
+                  {{ t("Description") }}
+                </div>
+                <div
+                  :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
+                  class="line-item-header"
+                >
+                  {{ t("Account") }}
+                </div>
+                <div class="col-2 line-item-header">{{ t("Amount") }}</div>
+                <div
+                  v-if="filteredProjects.length > 0"
+                  class="col-2 line-item-header"
+                >
+                  {{ t("Project") }}
+                </div>
+                <div
+                  v-if="lineTax && taxAccountList"
+                  class="col-2 line-item-header"
+                >
+                  {{ t("Tax Account") }}
+                </div>
+                <div
+                  v-if="lineTax && taxAccountList"
+                  class="col-1 line-item-header"
+                >
+                  {{ t("Tax Amount") }}
+                </div>
+                <div style="width: 40px" />
               </div>
               <!-- Use draggable to enable reordering of line items -->
               <draggable v-model="lines" item-key="id">
                 <template #item="{ element: line, index }">
-                  <div class="row q-mb-md justify-between container-bg q-pa-md">
+                  <div
+                    class="row justify-between align-center line-bg q-pa-sm q-mb-sm"
+                  >
                     <text-input
                       outlined
                       v-model="line.description"
                       :label="t('Description')"
                       :class="lineTax && taxAccountList ? 'col-2' : 'col-4'"
                       dense
+                      no-label
                       :ref="(el) => (lineDescRefs[index] = el)"
                       autogrow
                       label-color="secondary"
                       bg-color="input"
+                      :placeholder="t('Item Description')"
                     />
                     <s-select
                       outlined
@@ -378,10 +457,11 @@
                       bg-color="input"
                       label-color="secondary"
                       dense
+                      no-label
                       search="label"
                       account
+                      :placeholder="t('Expense Account')"
                     />
-                    <!-- Amount field with enter key -->
                     <fn-input
                       outlined
                       v-model="line.amount"
@@ -390,6 +470,7 @@
                       bg-color="input"
                       label-color="secondary"
                       dense
+                      no-label
                       @keyup.enter="() => handleLineEnter(index)"
                     />
                     <s-select
@@ -404,9 +485,10 @@
                       bg-color="input"
                       label-color="secondary"
                       dense
+                      no-label
                       search="description"
+                      :placeholder="t('Select Project')"
                     />
-
                     <s-select
                       v-if="lineTax && taxAccountList"
                       outlined
@@ -419,11 +501,12 @@
                       bg-color="input"
                       label-color="secondary"
                       dense
+                      no-label
                       search="label"
                       account
+                      :placeholder="t('Select Tax')"
                       @update:model-value="() => onLineTaxAccountChange(index)"
                     />
-                    <!-- Tax Amount field with enter key -->
                     <fn-input
                       v-if="lineTax && taxAccountList"
                       outlined
@@ -433,18 +516,22 @@
                       bg-color="input"
                       label-color="secondary"
                       dense
+                      no-label
                       @keyup.enter="() => handleLineEnter(index)"
                     />
                     <q-btn
                       color="negative"
-                      icon="delete"
+                      icon="delete_outline"
                       dense
                       flat
+                      size="0.75rem"
                       @click="removeLine(index)"
                     />
                   </div>
                 </template>
               </draggable>
+
+              <q-separator class="q-my-lg" />
 
               <!-- Totals Section -->
               <div class="row justify-between items-end">
@@ -458,6 +545,7 @@
                     :label="t('Notes')"
                     type="textarea"
                     v-model="notes"
+                    :placeholder="t('Visible on the bill')"
                   />
                 </div>
                 <div class="col q-ml-md">
@@ -470,94 +558,90 @@
                     :label="t('Internal Notes')"
                     type="textarea"
                     v-model="intnotes"
+                    :placeholder="t('Only visible to your team')"
                   />
                 </div>
                 <div class="col">
-                  <div class="row justify-end">
-                    <div class="maintext">
-                      <q-checkbox
-                        :label="t('Tax Included')"
-                        v-model="taxIncluded"
-                        @click="calculateTaxes"
-                      />
-                    </div>
+                  <div class="row justify-end q-mb-xs maintext">
+                    <q-checkbox
+                      :label="t('Tax Included')"
+                      v-model="taxIncluded"
+                      @click="calculateTaxes"
+                    />
                   </div>
-                  <div class="row justify-end">
-                    <div class="q-mr-xl">
-                      <p class="q-my-xs maintext">
-                        <strong>{{ t("Subtotal") }}</strong>
-                      </p>
-                    </div>
-                    <div>
-                      <p class="q-my-xs maintext">
-                        <strong>{{ formatAmount(subtotal) }}</strong>
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="row justify-end maintext items-center q-gutter-sm q-mb-xs"
-                    v-for="tax in invoiceTaxes"
-                    :key="tax.acc"
-                  >
-                    <div class="col-auto">
-                      <q-checkbox
-                        v-model="tax.checked"
-                        dense
-                        size="sm"
-                        :disabled="lineTax"
-                        @update:model-value="calculateTaxes"
-                      />
-                    </div>
-                    <div class="col-3">
-                      <fn-input
-                        v-model="tax.amount"
-                        class="text-right"
-                        bg-color="input"
-                        dense
-                        outlined
-                        :disabled="!tax.checked || lineTax"
-                        :label="tax.name"
-                      />
-                    </div>
-                  </div>
-                  <div class="row justify-end">
-                    <div class="q-mr-xl">
-                      <p class="q-my-xs maintext">
-                        <strong>{{ t("Total") }}</strong>
-                      </p>
-                    </div>
-                    <div>
-                      <p class="q-my-xs maintext">
-                        <strong>{{ formatAmount(total) }}</strong>
-                      </p>
-                    </div>
+                  <div class="totals-grid">
+                    <span class="totals-label maintext"
+                      ><strong>{{ t("Subtotal") }}</strong></span
+                    >
+                    <span class="totals-value maintext"
+                      ><strong>{{ formatAmount(subtotal) }}</strong></span
+                    >
+                    <template v-for="tax in invoiceTaxes" :key="tax.acc">
+                      <span class="totals-label maintext">
+                        <q-checkbox
+                          v-if="!lineTax"
+                          v-model="tax.checked"
+                          dense
+                          size="sm"
+                          :disabled="lineTax"
+                          @update:model-value="calculateTaxes"
+                        />
+                        {{ tax.name }}
+                      </span>
+                      <span class="totals-value maintext">{{
+                        formatAmount(tax.amount)
+                      }}</span>
+                    </template>
+                    <span class="totals-label maintext"
+                      ><strong>{{ t("Total") }}</strong></span
+                    >
+                    <span class="totals-value maintext"
+                      ><strong>{{ formatAmount(total) }}</strong></span
+                    >
                   </div>
                 </div>
               </div>
             </div>
             <!-- Payments Section -->
             <div class="container q-mr-sm">
-              <div class="row q-mb-md">
-                <h6 class="q-my-none q-pa-none text-secondary">
-                  {{ t("Payments") }}
+              <div class="row justify-between items-center q-mb-md">
+                <h6 class="container-title q-my-none q-ml-sm">
+                  {{ t("PAYMENTS") }}
                 </h6>
                 <s-button type="add-line" @click="addPayment" class="q-ml-md" />
+              </div>
+              <!-- Payment Column Headers -->
+              <div
+                class="row justify-between items-center q-px-sm q-ml-md line-item-headers q-mb-sm"
+              >
+                <div class="col-2 line-item-header">{{ t("Date") }}</div>
+                <div class="col-2 line-item-header">{{ t("Source") }}</div>
+                <div class="col-2 line-item-header">{{ t("Memo") }}</div>
+                <div class="col-2 line-item-header">{{ t("Amount") }}</div>
+                <div
+                  v-if="selectedCurrency && selectedCurrency.rn != 1"
+                  class="col-1 line-item-header"
+                >
+                  {{ t("Exchange Rate") }}
+                </div>
+                <div class="col-2 line-item-header">{{ t("Account") }}</div>
+                <div style="width: 40px" />
               </div>
               <div
                 v-for="(payment, index) in payments"
                 :key="index"
-                class="row q-mb-md justify-between container-bg q-pa-md"
+                class="row justify-between align-center line-bg q-pa-sm q-mb-sm"
               >
-                <!-- Date field with inline ref and enter key -->
                 <date-input
                   outlined
                   v-model="payment.date"
                   :label="t('Date')"
-                  class="q-mt-sm"
+                  class="col-2"
                   bg-color="input"
                   label-color="secondary"
                   dense
                   type="date"
+                  no-label
                   :ref="(el) => (paymentDateRefs[index] = el)"
                   @keyup.enter="() => handlePaymentEnter(index)"
                 />
@@ -565,30 +649,35 @@
                   outlined
                   v-model="payment.source"
                   :label="t('Source')"
-                  class="q-mt-sm"
+                  class="col-2"
+                  dense
+                  no-label
                   bg-color="input"
                   label-color="secondary"
-                  dense
                   @keyup.enter="() => handlePaymentEnter(index)"
+                  :placeholder="t('Source')"
                 />
                 <text-input
                   outlined
                   v-model="payment.memo"
                   :label="t('Memo')"
-                  class="q-mt-sm"
+                  class="col-2"
+                  dense
+                  no-label
                   bg-color="input"
                   label-color="secondary"
-                  dense
                   @keyup.enter="() => handlePaymentEnter(index)"
+                  :placeholder="t('Memo')"
                 />
                 <fn-input
                   outlined
                   v-model="payment.amount"
                   :label="t('Amount')"
-                  class="q-mt-sm"
-                  label-color="secondary"
+                  class="col-2"
                   bg-color="input"
+                  label-color="secondary"
                   dense
+                  no-label
                   @keyup.enter="() => handlePaymentEnter(index)"
                 >
                   <template
@@ -616,7 +705,8 @@
                   :currency="selectedCurrency?.curr"
                   :transdate="payment.date || invDate"
                   :label="t('Exchange Rate')"
-                  class="q-mt-sm"
+                  no-label
+                  class="col-1"
                 />
                 <s-select
                   outlined
@@ -625,48 +715,39 @@
                   :label="t('Account')"
                   option-label="label"
                   option-value="id"
-                  label-color="secondary"
-                  class="col-2 q-mt-sm"
-                  :class="
-                    selectedCurrency && selectedCurrency.rn !== 1 ? 'col-3' : ''
-                  "
+                  class="col-2"
                   bg-color="input"
+                  label-color="secondary"
                   dense
+                  no-label
                   search="label"
                   account
+                  @keyup.enter="() => handlePaymentEnter(index)"
+                  :placeholder="t('Payment Account')"
                 />
                 <q-btn
                   color="negative"
-                  icon="delete"
+                  icon="delete_outline"
                   dense
                   flat
+                  size="0.75rem"
                   @click="removePayment(index)"
                 />
               </div>
-            </div>
-            <!-- Action Buttons -->
-            <q-separator class="q-my-sm q-mt-md" size="2px" v-if="invId" />
-
-            <div class="row q-gutter-x-md items-center" v-if="invId">
-              <s-select
-                :options="printLocations"
-                v-model="printOptions.location"
-                class="mainbg"
-                dense
-                outlined
-                map-options
-                emit-value
-                option-label="label"
-                :label="t('Location')"
-              />
-              <s-button type="print" @click="printTransaction" v-if="invId" />
-            </div>
-
-            <div class="row q-my-sm q-px-sm justify-end">
+              <div class="row justify-end q-mt-md">
+                <p class="q-my-xs maintext">
+                  <strong
+                    >{{ t("Outstanding") }}:
+                    {{ formatAmount(remainingBalance) }}</strong
+                  >
+                </p>
+              </div>
+              <!-- Payment File & Payment Amount (vendor-only, under Outstanding) -->
               <div
                 v-if="
                   type === 'vendor' && !hidePaymentFile && !isPendingDisabled
                 "
+                class="row items-end justify-end q-gutter-md q-mt-sm"
               >
                 <q-checkbox
                   left-label
@@ -677,16 +758,8 @@
                   :false-value="0"
                   @click="togglePaymentFile"
                 />
-              </div>
-              <div
-                v-if="
-                  type === 'vendor' &&
-                  !hidePaymentFile &&
-                  !isPendingDisabled &&
-                  paymentFile === 1
-                "
-              >
                 <fn-input
+                  v-if="paymentFile === 1"
                   outlined
                   v-model="payment_amount"
                   :label="t('Payment Amount')"
@@ -697,78 +770,86 @@
                 />
               </div>
             </div>
-            <div class="row q-my-sm q-px-sm justify-end">
-              <div>
-                <s-button
-                  type="delete"
-                  @click="deleteTransaction"
-                  class="q-mr-md"
-                  v-if="canDelete"
-                />
-                <s-button
-                  type="new-number"
-                  @click="newNumber"
-                  class="q-mr-md"
-                />
-
-                <s-button
-                  type="secondary"
-                  :label="t('Reversal')"
-                  icon="swap_horiz"
-                  v-if="invId"
-                  class="q-mr-md"
-                  @click="reverseTransaction"
-                />
-
-                <s-button
-                  type="post-as-new"
-                  @click="postInvoice(false, true)"
-                  class="q-mr-md"
-                  v-if="canPostAsNew"
-                />
-                <s-button
-                  type="post"
-                  @click="postInvoice(true, false)"
-                  class="q-mr-md"
-                  v-if="canPost"
-                />
-                <s-button
-                  v-if="pending == '1'"
-                  type="primary"
-                  :label="t('Approve')"
-                  icon="check_circle"
-                  :disable="isPendingDisabled"
-                  @click="approveTransaction"
-                >
-                </s-button>
+            <!-- Actions & print (same structure as SalesInvoice) -->
+            <div class="container actions-and-print-container q-mr-sm">
+              <div class="row justify-between items-center actions-row">
+                <div class="row q-gutter-sm">
+                  <s-button
+                    type="delete"
+                    @click="deleteTransaction"
+                    v-if="canDelete"
+                  />
+                  <s-button type="new-number" @click="newNumber" />
+                  <s-button
+                    type="reversal"
+                    @click="reverseTransaction"
+                    v-if="invId"
+                  />
+                </div>
+                <div class="row q-gutter-sm">
+                  <s-button
+                    type="post-as-new"
+                    @click="postInvoice(false, true)"
+                    v-if="canPostAsNew"
+                  />
+                  <s-button
+                    type="post"
+                    @click="postInvoice(true, false)"
+                    v-if="canPost"
+                  />
+                  <s-button
+                    v-if="pending == '1'"
+                    type="primary"
+                    :label="t('Approve')"
+                    icon="check_circle"
+                    :disable="isPendingDisabled"
+                    @click="approveTransaction"
+                  />
+                </div>
+              </div>
+              <q-separator class="q-my-md" v-if="invId" />
+              <div class="row items-end q-gutter-md" v-if="invId">
+                <div class="col-auto">
+                  <s-select
+                    :options="printLocations"
+                    v-model="printOptions.location"
+                    dense
+                    outlined
+                    map-options
+                    emit-value
+                    option-label="label"
+                    :label="t('Location')"
+                  />
+                </div>
+                <s-button type="print" @click="printTransaction" />
               </div>
             </div>
-
-            <StationTransfer
-              v-if="
-                StationTransfer &&
-                type === 'vendor' &&
-                invId &&
-                stations.length > 0
-              "
-              :type="type"
-              :inv-id="invId"
-              :stations="stations"
-              :transferHistory="transfer_history"
-              :current-station-id="selectedTransferStation"
-              @transfer-success="handleTransferSuccess"
-              @refresh-invoice="handleRefreshInvoice"
-            />
-
-            <AiPrompt v-if="AiPrompt && invId" :inv-id="invId" />
-
-            <div class="row">
+            <div class="q-mr-sm">
+              <StationTransfer
+                v-if="
+                  StationTransfer &&
+                  type === 'vendor' &&
+                  invId &&
+                  stations.length > 0
+                "
+                :type="type"
+                :inv-id="invId"
+                :stations="stations"
+                :transferHistory="transfer_history"
+                :current-station-id="selectedTransferStation"
+                @transfer-success="handleTransferSuccess"
+                @refresh-invoice="handleRefreshInvoice"
+              />
+            </div>
+            <div class="row q-mr-sm q-mb-md">
               <LastTransactions
                 :type="db"
                 class="col-12"
                 ref="lastTransactionsRef"
               />
             </div>
+
+            <AiPrompt v-if="AiPrompt && invId" :inv-id="invId" />
           </template>
 
           <!-- Right Panel - Invoice Preview -->
@@ -1361,6 +1442,7 @@ const filterProjects = () => {
   });
 };
 const connection = ref({});
+const filePicker = ref(null);
 const stations = ref([]);
 const user_stations = ref({});
 const allowed_all = ref(false);
@@ -2657,5 +2739,18 @@ const handleRefreshInvoice = async () => {
 .mode-fade-leave-to {
   opacity: 0;
   transform: translateX(-20px);
+}
+
+/* Totals section alignment (match SalesInvoice) */
+.totals-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 24px;
+  justify-items: end;
+}
+
+.totals-value {
+  text-align: right;
+  min-width: 80px;
 }
 </style>
