@@ -1,5 +1,6 @@
 <template>
   <div class="input-container" ref="containerRef">
+    <label v-if="label && !noLabel" class="input-label">{{ label }}</label>
     <q-input
       :model-value="displayValue"
       @update:model-value="onInput"
@@ -8,7 +9,7 @@
       outlined
       dense
       bg-color="input"
-      :label="label"
+      :placeholder="placeholder"
     >
       <template v-for="(_, name) in $slots" #[name]="slotProps">
         <slot :name="name" v-bind="slotProps ?? {}" />
@@ -38,6 +39,14 @@ const props = defineProps({
   inlinelabel: {
     type: Boolean,
     default: false,
+  },
+  noLabel: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "",
   },
 });
 

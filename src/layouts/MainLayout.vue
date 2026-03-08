@@ -114,7 +114,7 @@ watch(
   (newTitle) => {
     document.title = t(newTitle);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Reactive printMode variable

@@ -70,10 +70,11 @@ body,
 }
 
 .container-title {
-  font-size: 1rem;
   font-weight: 600;
+  font-size: 0.8rem;
   margin-top: 0px;
   margin-bottom: 0.5rem;
+  color: var(--q-maintext);
 }
 
 .container-bg {
@@ -83,7 +84,7 @@ body,
 
 .line-bg {
   background-color: var(--q-tint);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .flex-container {
@@ -94,4 +95,8 @@ body,
 
 .flex-container > * {
   flex: 0 0 calc(50% - 10px);
+}
+
+.q-field--outlined .q-field__control:before {
+  border-color: var(--q-border) !important;
 }

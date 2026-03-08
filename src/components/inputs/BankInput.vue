@@ -1,5 +1,6 @@
 <template>
   <div class="input-container">
+    <label v-if="label && !noLabel" class="input-label">{{ label }}</label>
     <q-input
       :model-value="displayValue"
       @update:model-value="onInput"
@@ -8,13 +9,13 @@
       outlined
       dense
       bg-color="input"
-      :label="label"
       :error="hasError"
       :error-message="errorMessage"
       :hint="hint"
       :rules="computedRules"
       :lazy-rules="lazyRules"
       hide-bottom-space
+      :placeholder="placeholder"
     >
       <template v-slot:append v-if="isValid && displayValue">
         <q-icon name="check_circle" color="positive" />
@@ -51,6 +52,14 @@ const props = defineProps({
   lazyRules: {
     type: Boolean,
     default: true,
+  },
+  noLabel: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "",
   },
 });
 
@@ -398,7 +407,7 @@ watch(
       validate(newValue);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

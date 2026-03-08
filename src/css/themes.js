@@ -2,17 +2,18 @@ export const themes = {
   light: {
     menubg: "#1F2937",
     primary: "#06CEE0",
-    tint: "#F9FAFC",
+    tint: "#FBFBFB",
     highlight: "#F5F9FF",
     border: "#E1E7EF",
     mainbg: "#ffffff",
     lightbg: "#ffffff",
     mutedbg: "#f0f0f0",
-    maintext: "#000000",
+    maintext: "#2B2B2B",
     secondary: "#000000",
     secondarybtn: "#E7ECF2",
     lighttext: "#4d4d4d",
     lightbg: "#ffffff",
+    tableheader: "#FCFCFC",
   },
   dark: {
     menubg: "#0B0F14",
@@ -28,5 +29,6 @@ export const themes = {
     secondarybtn: "#1A222E",
     lighttext: "#e6e6e6",
     mutedtext: "#b4b4b4",
+    tableheader: "#1A222E",
   },
 };

@@ -52,20 +52,21 @@ const buttonClasses = computed(() => {
   const styleMap = {
     "add-line": "outlined",
     post: "primary",
-    "post-as-new": "primary",
-    "new-number": "secondary",
+    "post-as-new": "outlined",
+    "new-number": "outlined",
     "add-part": "secondary",
     "add-service": "secondary",
-    email: "secondary",
-    print: "secondary",
+    email: "outlined",
+    print: "outlined",
     "export-xl": "secondary",
     "export-pdf": "secondary",
     delete: "destructive",
-    save: "primary",
+    save: "outlined",
     search: "primary",
     clear: "secondary",
     edit: "primary",
     download: "secondary",
+    reversal: "outlined",
     default: "primary",
   };
 
@@ -101,6 +102,7 @@ const buttonIcon = computed(() => {
     clear: "clear",
     download: "download",
     edit: "edit",
+    reversal: "swap_horiz",
     "view-file": "picture_as_pdf",
     "more-actions": "more_vert",
     close: "close",
@@ -136,13 +138,25 @@ const displayLabel = computed(() => {
     clear: t("Clear"),
     edit: t("Edit"),
     download: t("Download"),
+    reversal: t("Reversal"),
     default: "",
   };
   return labelMap[props.type] || "";
 });
 
 const isOutline = computed(() => {
-  return props.type === "add-line" || props.type === "outlined";
+  const outlineTypes = [
+    "add-line",
+    "outlined",
+    "save",
+    "new-number",
+    "print",
+    "email",
+    "reversal",
+    "post-as-new",
+    "delete",
+  ];
+  return outlineTypes.includes(props.type);
 });
 </script>
 
@@ -232,29 +246,29 @@ const isOutline = computed(() => {
   }
 
   &--destructive {
-    background-color: #ef4343;
-    border: 1px solid #ef4343;
-    color: white;
+    background-color: transparent;
+    border: 2px solid #ef4343;
+    color: #ef4343;
 
     &:hover {
-      background-color: color-mix(in srgb, #ef4343 80%, black 5%);
-      border-color: color-mix(in srgb, #ef4343 80%, black 5%);
+      background-color: color-mix(in srgb, #ef4343 12%, transparent);
+      border-color: #ef4343;
     }
 
     .text-color {
-      color: white;
+      color: #ef4343;
     }
 
     &:hover .text-color {
-      color: white;
+      color: #ef4343;
     }
 
     .icon-color {
-      color: white;
+      color: #ef4343;
     }
 
     &:hover .icon-color {
-      color: white;
+      color: #ef4343;
     }
   }
 }

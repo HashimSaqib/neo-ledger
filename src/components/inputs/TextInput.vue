@@ -1,5 +1,6 @@
 <template>
   <div class="input-container">
+    <label v-if="label && !noLabel" class="input-label">{{ label }}</label>
     <q-input
       :model-value="displayValue"
       @update:model-value="onInput"
@@ -11,7 +12,8 @@
       :autogrow="autogrow"
       :rows="rows"
       bg-color="input"
-      :label="label"
+      :placeholder="placeholder"
+      :disable="disable"
     />
   </div>
 </template>
@@ -48,6 +50,18 @@ const props = defineProps({
   rows: {
     type: Number,
     default: 1,
+  },
+  noLabel: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "",
+  },
+  disable: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -103,11 +117,13 @@ function onInput(value) {
 .input-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.2rem;
 }
 
 .input-label {
-  font-weight: 600;
-  color: #65758b;
+  font-size: 0.8rem;
+  margin-bottom: 0px;
+  font-weight: 400;
+  color: #2b2b2b;
 }
 </style>

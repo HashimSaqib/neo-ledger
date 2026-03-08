@@ -8,7 +8,6 @@
       :rows-per-page="0"
       hide-bottom
       flat
-      bordered
       dense
     >
       <template v-slot:body-cell-reference="props">
@@ -207,7 +206,7 @@ const fetchTransactions = async () => {
   loading.value = true;
   try {
     const response = await api.get(
-      `/last_transactions/${props.type}?invoice=${props.invoice}&vc=${props.vc}&oe_type=${props.oe_type}`
+      `/last_transactions/${props.type}?invoice=${props.invoice}&vc=${props.vc}&oe_type=${props.oe_type}`,
     );
     transactions.value = response.data;
   } catch (error) {
@@ -225,8 +224,8 @@ const getPath = (row) => {
     path = row.till
       ? createLink("customer.pos")
       : row.invoice
-      ? createLink("customer.invoice")
-      : createLink("customer.transaction");
+        ? createLink("customer.invoice")
+        : createLink("customer.transaction");
   } else if (props.type === "ap") {
     path = row.invoice
       ? createLink("vendor.invoice")
@@ -271,3 +270,53 @@ defineExpose({
   fetchTransactions,
 });
 </script>
+
+<style scoped lang="scss">
+.last-transactions {
+  :deep(.q-table__container) {
+    border-radius: 8px;
+    border: 1px solid var(--q-border);
+    overflow: hidden;
+  }
+
+  :deep(.q-table thead tr th) {
+    background-color: var(--q-tableheader);
+    color: var(--q-maintext);
+    font-weight: 400;
+    padding: 10px 14px;
+    border: none;
+    border-bottom: 1px solid var(--q-border);
+  }
+
+  :deep(.q-table tbody td) {
+    padding: 10px 14px;
+    border: none;
+    border-bottom: 1px solid var(--q-border);
+    color: var(--q-maintext);
+  }
+
+  :deep(.q-table tbody tr:last-child td) {
+    border-bottom: none;
+  }
+
+  :deep(.q-table) {
+    border: none;
+  }
+
+  :deep(.q-table thead tr th .q-icon),
+  :deep(.q-table thead tr th .q-table__sort-icon) {
+    color: var(--q-maintext);
+  }
+
+  /* Invoice/reference number links: light blue/teal */
+  :deep(a.text-primary) {
+    color: var(--q-primary) !important;
+    text-decoration: none;
+    font-weight: 400;
+  }
+
+  :deep(a.text-primary:hover) {
+    text-decoration: underline;
+  }
+}
+</style>

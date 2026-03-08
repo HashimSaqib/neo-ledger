@@ -2,47 +2,51 @@
   <div class="email-options relative-position">
     <div class="row q-col-gutter-sm">
       <div class="col-12">
-        <q-input
+        <text-input
           v-model="emailData.email"
           outlined
           dense
           :label="t('Email')"
           bg-color="input"
           label-color="secondary"
+          :placeholder="t('Single Email')"
         />
       </div>
       <div class="col-12">
-        <q-input
+        <text-input
           v-model="emailData.subject"
           outlined
           dense
           :label="t('Subject')"
           bg-color="input"
           label-color="secondary"
+          :placeholder="t('Subject')"
         />
       </div>
       <div class="col-12">
-        <q-input
+        <text-input
           v-model="emailData.cc"
           outlined
           dense
           :label="t('CC')"
           bg-color="input"
           label-color="secondary"
+          :placeholder="t('Comma seperated list')"
         />
       </div>
       <div class="col-12">
-        <q-input
+        <text-input
           v-model="emailData.bcc"
           outlined
           dense
           :label="t('BCC')"
           bg-color="input"
           label-color="secondary"
+          :placeholder="t('Comma seperated list ')"
         />
       </div>
       <div class="col-12">
-        <q-input
+        <text-input
           v-model="emailData.message"
           outlined
           type="textarea"
@@ -50,14 +54,17 @@
           bg-color="input"
           label-color="secondary"
           rows="4"
+          :placeholder="t('Email Message')"
         />
       </div>
       <div class="col-12">
-        <q-btn
+        <s-button
           color="primary"
           :label="t('Send Email')"
           @click="sendEmail"
           class="full-width"
+          type="primary"
+          icon="send"
         />
       </div>
     </div>

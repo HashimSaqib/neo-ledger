@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-sm relative-position">
+  <q-page class="q-pa-md relative-position">
     <transition name="mode-fade" mode="out-in">
       <div v-if="isPrintMode" key="print" class="print-preview">
         <div class="print-preview__columns">
@@ -51,335 +51,193 @@
 
       <div v-else key="edit">
         <div class="container">
-          <div class="row justify-between full-width">
-            <div class="col-sm-6 col-12">
-              <div class="row full-width">
-                <s-select
-                  :label="t('Customer')"
-                  :options="customers"
-                  option-label="label"
-                  option-value="customernumber"
-                  v-model="selectedCustomer"
+          <div>
+            <h6 class="container-title q-my-none">
+              {{ t("HEADER ") }}
+            </h6>
+            <!-- Row 1: Customer, Invoice Number, Order Number -->
+            <div class="row q-col-gutter-sm q-mb-md items-end">
+              <s-select
+                :label="t('Customer')"
+                :options="customers"
+                option-label="label"
+                option-value="customernumber"
+                v-model="selectedCustomer"
+                dense
+                outlined
+                class="col"
+                @update:model-value="customerUpdate"
+                search="label"
+                :placeholder="t('Select Customer')"
+              />
+              <div class="col-auto" style="display: flex; align-items: center">
+                <q-btn
+                  @click.prevent="openEditCustomer"
+                  class="text-primary q-mr-xs"
+                  style="text-decoration: none"
+                  v-if="selectedCustomer"
+                  icon="edit"
+                  flat
                   dense
-                  outlined
-                  class="q-mb-sm col-12 col-sm-7"
-                  @update:model-value="customerUpdate"
-                  search="label"
                 />
-                <div class="q-ml-sm" style="display: flex; align-items: center">
-                  <q-btn
-                    @click.prevent="openEditCustomer"
-                    class="text-primary q-mr-xs"
-                    style="text-decoration: none"
-                    v-if="selectedCustomer"
-                    icon="edit"
-                    flat
-                    dense
-                  />
-                  <q-btn
-                    @click.prevent="openAddCustomer"
-                    class="text-primary"
-                    style="margin-right: 0.5em; text-decoration: none"
-                    icon="add"
-                    flat
-                    dense
-                  />
-                </div>
-                <div class="col-sm-4 q-md-ml-md content-center" v-if="customer">
-                  <p class="q-px-sm maintext q-ma-none">
-                    <strong>{{ t("Credit Limit") }}</strong>
-                    <span class="text-primary q-mx-sm">
-                      {{ formatAmount(customer.creditlimit) }}
-                    </span>
-                    <strong>{{ t("Remaining") }}</strong>
-                    <span class="text-negative q-ml-sm">
-                      {{ formatAmount(customer.creditremaining) }}
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              <div v-if="customer">
-                <p class="q-mb-sm q-px-sm maintext">
-                  <strong>{{ t("Address") }}</strong>
-                  {{ customer.full_address }}
-                </p>
-              </div>
-
-              <div class="row">
-                <!-- Shipto Expansion Item -->
-                <q-expansion-item
-                  :label="t('Shipto')"
+                <q-btn
+                  @click.prevent="openAddCustomer"
+                  style="text-decoration: none"
+                  icon="add"
+                  class="text-primary"
+                  flat
                   dense
-                  class="q-mt-none q-mb-sm col-7 line-bg"
-                >
-                  <div class="q-pa-sm">
-                    <q-input
-                      v-model="shipto.name"
-                      :label="t('Name')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.address1"
-                      :label="t('Street Name')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.street"
-                      :label="t('Street Number')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.address2"
-                      :label="t('Address 2')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.post_office"
-                      :label="t('Postal Office')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.city"
-                      :label="t('City')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.state"
-                      :label="t('State')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                    <q-input
-                      v-model="shipto.zip"
-                      :label="t('Zip')"
-                      outlined
-                      dense
-                      class="q-mb-sm"
-                      bg-color="input"
-                      label-color="secondary"
-                    />
-                  </div>
-                </q-expansion-item>
-              </div>
-
-              <!-- Record Account & Currency Selection -->
-              <div class="row">
-                <s-select
-                  outlined
-                  v-model="recordAccount"
-                  :options="openRecordAccounts"
-                  :label="t('Record In')"
-                  dense
-                  popup-content-class="mainbg maintext"
-                  class="q-mb-sm col-sm-7 col-12"
-                  search="label"
-                  option-label="label"
-                  account
                 />
               </div>
+              <text-input
+                v-if="!isRecurring"
+                outlined
+                :label="t('Invoice Number')"
+                v-model="invNumber"
+                class="col-sm-2 col-12"
+                :disable="lockNumber"
+                :placeholder="t('Auto')"
+              />
+              <text-input
+                v-if="!isRecurring"
+                outlined
+                :label="t('Order Number')"
+                v-model="ordNumber"
+                class="col-sm-2 col-12"
+                :placeholder="t('Optional')"
+              />
+            </div>
 
-              <div v-if="currencies && currencies.length" class="row">
-                <s-select
-                  v-if="currencies"
-                  outlined
-                  v-model="selectedCurrency"
-                  :options="currencies"
-                  option-value="curr"
-                  option-label="curr"
-                  search="curr"
-                  :label="t('Currency')"
-                  class="q-mb-sm col-sm-5 col-12"
-                />
-                <exchange-rate-input
-                  v-if="selectedCurrency && selectedCurrency.rn != 1"
-                  v-model="exchangeRate"
-                  :currency="selectedCurrency?.curr"
-                  :transdate="invDate"
-                  :label="t('Exchange Rate')"
-                  class="q-mb-sm col-sm-5 col-12 q-ml-md-sm q-mb-sm"
-                />
-              </div>
+            <!-- Customer Info -->
+            <div v-if="customer" class="q-mb-md">
+              <p class="q-mb-xs q-px-sm maintext">
+                <strong>{{ t("Address") }}</strong>
+                {{ customer.full_address }}
+              </p>
+              <p class="q-px-sm maintext q-ma-none">
+                <strong>{{ t("Credit Limit") }}</strong>
+                <span class="text-primary q-mx-sm">
+                  {{ formatAmount(customer.creditlimit) }}
+                </span>
+                <strong>{{ t("Remaining") }}</strong>
+                <span class="text-negative q-ml-sm">
+                  {{ formatAmount(customer.creditremaining) }}
+                </span>
+              </p>
+            </div>
 
-              <!-- Additional Header Fields -->
-              <div class="row q-mb-sm">
+            <!-- Row 2: Invoice Date, Due Date, Currency, Exchange Rate, Record In -->
+            <div
+              v-if="!isRecurring"
+              class="row q-col-gutter-sm q-mb-md items-end"
+            >
+              <text-input
+                v-model="invDate"
+                :label="t('Invoice Date')"
+                class="col-sm-2 col-6"
+                outlined
+                type="date"
+                @change="filterProjects"
+              />
+              <text-input
+                v-model="dueDate"
+                :label="t('Due Date')"
+                class="col-sm-2 col-6"
+                outlined
+                type="date"
+              />
+              <s-select
+                v-if="currencies && currencies.length"
+                outlined
+                v-model="selectedCurrency"
+                :options="currencies"
+                option-value="curr"
+                option-label="curr"
+                search="curr"
+                :label="t('Currency')"
+                class="col-sm-2 col-12"
+              />
+              <exchange-rate-input
+                v-if="selectedCurrency && selectedCurrency.rn != 1"
+                v-model="exchangeRate"
+                :currency="selectedCurrency?.curr"
+                :transdate="invDate"
+                :label="t('Exchange Rate')"
+                class="col-sm-2 col-12"
+              />
+              <s-select
+                outlined
+                v-model="recordAccount"
+                :options="openRecordAccounts"
+                :label="t('Record In')"
+                dense
+                popup-content-class="mainbg maintext"
+                :class="
+                  selectedCurrency && selectedCurrency.rn != 1
+                    ? 'col-sm-3 col-12'
+                    : 'col-sm-3 col-12'
+                "
+                search="label"
+                option-label="label"
+                account
+              />
+            </div>
+
+            <!-- Row 3: Description, Reference Documents -->
+            <div class="row q-col-gutter-sm q-mb-md items-end">
+              <div class="col-sm-7 col-12">
                 <MessageVariableInput
                   v-if="isRecurring"
                   type="invoice_fields"
                   simple
                   v-model="description"
                   :label="t('Description')"
-                  class="col-sm-10 col-12"
+                  :placeholder="t('Invoice Description')"
                 />
                 <text-input
                   v-else
                   outlined
                   :label="t('Description')"
                   v-model="description"
-                  class="col-sm-10 col-12"
+                  :placeholder="t('Invoice Description')"
                   autogrow
                 />
               </div>
-              <div class="row q-gutter-x-sm">
-                <text-input
-                  outlined
-                  :label="t('Shipping Point')"
-                  v-model="shippingPoint"
-                  class="q-mb-sm col-sm-5 col-12"
-                  autogrow
-                />
-                <text-input
-                  outlined
-                  :label="t('Ship Via')"
-                  v-model="shipVia"
-                  class="q-mb-sm col-sm-5 col-12"
-                  autogrow
-                />
-                <text-input
-                  outlined
-                  :label="t('Way Bill')"
-                  v-model="wayBill"
-                  class="q-mb-sm col-sm-5 col-12"
-                  autogrow
-                />
-                <s-select
-                  v-if="departments.length > 0"
-                  outlined
-                  v-model="selectedDepartment"
-                  :options="departments"
-                  option-value="description"
-                  option-label="description"
-                  :label="t('Department')"
-                  dense
-                  clearable
-                  search="description"
-                  autogrow
-                  hide-bottom-space
-                  class="col-sm-5 col-12 q-mb-sm"
-                />
-                <div
-                  v-if="filteredProjects.length > 0"
-                  class="row items-center col-sm-5 col-12 q-mb-sm"
-                >
-                  <s-select
-                    outlined
-                    v-model="headerProject"
-                    :options="filteredProjects"
-                    option-label="description"
-                    option-value="value"
-                    emit-value
-                    map-options
-                    :label="t('Project')"
-                    dense
-                    clearable
-                    search="description"
-                    autogrow
-                    hide-bottom-space
-                    class="col"
-                    @update:model-value="applyHeaderProject"
-                  />
-                  <q-icon
-                    name="help"
-                    class="q-ml-xs text-grey-6"
-                    size="18px"
-                    style="cursor: default"
-                  >
-                    <q-tooltip max-width="240px">
-                      {{
-                        t(
-                          "Selecting a project will apply it to all current line items and any new lines added. Only the line item project is saved.",
-                        )
-                      }}
-                    </q-tooltip>
-                  </q-icon>
+              <div v-if="!isRecurring" class="col-sm-5 col-12">
+                <div class="text-caption text-secondary q-mb-xs">
+                  {{ t("Reference Documents") }}
                 </div>
-                <div v-if="dcn">
-                  {{ dcn }}
-                </div>
-              </div>
-              <!-- New file upload section -->
-            </div>
-
-            <!-- Invoice Number and Date Fields -->
-            <div class="col-sm-4 col-12">
-              <div v-if="!isRecurring" class="row justify-around">
-                <text-input
-                  outlined
-                  :label="t('Invoice Number')"
-                  v-model="invNumber"
-                  class="q-mb-sm col-sm-5 col-12"
-                  :disable="lockNumber"
-                />
-                <text-input
-                  outlined
-                  :label="t('Order Number')"
-                  v-model="ordNumber"
-                  class="q-mb-sm col-sm-5 col-12"
-                />
-              </div>
-              <div v-if="!isRecurring" class="row justify-around">
-                <text-input
-                  v-model="invDate"
-                  :label="t('Invoice Date')"
-                  class="q-mb-sm col-sm-5 col-12"
-                  outlined
-                  type="date"
-                  @change="filterProjects"
-                />
-                <text-input
-                  v-model="dueDate"
-                  :label="t('Due Date')"
-                  class="q-mb-sm col-sm-5 col-12"
-                  outlined
-                  type="date"
-                />
-              </div>
-              <div v-if="!isRecurring" class="row q-ml-lg q-mb-sm">
                 <q-file
-                  bg-color="input"
-                  label-color="secondary"
-                  filled
-                  dense
-                  outlined
+                  ref="filePicker"
                   v-model="files"
-                  :label="t('Reference Documents')"
                   multiple
                   append
-                  use-chips
+                  style="display: none"
+                />
+                <q-btn
+                  flat
+                  dense
+                  no-caps
+                  color="primary"
+                  icon="add"
+                  :label="t(' Add Reference Documents')"
+                  @click="filePicker.pickFiles()"
+                  class="q-pa-none"
+                />
+                <div
+                  v-if="files && files.length"
+                  class="row q-gutter-xs q-mt-xs"
                 >
-                  <template v-slot:prepend>
-                    <q-icon name="attachment" />
-                  </template>
-                </q-file>
-              </div>
-              <div v-if="!isRecurring" class="row q-ml-lg q-mt-sm">
+                  <q-chip
+                    v-for="(file, idx) in files"
+                    :key="idx"
+                    removable
+                    dense
+                    @remove="files.splice(idx, 1)"
+                  >
+                    {{ file.name }}
+                  </q-chip>
+                </div>
                 <FileList
                   :files="existingFiles"
                   module="ar"
@@ -387,26 +245,212 @@
                 />
               </div>
             </div>
+            <div class="row q-col-gutter-sm q-mb-md">
+              <s-select
+                v-if="departments.length > 0"
+                outlined
+                v-model="selectedDepartment"
+                :options="departments"
+                option-value="description"
+                option-label="description"
+                :label="t('Department')"
+                dense
+                clearable
+                search="description"
+                autogrow
+                hide-bottom-space
+                class="col-sm-3 col-12 q-mb-sm"
+                :placeholder="t('Select Department')"
+              />
+              <div
+                v-if="filteredProjects.length > 0"
+                class="row items-center col-sm-3 col-12 q-mb-sm"
+              >
+                <s-select
+                  outlined
+                  v-model="headerProject"
+                  :options="filteredProjects"
+                  option-label="description"
+                  option-value="value"
+                  emit-value
+                  map-options
+                  :label="t('Project')"
+                  dense
+                  clearable
+                  search="description"
+                  autogrow
+                  hide-bottom-space
+                  class="col"
+                  @update:model-value="applyHeaderProject"
+                  :placeholder="t('Select Project')"
+                />
+                <q-icon
+                  name="help"
+                  class="q-ml-xs q-mt-lg text-grey-6"
+                  size="18px"
+                  style="cursor: default"
+                >
+                  <q-tooltip max-width="240px">
+                    {{
+                      t(
+                        "Selecting a project will apply it to all current line items and any new lines added. Only the line item project is saved.",
+                      )
+                    }}
+                  </q-tooltip>
+                </q-icon>
+              </div>
+            </div>
+
+            <!-- Shipping & Controlling Expansion -->
+            <q-expansion-item
+              :label="t('Shipping & Controlling')"
+              dense
+              class="q-mb-sm no-hover-expansion"
+              switch-toggle-side
+              dense-toggle
+            >
+              <div class="q-pa-sm">
+                <div class="row q-col-gutter-sm q-mb-sm item">
+                  <text-input
+                    outlined
+                    :label="t('Shipping Point')"
+                    v-model="shippingPoint"
+                    class="col-sm-3 col-12"
+                    autogrow
+                  />
+                  <text-input
+                    outlined
+                    :label="t('Ship Via')"
+                    v-model="shipVia"
+                    class="col-sm-3 col-12"
+                    autogrow
+                  />
+                  <text-input
+                    outlined
+                    :label="t('Way Bill')"
+                    v-model="wayBill"
+                    class="col-sm-3 col-12"
+                    autogrow
+                  />
+                </div>
+                <div class="row">
+                  <q-expansion-item
+                    :label="t('Ship to')"
+                    :model-value="shiptoExpanded"
+                    dense
+                    class="col-sm-3 col-12"
+                    @update:model-value="shiptoExpanded = !shiptoExpanded"
+                  >
+                    <div>
+                      <q-input
+                        v-model="shipto.name"
+                        :label="t('Name')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.address1"
+                        :label="t('Street Name')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.street"
+                        :label="t('Street Number')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.address2"
+                        :label="t('Address 2')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.post_office"
+                        :label="t('Postal Office')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.city"
+                        :label="t('City')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.state"
+                        :label="t('State')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                      <q-input
+                        v-model="shipto.zip"
+                        :label="t('Zip')"
+                        outlined
+                        dense
+                        class="q-mb-sm"
+                        bg-color="input"
+                        label-color="secondary"
+                      />
+                    </div>
+                  </q-expansion-item>
+                </div>
+              </div>
+            </q-expansion-item>
+
+            <div v-if="dcn">
+              {{ dcn }}
+            </div>
           </div>
         </div>
 
         <!-- Line Items Section -->
         <div class="container">
-          <div class="row q-mb-md items-center">
-            <h6 class="container-title q-my-none">{{ t("Items") }}</h6>
-            <s-button type="add-line" @click="addLine" class="q-ml-md" />
+          <div class="row justify-between items-center">
+            <h6 class="container-title q-my-none q-ml-sm q-mb-md">
+              {{ t("LINE ITEMS") }}
+            </h6>
 
-            <s-button
-              type="add-part"
-              @click="openAddPart('part')"
-              class="q-ml-md"
-            />
-            <s-button
-              type="add-service"
-              @click="openAddPart('service')"
-              class="q-ml-md"
-            />
+            <s-button type="add-line" @click="addLine" class="" />
           </div>
+
+          <!-- Line Item Column Headers -->
+          <div
+            class="row items-center q-col-gutter-sm q-px-sm line-item-headers"
+          >
+            <div class="col-2 line-item-header">{{ t("Number") }}</div>
+            <div class="col-2 line-item-header">{{ t("Description") }}</div>
+            <div class="col-1 line-item-header">{{ t("Qty") }}</div>
+            <div class="col-1 line-item-header">{{ t("OH") }}</div>
+            <div class="col-1 line-item-header">{{ t("Unit") }}</div>
+            <div class="col-2 line-item-header">{{ t("Price") }}</div>
+            <div class="col-1 line-item-header">{{ t("%") }}</div>
+            <div class="col-1 line-item-header">{{ t("Total") }}</div>
+            <div class="col-1" />
+          </div>
+
           <draggable
             v-model="lines"
             item-key="id"
@@ -414,10 +458,10 @@
             @end="dragging = false"
           >
             <template #item="{ element: line, index }">
-              <div :key="line.id" class="line-bg q-pa-md q-my-md">
+              <div :key="line.id" class="line-bg q-pa-sm q-my-md">
                 <!-- Main Line Fields -->
                 <div
-                  class="row justify-between align-center"
+                  class="row align-center q-col-gutter-sm"
                   :class="line.lineitemdetail ? '' : 'q-mb-sm'"
                 >
                   <s-select
@@ -435,6 +479,8 @@
                     @update:model-value="handleLineItemChange(line, index)"
                     search="label"
                     :ref="(el) => (lineSelects[index] = el)"
+                    no-label
+                    :placeholder="t('No.')"
                   />
 
                   <s-select
@@ -453,6 +499,8 @@
                     @update:model-value="handleLineItemChange(line, index)"
                     search="label"
                     :ref="(el) => (descriptionInputs[index] = el)"
+                    no-label
+                    :placeholder="t('Description')"
                   />
                   <MessageVariableInput
                     v-else-if="isRecurring"
@@ -461,6 +509,7 @@
                     v-model="line.description"
                     :label="t('Description')"
                     class="col-2"
+                    no-label
                   />
                   <text-input
                     v-else
@@ -474,6 +523,7 @@
                     autogrow
                     @keydown.enter="handleLineEnter(index, $event)"
                     :ref="(el) => (descriptionInputs[index] = el)"
+                    no-label
                   />
                   <fn-input
                     outlined
@@ -485,6 +535,7 @@
                     label-color="secondary"
                     dense
                     @keyup.enter="handleLineEnter(index, $event)"
+                    no-label
                   />
                   <text-input
                     outlined
@@ -497,6 +548,7 @@
                     type="input"
                     @keyup.enter="handleLineEnter(index, $event)"
                     disable
+                    no-label
                   />
                   <text-input
                     outlined
@@ -507,6 +559,7 @@
                     label-color="secondary"
                     dense
                     @keyup.enter="handleLineEnter(index, $event)"
+                    no-label
                   />
                   <fn-input
                     outlined
@@ -517,6 +570,7 @@
                     label-color="secondary"
                     dense
                     @keyup.enter="handleLineEnter(index, $event)"
+                    no-label
                   />
                   <fn-input
                     outlined
@@ -528,6 +582,7 @@
                     label-color="secondary"
                     dense
                     @keyup.enter="handleLineEnter(index, $event)"
+                    no-label
                   />
                   <text-input
                     outlined
@@ -538,37 +593,42 @@
                     bg-color="input"
                     label-color="secondary"
                     readonly
+                    disable
                     class="col-1"
                     @keyup.enter="handleLineEnter(index, $event)"
+                    no-label
                   />
-                  <q-btn
-                    flat
-                    dense
-                    icon="edit"
-                    href="#"
-                    size="0.8rem"
-                    @click.prevent="openEditPart(line)"
-                    class="text-primary items-center"
-                    v-if="line.partnumber"
-                  />
-
-                  <q-btn
-                    flat
-                    dense
-                    icon="keyboard_arrow_down"
-                    :class="line.lineitemdetail ? 'rotate-180' : ''"
-                    @click="toggleDetail(line)"
-                  />
-                  <q-btn
-                    color="negative"
-                    icon="delete"
-                    dense
-                    flat
-                    @click="removeLine(index)"
-                  />
+                  <div class="col-1 flex no-wrap items-center q-gutter-xs">
+                    <q-btn
+                      flat
+                      dense
+                      icon="edit"
+                      href="#"
+                      size="0.8rem"
+                      @click.prevent="openEditPart(line)"
+                      class="text-primary"
+                      v-if="line.partnumber"
+                    />
+                    <q-btn
+                      flat
+                      dense
+                      icon="keyboard_arrow_down"
+                      :class="line.lineitemdetail ? 'rotate-180' : ''"
+                      @click="toggleDetail(line)"
+                      size="0.75rem"
+                    />
+                    <q-btn
+                      color="negative"
+                      icon="delete_outline"
+                      dense
+                      flat
+                      @click="removeLine(index)"
+                      size="0.75rem"
+                    />
+                  </div>
                 </div>
 
-                <!-- Detailed Line Item Section -->
+                <!-- Detailed s Section -->
                 <div v-if="line.lineitemdetail" class="row q-pa-sm q-gutter-xs">
                   <s-select
                     outlined
@@ -582,7 +642,7 @@
                     :label="t('Project')"
                     @keydown.enter="handleLineEnter(index, $event)"
                   />
-                  <q-input
+                  <text-input
                     outlined
                     v-model="line.devliverydate"
                     :label="t('Delivery Date')"
@@ -603,7 +663,7 @@
                     bg-color="input"
                     @keyup.enter="handleLineEnter(index, $event)"
                   />
-                  <q-input
+                  <text-input
                     outlined
                     v-model="line.serialnumber"
                     :label="t('Serial No.')"
@@ -612,7 +672,7 @@
                     bg-color="input"
                     @keyup.enter="handleLineEnter(index, $event)"
                   />
-                  <q-input
+                  <text-input
                     outlined
                     v-model="line.costvendor"
                     :label="t('Vendor')"
@@ -630,7 +690,7 @@
                     bg-color="input"
                     @keyup.enter="handleLineEnter(index, $event)"
                   />
-                  <q-input
+                  <text-input
                     outlined
                     v-model="line.ordernumber"
                     :label="t('Order Number')"
@@ -639,7 +699,7 @@
                     bg-color="input"
                     @keyup.enter="handleLineEnter(index, $event)"
                   />
-                  <q-input
+                  <text-input
                     outlined
                     v-model="line.customerponthumber"
                     :label="t('PO Number')"
@@ -648,7 +708,7 @@
                     bg-color="input"
                     @keyup.enter="handleLineEnter(index, $event)"
                   />
-                  <q-input
+                  <text-input
                     outlined
                     v-model="line.package"
                     :label="t('Packaging')"
@@ -688,6 +748,23 @@
               </div>
             </template>
           </draggable>
+          <div class="row q-mb-md items-center q-gutter-x-md">
+            <s-button
+              type="outlined"
+              label="Add Part"
+              icon="add"
+              @click="openAddPart('part')"
+              outlined
+            />
+            <s-button
+              type="outlined"
+              label="Add Service"
+              icon="add"
+              @click="openAddPart('service')"
+              outlined
+            />
+          </div>
+          <q-separator class="q-my-md" />
 
           <!-- Invoice Totals and Notes -->
           <div class="row justify-between items-end">
@@ -698,6 +775,7 @@
                 simple
                 v-model="notes"
                 :label="t('Notes')"
+                :placeholder="t('Visible to customer on the invoice')"
               />
               <text-input
                 v-else
@@ -710,6 +788,7 @@
                 :label="t('Notes')"
                 type="textarea"
                 v-model="notes"
+                :placeholder="t('Visible to customer on the invoice')"
               />
             </div>
             <div class="col q-ml-md">
@@ -719,77 +798,55 @@
                 simple
                 v-model="intnotes"
                 :label="t('Internal Notes')"
+                :placeholder="t('Only visible to your team')"
               />
               <text-input
                 v-else
                 dense
                 outlined
-                class="col-sm-11 col-12"
+                class="col-sm-10 col-12"
                 rows="2"
-                autogrow
+                type="textarea"
                 bg-color="input"
                 label-color="secondary"
                 :label="t('Internal Notes')"
                 v-model="intnotes"
+                :placeholder="t('Only visible to your team')"
               />
             </div>
             <div class="col">
-              <div class="row justify-end">
-                <div class="maintext">
-                  <q-checkbox
-                    :label="t('Tax Included')"
-                    v-model="taxIncluded"
-                    @click="taxInclude"
-                  />
-                </div>
+              <div class="row justify-end q-mb-xs maintext">
+                <q-checkbox
+                  :label="t('Tax Included')"
+                  v-model="taxIncluded"
+                  @click="taxInclude"
+                />
               </div>
-              <div class="row justify-end">
-                <div class="q-mr-xl">
-                  <p class="q-my-xs maintext">
-                    <strong>{{ t("Subtotal") }}</strong>
-                  </p>
-                </div>
-                <div>
-                  <p class="q-my-xs maintext">
-                    <strong>{{ formatAmount(subtotal) }}</strong>
-                  </p>
-                </div>
-              </div>
-              <div
-                class="row justify-end maintext"
-                v-for="tax in invoiceTaxes"
-                :key="tax.name"
-              >
-                <div class="q-mr-xl">
-                  <p class="q-my-xs">{{ tax.name }}</p>
-                </div>
-                <div class="">
-                  <p class="q-my-xs">{{ formatAmount(tax.amount) }}</p>
-                </div>
-              </div>
-              <div class="row justify-end items-center">
-                <div>
-                  <text-input
-                    label="Rounding"
-                    v-model="rounding"
-                    dense
-                    outlined
-                    type="number"
-                    style="width: 120px"
-                  />
-                </div>
-              </div>
-              <div class="row justify-end">
-                <div class="q-mr-xl">
-                  <p class="q-my-xs maintext">
-                    <strong>{{ t("Total") }}</strong>
-                  </p>
-                </div>
-                <div>
-                  <p class="q-my-xs maintext">
-                    <strong>{{ formatAmount(total) }}</strong>
-                  </p>
-                </div>
+              <div class="totals-grid">
+                <template v-for="tax in invoiceTaxes" :key="tax.name">
+                  <span class="totals-label maintext">{{ tax.name }}</span>
+                  <span class="totals-value maintext">{{
+                    formatAmount(tax.amount)
+                  }}</span>
+                </template>
+                <span class="totals-label maintext"
+                  ><strong>{{ t("Subtotal") }}</strong></span
+                >
+                <span class="totals-value maintext"
+                  ><strong>{{ formatAmount(subtotal) }}</strong></span
+                >
+                <span class="totals-label maintext"
+                  ><strong>{{ t("Rounding") }}</strong></span
+                >
+                <span class="totals-value maintext"
+                  ><strong>{{ rounding }}</strong></span
+                >
+                <span class="totals-label maintext"
+                  ><strong>{{ t("Total") }}</strong></span
+                >
+                <span class="totals-value maintext"
+                  ><strong>{{ formatAmount(total) }}</strong></span
+                >
               </div>
             </div>
           </div>
@@ -797,24 +854,44 @@
 
         <!-- Payment Section (hidden in recurring mode) -->
         <div v-if="!isRecurring" class="container">
-          <div class="row q-mb-md">
-            <h6 class="q-my-none q-pa-none text-secondary">
-              {{ t("Payments") }}
+          <div class="row justify-between items-center">
+            <h6 class="container-title q-my-none q-ml-sm">
+              {{ t("PAYMENTS") }}
             </h6>
             <s-button type="add-line" @click="addPayment" class="q-ml-md" />
+          </div>
+          <!-- Payment Column Headers -->
+          <div
+            class="row justify-between items-center q-px-sm line-item-headers"
+          >
+            <div class="col-2 line-item-header">{{ t("Date") }}</div>
+            <div class="col-2 line-item-header">{{ t("Source") }}</div>
+            <div class="col-2 line-item-header">{{ t("Memo") }}</div>
+            <div class="col-2 line-item-header">{{ t("Amount") }}</div>
+            <div
+              v-if="selectedCurrency && selectedCurrency.rn != 1"
+              class="col-1 line-item-header"
+            >
+              {{ t("Exchange Rate") }}
+            </div>
+            <div class="col-2 line-item-header">{{ t("Account") }}</div>
+            <div style="width: 40px" />
           </div>
           <div
             v-for="(payment, index) in payments"
             :key="index"
-            class="row q-mb-md justify-between line-bg q-pa-md"
+            class="row justify-between align-center line-bg q-pa-sm q-mb-sm"
           >
             <text-input
               outlined
               v-model="payment.date"
               :label="t('Date')"
-              class="q-mt-sm"
+              class="col-2"
               dense
               type="date"
+              no-label
+              bg-color="input"
+              label-color="secondary"
               @keyup.enter="handlePaymentEnter(index, $event)"
               :ref="(el) => (paymentDateInputs[index] = el)"
             />
@@ -822,26 +899,35 @@
               outlined
               v-model="payment.source"
               :label="t('Source')"
-              class="q-mt-sm"
+              class="col-2"
               dense
+              no-label
+              bg-color="input"
+              label-color="secondary"
               @keyup.enter="handlePaymentEnter(index, $event)"
+              :placeholder="t('Source')"
             />
             <text-input
               outlined
               v-model="payment.memo"
               :label="t('Memo')"
-              class="q-mt-sm"
+              class="col-2"
               dense
+              no-label
+              bg-color="input"
+              label-color="secondary"
               @keyup.enter="handlePaymentEnter(index, $event)"
+              :placeholder="t('Memo')"
             />
             <fn-input
               outlined
               v-model="payment.amount"
               :label="t('Amount')"
-              class="q-mt-sm"
+              class="col-2"
               bg-color="input"
               label-color="secondary"
               dense
+              no-label
               @keyup.enter="handlePaymentEnter(index, $event)"
             >
               <template
@@ -867,7 +953,8 @@
               :currency="selectedCurrency?.curr"
               :transdate="payment.date || invDate"
               :label="t('Exchange Rate')"
-              class="q-mt-sm col-1"
+              no-label
+              class="col-1"
             />
             <s-select
               outlined
@@ -876,23 +963,26 @@
               :label="t('Account')"
               option-label="label"
               option-value="id"
-              class="q-mt-sm col-3"
+              class="col-2"
               bg-color="input"
               label-color="secondary"
               dense
+              no-label
               search="label"
               account
               @keyup.enter="handlePaymentEnter(index, $event)"
+              :placeholder="t('Payment Account')"
             />
             <q-btn
               color="negative"
-              icon="delete"
+              icon="delete_outline"
               dense
               flat
+              size="0.75rem"
               @click="removePayment(index)"
             />
           </div>
-          <div class="row">
+          <div class="row justify-end q-mt-md">
             <p class="q-my-xs maintext">
               <strong>Outstanding: {{ formatAmount(balance) }}</strong>
             </p>
@@ -914,83 +1004,69 @@
           v-model:email-to="recurringEmailTo"
         />
 
-        <div class="row justify-end">
-          <template v-if="isRecurring">
-            <q-btn
-              color="primary"
-              :label="
-                recurringId
-                  ? t('Update recurring invoice')
-                  : t('Save recurring invoice')
-              "
-              icon="save"
-              :loading="loading"
-              @click="saveRecurringInvoice"
-              class="q-mr-md"
-            />
-            <q-btn flat :label="t('Cancel')" @click="goToRecurringList" />
-          </template>
-          <template v-else>
-            <s-button
-              type="delete"
-              @click="deleteInvoice"
-              class="q-mr-md"
-              v-if="canDelete"
-            />
-            <s-button
-              type="save"
-              @click="postInvoice(true, false)"
-              class="q-mr-md"
-              v-if="canPost"
-            />
-            <s-button type="new-number" @click="newNumber" class="q-mr-md" />
-            <s-button
-              type="secondary"
-              :label="t('Reversal')"
-              icon="swap_horiz"
-              v-if="invId"
-              class="q-mr-md"
-              @click="reverseTransaction"
-            />
-            <s-button
-              type="post-as-new"
-              @click="postInvoice(false, true)"
-              class="q-mr-md"
-              v-if="canPostAsNew"
-            />
-            <s-button
-              type="post"
-              @click="postInvoice(true, false)"
-              class="q-mr-md"
-              v-if="canPost"
-            />
-          </template>
+        <div class="row justify-end" v-if="isRecurring">
+          <q-btn
+            color="primary"
+            :label="
+              recurringId
+                ? t('Update recurring invoice')
+                : t('Save recurring invoice')
+            "
+            icon="save"
+            :loading="loading"
+            @click="saveRecurringInvoice"
+            class="q-mr-md"
+          />
+          <q-btn flat :label="t('Cancel')" @click="goToRecurringList" />
         </div>
 
-        <q-separator
-          class="q-my-sm q-mt-md"
-          size="2px"
-          v-if="invId && !isRecurring"
-        />
-
-        <div class="row q-gutter-x-md" v-if="invId && !isRecurring">
-          <s-select
-            :options="templates"
-            option-label="label"
-            option-value="value"
-            map-options
-            emit-value
-            v-model="printOptions.template"
-            :label="t('Template')"
-            search="label"
-          />
-
-          <s-button type="print" @click="printInvoice" v-if="invId" />
-          <s-button type="email" @click="toggleEmailDialog" v-if="invId" />
+        <!-- Actions & template in one container (non-recurring, when invoice exists) -->
+        <div v-if="!isRecurring" class="container actions-and-print-container">
+          <div class="row justify-between items-center actions-row">
+            <div class="row q-gutter-sm">
+              <s-button type="delete" @click="deleteInvoice" v-if="canDelete" />
+              <s-button
+                type="save"
+                @click="postInvoice(true, false)"
+                v-if="canPost"
+              />
+              <s-button type="new-number" @click="newNumber" />
+              <s-button type="reversal" @click="reverseTransaction" />
+            </div>
+            <div class="row q-gutter-sm">
+              <s-button
+                type="post-as-new"
+                @click="postInvoice(false, true)"
+                v-if="canPostAsNew"
+              />
+              <s-button
+                type="post"
+                @click="postInvoice(true, false)"
+                v-if="canPost"
+              />
+            </div>
+          </div>
+          <q-separator class="q-my-md" v-if="invId" />
+          <div class="row items-end q-gutter-md" v-if="invId">
+            <div class="col-auto">
+              <s-select
+                :options="templates"
+                option-label="label"
+                option-value="value"
+                map-options
+                emit-value
+                v-model="printOptions.template"
+                :label="t('Template')"
+                search="label"
+              />
+            </div>
+            <s-button type="print" @click="printInvoice" />
+            <s-button type="email" @click="toggleEmailDialog" />
+          </div>
         </div>
         <div v-if="!isRecurring" class="q-mt-md q-px-md">
-          <h6 class="q-my-md q-pa-none text-secondary">
-            {{ t("Last 5 Transactions") }}
+          <h6 class="container-title q-my-md q-pa-none q-ml-sm">
+            {{ t("LAST 5 TRANSACTIONS") }}
           </h6>
           <LastTransactions
             type="ar"
@@ -1114,7 +1190,7 @@ const recurringDueDateDays = ref(30);
 const recurringSendEmail = ref(false);
 const recurringMessage = ref("");
 const recurringEmailTo = ref("");
-
+const shiptoExpanded = ref(false);
 const exitPrintMode = () => {
   printModeActive.value = false;
   if (pdfUrl.value) {
@@ -1388,6 +1464,7 @@ const poNumber = ref("");
 const shipto = ref({});
 const invId = ref(route.query.id ? `${route.query.id}` : "");
 const dcn = ref("");
+const filePicker = ref(null);
 // Add after the existing refs
 const files = ref(null);
 const existingFiles = ref([]);
@@ -2745,5 +2822,34 @@ const originalInvDate = ref(null);
 .mode-fade-leave-to {
   opacity: 0;
   transform: translateX(-20px);
+}
+
+.no-hover-expansion :deep(.q-item:hover),
+.no-hover-expansion :deep(.q-item:focus) {
+  background: transparent !important;
+}
+
+.no-hover-expansion :deep(.q-focus-helper) {
+  display: none;
+}
+
+.no-hover-expansion :deep(.q-item) {
+  padding-left: 0;
+}
+
+.line-item-header {
+  font-size: 0.75rem;
+}
+
+.totals-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 24px;
+  justify-items: end;
+}
+
+.totals-value {
+  text-align: right;
+  min-width: 80px;
 }
 </style>

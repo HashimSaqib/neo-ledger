@@ -1,5 +1,6 @@
 <template>
   <div class="input-container">
+    <label v-if="label && !noLabel" class="input-label">{{ label }}</label>
     <q-select
       ref="qSelectRef"
       v-model="internalValue"
@@ -22,9 +23,10 @@
       :option-value="optionValue"
       :option-label="optionLabel"
       bg-color="input"
-      class="mainbg"
+      class="mainbg search-select"
       popup-content-class="popupcontentclass"
-      :label="label"
+      :placeholder="placeholder"
+      clear-icon="close"
     />
   </div>
 </template>
@@ -99,6 +101,14 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  noLabel: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "",
+  },
 });
 
 // Emit the usual v-model event
@@ -112,7 +122,7 @@ watch(
   () => props.modelValue,
   (newVal) => {
     internalValue.value = newVal;
-  }
+  },
 );
 
 // Whenever local changes, emit to the parent
@@ -127,7 +137,7 @@ watch(
   (newVal) => {
     internalOptions.value = [...newVal];
   },
-  { deep: true }
+  { deep: true },
 );
 
 // The filtered list that we pass to <q-select>
@@ -199,7 +209,7 @@ function onFilter(val, update) {
         ref.setOptionIndex(-1); // Reset option index
         ref.moveOptionSelection(1, true); // Focus the first option
       }
-    }
+    },
   );
 }
 const qSelectRef = ref(null);
@@ -236,7 +246,9 @@ function onPopupShow() {
   border-radius: 10px;
   border: 1px solid var(--q-border);
   background-color: var(--q-mainbg);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
 }
 
 .q-item--active,
@@ -247,5 +259,9 @@ function onPopupShow() {
 .q-item--active .q-item__section,
 .q-item.q-manual-focusable--focused .q-item__section {
   color: var(--q-maintext) !important;
+}
+
+.search-select .q-field__focusable-action {
+  font-size: 14px;
 }
 </style>

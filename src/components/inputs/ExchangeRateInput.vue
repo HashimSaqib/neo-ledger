@@ -3,11 +3,12 @@
     <fn-input
       :model-value="numericValue"
       @update:model-value="emitValue"
-      :label="label"
+      :label="noLabel ? '' : label"
       outlined
       dense
       :bg-color="bgColor"
       label-color="secondary"
+      :no-label="noLabel"
     >
       <template #append>
         <q-icon
@@ -47,6 +48,10 @@ const props = defineProps({
   label: {
     type: String,
     default: "",
+  },
+  noLabel: {
+    type: Boolean,
+    default: false,
   },
   bgColor: {
     type: String,
