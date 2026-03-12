@@ -38,6 +38,7 @@
             :options="vcList"
             search="label"
             option-label="label"
+            multiple
           />
           <q-input
             v-model="formData.invnumber"
@@ -310,7 +311,7 @@ const pageTitle = computed(() =>
 const formData = ref({
   transdatefrom: "",
   transdateto: "",
-  vc: null,
+  vc: [],
   invnumber: "",
   description: "",
 });
@@ -804,8 +805,13 @@ const flattenParams = (obj) => {
   const flattened = {};
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
-    if (key === "vc" && typeof value === "object") {
-      flattened["vc_id"] = value.id;
+    if (key === "vc") {
+      if (Array.isArray(value) && value.length > 0) {
+        const ids = value.map((v) => (v && typeof v === "object" ? v.id : v));
+        flattened["vc_id"] = ids.length === 1 ? ids[0] : ids.join(",");
+      } else if (value != null && value !== "" && (typeof value !== "object" || value.id != null)) {
+        flattened["vc_id"] = typeof value === "object" ? value.id : value;
+      }
     } else {
       flattened[key] = value;
     }
@@ -817,8 +823,15 @@ const loadParams = (triggerSearch = true) => {
   const query = route.query;
 
   if (query.vc_id) {
-    const foundVc = vcList.value.find((c) => c.id == query.vc_id);
-    formData.value.vc = foundVc || { id: query.vc_id, label: "Loading..." };
+    const raw = query.vc_id;
+    const ids = Array.isArray(raw)
+      ? raw.flatMap((s) => String(s).split(/\s*,\s*/))
+      : String(raw).split(/\s*,\s*/);
+    const trimmedIds = ids.map((id) => id.trim()).filter(Boolean);
+    formData.value.vc = trimmedIds.map((id) => {
+      const found = vcList.value.find((c) => c.id == id);
+      return found || { id, label: String(id) };
+    });
   }
 
   const simpleParams = [
@@ -844,8 +857,11 @@ const fetchOverview = async () => {
       params.transdatefrom = formData.value.transdatefrom;
     if (formData.value.transdateto)
       params.transdateto = formData.value.transdateto;
-    if (formData.value.vc?.id)
-      params[`${vcType.value}_id`] = formData.value.vc.id;
+    const vcSel = formData.value.vc;
+    if (Array.isArray(vcSel) && vcSel.length > 0) {
+      const ids = vcSel.map((v) => (v && typeof v === "object" ? v.id : v));
+      params[`${vcType.value}_id`] = ids.length === 1 ? ids[0] : ids.join(",");
+    }
     if (formData.value.invnumber) params.invnumber = formData.value.invnumber;
     if (formData.value.description)
       params.description = formData.value.description;
@@ -885,7 +901,7 @@ const clearForm = () => {
   formData.value = {
     transdatefrom: "",
     transdateto: "",
-    vc: null,
+    vc: [],
     invnumber: "",
     description: "",
   };

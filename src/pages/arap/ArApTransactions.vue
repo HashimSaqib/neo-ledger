@@ -36,6 +36,7 @@
               :options="customers"
               search="label"
               option-label="label"
+              multiple
             />
             <q-input
               v-model="formData.customernumber"
@@ -491,7 +492,7 @@ const partyNumberLabel = computed(() =>
 
 // Form data (with defaults)
 const formData = ref({
-  customer: "",
+  customer: [],
   invnumber: "",
   description: "",
   ordnumber: "",
@@ -897,8 +898,13 @@ const flattenParams = (obj, prefix = "") => {
   const flattened = {};
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
-    if (key === "customer" && typeof value === "object") {
-      flattened["vc_id"] = value.id;
+    if (key === "customer") {
+      if (Array.isArray(value) && value.length > 0) {
+        const ids = value.map((v) => (v && typeof v === "object" ? v.id : v));
+        flattened["vc_id"] = ids.length === 1 ? ids[0] : ids.join(",");
+      } else if (value != null && value !== "" && typeof value === "object" && value.id != null) {
+        flattened["vc_id"] = value.id;
+      }
     } else if (key === "account" && typeof value === "object") {
       if (value.accno) {
         flattened["accno"] = value.accno;
@@ -943,14 +949,21 @@ const loadParams = (triggerSearch = true) => {
   if (query.customernumber) {
     const cust = customers.value.find(
       (c) =>
-        c.customernumber.toLowerCase() === query.customernumber.toLowerCase(),
+        c.customernumber?.toLowerCase() === query.customernumber?.toLowerCase(),
     );
-    formData.value.customer = cust || query.customer;
+    formData.value.customer = cust ? [cust] : [];
   }
 
   if (query.vc_id) {
-    const cust = customers.value.find((c) => c.id == query.vc_id);
-    formData.value.customer = cust || { id: query.vc_id, label: "Loading..." };
+    const raw = query.vc_id;
+    const ids = Array.isArray(raw)
+      ? raw.flatMap((s) => String(s).split(/\s*,\s*/))
+      : String(raw).split(/\s*,\s*/);
+    const trimmedIds = ids.map((id) => id.trim()).filter(Boolean);
+    formData.value.customer = trimmedIds.map((id) => {
+      const found = customers.value.find((c) => c.id == id);
+      return found || { id, label: String(id) };
+    });
   }
 
   // Simplify loading of other parameters using an array of keys
@@ -1018,6 +1031,8 @@ const clearForm = () => {
       formData.value[key] = "1";
     } else if (key === "interval") {
       formData.value[key] = "0";
+    } else if (key === "customer") {
+      formData.value[key] = [];
     } else {
       formData.value[key] = "";
     }
