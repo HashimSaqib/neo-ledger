@@ -300,12 +300,12 @@ const vcType = ref(route.params.type || "customer");
 const isCustomer = computed(() => vcType.value === "customer");
 
 const vcLabel = computed(() =>
-  isCustomer.value ? t("Customer") : t("Vendor")
+  isCustomer.value ? t("Customer") : t("Vendor"),
 );
 const pageTitle = computed(() =>
   isCustomer.value
     ? t("Accounts Receivable Overview")
-    : t("Accounts Payable Overview")
+    : t("Accounts Payable Overview"),
 );
 
 const formData = ref({
@@ -599,7 +599,7 @@ watch(
     if (activeView.value === "graph") {
       initMainChart();
     }
-  }
+  },
 );
 
 const activeTransactions = computed(() => {
@@ -609,7 +609,7 @@ const activeTransactions = computed(() => {
   const byId = new Map();
   activeStatuses.value.forEach((status) => {
     (tx[status]?.transactions || []).forEach((row) =>
-      byId.set(row.id, { ...row, status: row.status || status })
+      byId.set(row.id, { ...row, status: row.status || status }),
     );
   });
   const rows = Array.from(byId.values());
@@ -647,9 +647,7 @@ const activeStatusTitle = computed(() => {
   if (activeStatuses.value.length === 0) return t("Transactions");
   if (activeStatuses.value.length === 1)
     return titles[activeStatuses.value[0]] || t("Transactions");
-  return activeStatuses.value
-    .map((s) => getStatusLabel(s))
-    .join(", ");
+  return activeStatuses.value.map((s) => getStatusLabel(s)).join(", ");
 });
 
 const newInvoiceLink = computed(() => {
@@ -766,7 +764,7 @@ const getInvoiceLink = (row) => {
   const path = row.invoice
     ? createLink(isCustomer.value ? "customer.invoice" : "vendor.invoice")
     : createLink(
-        isCustomer.value ? "customer.transaction" : "vendor.transaction"
+        isCustomer.value ? "customer.transaction" : "vendor.transaction",
       );
   const flatParams = flattenParams(formData.value);
   return {
@@ -809,7 +807,11 @@ const flattenParams = (obj) => {
       if (Array.isArray(value) && value.length > 0) {
         const ids = value.map((v) => (v && typeof v === "object" ? v.id : v));
         flattened["vc_id"] = ids.length === 1 ? ids[0] : ids.join(",");
-      } else if (value != null && value !== "" && (typeof value !== "object" || value.id != null)) {
+      } else if (
+        value != null &&
+        value !== "" &&
+        (typeof value !== "object" || value.id != null)
+      ) {
         flattened["vc_id"] = typeof value === "object" ? value.id : value;
       }
     } else {

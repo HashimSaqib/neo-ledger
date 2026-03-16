@@ -229,60 +229,6 @@ const getMenuLinks = async () => {
       ],
     },
     {
-      title: "POS",
-      icon: "receipt",
-      perm: "pos",
-      sublinks: [
-        {
-          title: "Sale",
-          link: "/pos/sale",
-          perm: "pos.sale",
-        },
-      ],
-    },
-    {
-      title: "Cash",
-      icon: "attach_money",
-      perm: "cash",
-      sublinks: [
-        {
-          title: "Bank Adjustment",
-          link: "/bank-adjustments",
-          perm: "bank.adjustments",
-        },
-        {
-          title: "Reconciliation",
-          link: "/cash/reconciliation",
-          perm: "cash.recon",
-        },
-        {
-          title: "Receipts",
-          link: "/cash/payment/customer",
-          perm: "cash.receipts",
-        },
-        {
-          title: "Payments",
-          link: "/cash/payment/vendor",
-          perm: "cash.payments",
-        },
-        {
-          title: "Reports",
-          sublinks: [
-            {
-              title: "Customer Payments",
-              link: "/cash/report/customer",
-              perm: "cash.report.customer",
-            },
-            {
-              title: "Vendor Payments",
-              link: "/cash/report/vendor",
-              perm: "cash.report.vendor",
-            },
-          ],
-        },
-      ],
-    },
-    {
       title: "General Ledger",
       icon: "account_balance",
       perm: "gl",
@@ -319,6 +265,11 @@ const getMenuLinks = async () => {
               title: "All Taxes",
               link: "/reports/all_taxes",
               perm: "reports.alltaxes",
+            },
+            {
+              title: "Reconciliation",
+              link: "/cash/reconciliation",
+              perm: "cash.recon",
             },
           ],
         },
