@@ -1,317 +1,521 @@
 <template>
-  <q-page class="lightbg q-px-sm q-py-sm relative-position">
-    <q-form @submit.prevent="search" class="q-px-sm q-py-sm mainbg">
+  <q-page class="q-pa-md q-py-sm relative-position">
+    <q-form @submit.prevent="search" class="q-px-sm q-py-sm container">
       <q-expansion-item
         :label="t('Search Params')"
-        header-class="lightbg maintext"
+        header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
-        <!-- Basic Info Section (common fields) -->
-        <div class="row q-mt-sm q-gutter-sm">
-          <q-input
-            v-model="formData.partnumber"
-            class="lightbg col-6 col-md-3"
-            :label="t('Number')"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.description"
-            class="lightbg col-6 col-md-3"
-            :label="t('Description')"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.serialnumber"
-            class="lightbg col-6 col-md-3"
-            :label="t('Serial Number')"
-            outlined
-            dense
-          />
-          <!-- For parts and allitems, include extra fields -->
-          <template v-if="itemType !== 'services'">
+        <div class="flex-container">
+          <!-- Left: Item Details -->
+          <div class="flex-container q-mt-md container">
             <q-input
-              v-model="formData.lot"
-              class="lightbg col-6 col-md-3"
-              :label="t('Lot')"
+              v-model="formData.partnumber"
+              :label="t('Number')"
+              input-class="maintext"
+              label-color="secondary"
               outlined
               dense
             />
             <q-input
-              v-model="formData.make"
-              class="lightbg col-6 col-md-3"
-              :label="t('Make')"
-              outlined
-              dense
-            />
-            <q-input
-              v-model="formData.model"
-              class="lightbg col-6 col-md-3"
-              :label="t('Model')"
-              outlined
-              dense
-            />
-            <q-input
-              v-model="formData.drawing"
-              class="lightbg col-6 col-md-3"
-              :label="t('Drawing')"
-              outlined
-              dense
-            />
-            <q-input
-              v-model="formData.toolnumber"
-              class="lightbg col-6 col-md-3"
-              :label="t('Tool Number')"
-              outlined
-              dense
-            />
-            <q-input
-              v-model="formData.microfiche"
-              class="lightbg col-6 col-md-3"
-              :label="t('Microfiche')"
-              outlined
-              dense
-            />
-            <q-input
-              v-model="formData.barcode"
-              class="lightbg col-6 col-md-3"
-              :label="t('Barcode')"
-              outlined
-              dense
-            />
-          </template>
-        </div>
-
-        <!-- Item Status Section -->
-        <div class="q-mt-sm">
-          <div class="text-subtitle1">{{ t("Item Status") }}</div>
-          <q-option-group
-            v-model="formData.itemstatus"
-            :options="itemStatusOptions"
-            type="radio"
-            inline
-          />
-        </div>
-
-        <!-- Transaction Filters (common) -->
-        <div class="row q-mt-sm">
-          <div class="col-12">
-            <div class="text-subtitle1">{{ t("Transaction Filters") }}</div>
-          </div>
-          <div class="col-12 row q-col-gutter-md">
-            <q-toggle
-              v-model="formData.sold"
-              :label="t('Sales Invoices')"
-              :true-value="1"
-              :false-value="0"
-            />
-            <q-toggle
-              v-model="formData.ordered"
-              :label="t('Sales Orders')"
-              :true-value="1"
-              :false-value="0"
-            />
-            <q-toggle
-              v-model="formData.quoted"
-              :label="t('Quotations')"
-              :true-value="1"
-              :false-value="0"
-            />
-            <q-toggle
-              v-model="formData.bought"
-              :label="t('Vendor Invoices')"
-              :true-value="1"
-              :false-value="0"
-            />
-            <q-toggle
-              v-model="formData.onorder"
-              :label="t('Purchase Orders')"
-              :true-value="1"
-              :false-value="0"
-            />
-            <q-toggle
-              v-model="formData.rfq"
-              :label="t('RFQ')"
-              :true-value="1"
-              :false-value="0"
-            />
-          </div>
-        </div>
-        <div
-          v-if="
-            formData.sold ||
-            formData.ordered ||
-            formData.quoted ||
-            formData.bought ||
-            formData.onorder ||
-            formData.rfq
-          "
-        >
-          <div class="row q-mt-sm q-gutter-sm">
-            <q-input
-              v-model="formData.transdatefrom"
-              type="date"
-              :label="t('Transaction Date From')"
-              outlined
-              dense
-              class="col-6 col-md-3"
-            />
-            <q-input
-              v-model="formData.transdateto"
-              type="date"
-              :label="t('Transaction Date To')"
-              outlined
-              dense
-              class="col-6 col-md-3"
-            />
-            <q-select
-              v-model="formData.month"
-              :options="monthOptions"
-              :label="t('Period: Month')"
-              outlined
-              dense
-              class="col-6 col-md-3"
-            />
-            <q-select
-              v-model="formData.year"
-              :options="yearOptions"
-              :label="t('Period: Year')"
-              outlined
-              dense
-              class="col-6 col-md-3"
-            />
-            <div class="col-12 q-mt-sm">
-              <q-option-group
-                v-model="formData.interval"
-                :options="intervalOptions"
-                type="radio"
-                inline
-                :label="t('Interval')"
-              />
-            </div>
-          </div>
-
-          <!-- Method, Status & Report Detail (common) -->
-          <div class="row q-gutter-sm">
-            <div class="col">
-              <q-option-group
-                v-model="formData.method"
-                :options="methodOptions"
-                type="radio"
-                inline
-                :label="t('Method')"
-              />
-            </div>
-            <div class="col">
-              <q-checkbox v-model="formData.open" :label="t('Open')" />
-              <q-checkbox v-model="formData.closed" :label="t('Closed')" />
-            </div>
-            <div class="col">
-              <q-option-group
-                v-model="formData.summary"
-                :options="summaryOptions"
-                type="radio"
-                inline
-                :label="t('Report Detail')"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Column Selection for Report -->
-        <div class="q-py-md">
-          <div class="text-subtitle1">{{ t("Include in Report") }}</div>
-          <div class="row">
-            <!-- The checkboxes here correspond to fields in the unified columns list -->
-            <q-checkbox v-model="formData.l_runningnumber" :label="t('No.')" />
-            <q-checkbox v-model="formData.l_id" :label="t('ID')" />
-            <q-checkbox v-model="formData.l_partnumber" :label="t('Number')" />
-            <q-checkbox
-              v-model="formData.l_description"
+              v-model="formData.description"
               :label="t('Description')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
             />
-            <q-checkbox v-model="formData.l_onhand" :label="t('Qty')" />
-            <q-checkbox v-model="formData.l_unit" :label="t('Unit')" />
-            <q-checkbox
-              v-model="formData.l_priceupdate"
-              :label="t('Updated')"
-            />
-            <q-checkbox v-model="formData.l_lot" :label="t('Lot')" />
-            <q-checkbox v-model="formData.l_expires" :label="t('Expires')" />
-            <q-checkbox
-              v-model="formData.l_checkinventory"
-              :label="t('Check Inventory')"
-            />
-            <q-checkbox v-model="formData.l_cost" :label="t('Cost')" />
-            <q-checkbox
-              v-model="formData.l_sellprice"
-              :label="t('Sell Price')"
-            />
-            <q-checkbox
-              v-model="formData.l_listprice"
-              :label="t('List Price')"
-            />
-            <q-checkbox v-model="formData.l_lastcost" :label="t('Last Cost')" />
-            <q-checkbox
-              v-model="formData.l_avgcost"
-              :label="t('Average Cost')"
-            />
-            <q-checkbox v-model="formData.l_linetotal" :label="t('Extended')" />
-            <q-checkbox v-model="formData.l_markup" :label="t('Markup')" />
-            <q-checkbox v-model="formData.l_bin" :label="t('Bin')" />
-            <q-checkbox v-model="formData.l_rop" :label="t('ROP')" />
-            <q-checkbox v-model="formData.l_weight" :label="t('Weight')" />
-            <q-checkbox v-model="formData.l_notes" :label="t('Notes')" />
-            <q-checkbox v-model="formData.l_image" :label="t('Image')" />
-            <q-checkbox v-model="formData.l_drawing" :label="t('Drawing')" />
-            <q-checkbox
-              v-model="formData.l_toolnumber"
-              :label="t('Tool Number')"
-            />
-            <q-checkbox
-              v-model="formData.l_microfiche"
-              :label="t('Microfiche')"
-            />
-            <q-checkbox v-model="formData.l_make" :label="t('Make')" />
-            <q-checkbox v-model="formData.l_model" :label="t('Model')" />
-            <q-checkbox v-model="formData.l_account" :label="t('Accounts')" />
-            <q-checkbox v-model="formData.l_name" :label="t('Name')" />
-            <q-checkbox v-model="formData.l_curr" :label="t('Currency')" />
-            <q-checkbox v-model="formData.l_employee" :label="t('Employee')" />
-            <q-checkbox
-              v-model="formData.l_serialnumber"
+            <q-input
+              v-model="formData.serialnumber"
               :label="t('Serial Number')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
             />
-            <q-checkbox
-              v-model="formData.l_countryorigin"
-              :label="t('Country of Origin')"
-            />
-            <q-checkbox
-              v-model="formData.l_tariff_hscode"
-              :label="t('HS Code')"
-            />
-            <q-checkbox v-model="formData.l_barcode" :label="t('Barcode')" />
-            <q-checkbox v-model="formData.l_subtotal" :label="t('Subtotal')" />
+            <template v-if="itemType !== 'services'">
+              <q-input
+                v-model="formData.lot"
+                :label="t('Lot')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.make"
+                :label="t('Make')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.model"
+                :label="t('Model')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.drawing"
+                :label="t('Drawing')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.toolnumber"
+                :label="t('Tool Number')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.microfiche"
+                :label="t('Microfiche')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.barcode"
+                :label="t('Barcode')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+            </template>
+          </div>
+
+          <!-- Right column -->
+          <div>
+            <!-- Item Status + Transaction Filters -->
+            <div class="container q-mt-md">
+              <div class="container-title">{{ t("Item Status") }}</div>
+              <q-option-group
+                v-model="formData.itemstatus"
+                :options="itemStatusOptions"
+                type="radio"
+                inline
+              />
+              <q-separator class="q-my-sm" />
+              <div class="container-title q-mt-sm">
+                {{ t("Transaction Filters") }}
+              </div>
+              <div>
+                <q-toggle
+                  v-model="formData.sold"
+                  :label="t('Sales Invoices')"
+                  :true-value="1"
+                  :false-value="0"
+                  color="primary"
+                />
+                <q-toggle
+                  v-model="formData.ordered"
+                  :label="t('Sales Orders')"
+                  :true-value="1"
+                  :false-value="0"
+                  color="primary"
+                />
+                <q-toggle
+                  v-model="formData.quoted"
+                  :label="t('Quotations')"
+                  :true-value="1"
+                  :false-value="0"
+                  color="primary"
+                />
+                <q-toggle
+                  v-model="formData.bought"
+                  :label="t('Vendor Invoices')"
+                  :true-value="1"
+                  :false-value="0"
+                  color="primary"
+                />
+                <q-toggle
+                  v-model="formData.onorder"
+                  :label="t('Purchase Orders')"
+                  :true-value="1"
+                  :false-value="0"
+                  color="primary"
+                />
+                <q-toggle
+                  v-model="formData.rfq"
+                  :label="t('RFQ')"
+                  :true-value="1"
+                  :false-value="0"
+                  color="primary"
+                />
+              </div>
+            </div>
+
+            <!-- Date + Period Filters (conditional) -->
+            <div
+              v-if="
+                formData.sold ||
+                formData.ordered ||
+                formData.quoted ||
+                formData.bought ||
+                formData.onorder ||
+                formData.rfq
+              "
+              class="flex-container container"
+            >
+              <q-input
+                v-model="formData.transdatefrom"
+                type="date"
+                :label="t('Transaction Date From')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-input
+                v-model="formData.transdateto"
+                type="date"
+                :label="t('Transaction Date To')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-select
+                v-model="formData.month"
+                :options="monthOptions"
+                :label="t('Period: Month')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-select
+                v-model="formData.year"
+                :options="yearOptions"
+                :label="t('Period: Year')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <div style="flex: 0 0 100%">
+                <div class="container-title q-mb-xs">{{ t("Interval") }}</div>
+                <q-option-group
+                  v-model="formData.interval"
+                  :options="intervalOptions"
+                  type="radio"
+                  inline
+                />
+              </div>
+              <div
+                style="flex: 0 0 100%"
+                class="row q-gutter-x-lg items-start q-mt-xs"
+              >
+                <div>
+                  <div class="container-title q-mb-xs">{{ t("Method") }}</div>
+                  <q-option-group
+                    v-model="formData.method"
+                    :options="methodOptions"
+                    type="radio"
+                    inline
+                  />
+                </div>
+                <div>
+                  <div class="container-title q-mb-xs">{{ t("Status") }}</div>
+                  <q-checkbox v-model="formData.open" :label="t('Open')" />
+                  <q-checkbox v-model="formData.closed" :label="t('Closed')" />
+                </div>
+                <div>
+                  <div class="container-title q-mb-xs">
+                    {{ t("Report Detail") }}
+                  </div>
+                  <q-option-group
+                    v-model="formData.summary"
+                    :options="summaryOptions"
+                    type="radio"
+                    inline
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Include in Report -->
+            <div class="container">
+              <div class="container-title">{{ t("Include in Report") }}</div>
+              <div class="q-py-sm">
+                <div class="drag-area">
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_runningnumber"
+                    :label="t('No.')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_id"
+                    :label="t('ID')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_partnumber"
+                    :label="t('Number')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_description"
+                    :label="t('Description')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_onhand"
+                    :label="t('Qty')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_unit"
+                    :label="t('Unit')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_priceupdate"
+                    :label="t('Updated')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_lot"
+                    :label="t('Lot')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_expires"
+                    :label="t('Expires')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_checkinventory"
+                    :label="t('Check Inventory')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_cost"
+                    :label="t('Cost')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_sellprice"
+                    :label="t('Sell Price')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_listprice"
+                    :label="t('List Price')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_lastcost"
+                    :label="t('Last Cost')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_avgcost"
+                    :label="t('Average Cost')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_linetotal"
+                    :label="t('Extended')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_markup"
+                    :label="t('Markup')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_bin"
+                    :label="t('Bin')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_rop"
+                    :label="t('ROP')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_weight"
+                    :label="t('Weight')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_notes"
+                    :label="t('Notes')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_image"
+                    :label="t('Image')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_drawing"
+                    :label="t('Drawing')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_toolnumber"
+                    :label="t('Tool Number')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_microfiche"
+                    :label="t('Microfiche')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_make"
+                    :label="t('Make')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_model"
+                    :label="t('Model')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_account"
+                    :label="t('Accounts')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_name"
+                    :label="t('Name')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_curr"
+                    :label="t('Currency')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_employee"
+                    :label="t('Employee')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_serialnumber"
+                    :label="t('Serial Number')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_countryorigin"
+                    :label="t('Country of Origin')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_tariff_hscode"
+                    :label="t('HS Code')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_barcode"
+                    :label="t('Barcode')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                  <q-checkbox
+                    size="2rem"
+                    v-model="formData.l_subtotal"
+                    :label="t('Subtotal')"
+                    color="primary"
+                    class="q-mr-sm maintext"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="row q-mt-sm">
-          <q-btn
-            type="submit"
-            :label="t('Search')"
-            color="primary"
-            class="q-mr-sm"
-          />
-          <q-btn :label="t('Clear')" @click="clearForm" />
+        <div class="row q-mt-sm q-gutter-x-sm justify-end">
+          <s-button type="clear" @click="clearForm" />
+          <s-button type="search" @click="search()" />
         </div>
       </q-expansion-item>
     </q-form>
 
     <!-- Results Table -->
-    <div v-if="results.length > 0">
+    <div v-if="results.length > 0" class="table-styling">
       <q-table
         class="q-mt-sm"
         :rows="results"
@@ -322,6 +526,9 @@
         flat
         bordered
         dense
+        virtual-scroll
+        :virtual-scroll-slice-size="30"
+        :virtual-scroll-item-size="48"
       >
         <template v-slot:body-cell-partnumber="props">
           <q-td :props="props">
@@ -335,7 +542,7 @@
             <span
               v-if="
                 ['sellprice', 'lastcost', 'listprice', 'onhand'].includes(
-                  props.col.name
+                  props.col.name,
                 )
               "
             >
@@ -644,7 +851,7 @@ const baseColumns = computed(() => [
 const finalColumns = computed(() => {
   // 1. Filter out any columns the user has not toggled on.
   let cols = baseColumns.value.filter(
-    (col) => formData.value["l_" + col.name] === true
+    (col) => formData.value["l_" + col.name] === true,
   );
 
   // 2. If itemType is "services", remove the part-specific columns.
@@ -708,7 +915,7 @@ const finalColumns = computed(() => {
           label: t("Expense"),
           field: "expense",
           align: "right",
-        }
+        },
       );
     }
   }
@@ -732,7 +939,17 @@ function search() {
   api
     .get("/ic/items", { params })
     .then((resp) => {
-      results.value = resp.data;
+      const data = resp.data;
+      if (!data || data.length === 0) {
+        results.value = [];
+        Notify.create({
+          message: t("No items found"),
+          type: "warning",
+          position: "center",
+        });
+        return;
+      }
+      results.value = data;
       filtersOpen.value = false;
     })
     .catch((err) => {
@@ -772,8 +989,8 @@ function getinvPath(row) {
     row.module === "ir"
       ? createLink("vendor.invoice")
       : row.module === "is"
-      ? createLink("customer.invoice")
-      : "";
+        ? createLink("customer.invoice")
+        : "";
 
   return { path: base, query: { id: row.trans_id } };
 }
@@ -792,27 +1009,19 @@ onMounted(() => {});
   flex-wrap: wrap;
 }
 
-/* Example: maintain table container height */
 :deep(.q-table__container) {
   height: calc(100vh - 180px);
   position: relative;
 }
 
-/* Sticky header styles */
 :deep(.q-table thead) {
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: var(--q-maintext);
-  color: var(--q-mainbg);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-}
-.multiline {
-  white-space: pre-wrap; /* Allows wrapping and respects newline characters */
-  word-wrap: break-word; /* Helps prevent overly long words from overflowing */
 }
 
-:deep(.q-table td) {
-  padding: 8px 16px;
+.multiline {
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>
