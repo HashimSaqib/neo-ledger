@@ -58,6 +58,34 @@
             <template v-else-if="col.name === 'closed'">
               {{ props.row.closed === 1 ? t("Yes") : "" }}
             </template>
+            <template v-else-if="col.name === 'categories'">
+              <div class="row items-center q-gutter-xs no-wrap">
+                <q-chip
+                  v-for="cat in props.row.categories || []"
+                  :key="cat.id"
+                  dense
+                  removable
+                  color="teal"
+                  text-color="white"
+                  size="sm"
+                  @remove="removeCategoryFromAccount(props.row, cat.id)"
+                >
+                  {{ cat.accno }} - {{ cat.description }}
+                </q-chip>
+                <q-btn
+                  flat
+                  dense
+                  round
+                  size="sm"
+                  icon="add"
+                  color="primary"
+                  class="hide-print"
+                  @click.stop="openCategoriesQuickDialog(props.row)"
+                >
+                  <q-tooltip>{{ t("Add or edit categories") }}</q-tooltip>
+                </q-btn>
+              </div>
+            </template>
             <template v-else>
               {{ props.row[col.field] }}
             </template>
@@ -402,6 +430,21 @@
               </div>
             </div>
 
+            <!-- Categories -->
+            <s-select
+              dense
+              outlined
+              v-model="selectedAccount.category_ids"
+              :options="allCategories"
+              :label="t('Categories')"
+              option-value="id"
+              option-label="label"
+              emit-value
+              map-options
+              multiple
+              class="q-mt-xs"
+            />
+
             <!-- Row 6: GIFI -->
             <s-select
               v-if="gifi && gifi.length > 0"
@@ -447,12 +490,59 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- Quick edit: categories only -->
+    <q-dialog v-model="categoriesQuickDialog">
+      <q-card class="q-pa-sm" style="min-width: 360px; max-width: 520px">
+        <q-card-section class="q-pa-xs">
+          <div class="text-h6">{{ t("Categories") }}</div>
+          <div class="text-caption text-grey-7 q-mt-xs">
+            {{ categoriesQuickHeader.accno }} —
+            {{ categoriesQuickHeader.description }}
+          </div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-pa-xs">
+          <s-select
+            dense
+            outlined
+            v-model="categoriesQuickIds"
+            :options="allCategories"
+            :label="t('Categories')"
+            option-value="id"
+            option-label="label"
+            emit-value
+            map-options
+            multiple
+            class="q-mt-xs"
+          />
+          <div class="row justify-end q-mt-md q-gutter-sm">
+            <q-btn
+              flat
+              :label="t('Cancel')"
+              color="primary"
+              @click="categoriesQuickDialog = false"
+            />
+            <q-btn
+              :label="t('Save')"
+              color="primary"
+              :loading="categoriesQuickSaving"
+              @click="saveCategoriesQuick"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
 import { ref, onMounted, inject } from "vue";
 import { api } from "src/boot/axios";
+import {
+  formatCategorySelectOptions,
+  accountSavePayload,
+} from "src/helpers/chartCategories";
 import { useI18n } from "vue-i18n";
 import { Notify, Dialog } from "quasar";
 import { utils, writeFile } from "xlsx";
@@ -481,6 +571,12 @@ const columns = [
     name: "detail",
     label: t("Detail"),
     field: "detail",
+    align: "left",
+  },
+  {
+    name: "categories",
+    label: t("Categories"),
+    field: "categories",
     align: "left",
   },
 ];
@@ -552,6 +648,101 @@ const fetchGifi = async () => {
     console.error(error);
   }
 };
+
+const allCategories = ref([]);
+const fetchCategories = async () => {
+  try {
+    const response = await api.get("/system/chart/categories");
+    allCategories.value = formatCategorySelectOptions(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const categoriesQuickDialog = ref(false);
+const categoriesQuickAccountId = ref(null);
+const categoriesQuickHeader = ref({ accno: "", description: "" });
+const categoriesQuickIds = ref([]);
+const categoriesQuickSaving = ref(false);
+
+async function persistAccountCategoryIds(accountId, categoryIds, prefetched) {
+  const data =
+    prefetched ?? (await api.get(`/system/chart/accounts/${accountId}`)).data;
+  if (!data) throw new Error("empty");
+  const payload = accountSavePayload(data);
+  payload.category_ids = [...categoryIds];
+  await api.post(`/system/chart/accounts/${accountId}`, payload);
+  await fetchData();
+}
+
+async function openCategoriesQuickDialog(row) {
+  try {
+    const { data } = await api.get(`/system/chart/accounts/${row.id}`);
+    if (!data) throw new Error("empty");
+    categoriesQuickAccountId.value = data.id;
+    categoriesQuickHeader.value = {
+      accno: data.accno,
+      description: data.description,
+    };
+    categoriesQuickIds.value = (data.categories || []).map((c) => c.id);
+    categoriesQuickDialog.value = true;
+  } catch (e) {
+    console.error(e);
+    Notify.create({
+      message: t("Failed to load account."),
+      color: "negative",
+      position: "center",
+    });
+  }
+}
+
+async function saveCategoriesQuick() {
+  const id = categoriesQuickAccountId.value;
+  if (id == null) return;
+  categoriesQuickSaving.value = true;
+  try {
+    await persistAccountCategoryIds(id, categoriesQuickIds.value);
+    Notify.create({
+      message: t("Categories updated"),
+      color: "positive",
+      position: "top-right",
+    });
+    categoriesQuickDialog.value = false;
+  } catch (e) {
+    console.error(e);
+    Notify.create({
+      message: t("Failed to save categories"),
+      color: "negative",
+      position: "center",
+    });
+  } finally {
+    categoriesQuickSaving.value = false;
+  }
+}
+
+async function removeCategoryFromAccount(row, categoryId) {
+  try {
+    const { data } = await api.get(`/system/chart/accounts/${row.id}`);
+    if (!data) throw new Error("empty");
+    const ids = (data.categories || [])
+      .map((c) => c.id)
+      .filter((id) => String(id) !== String(categoryId));
+    await persistAccountCategoryIds(row.id, ids, data);
+    Notify.create({
+      message: t("Category removed"),
+      color: "positive",
+      position: "top-right",
+    });
+  } catch (e) {
+    console.error(e);
+    Notify.create({
+      message: t("Failed to remove category"),
+      color: "negative",
+      position: "center",
+    });
+  }
+}
+
 const editDialog = ref(false);
 const selectedAccount = ref({});
 
@@ -601,6 +792,11 @@ async function openEditDialog(accountId) {
 
     // Clone account to avoid direct mutations
     selectedAccount.value = { ...account };
+
+    // Map categories array to ids array for the multi-select
+    selectedAccount.value.category_ids = (account.categories || []).map(
+      (c) => c.id
+    );
 
     // Standardize checkbox values as strings
     selectedAccount.value.closed = String(account.closed);
@@ -733,8 +929,7 @@ async function saveAccount(isNew = false) {
       ? `/system/chart/accounts/` // Save as new (no id)
       : `/system/chart/accounts/${selectedAccount.value.id}`;
 
-    // Remove id when saving as new
-    const accountData = { ...selectedAccount.value };
+    const accountData = accountSavePayload(selectedAccount.value);
     if (isNew) {
       delete accountData.id;
     }
@@ -875,6 +1070,7 @@ const downloadExcel = () => {
 onMounted(() => {
   fetchGifi();
   fetchData();
+  fetchCategories();
 });
 </script>
 

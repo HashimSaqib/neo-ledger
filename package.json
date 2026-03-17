@@ -38,8 +38,7 @@
     "@quasar/app-vite": "^2.0.0-beta.12",
     "autoprefixer": "^10.4.2",
     "gettext-parser": "^8.0.0",
-    "postcss": "^8.4.14",
-    "vite-bundle-visualizer": "^1.2.1"
+    "postcss": "^8.4.14"
   },
   "engines": {
     "node": "^24 || ^22 || ^20 || ^18",

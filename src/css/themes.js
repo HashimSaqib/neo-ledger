@@ -14,10 +14,11 @@ export const themes = {
     lighttext: "#4d4d4d",
     lightbg: "#ffffff",
     tableheader: "#FCFCFC",
+    inputlabel: "#2b2b2b",
   },
   dark: {
     menubg: "#0B0F14",
-    primary: "#3c83f6",
+    primary: "#06CEE0",
     tint: "#161C26",
     highlight: "#141B24",
     border: "#212C3B",
@@ -30,5 +31,6 @@ export const themes = {
     lighttext: "#e6e6e6",
     mutedtext: "#b4b4b4",
     tableheader: "#1A222E",
+    inputlabel: "#ffffff",
   },
 };

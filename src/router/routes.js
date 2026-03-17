@@ -37,6 +37,8 @@ const SysAiPrompts = () => import("src/pages/system/AiPrompts.vue");
 const ListAccounts = () => import("src/pages/system/chart/ListAccounts.vue");
 const AddAccount = () => import("src/pages/system/chart/AddAccount.vue");
 const GIFI = () => import("src/pages/system/chart/Gifi.vue");
+const ChartCategories = () =>
+  import("src/pages/system/chart/Categories.vue");
 const ListDepartments = () =>
   import("src/pages/system/department/ListDepartments.vue");
 const ListProjects = () => import("src/pages/projectsjobs/ListProjects.vue");
@@ -373,6 +375,11 @@ const getRoutes = async () => {
           path: "system/chart/gifi",
           component: GIFI,
           meta: { permission: "system.chart.gifi" },
+        },
+        {
+          path: "system/chart/categories",
+          component: ChartCategories,
+          meta: { permission: "system.chart.categories" },
         },
         {
           path: "system/departments",

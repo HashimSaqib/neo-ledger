@@ -124,6 +124,6 @@ function onInput(value) {
   font-size: 0.8rem;
   margin-bottom: 0px;
   font-weight: 400;
-  color: #2b2b2b;
+  color: var(--q-inputlabel);
 }
 </style>

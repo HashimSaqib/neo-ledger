@@ -381,6 +381,11 @@ const getMenuLinks = async () => {
               link: "/system/chart/gifi",
               perm: "system.chart.gifi",
             },
+            {
+              title: "Categories",
+              link: "/system/chart/categories",
+              perm: "system.chart.categories",
+            },
           ],
         },
         {

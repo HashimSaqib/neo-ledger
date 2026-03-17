@@ -265,6 +265,21 @@
             </div>
           </div>
 
+          <!-- Categories -->
+          <s-select
+            dense
+            outlined
+            v-model="selectedAccount.category_ids"
+            :options="allCategories"
+            :label="t('Categories')"
+            option-value="id"
+            option-label="label"
+            emit-value
+            map-options
+            multiple
+            class="q-mt-xs"
+          />
+
           <!-- Row 6: GIFI -->
           <q-input
             dense
@@ -287,6 +302,7 @@
 <script setup>
 import { ref, inject, onMounted } from "vue";
 import { api } from "src/boot/axios";
+import { formatCategorySelectOptions } from "src/helpers/chartCategories";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 const { t } = useI18n();
@@ -323,6 +339,7 @@ const selectedAccount = ref({
   IC_taxservice: "",
   gifi_accno: "",
   link: "",
+  category_ids: [],
 });
 
 // Options for account type and chart type
@@ -360,6 +377,16 @@ const possibleLinks = [
   "IC_taxservice",
 ];
 
+const allCategories = ref([]);
+const fetchCategories = async () => {
+  try {
+    const response = await api.get("/system/chart/categories");
+    allCategories.value = formatCategorySelectOptions(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 // Add parent accounts ref
 const parentAccounts = ref([]);
 
@@ -388,6 +415,7 @@ async function fetchParentAccounts() {
 // Call fetchParentAccounts when component mounts
 onMounted(() => {
   fetchParentAccounts();
+  fetchCategories();
 });
 
 function countSelected(options) {
@@ -540,6 +568,7 @@ function resetForm() {
     IC_taxservice: "",
     gifi_accno: "",
     link: "",
+    category_ids: [],
   };
 }
 </script>
