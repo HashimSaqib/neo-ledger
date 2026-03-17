@@ -552,7 +552,7 @@ const fetchLinks = async () => {
 // ----------------------------------------------------
 const finalColumns = computed(() => {
   let cols = baseColumns.value.filter(
-    (col) => selectedColumns.value[col.name] === true
+    (col) => selectedColumns.value[col.name] === true,
   );
 
   // If AR/AP or Invoice toggles are on => add invnumber column (if not already there).
@@ -600,7 +600,7 @@ watch(
       console.error("Error saving filters to cookies:", error);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 // ----------------------------------------------------
@@ -787,8 +787,8 @@ function getinvPath(row) {
         ? createLink("vendor.invoice")
         : createLink("vendor.transaction")
       : row.module === "is"
-      ? createLink("customer.invoice")
-      : createLink("customer.transaction");
+        ? createLink("customer.invoice")
+        : createLink("customer.transaction");
   return { path: base, query: { id: row.invid } };
 }
 
@@ -808,7 +808,7 @@ function updateVCSettings() {
 
     // Filter out "customer"/"customernumber" from baseColumns
     baseColumns.value = allColumns.value.filter(
-      (c) => c.name !== "customer" && c.name !== "customernumber"
+      (c) => c.name !== "customer" && c.name !== "customernumber",
     );
   } else {
     nameLabel.value = t("Customer");
@@ -819,7 +819,7 @@ function updateVCSettings() {
 
     // Filter out "vendor"/"vendornumber" from baseColumns
     baseColumns.value = allColumns.value.filter(
-      (c) => c.name !== "vendor" && c.name !== "vendornumber"
+      (c) => c.name !== "vendor" && c.name !== "vendornumber",
     );
   }
 
@@ -833,7 +833,7 @@ function updateVCSettings() {
 onMounted(async () => {
   if (updateTitle) {
     updateTitle(
-      vcType.value === "vendor" ? t("Search Vendors") : t("Search Customers")
+      vcType.value === "vendor" ? t("Search Vendors") : t("Search Customers"),
     );
   }
   await fetchLinks();
@@ -847,10 +847,10 @@ watch(
     updateVCSettings();
     if (updateTitle) {
       updateTitle(
-        vcType.value === "vendor" ? t("Search Vendors") : t("Search Customers")
+        vcType.value === "vendor" ? t("Search Vendors") : t("Search Customers"),
       );
     }
-  }
+  },
 );
 </script>
 <style scoped>
@@ -871,7 +871,7 @@ watch(
   z-index: 2;
   top: 0;
   background-color: var(--q-maintext);
-  color: var(--q-main g);
+  color: var(--q-main);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 

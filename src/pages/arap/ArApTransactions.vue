@@ -902,7 +902,12 @@ const flattenParams = (obj, prefix = "") => {
       if (Array.isArray(value) && value.length > 0) {
         const ids = value.map((v) => (v && typeof v === "object" ? v.id : v));
         flattened["vc_id"] = ids.length === 1 ? ids[0] : ids.join(",");
-      } else if (value != null && value !== "" && typeof value === "object" && value.id != null) {
+      } else if (
+        value != null &&
+        value !== "" &&
+        typeof value === "object" &&
+        value.id != null
+      ) {
         flattened["vc_id"] = value.id;
       }
     } else if (key === "account" && typeof value === "object") {
@@ -1123,7 +1128,7 @@ const vcSaved = async () => {
   z-index: 2;
   top: 0;
   background-color: var(--q-maintext);
-  color: var(--q-main g);
+  color: var(--q-main);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
