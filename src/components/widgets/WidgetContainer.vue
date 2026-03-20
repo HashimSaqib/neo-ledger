@@ -64,143 +64,114 @@
         >
           <q-tooltip>{{ t("Refresh All") }}</q-tooltip>
         </q-btn>
+        <q-btn flat dense icon="picture_as_pdf" @click="openExportDialog">
+          <q-tooltip>{{ t("Export to PDF") }}</q-tooltip>
+        </q-btn>
         <q-btn flat dense icon="settings" @click="showSettingsDialog = true">
           <q-tooltip>{{ t("Widget Settings") }}</q-tooltip>
         </q-btn>
       </div>
     </div>
 
-    <!-- Widgets Grid (masonry: two columns, widgets stack in column to avoid row gaps) -->
-    <div class="widgets-grid widgets-grid--masonry" ref="gridRef">
+    <!-- Widgets Grid -->
+    <div class="widgets-grid" ref="gridRef">
       <template v-if="visibleWidgets.length > 0">
-      <div class="masonry-column">
         <div
-          v-for="(widget, colIndex) in leftColumnWidgets"
+          v-for="(widget, index) in visibleWidgets"
           :key="widget.id"
-          class="widget-wrapper widget-wrapper--masonry"
-        :class="[
-          { 'widget-wrapper--dragging': draggingWidget === widget.id },
-          { 'widget-wrapper--drag-over': dragOverWidget === widget.id },
-        ]"
-        :data-widget-id="widget.id"
-        :data-index="colIndex * 2"
-        draggable="true"
-        @dragstart="onDragStart($event, widget, colIndex * 2)"
-        @dragenter="onDragEnter($event, widget, colIndex * 2)"
-        @dragover.prevent="onDragOver"
-        @dragleave="onDragLeave"
-        @drop="onDrop($event, widget, colIndex * 2)"
-        @dragend="onDragEnd"
-      >
-        <overview-widget
-          v-if="widget.type === 'ar_overview' || widget.type === 'ap_overview'"
-          :type="widget.type === 'ar_overview' ? 'customer' : 'vendor'"
-          :data="widgetData[widget.type]"
-          :loading="widgetLoading[widget.type]"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          @refresh="refreshWidget(widget.type)"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-        />
-        <top10-vc-widget
-          v-else-if="widget.type === 'top10_customers'"
-          type="customer"
-          :data="widgetData.ar_overview"
-          :previous-data="widgetData.ar_overview_previous"
-          :loading="widgetLoading.ar_overview"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          @refresh="refreshWidget('top10_customers')"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-        />
-        <top10-vc-widget
-          v-else-if="widget.type === 'top10_vendors'"
-          type="vendor"
-          :data="widgetData.ap_overview"
-          :previous-data="widgetData.ap_overview_previous"
-          :loading="widgetLoading.ap_overview"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          @refresh="refreshWidget('top10_vendors')"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-        />
-        <bank-activity-widget
-          v-else-if="widget.type === 'bank_activity'"
-          :data="widgetData[widget.type]"
-          :loading="widgetLoading[widget.type]"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          :selected-account-ids="getBankActivitySelectedIds()"
-          @refresh="refreshWidget(widget.type)"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-          @update:selected-account-ids="setBankActivitySelectedIds($event)"
-        />
+          class="widget-wrapper"
+          :class="[
+            widget.width === 'full' ? 'widget-wrapper--full' : 'widget-wrapper--half',
+            { 'widget-wrapper--dragging': draggingWidget === widget.id },
+            { 'widget-wrapper--drag-over': dragOverWidget === widget.id },
+          ]"
+          :data-widget-id="widget.id"
+          :data-index="index"
+          draggable="true"
+          @dragstart="onDragStart($event, widget, index)"
+          @dragenter="onDragEnter($event, widget, index)"
+          @dragover.prevent="onDragOver"
+          @dragleave="onDragLeave"
+          @drop="onDrop($event, widget, index)"
+          @dragend="onDragEnd"
+        >
+          <overview-widget
+            v-if="widget.type === 'ar_overview' || widget.type === 'ap_overview'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            :type="widget.type === 'ar_overview' ? 'customer' : 'vendor'"
+            :data="widgetData[widget.type]"
+            :loading="widgetLoading[widget.type]"
+            :is-dragging="draggingWidget === widget.id"
+            :period-type="config.period_type"
+            @refresh="refreshWidget(widget.type)"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
+          <top10-vc-widget
+            v-else-if="widget.type === 'top10_customers'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            type="customer"
+            :data="widgetData.ar_overview"
+            :previous-data="widgetData.ar_overview_previous"
+            :loading="widgetLoading.ar_overview"
+            :is-dragging="draggingWidget === widget.id"
+            :period-type="config.period_type"
+            @refresh="refreshWidget('top10_customers')"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
+          <top10-vc-widget
+            v-else-if="widget.type === 'top10_vendors'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            type="vendor"
+            :data="widgetData.ap_overview"
+            :previous-data="widgetData.ap_overview_previous"
+            :loading="widgetLoading.ap_overview"
+            :is-dragging="draggingWidget === widget.id"
+            :period-type="config.period_type"
+            @refresh="refreshWidget('top10_vendors')"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
+          <bank-activity-widget
+            v-else-if="widget.type === 'bank_activity'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            :data="widgetData[widget.type]"
+            :loading="widgetLoading[widget.type]"
+            :is-dragging="draggingWidget === widget.id"
+            :period-type="config.period_type"
+            :selected-account-ids="getBankActivitySelectedIds()"
+            @refresh="refreshWidget(widget.type)"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+            @update:selected-account-ids="setBankActivitySelectedIds($event)"
+          />
+          <revenue-widget
+            v-else-if="widget.type === 'revenue'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            :data="widgetData.revenue"
+            :loading="widgetLoading.revenue"
+            :is-dragging="draggingWidget === widget.id"
+            :period-type="config.period_type"
+            @refresh="refreshWidget(widget.type)"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
+          <p-l-widget
+            v-else-if="widget.type === 'pl'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            :data="widgetData.pl"
+            :loading="widgetLoading.pl"
+            :is-dragging="draggingWidget === widget.id"
+            @refresh="refreshWidget(widget.type)"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
+          <balance-sheet-widget
+            v-else-if="widget.type === 'balance_sheet'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            :data="widgetData.balance_sheet"
+            :loading="widgetLoading.balance_sheet"
+            :is-dragging="draggingWidget === widget.id"
+            :period-type="config.period_type"
+            @refresh="refreshWidget(widget.type)"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
         </div>
-      </div>
-      <div class="masonry-column">
-        <div
-          v-for="(widget, colIndex) in rightColumnWidgets"
-          :key="widget.id"
-          class="widget-wrapper widget-wrapper--masonry"
-        :class="[
-          { 'widget-wrapper--dragging': draggingWidget === widget.id },
-          { 'widget-wrapper--drag-over': dragOverWidget === widget.id },
-        ]"
-        :data-widget-id="widget.id"
-        :data-index="colIndex * 2 + 1"
-        draggable="true"
-        @dragstart="onDragStart($event, widget, colIndex * 2 + 1)"
-        @dragenter="onDragEnter($event, widget, colIndex * 2 + 1)"
-        @dragover.prevent="onDragOver"
-        @dragleave="onDragLeave"
-        @drop="onDrop($event, widget, colIndex * 2 + 1)"
-        @dragend="onDragEnd"
-      >
-        <overview-widget
-          v-if="widget.type === 'ar_overview' || widget.type === 'ap_overview'"
-          :type="widget.type === 'ar_overview' ? 'customer' : 'vendor'"
-          :data="widgetData[widget.type]"
-          :loading="widgetLoading[widget.type]"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          @refresh="refreshWidget(widget.type)"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-        />
-        <top10-vc-widget
-          v-else-if="widget.type === 'top10_customers'"
-          type="customer"
-          :data="widgetData.ar_overview"
-          :previous-data="widgetData.ar_overview_previous"
-          :loading="widgetLoading.ar_overview"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          @refresh="refreshWidget('top10_customers')"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-        />
-        <top10-vc-widget
-          v-else-if="widget.type === 'top10_vendors'"
-          type="vendor"
-          :data="widgetData.ap_overview"
-          :previous-data="widgetData.ap_overview_previous"
-          :loading="widgetLoading.ap_overview"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          @refresh="refreshWidget('top10_vendors')"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-        />
-        <bank-activity-widget
-          v-else-if="widget.type === 'bank_activity'"
-          :data="widgetData[widget.type]"
-          :loading="widgetLoading[widget.type]"
-          :is-dragging="draggingWidget === widget.id"
-          :period-type="config.period_type"
-          :selected-account-ids="getBankActivitySelectedIds()"
-          @refresh="refreshWidget(widget.type)"
-          @toggle-visibility="toggleWidgetVisibility(widget.id)"
-          @update:selected-account-ids="setBankActivitySelectedIds($event)"
-        />
-        </div>
-      </div>
       </template>
 
       <!-- Empty State -->
@@ -216,6 +187,91 @@
         />
       </div>
     </div>
+
+    <!-- Export PDF Dialog -->
+    <q-dialog v-model="showExportDialog">
+      <q-card class="settings-dialog">
+        <q-card-section class="row items-center">
+          <div class="text-h6">{{ t("Export to PDF") }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="q-pt-md">
+          <p class="section-description q-mb-md">
+            {{ t("Select which widgets to include in the export") }}
+          </p>
+
+          <div class="row q-mb-sm">
+            <q-btn
+              flat
+              dense
+              no-caps
+              size="sm"
+              :label="t('Select All')"
+              @click="exportSelection = visibleWidgets.map((w) => w.id)"
+            />
+            <q-btn
+              flat
+              dense
+              no-caps
+              size="sm"
+              :label="t('Deselect All')"
+              @click="exportSelection = []"
+            />
+          </div>
+
+          <q-list bordered separator class="widget-list">
+            <q-item
+              v-for="widget in visibleWidgets"
+              :key="widget.id"
+              clickable
+              @click="toggleExportSelection(widget.id)"
+            >
+              <q-item-section avatar>
+                <q-checkbox
+                  :model-value="exportSelection.includes(widget.id)"
+                  @update:model-value="toggleExportSelection(widget.id)"
+                />
+              </q-item-section>
+              <q-item-section avatar>
+                <q-icon
+                  :name="widget.icon"
+                  :color="exportSelection.includes(widget.id) ? 'primary' : 'grey'"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ widget.label }}</q-item-label>
+                <q-item-label caption>{{ widget.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn flat :label="t('Cancel')" v-close-popup />
+          <q-btn
+            flat
+            icon="content_copy"
+            :label="t('Copy JSON')"
+            :disable="exportSelection.length === 0"
+            @click="copyJSON"
+          />
+          <q-btn
+            color="primary"
+            icon="picture_as_pdf"
+            :label="t('Export')"
+            :loading="exportLoading"
+            :disable="exportSelection.length === 0"
+            @click="exportToPDF"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
     <!-- Settings Dialog -->
     <q-dialog v-model="showSettingsDialog">
@@ -333,6 +389,10 @@ import { getPreviousPeriod } from "src/helpers/utils";
 import OverviewWidget from "./OverviewWidget.vue";
 import BankActivityWidget from "./BankActivityWidget.vue";
 import Top10VcWidget from "./Top10VcWidget.vue";
+import RevenueWidget from "./RevenueWidget.vue";
+import PLWidget from "./PLWidget.vue";
+import BalanceSheetWidget from "./BalanceSheetWidget.vue";
+import { drawLineChart, LABEL_AREA, chartBoxHeight } from "src/helpers/pdfChartRenderer";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -350,6 +410,14 @@ const emit = defineEmits(["config-loaded", "config-saved"]);
 
 // State
 const showSettingsDialog = ref(false);
+const showExportDialog = ref(false);
+const exportSelection = ref([]);
+const exportLoading = ref(false);
+const widgetRefs = reactive({});
+const setWidgetRef = (id, el) => {
+  if (el) widgetRefs[id] = el;
+  else delete widgetRefs[id];
+};
 const saving = ref(false);
 const refreshing = ref(false);
 const gridRef = ref(null);
@@ -364,6 +432,9 @@ const widgetWidths = reactive({
   top10_customers: "half",
   top10_vendors: "half",
   bank_activity: "half",
+  revenue: "half",
+  pl: "half",
+  balance_sheet: "full",
 });
 
 const widthOptions = [
@@ -388,6 +459,9 @@ const widgetData = ref({
   ar_overview_previous: null,
   ap_overview_previous: null,
   bank_activity: null,
+  revenue: null,
+  pl: null,
+  balance_sheet: null,
 });
 
 const widgetLoading = ref({
@@ -396,15 +470,22 @@ const widgetLoading = ref({
   top10_customers: false,
   top10_vendors: false,
   bank_activity: false,
+  revenue: false,
+  pl: false,
+  balance_sheet: false,
 });
 
-// Period type options
+const ALLOWED_PERIOD_TYPES = ["monthly", "quarterly", "yearly"];
+
+// Period type options (monthly is default)
 const periodTypeOptions = [
-  { label: t("Daily"), value: "daily" },
   { label: t("Monthly"), value: "monthly" },
   { label: t("Quarterly"), value: "quarterly" },
   { label: t("Yearly"), value: "yearly" },
 ];
+
+const normalizePeriodType = (type) =>
+  ALLOWED_PERIOD_TYPES.includes(type) ? type : "monthly";
 
 const currentPeriodLabel = computed(() => {
   const typeLabel =
@@ -480,6 +561,30 @@ const widgetDefinitions = [
     icon: "account_balance",
     permission: "gl.transactions",
   },
+  {
+    id: "revenue",
+    type: "revenue",
+    label: t("Revenue"),
+    description: t("Monthly revenue vs prior year with YTD total"),
+    icon: "show_chart",
+    permission: "gl.transactions",
+  },
+  {
+    id: "pl",
+    type: "pl",
+    label: t("P&L Overview"),
+    description: t("YTD profit & loss summary vs prior year"),
+    icon: "analytics",
+    permission: "gl.transactions",
+  },
+  // {
+  //   id: "balance_sheet",
+  //   type: "balance_sheet",
+  //   label: t("Balance Sheet"),
+  //   description: t("Monthly asset and liability positions as stacked bar charts"),
+  //   icon: "account_balance_wallet",
+  //   permission: "gl.transactions",
+  // },
 ];
 
 // Get widget width
@@ -578,7 +683,7 @@ const hasNoPermissions = computed(() => {
 
 // Period functions
 const setPeriodType = (value) => {
-  config.value.period_type = value;
+  config.value.period_type = normalizePeriodType(value);
   // Don't refresh data - period type only affects how we group existing data
   // The chart will re-render automatically via the prop change
 };
@@ -854,10 +959,12 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
       ) {
         console.log("Loading server config...");
 
-        // Load period type
+        // Load period type (daily removed — migrate to monthly)
         if (serverConfig.period_type) {
-          config.value.period_type = serverConfig.period_type;
-          console.log("Loaded period_type:", serverConfig.period_type);
+          config.value.period_type = normalizePeriodType(
+            serverConfig.period_type
+          );
+          console.log("Loaded period_type:", config.value.period_type);
         }
 
         // Load period dates
@@ -921,6 +1028,15 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
           bank_accounts: configResponse.data.bank_accounts,
         };
       }
+      if (configResponse.data.revenue) {
+        widgetData.value.revenue = configResponse.data.revenue;
+      }
+      if (configResponse.data.pl) {
+        widgetData.value.pl = configResponse.data.pl;
+      }
+      if (configResponse.data.balance_sheet) {
+        widgetData.value.balance_sheet = configResponse.data.balance_sheet;
+      }
 
       // If there are period dates, re-fetch with those dates
       if (config.value.period.start || config.value.period.end) {
@@ -953,6 +1069,15 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
       widgetData.value.bank_activity = {
         bank_accounts: response.data.bank_accounts,
       };
+    }
+    if (response.data.revenue) {
+      widgetData.value.revenue = response.data.revenue;
+    }
+    if (response.data.pl) {
+      widgetData.value.pl = response.data.pl;
+    }
+    if (response.data.balance_sheet) {
+      widgetData.value.balance_sheet = response.data.balance_sheet;
     }
 
     // Fetch previous period for Top 10 trend comparison
@@ -1037,6 +1162,15 @@ const refreshWidget = async (widgetType) => {
         bank_accounts: response.data.bank_accounts,
       };
     }
+    if (widgetType === "revenue" && response.data.revenue) {
+      widgetData.value.revenue = response.data.revenue;
+    }
+    if (widgetType === "pl" && response.data.pl) {
+      widgetData.value.pl = response.data.pl;
+    }
+    if (widgetType === "balance_sheet" && response.data.balance_sheet) {
+      widgetData.value.balance_sheet = response.data.balance_sheet;
+    }
 
     // For Top 10 widgets, also fetch previous period for trend
     if (
@@ -1084,6 +1218,171 @@ const refreshWidget = async (widgetType) => {
     });
   } finally {
     widgetLoading.value[loadingKey] = false;
+  }
+};
+
+// PDF Export
+const openExportDialog = () => {
+  exportSelection.value = visibleWidgets.value.map((w) => w.id);
+  showExportDialog.value = true;
+};
+
+const toggleExportSelection = (widgetId) => {
+  const idx = exportSelection.value.indexOf(widgetId);
+  if (idx === -1) {
+    exportSelection.value.push(widgetId);
+  } else {
+    exportSelection.value.splice(idx, 1);
+  }
+};
+
+// Chart height is computed dynamically per widget (see chartBoxHeight)
+
+// Maps a widget ID to the key(s) inside widgetData
+const widgetDataKey = {
+  ar_overview: ["ar_overview"],
+  ap_overview: ["ap_overview"],
+  top10_customers: ["ar_overview"],
+  top10_vendors: ["ap_overview"],
+  bank_activity: ["bank_activity"],
+  revenue: ["revenue"],
+  pl: ["pl"],
+  balance_sheet: ["balance_sheet"],
+};
+
+const copyJSON = async () => {
+  const orderedWidgets = visibleWidgets.value.filter((w) =>
+    exportSelection.value.includes(w.id)
+  );
+
+  const payload = {};
+  for (const widget of orderedWidgets) {
+    const keys = widgetDataKey[widget.id] ?? [];
+    for (const key of keys) {
+      if (widgetData.value[key] != null) {
+        payload[key] = widgetData.value[key];
+      }
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+    Notify.create({ type: "positive", message: t("JSON copied to clipboard"), position: "top" });
+  } catch {
+    Notify.create({ type: "negative", message: t("Failed to copy JSON"), position: "top" });
+  }
+};
+
+const ensurePageSpace = (pdf, yPos, needed, margin, pageHeight) => {
+  if (yPos + needed > pageHeight - margin) {
+    pdf.addPage();
+    return margin;
+  }
+  return yPos;
+};
+
+const exportToPDF = async () => {
+  exportLoading.value = true;
+  try {
+    const { jsPDF } = await import("jspdf");
+    const autoTable = (await import("jspdf-autotable")).default;
+
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 12;
+    const usableWidth = pageWidth - margin * 2;
+
+    // Document header
+    pdf.setFontSize(16);
+    pdf.setFont(undefined, "bold");
+    pdf.text("Dashboard Export", margin, margin + 6);
+
+    pdf.setFontSize(9);
+    pdf.setFont(undefined, "normal");
+    pdf.setTextColor(100, 100, 100);
+    const periodLabel =
+      config.value.period.start && config.value.period.end
+        ? `${config.value.period.start}  →  ${config.value.period.end}`
+        : t("All time");
+    pdf.text(periodLabel, margin, margin + 12);
+    pdf.setTextColor(0, 0, 0);
+
+    let yPos = margin + 22;
+
+    const orderedWidgets = visibleWidgets.value.filter((w) =>
+      exportSelection.value.includes(w.id)
+    );
+
+    for (const widget of orderedWidgets) {
+      const widgetRef = widgetRefs[widget.id];
+      if (!widgetRef?.getPdfExport) continue;
+      const exportData = widgetRef.getPdfExport();
+
+      // Widget title — aligned with chart card left edge (margin + LABEL_AREA for
+      // chart widgets, plain margin for table widgets)
+      const titleX = exportData.type === "chart" ? margin + LABEL_AREA : margin;
+      yPos = ensurePageSpace(pdf, yPos, 14, margin, pageHeight);
+      pdf.setFontSize(11);
+      pdf.setFont(undefined, "bold");
+      pdf.text(widget.label, titleX, yPos);
+      yPos += 4;
+      pdf.setFont(undefined, "normal");
+
+      if (exportData.type === "chart") {
+        // KPI row (Revenue widget) — aligned with card left
+        if (exportData.kpis?.length) {
+          yPos = ensurePageSpace(pdf, yPos, 8, margin, pageHeight);
+          pdf.setFontSize(8.5);
+          pdf.setTextColor(80, 80, 80);
+          const kpiText = exportData.kpis.map((k) => `${k.label}: ${k.value}`).join("    ");
+          pdf.text(kpiText, margin + LABEL_AREA, yPos);
+          pdf.setTextColor(0, 0, 0);
+          yPos += 6;
+        }
+
+        // Native vector line chart — box starts after LABEL_AREA reserved for y labels
+        const h = chartBoxHeight(exportData.datasets.length);
+        yPos = ensurePageSpace(pdf, yPos, h, margin, pageHeight);
+        drawLineChart(pdf, margin + LABEL_AREA, yPos, usableWidth - LABEL_AREA, h, {
+          labels: exportData.labels,
+          datasets: exportData.datasets,
+        });
+        yPos += h + 6;
+      } else if (exportData.type === "table") {
+        const tableRows = exportData.rows ?? [];
+        const footerRows = exportData.footer ? [exportData.footer] : [];
+        const rowStyles = exportData.rowStyles ?? [];
+
+        autoTable(pdf, {
+          startY: yPos,
+          head: [exportData.headers],
+          body: tableRows,
+          foot: footerRows,
+          margin: { left: margin, right: margin },
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [59, 130, 246], textColor: [255, 255, 255], fontStyle: "bold" },
+          footStyles: { fillColor: [219, 234, 254], textColor: [20, 40, 100], fontStyle: "bold" },
+          columnStyles: { 0: { cellWidth: "auto" } },
+          didParseCell: (data) => {
+            if (data.section === "body" && rowStyles[data.row.index] === "muted") {
+              data.cell.styles.textColor = [120, 120, 120];
+              data.cell.styles.fontSize = 8;
+            }
+          },
+        });
+        yPos = pdf.lastAutoTable.finalY + 10;
+      }
+    }
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    pdf.save(`dashboard-export-${dateStr}.pdf`);
+    showExportDialog.value = false;
+  } catch (err) {
+    console.error("PDF export failed:", err);
+    Notify.create({ type: "negative", message: t("PDF export failed"), position: "top" });
+  } finally {
+    exportLoading.value = false;
   }
 };
 
@@ -1240,42 +1539,24 @@ watch(
 }
 
 .widgets-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  align-items: start;
   min-height: 300px;
 }
 
-/* Masonry: two columns, widgets stack in column to avoid gaps when one widget is taller */
-.widgets-grid--masonry {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.masonry-column {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
 .widget-wrapper {
+  min-width: 0;
   transition: all 0.3s ease;
   cursor: grab;
 
   &--full {
-    width: 100%;
+    grid-column: span 2;
   }
 
   &--half {
-    width: calc(50% - 0.5rem);
-  }
-
-  &--masonry {
-    width: 100%;
+    grid-column: span 1;
   }
 
   &--dragging {
@@ -1295,16 +1576,13 @@ watch(
 }
 
 @media (max-width: 1024px) {
+  .widgets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget-wrapper--full,
   .widget-wrapper--half {
-    width: 100%;
-  }
-
-  .widgets-grid--masonry {
-    flex-direction: column;
-  }
-
-  .widgets-grid--masonry .widget-wrapper--masonry {
-    width: 100%;
+    grid-column: span 1;
   }
 }
 

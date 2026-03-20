@@ -123,11 +123,21 @@ const props = defineProps({
   periodType: {
     type: String,
     default: "monthly",
-    validator: (val) => ["daily", "monthly", "quarterly", "yearly"].includes(val),
+    validator: (val) =>
+      ["monthly", "quarterly", "yearly"].includes(val),
   },
 });
 
 defineEmits(["dragStart", "refresh", "toggleVisibility"]);
+
+defineExpose({
+  getPdfExport: () => ({
+    type: "table",
+    headers: [widgetTitle.value, t("Amount"), "%"],
+    rows: top10Rows.value.map((r) => [r.vc_name, formatAmount(r.amount), r.percentText]),
+    footer: [`${t("Total")} (${totalLabel.value})`, formatAmount(totalAmount.value), "100%"],
+  }),
+});
 
 const isCustomer = computed(() => props.type === "customer");
 
@@ -143,83 +153,47 @@ const totalLabel = computed(() =>
   isCustomer.value ? t("Total Sales") : t("Total Purchases")
 );
 
-const allTransactions = computed(() => {
-  if (!props.data?.transactions) return [];
-  const tx = props.data.transactions;
-  return [
-    ...(tx.open?.transactions || []),
-    ...(tx.overdue?.transactions || []),
-    ...(tx.closed?.transactions || []),
-    ...(tx.overpaid?.transactions || []),
-  ];
-});
-
-const previousByVc = computed(() => {
-  if (!props.previousData?.transactions) return {};
-  const tx = props.previousData.transactions;
-  const list = [
-    ...(tx.open?.transactions || []),
-    ...(tx.overdue?.transactions || []),
-    ...(tx.closed?.transactions || []),
-    ...(tx.overpaid?.transactions || []),
-  ];
-  const byVc = {};
-  list.forEach((row) => {
-    const id = row.vc_id ?? row.vc_name ?? "?";
-    if (!byVc[id]) byVc[id] = { amount: 0, vc_name: row.vc_name };
-    byVc[id].amount += Number(row.totalamount) || 0;
-  });
-  return byVc;
-});
-
-const top10Rows = computed(() => {
-  const transactions = allTransactions.value;
-  if (!transactions.length) return [];
-
-  const byVc = {};
-  transactions.forEach((row) => {
-    const id = row.vc_id ?? row.vc_name ?? "?";
-    if (!byVc[id]) {
-      byVc[id] = { vc_id: id, vc_name: row.vc_name, amount: 0 };
-    }
-    byVc[id].amount += Number(row.totalamount) || 0;
-  });
-
-  const total = Object.values(byVc).reduce((sum, r) => sum + r.amount, 0);
-  if (total <= 0) return [];
-
-  const rows = Object.values(byVc)
-    .map((r) => ({
-      ...r,
-      percent: total > 0 ? (r.amount / total) * 100 : 0,
-      percentText: total > 0 ? `${((r.amount / total) * 100).toFixed(1)}%` : "0%",
-      trend: null,
-    }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 10);
-
-  const prev = previousByVc.value;
-  if (Object.keys(prev).length > 0) {
-    rows.forEach((r) => {
-      const prevAmount = prev[r.vc_id]?.amount ?? 0;
-      if (prevAmount === 0 && r.amount === 0) r.trend = 0;
-      else if (r.amount > prevAmount) r.trend = 1;
-      else if (r.amount < prevAmount) r.trend = -1;
-      else r.trend = 0;
-    });
-  }
-
-  return rows;
-});
+const hasData = computed(() => (props.data?.top10?.length ?? 0) > 0);
 
 const totalAmount = computed(() => {
-  return allTransactions.value.reduce(
-    (sum, tx) => sum + (Number(tx.totalamount) || 0),
-    0
+  const t = props.data?.totals;
+  if (!t) return 0;
+  return (t.open || 0) + (t.overdue || 0) + (t.closed || 0) + (t.overpaid || 0);
+});
+
+// Build a vc_id → amount lookup from the previous period's top10 list for O(1) trend checks
+const previousByVc = computed(() => {
+  const prev = props.previousData?.top10;
+  if (!prev?.length) return {};
+  return Object.fromEntries(
+    prev.map((r) => [r.vc_id, { amount: r.amount, vc_name: r.vc_name }])
   );
 });
 
-const hasData = computed(() => top10Rows.value.length > 0);
+const top10Rows = computed(() => {
+  const list = props.data?.top10;
+  if (!list?.length) return [];
+
+  const total = totalAmount.value;
+  const prev = previousByVc.value;
+  const hasPrev = Object.keys(prev).length > 0;
+
+  return list.map((r) => {
+    let trend = null;
+    if (hasPrev) {
+      const prevAmount = prev[r.vc_id]?.amount ?? 0;
+      trend = r.amount > prevAmount ? 1 : r.amount < prevAmount ? -1 : 0;
+    }
+    return {
+      vc_id: r.vc_id,
+      vc_name: r.vc_name,
+      amount: r.amount,
+      percent: total > 0 ? (r.amount / total) * 100 : 0,
+      percentText: total > 0 ? `${((r.amount / total) * 100).toFixed(1)}%` : "0%",
+      trend,
+    };
+  });
+});
 
 function trendClass(trend) {
   if (trend === 1) return "top10-row__trend--up";

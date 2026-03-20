@@ -1,9 +1,9 @@
 <template>
-  <div class="overview-widget" :class="{ 'overview-widget--dragging': isDragging }">
+  <div class="revenue-widget" :class="{ 'revenue-widget--dragging': isDragging }">
     <div class="widget-header" @mousedown="$emit('dragStart', $event)">
       <div class="widget-header__left">
-        <q-icon :name="widgetIcon" size="20px" class="widget-icon" />
-        <span class="widget-title">{{ widgetTitle }}</span>
+        <q-icon name="show_chart" size="20px" class="widget-icon" />
+        <span class="widget-title">{{ t("Revenue") }}</span>
       </div>
       <div class="widget-header__right">
         <q-btn
@@ -41,23 +41,42 @@
       </div>
 
       <template v-else-if="hasData">
-        <!-- Chart Section -->
-        <div class="chart-section">
-          <div class="chart-legend">
-            <div
-              v-for="(color, status) in statusColors"
-              :key="status"
-              class="legend-item"
-            >
-              <span class="legend-dot" :style="{ background: color.line }"></span>
-              <span class="legend-label">{{ getStatusLabel(status) }}</span>
-            </div>
+        <!-- KPI row -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <span class="kpi-label">{{ t("AC YTD") }}</span>
+            <span class="kpi-value">{{ formatAmount(data.ac_ytd) }}</span>
           </div>
-          <div class="chart-container">
-            <canvas ref="chartCanvas"></canvas>
+          <div class="kpi-card kpi-card--secondary">
+            <span class="kpi-label">{{ t("PY YTD") }}</span>
+            <span class="kpi-value kpi-value--secondary">{{ formatAmount(data.py_ytd) }}</span>
+            <span
+              v-if="data.py_ytd > 0"
+              class="kpi-delta"
+              :class="deltaClass"
+            >
+              <q-icon :name="deltaIcon" size="12px" />
+              {{ deltaText }}
+            </span>
           </div>
         </div>
 
+        <!-- Chart -->
+        <div class="chart-section">
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-line legend-line--ac" />
+              <span class="legend-label">{{ t("AC") }}</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line legend-line--py" />
+              <span class="legend-label">{{ t("PY") }}</span>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas ref="chartCanvas" />
+          </div>
+        </div>
       </template>
 
       <div v-else class="widget-empty">
@@ -81,11 +100,6 @@ const { t } = useI18n();
 const $q = useQuasar();
 
 const props = defineProps({
-  type: {
-    type: String,
-    required: true,
-    validator: (val) => ["customer", "vendor"].includes(val),
-  },
   data: {
     type: Object,
     default: null,
@@ -101,12 +115,11 @@ const props = defineProps({
   periodType: {
     type: String,
     default: "monthly",
-    validator: (val) =>
-      ["monthly", "quarterly", "yearly"].includes(val),
+    validator: (val) => ["monthly", "quarterly", "yearly"].includes(val),
   },
 });
 
-const emit = defineEmits(["dragStart", "refresh", "toggleVisibility"]);
+defineEmits(["dragStart", "refresh", "toggleVisibility"]);
 
 defineExpose({
   getPdfExport: () => ({
@@ -116,39 +129,31 @@ defineExpose({
       label: ds.label,
       data: ds.data,
       color: ds.borderColor,
-      dashed: false,
+      dashed: Array.isArray(ds.borderDash) && ds.borderDash.length > 0,
     })),
     formatY: (v) => formatAmount(v),
+    kpis: [
+      { label: "AC YTD", value: formatAmount(props.data?.ac_ytd ?? 0) },
+      { label: "PY YTD", value: formatAmount(props.data?.py_ytd ?? 0) },
+      ...(deltaText.value ? [{ label: "YoY", value: deltaText.value }] : []),
+    ],
   }),
 });
 
 const chartCanvas = ref(null);
 let chartInstance = null;
 
-const isCustomer = computed(() => props.type === "customer");
-
-const widgetTitle = computed(() =>
-  isCustomer.value ? t("Accounts Receivable") : t("Accounts Payable")
-);
-
-const widgetIcon = computed(() =>
-  isCustomer.value ? "trending_up" : "trending_down"
-);
-
-const statusColors = {
-  open: { line: "#3b82f6", fill: "rgba(59, 130, 246, 0.15)" },
-  overdue: { line: "#ef4444", fill: "rgba(239, 68, 68, 0.15)" },
-  closed: { line: "#22c55e", fill: "rgba(34, 197, 94, 0.15)" },
-  overpaid: { line: "#f97316", fill: "rgba(249, 115, 22, 0.15)" },
-};
+const AC_COLOR  = "#3b82f6";
+const AC_FILL   = "rgba(59, 130, 246, 0.12)";
+const PY_COLOR  = "#94a3b8";
+const PY_FILL   = "rgba(148, 163, 184, 0.07)";
 
 const hasData = computed(() => {
   const bm = props.data?.by_month;
   return bm != null && Object.keys(bm).length > 0;
 });
 
-// Group sorted month keys into display buckets.
-// Monthly → one bucket per month.  Quarterly/yearly → sum all months in each bucket.
+// Fold monthly data into display buckets for the chosen period type
 const chartData = computed(() => {
   const byMonth = props.data?.by_month;
   if (!byMonth || !Object.keys(byMonth).length) return { labels: [], datasets: [] };
@@ -194,94 +199,79 @@ const chartData = computed(() => {
     return key;
   };
 
-  const sumBucket = (months) => {
-    const r = { open: 0, overdue: 0, closed: 0, overpaid: 0 };
-    months.forEach((m) => {
-      const d = byMonth[m] || {};
-      r.open     += d.open     || 0;
-      r.overdue  += d.overdue  || 0;
-      r.closed   += d.closed   || 0;
-      r.overpaid += d.overpaid || 0;
-    });
-    return r;
-  };
+  const sumBucket = (months) =>
+    months.reduce(
+      (acc, m) => {
+        const d = byMonth[m] || {};
+        acc.ac += d.ac || 0;
+        acc.py += d.py || 0;
+        return acc;
+      },
+      { ac: 0, py: 0 }
+    );
 
-  const aggregated = buckets.map((b) => ({
-    label: formatLabel(b.key),
-    ...sumBucket(b.months),
-  }));
+  const aggregated = buckets.map((b) => ({ label: formatLabel(b.key), ...sumBucket(b.months) }));
 
   return {
     labels: aggregated.map((b) => b.label),
     datasets: [
       {
-        label: t("Open"),
-        data: aggregated.map((b) => b.open),
-        backgroundColor: statusColors.open.fill,
-        borderColor: statusColors.open.line,
+        label: t("AC"),
+        data: aggregated.map((b) => b.ac),
+        borderColor: AC_COLOR,
+        backgroundColor: AC_FILL,
         borderWidth: 2,
         tension: 0.4,
         fill: true,
         pointRadius: 3,
         pointHoverRadius: 5,
-        pointBackgroundColor: statusColors.open.line,
+        pointBackgroundColor: AC_COLOR,
       },
       {
-        label: t("Overdue"),
-        data: aggregated.map((b) => b.overdue),
-        backgroundColor: statusColors.overdue.fill,
-        borderColor: statusColors.overdue.line,
+        label: t("PY"),
+        data: aggregated.map((b) => b.py),
+        borderColor: PY_COLOR,
+        backgroundColor: PY_FILL,
         borderWidth: 2,
+        borderDash: [6, 4],
         tension: 0.4,
-        fill: true,
+        fill: false,
         pointRadius: 3,
         pointHoverRadius: 5,
-        pointBackgroundColor: statusColors.overdue.line,
-      },
-      {
-        label: t("Closed"),
-        data: aggregated.map((b) => b.closed),
-        backgroundColor: statusColors.closed.fill,
-        borderColor: statusColors.closed.line,
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-        pointBackgroundColor: statusColors.closed.line,
-      },
-      {
-        label: t("Overpaid"),
-        data: aggregated.map((b) => b.overpaid),
-        backgroundColor: statusColors.overpaid.fill,
-        borderColor: statusColors.overpaid.line,
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-        pointBackgroundColor: statusColors.overpaid.line,
+        pointBackgroundColor: PY_COLOR,
+        pointStyle: "circle",
       },
     ],
   };
 });
 
-const getStatusLabel = (status) => {
-  const labels = {
-    open: t("Open"),
-    overdue: t("Overdue"),
-    closed: t("Closed"),
-    overpaid: t("Overpaid"),
-  };
-  return labels[status] || status;
-};
+// YTD delta vs prior year
+const delta = computed(() => {
+  const ac = props.data?.ac_ytd ?? 0;
+  const py = props.data?.py_ytd ?? 0;
+  if (!py) return null;
+  return ((ac - py) / Math.abs(py)) * 100;
+});
+
+const deltaClass = computed(() => {
+  if (delta.value === null) return "";
+  return delta.value >= 0 ? "kpi-delta--up" : "kpi-delta--down";
+});
+
+const deltaIcon = computed(() => {
+  if (delta.value === null) return "";
+  return delta.value >= 0 ? "trending_up" : "trending_down";
+});
+
+const deltaText = computed(() => {
+  if (delta.value === null) return "";
+  const sign = delta.value >= 0 ? "+" : "";
+  return `${sign}${delta.value.toFixed(1)}% ${t("vs PY")}`;
+});
 
 const initChart = () => {
   if (!chartCanvas.value) return;
-
-  if (chartInstance) {
-    chartInstance.destroy();
-  }
+  if (chartInstance) chartInstance.destroy();
 
   const ctx = chartCanvas.value.getContext("2d");
   chartInstance = new Chart(ctx, {
@@ -290,10 +280,7 @@ const initChart = () => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        intersect: false,
-        mode: "index",
-      },
+      interaction: { intersect: false, mode: "index" },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -303,23 +290,18 @@ const initChart = () => {
           padding: 10,
           cornerRadius: 6,
           callbacks: {
-            label: (context) => {
-              return `${context.dataset.label}: ${formatAmount(context.raw)}`;
-            },
+            label: (ctx) => `${ctx.dataset.label}: ${formatAmount(ctx.raw)}`,
           },
         },
       },
       scales: {
         y: {
           beginAtZero: true,
-          grid: {
-            color: getCssVar("border"),
-            drawBorder: false,
-          },
+          grid: { color: getCssVar("border"), drawBorder: false },
           ticks: {
             color: getCssVar("mutedtext"),
             font: { size: 10 },
-            callback: (value) => formatAmount(value),
+            callback: (v) => formatAmount(v),
             padding: 6,
           },
         },
@@ -338,61 +320,29 @@ const initChart = () => {
   });
 };
 
-watch(
-  () => props.periodType,
-  async (newVal, oldVal) => {
-    console.log(`Period type changed from ${oldVal} to ${newVal}`);
-    if (hasData.value) {
-      await nextTick();
-      initChart();
-    }
-  }
-);
+watch(() => props.periodType, async () => {
+  if (hasData.value) { await nextTick(); initChart(); }
+});
 
-watch(
-  () => $q.dark.isActive,
-  async () => {
-    if (hasData.value) {
-      await nextTick();
-      initChart();
-    }
-  }
-);
+watch(() => $q.dark.isActive, async () => {
+  if (hasData.value) { await nextTick(); initChart(); }
+});
 
-watch(
-  () => props.data,
-  async () => {
-    if (hasData.value) {
-      await nextTick();
-      initChart();
-    }
-  },
-  { deep: true }
-);
+watch(() => props.data, async () => {
+  if (hasData.value) { await nextTick(); initChart(); }
+}, { deep: true });
 
-// When loading becomes false, the chart section is finally in the DOM — init chart then
-// (on date change we update data while still loading, so initChart() runs with canvas null)
-watch(
-  () => props.loading,
-  async (loading) => {
-    if (!loading && hasData.value) {
-      await nextTick();
-      initChart();
-    }
-  }
-);
+watch(() => props.loading, async (loading) => {
+  if (!loading && hasData.value) { await nextTick(); initChart(); }
+});
 
 onMounted(() => {
-  if (hasData.value && !props.loading) {
-    nextTick(() => {
-      initChart();
-    });
-  }
+  if (hasData.value && !props.loading) nextTick(() => initChart());
 });
 </script>
 
 <style lang="scss" scoped>
-.overview-widget {
+.revenue-widget {
   background: var(--q-lightbg);
   border: 1px solid var(--q-border);
   border-radius: 12px;
@@ -419,9 +369,7 @@ onMounted(() => {
   border-bottom: 1px solid var(--q-border);
   cursor: grab;
 
-  &:active {
-    cursor: grabbing;
-  }
+  &:active { cursor: grabbing; }
 
   &__left {
     display: flex;
@@ -436,9 +384,7 @@ onMounted(() => {
   }
 }
 
-.widget-icon {
-  color: var(--q-primary);
-}
+.widget-icon { color: var(--q-primary); }
 
 .widget-title {
   font-size: 0.95rem;
@@ -446,22 +392,15 @@ onMounted(() => {
   color: var(--q-maintext);
 }
 
-.widget-menu-btn {
-  color: var(--q-mutedtext);
-}
+.widget-menu-btn { color: var(--q-mutedtext); }
 
 .drag-handle {
   color: var(--q-mutedtext);
   cursor: grab;
-
-  &:active {
-    cursor: grabbing;
-  }
+  &:active { cursor: grabbing; }
 }
 
-.widget-content {
-  padding: 1rem;
-}
+.widget-content { padding: 1rem; }
 
 .widget-loading {
   display: flex;
@@ -479,11 +418,65 @@ onMounted(() => {
   gap: 0.5rem;
   color: var(--q-mutedtext);
 
-  .empty-icon {
-    opacity: 0.5;
+  .empty-icon { opacity: 0.5; }
+}
+
+// KPI row
+.kpi-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.kpi-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  background: var(--q-mainbg);
+  border: 1px solid var(--q-border);
+  border-radius: 10px;
+
+  &--secondary {
+    flex: 0 0 auto;
+    min-width: 0;
   }
 }
 
+.kpi-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--q-mutedtext);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--q-maintext);
+  line-height: 1.15;
+
+  &--secondary {
+    font-size: 1.1rem;
+    color: var(--q-mutedtext);
+  }
+}
+
+.kpi-delta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 0.1rem;
+
+  &--up   { color: #22c55e; }
+  &--down { color: #ef4444; }
+}
+
+// Chart
 .chart-section {
   background: var(--q-mainbg);
   border: 1px solid var(--q-border);
@@ -495,19 +488,34 @@ onMounted(() => {
   display: flex;
   gap: 1rem;
   margin-bottom: 0.75rem;
-  flex-wrap: wrap;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.legend-line {
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  border-radius: 1px;
+
+  &--ac {
+    background: #3b82f6;
+  }
+
+  &--py {
+    // Simulate dashed line with gradient
+    background: repeating-linear-gradient(
+      90deg,
+      #94a3b8 0px,
+      #94a3b8 6px,
+      transparent 6px,
+      transparent 10px
+    );
+  }
 }
 
 .legend-label {

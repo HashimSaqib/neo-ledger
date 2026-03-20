@@ -118,7 +118,7 @@ const props = defineProps({
     type: String,
     default: "monthly",
     validator: (val) =>
-      ["daily", "monthly", "quarterly", "yearly"].includes(val),
+      ["monthly", "quarterly", "yearly"].includes(val),
   },
   selectedAccountIds: {
     type: Array,
@@ -132,6 +132,20 @@ const emit = defineEmits([
   "toggleVisibility",
   "update:selectedAccountIds",
 ]);
+
+defineExpose({
+  getPdfExport: () => ({
+    type: "chart",
+    labels: chartData.value.labels,
+    datasets: chartData.value.datasets.map((ds) => ({
+      label: ds.label,
+      data: ds.data,
+      color: ds.borderColor,
+      dashed: false,
+    })),
+    formatY: (v) => formatAmount(v),
+  }),
+});
 
 const chartCanvas = ref(null);
 let chartInstance = null;
@@ -172,109 +186,83 @@ const onSelectedAccountsChange = (ids) => {
 };
 
 const hasData = computed(() => {
-  return (
-    bankAccounts.value.length > 0 &&
-    bankAccounts.value.some(
-      (acc) => acc.acc_trans && acc.acc_trans.length > 0
-    )
-  );
+  return bankAccounts.value.some((acc) => {
+    const bm = acc.balance_by_month;
+    return bm != null && Object.keys(bm).length > 0;
+  });
 });
 
 const accountLabels = computed(() => {
   return bankAccounts.value.map((acc) => ({
     id: acc.id ?? acc.accno,
-    label:
-      acc.description || acc.name || acc.accno || String(acc.id ?? ""),
+    label: acc.description || acc.name || acc.accno || String(acc.id ?? ""),
   }));
 });
-
-const groupByPeriod = (date) => {
-  const d = new Date(date);
-  if (props.periodType === "daily") {
-    return date;
-  } else if (props.periodType === "monthly") {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-  } else if (props.periodType === "quarterly") {
-    const quarter = Math.floor(d.getMonth() / 3) + 1;
-    return `${d.getFullYear()}-Q${quarter}`;
-  } else {
-    return `${d.getFullYear()}`;
-  }
-};
 
 const chartData = computed(() => {
   const accounts = bankAccounts.value;
   if (!accounts.length) return { labels: [], datasets: [] };
 
-  const allPeriodsSet = new Set();
+  // Collect all months present across all visible accounts
+  const allMonthsSet = new Set();
   accounts.forEach((acc) => {
-    (acc.acc_trans || []).forEach((tx) => {
-      allPeriodsSet.add(groupByPeriod(tx.transdate));
-    });
+    Object.keys(acc.balance_by_month || {}).forEach((m) => allMonthsSet.add(m));
   });
-  const sortedPeriods = Array.from(allPeriodsSet).sort((a, b) => {
-    if (props.periodType === "quarterly") {
-      const [yearA, qA] = a.split("-Q");
-      const [yearB, qB] = b.split("-Q");
-      return yearA - yearB || (qA - qB);
-    }
-    return a.localeCompare(b);
-  });
+  const allMonths = Array.from(allMonthsSet).sort();
+  if (!allMonths.length) return { labels: [], datasets: [] };
 
-  const formatLabel = (period) => {
-    if (props.periodType === "daily") {
-      const d = new Date(period);
-      return d.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-      });
-    } else if (props.periodType === "monthly") {
-      const [year, month] = period.split("-");
+  // Build display buckets.
+  // Balance is a running total, so Q/Y buckets use the LAST available month in the bucket.
+  let buckets;
+  if (props.periodType === "quarterly") {
+    const qMap = {};
+    allMonths.forEach((m) => {
+      const [year, mo] = m.split("-").map(Number);
+      const key = `${year}-Q${Math.ceil(mo / 3)}`;
+      if (!qMap[key]) qMap[key] = [];
+      qMap[key].push(m);
+    });
+    buckets = Object.keys(qMap)
+      .sort((a, b) => {
+        const [yA, qA] = a.split("-Q").map(Number);
+        const [yB, qB] = b.split("-Q").map(Number);
+        return yA - yB || qA - qB;
+      })
+      .map((k) => ({ key: k, lastMonth: qMap[k][qMap[k].length - 1] }));
+  } else if (props.periodType === "yearly") {
+    const yMap = {};
+    allMonths.forEach((m) => {
+      const year = m.substring(0, 4);
+      if (!yMap[year]) yMap[year] = [];
+      yMap[year].push(m);
+    });
+    buckets = Object.keys(yMap)
+      .sort()
+      .map((k) => ({ key: k, lastMonth: yMap[k][yMap[k].length - 1] }));
+  } else {
+    buckets = allMonths.map((m) => ({ key: m, lastMonth: m }));
+  }
+
+  const formatLabel = (key) => {
+    if (props.periodType === "monthly") {
+      const [year, month] = key.split("-");
       const d = new Date(year, parseInt(month, 10) - 1);
-      return d.toLocaleDateString(undefined, {
-        month: "short",
-        year: "2-digit",
-      });
-    } else if (props.periodType === "quarterly") {
-      return period;
-    } else {
-      return period;
+      return d.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
     }
+    return key;
   };
 
   const datasets = accounts.map((acc, index) => {
-    const trans = (acc.acc_trans || []).slice();
-    trans.sort(
-      (a, b) => new Date(a.transdate).getTime() - new Date(b.transdate).getTime()
-    );
-
-    const balanceByPeriod = {};
-    sortedPeriods.forEach((p) => {
-      let periodEndTime;
-      if (props.periodType === "daily") {
-        periodEndTime = new Date(p + "T23:59:59").getTime();
-      } else if (props.periodType === "monthly") {
-        const [y, m] = p.split("-").map(Number);
-        periodEndTime = new Date(y, m, 0, 23, 59, 59).getTime();
-      } else if (props.periodType === "quarterly") {
-        const [y, q] = p.split("-Q").map((s, i) => (i === 0 ? parseInt(s, 10) : parseInt(s, 10)));
-        periodEndTime = new Date(y, q * 3, 0, 23, 59, 59).getTime();
-      } else {
-        periodEndTime = new Date(parseInt(p, 10), 11, 31, 23, 59, 59).getTime();
-      }
-      let sum = 0;
-      trans.forEach((tx) => {
-        if (new Date(tx.transdate).getTime() <= periodEndTime) {
-          sum += Number(tx.amount) || 0;
-        }
-      });
-      balanceByPeriod[p] = sum;
-    });
-
+    const bm = acc.balance_by_month || {};
     const color = accountColors[index % accountColors.length];
     return {
       label: acc.description || acc.name || acc.accno || String(acc.id ?? ""),
-      data: sortedPeriods.map((p) => balanceByPeriod[p]),
+      data: buckets.map(({ lastMonth }) => {
+        // Use the running balance at lastMonth; if missing, fall back to the nearest prior month
+        if (bm[lastMonth] !== undefined) return bm[lastMonth];
+        const prior = allMonths.filter((m) => m <= lastMonth && bm[m] !== undefined);
+        return prior.length ? bm[prior[prior.length - 1]] : 0;
+      }),
       backgroundColor: color.fill,
       borderColor: color.line,
       borderWidth: 2,
@@ -287,7 +275,7 @@ const chartData = computed(() => {
   });
 
   return {
-    labels: sortedPeriods.map(formatLabel),
+    labels: buckets.map((b) => formatLabel(b.key)),
     datasets,
   };
 });
