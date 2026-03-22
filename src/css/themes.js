@@ -19,7 +19,7 @@ export const themes = {
     inputlabel: "#2b2b2b",
   },
   dark: {
-    menubg: "#141B24",
+    menubg: "#0B0F14",
     menutext: "#e6e6e6",
     menuheader: "#9ca3af",
     menuactive: "rgba(255, 255, 255, 0.08)",
