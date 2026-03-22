@@ -34,6 +34,9 @@ yarn-error.log*
 .env.local*
 
 neoledger.json
+
+# macOS duplicate lock files (created by Finder/Time Machine)
+package-lock[^.]*
 /src/ai_plugin
 
 # i18n generated files
