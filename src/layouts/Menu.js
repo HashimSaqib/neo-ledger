@@ -4,12 +4,36 @@ import { loadPluginConfig } from "../ai_plugin/index.js";
 const getMenuLinks = async () => {
   const { pluginMenu } = await loadPluginConfig();
 
+  // Find plugin sections by title
+  const stationsMenu = pluginMenu.find((m) => m.title === "Stations");
+  const docMgmtMenu = pluginMenu.find((m) => m.title === "Document Management");
+  const integrationsMenu = pluginMenu.find((m) => m.title === "Integrations");
+
+  // Safely extract a named sublink from a plugin section (returns null if not found)
+  const getPluginSublink = (menu, title) =>
+    menu?.sublinks?.find((s) => s.title === title) ?? null;
+
+  const inbox = getPluginSublink(docMgmtMenu, "Inbox");
+  const approvals = getPluginSublink(stationsMenu, "My Workstations");
+  const payments = getPluginSublink(stationsMenu, "Bank Payments");
+  const bankMatching = getPluginSublink(stationsMenu, "Bank Transactions");
+  const emailNotif = getPluginSublink(stationsMenu, "Email Notifications");
+  const manageStations = getPluginSublink(stationsMenu, "Manage Stations");
+  const camtImport = getPluginSublink(docMgmtMenu, "Bank Import");
+
   const menuLinks = [
     {
-      title: "Dashboard",
-      icon: "dashboard",
-      perm: "dashboard",
-      link: "/",
+      title: "Cockpit",
+      icon: "speed",
+      perm: "cockpit",
+      sublinks: [
+        { title: "Dashboard", link: "/", perm: "dashboard", icon: "grid_view" },
+        ...(inbox ? [{ ...inbox, title: "Inbox", icon: "move_to_inbox" }] : []),
+        ...(approvals ? [{ ...approvals, title: "Approvals", icon: "task_alt" }] : []),
+        ...(payments ? [{ ...payments, title: "Payments", icon: "payments" }] : []),
+        ...(bankMatching ? [{ ...bankMatching, title: "Bank Matching", icon: "compare_arrows" }] : []),
+        ...(emailNotif ? [{ ...emailNotif, icon: "notifications" }] : []),
+      ],
     },
     {
       title: "Customers",
@@ -20,9 +44,11 @@ const getMenuLinks = async () => {
           title: "Overview",
           link: "/arap/overview/customer",
           perm: "customer.overview",
+          icon: "visibility",
         },
         {
           title: "Postings",
+          icon: "edit_note",
           sublinks: [
             {
               title: "Customer Transaction",
@@ -44,7 +70,6 @@ const getMenuLinks = async () => {
               link: "/ar/sales-invoice/credit_invoice",
               perm: "customer.invoice_return",
             },
-
             {
               title: "Add Customer",
               link: "/arap/customer",
@@ -54,6 +79,7 @@ const getMenuLinks = async () => {
         },
         {
           title: "Batch",
+          icon: "dynamic_feed",
           sublinks: [
             {
               title: "Batch Email Invoices",
@@ -79,6 +105,7 @@ const getMenuLinks = async () => {
         },
         {
           title: "Reports",
+          icon: "assessment",
           sublinks: [
             {
               title: "AR Transactions",
@@ -113,9 +140,11 @@ const getMenuLinks = async () => {
           title: "Overview",
           link: "/arap/overview/vendor",
           perm: "vendor.overview",
+          icon: "visibility",
         },
         {
           title: "Postings",
+          icon: "edit_note",
           sublinks: [
             {
               title: "Vendor Transaction",
@@ -146,6 +175,7 @@ const getMenuLinks = async () => {
         },
         {
           title: "Reports",
+          icon: "assessment",
           sublinks: [
             {
               title: "AP Transactions",
@@ -178,6 +208,7 @@ const getMenuLinks = async () => {
       sublinks: [
         {
           title: "Postings",
+          icon: "edit_note",
           sublinks: [
             {
               title: "Sales Order",
@@ -203,6 +234,7 @@ const getMenuLinks = async () => {
         },
         {
           title: "Reports",
+          icon: "assessment",
           sublinks: [
             {
               title: "Sales Order Reports",
@@ -237,9 +269,23 @@ const getMenuLinks = async () => {
           title: "Add Transaction",
           link: "/gl/add-gl",
           perm: "gl.add",
+          icon: "post_add",
+        },
+        {
+          title: "Year End",
+          link: "/system/yearend",
+          perm: "system.yearend",
+          icon: "event",
+        },
+        {
+          title: "Audit",
+          link: "/system/audit",
+          perm: "system.audit",
+          icon: "policy",
         },
         {
           title: "Reports",
+          icon: "assessment",
           sublinks: [
             {
               title: "Journal",
@@ -277,7 +323,6 @@ const getMenuLinks = async () => {
     },
     {
       title: "Goods & Services",
-      perm: "Goods & Services--Goods & Services",
       icon: "local_offer",
       perm: "items",
       sublinks: [
@@ -285,30 +330,30 @@ const getMenuLinks = async () => {
           title: "Add Part",
           link: "/ic/add/part",
           perm: "items.part",
+          icon: "inventory_2",
         },
         {
           title: "Add Service",
           link: "/ic/add/service",
           perm: "items.service",
+          icon: "miscellaneous_services",
         },
         {
           title: "Reports",
+          icon: "assessment",
           sublinks: [
             {
               title: "All Items",
-              perm: "Goods & Services-All Items",
               link: "/ic/search/allitems",
               perm: "items.search.allitems",
             },
             {
               title: "Parts",
-              perm: "Goods & Services-Parts",
               link: "/ic/search/parts",
               perm: "items.search.parts",
             },
             {
               title: "Services",
-              perm: "Goods & Services-Services",
               link: "/ic/search/services",
               perm: "items.search.services",
             },
@@ -316,7 +361,6 @@ const getMenuLinks = async () => {
         },
       ],
     },
-
     {
       title: "System",
       icon: "settings",
@@ -326,45 +370,54 @@ const getMenuLinks = async () => {
           title: "Currencies",
           link: "/system/currencies",
           perm: "system.currencies",
+          icon: "currency_exchange",
         },
         {
           title: "Messages",
           link: "/system/messages",
           perm: "system.messages",
+          icon: "chat",
         },
         {
           title: "Projects",
           link: "/system/projects",
           perm: "system.projects",
+          icon: "work",
         },
         {
           title: "Departments",
           link: "/system/departments",
           perm: "system.departments",
+          icon: "corporate_fare",
         },
         {
           title: "Defaults",
           link: "/system/defaults",
           perm: "system.defaults",
+          icon: "tune",
         },
         {
           title: "AI Prompts",
           link: "/system/ai_prompts",
           perm: "ai.prompts",
+          icon: "psychology",
         },
         {
           title: "Templates",
           link: "/system/templates",
           perm: "system.templates",
+          icon: "article",
         },
         {
           title: "Taxes",
           link: "/system/taxes",
           perm: "system.taxes",
+          icon: "percent",
         },
         {
           title: "Chart Of Accounts",
           perm: "system.chart",
+          icon: "account_tree",
           sublinks: [
             {
               title: "List Accounts",
@@ -392,22 +445,15 @@ const getMenuLinks = async () => {
           title: "Bank Accounts",
           link: "/system/bank",
           perm: "system.bank",
-        },
-        {
-          title: "Audit",
-          link: "/system/audit",
-          perm: "system.audit",
+          icon: "savings",
         },
         {
           title: "Batch Jobs",
           link: "/system/batch",
           perm: "system.batch",
+          icon: "pending_actions",
         },
-        {
-          title: "Year End",
-          link: "/system/yearend",
-          perm: "system.yearend",
-        },
+        ...(manageStations ? [{ ...manageStations, icon: "computer" }] : []),
       ],
     },
     {
@@ -419,41 +465,48 @@ const getMenuLinks = async () => {
           title: "General Ledger",
           link: "/import/gl",
           perm: "import.gl",
+          icon: "account_balance",
         },
         {
           title: "Customers",
           link: "/import/customer",
           perm: "import.customer",
+          icon: "people",
         },
         {
           title: "Sales Invoice",
           link: "/import/ar_invoice",
           perm: "import.ar_invoice",
+          icon: "receipt_long",
         },
         {
           title: "Customer Transactions",
           link: "/import/ar_transaction",
           perm: "import.ar_transaction",
+          icon: "compare_arrows",
         },
         {
           title: "Vendors",
           link: "/import/vendor",
           perm: "import.vendor",
+          icon: "storefront",
         },
         {
           title: "Vendor Invoice",
           link: "/import/ap_invoice",
           perm: "import.ap_invoice",
+          icon: "receipt_long",
         },
         {
           title: "Vendor Transactions",
           link: "/import/ap_transaction",
           perm: "import.ap_transaction",
+          icon: "compare_arrows",
         },
+        ...(camtImport ? [{ ...camtImport, title: "CAMT Import", icon: "upload_file" }] : []),
       ],
     },
-    // Merge AI plugin menu items
-    ...pluginMenu,
+    ...(integrationsMenu ? [integrationsMenu] : []),
   ];
 
   return menuLinks;

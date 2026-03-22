@@ -401,7 +401,7 @@ const handleDrawerMouseLeave = (event) => {
 .side-drawer .q-item {
   color: var(--menu-item-color);
   font-size: var(--menu-item-font-size);
-  font-weight: 400;
+  font-weight: 600;
   min-height: 38px;
 }
 

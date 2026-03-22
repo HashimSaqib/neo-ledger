@@ -56,9 +56,17 @@
           class="q-pa-none"
         >
           <div
-            :style="computeInnerStyle(props.depth + 1)"
+            :style="computeInnerStyle(props.depth + 1, !!sublink.icon)"
             class="row items-center"
           >
+            <q-item-section
+              avatar
+              v-if="sublink.icon"
+              class="menu-link"
+              style="min-width: 20px"
+            >
+              <q-icon :name="sublink.icon" />
+            </q-item-section>
             <q-item-section class="menu-link">
               {{ t(sublink.title) }}
             </q-item-section>
@@ -77,9 +85,12 @@
           <template v-slot:header>
             <q-item class="q-pa-none">
               <div
-                :style="computeInnerStyle(props.depth + 1)"
+                :style="computeInnerStyle(props.depth + 1, !!sublink.icon)"
                 class="row items-center"
               >
+                <q-item-section avatar v-if="sublink.icon" class="menu-link" style="min-width: 28px">
+                  <q-icon :name="sublink.icon" />
+                </q-item-section>
                 <q-item-section>
                   {{ t(sublink.title) }}
                 </q-item-section>
@@ -171,9 +182,11 @@ const innerStyle = computed(() => ({
 }));
 
 // For sublinks, compute an inner style based on the passed depth.
-function computeInnerStyle(depth) {
+// When an icon is present it acts as the visual indent, so reduce padding.
+function computeInnerStyle(depth, hasIcon = false) {
+  const base = hasIcon ? 1.2 : 2.1;
   return {
-    paddingLeft: `${(depth + 1) * 2.1}rem`,
+    paddingLeft: `${(depth + 1) * base}rem`,
   };
 }
 </script>
