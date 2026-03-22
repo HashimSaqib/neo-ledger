@@ -83,31 +83,6 @@
         </q-item-section>
       </q-item>
 
-      <q-item clickable v-ripple @click="handleDatasetList" class="q-mb-sm">
-        <q-item-section avatar>
-          <q-icon name="list_alt" />
-        </q-item-section>
-        <q-item-section>{{ $t("Dataset List") }}</q-item-section>
-      </q-item>
-      <div>
-        <s-select
-          v-model="selectedDb"
-          :options="dbOptions"
-          dense
-          options-dense
-          @update:model-value="switchDatabase"
-          outlined
-          :label="$t('Switch Database')"
-          class="q-px-none"
-        >
-          <!-- No emit-value/map-options needed if options are just strings -->
-          <template v-slot:prepend>
-            <q-icon name="open_in_new" size="xs" class="q-mr-xs" />
-            <!-- Hint that it opens a new tab -->
-          </template>
-        </s-select>
-      </div>
-
       <q-separator spaced color="grey-5" />
 
       <!-- Logout Button -->
@@ -126,6 +101,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Cookies, LocalStorage, useQuasar } from "quasar";
 import { setTheme } from "src/boot/theme";
+import { clearSessionDatasets } from "src/helpers/sessionDatasets";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 import axios from "axios";
 import config from "../../neoledger.json";
@@ -219,27 +195,7 @@ const handleNumberFormatChange = async (format) => {
   }
 };
 
-const dbOptions = ref([]);
-const selectedDb = ref(null);
-const loadDbOptions = () => {
-  const availableDbString = LocalStorage.getItem("available_db");
-  if (availableDbString) {
-    dbOptions.value = availableDbString.split(",");
-  } else {
-    dbOptions.value = []; // Ensure it's empty if nothing in storage
-  }
-};
-function switchDatabase(dbName) {
-  if (!dbName) return; // Avoid issues if null is somehow selected
-
-  const url = `/client/${dbName}`;
-  window.open(url, "_blank"); // Open in new tab
-
-  selectedDb.value = null;
-}
 onMounted(() => {
-  loadDbOptions();
-
   // Load saved number format from localStorage
   const savedFormat = LocalStorage.getItem("numberFormat");
   if (savedFormat) {
@@ -253,14 +209,11 @@ onMounted(() => {
   }
 });
 
-function handleDatasetList() {
-  // Navigate to dataset list page
-  router.push("/");
-}
-
 async function handleLogout() {
   Cookies.remove("client");
   Cookies.remove("sessionkey");
+  LocalStorage.remove("available_db");
+  clearSessionDatasets();
   await router.push("/login");
 }
 </script>

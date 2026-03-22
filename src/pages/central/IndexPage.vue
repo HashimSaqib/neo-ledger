@@ -1197,6 +1197,7 @@ import { useRouter } from "vue-router";
 import { setTheme } from "src/boot/theme";
 import { i18n, loadLanguagePack } from "src/boot/i18n";
 import { resolveLogo } from "src/helpers/resolveLogo";
+import { setSessionDatasetsFromApiRows } from "src/helpers/sessionDatasets";
 import CreateDataset from "./CreateDataset.vue";
 import DatasetConnections from "./DatasetConnections.vue";
 import ApiKeys from "./ApiKeys.vue";
@@ -1643,15 +1644,7 @@ const getDatasets = async () => {
         : ds.logo,
     }));
     if (response.data && Array.isArray(response.data)) {
-      // 1. Extract all db_name values
-      const dbNames = response.data.map((ds) => ds.db_name);
-      // 2. Join them into a comma-separated string
-      const availableDbString = dbNames.join(",");
-      // 3. Store in LocalStorage using the key 'available_db'
-      LocalStorage.set("available_db", availableDbString);
-
-      // Optional: Log the stored value for verification
-      console.log("Stored available_db:", availableDbString);
+      setSessionDatasetsFromApiRows(response.data);
     } else {
       console.warn("API response data is not an array:", response.data);
     }

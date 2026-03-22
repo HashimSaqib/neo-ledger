@@ -3,7 +3,7 @@
     <div v-if="showOnboarding" class="onboarding-wrapper">
       <OnboardingList :client="client" @completed="showOnboarding = false" />
     </div>
-    <div v-else class="q-pa-md">
+    <div v-else>
       <MainDashboard />
     </div>
   </q-page>

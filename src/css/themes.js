@@ -1,6 +1,9 @@
 export const themes = {
   light: {
-    menubg: "#1F2937",
+    menubg: "#FFFFFF",
+    menutext: "#333333",
+    menuheader: "#707070",
+    menuactive: "#F5F5F5",
     primary: "#06CEE0",
     tint: "#FBFBFB",
     highlight: "#F5F9FF",
@@ -12,12 +15,14 @@ export const themes = {
     secondary: "#000000",
     secondarybtn: "#E7ECF2",
     lighttext: "#4d4d4d",
-    lightbg: "#ffffff",
     tableheader: "#FCFCFC",
     inputlabel: "#2b2b2b",
   },
   dark: {
-    menubg: "#0B0F14",
+    menubg: "#141B24",
+    menutext: "#e6e6e6",
+    menuheader: "#9ca3af",
+    menuactive: "rgba(255, 255, 255, 0.08)",
     primary: "#06CEE0",
     tint: "#161C26",
     highlight: "#141B24",

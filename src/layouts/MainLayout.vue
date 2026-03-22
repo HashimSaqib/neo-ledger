@@ -35,6 +35,7 @@
       style="height: 100%"
     >
       <div class="column no-wrap" style="height: 100%">
+        <DatasetSwitcher />
         <q-scroll-area class="col">
           <div>
             <q-list>
@@ -73,8 +74,16 @@ import { useI18n } from "vue-i18n";
 import { useQuasar } from "quasar";
 import EssentialLink from "components/EssentialLink.vue";
 import SettingsPanel from "components/SettingsPanel.vue";
+import DatasetSwitcher from "components/DatasetSwitcher.vue";
+import {
+  getSessionDatasets,
+  hasSessionDatasets,
+  setSessionDatasetsFromApiRows,
+} from "src/helpers/sessionDatasets";
+import { api } from "src/boot/axios";
 import { getMenuLinks } from "src/layouts/Menu.js";
 import { Cookies, Dark, LocalStorage } from "quasar";
+import axios from "axios";
 import config from "../../neoledger.json";
 
 const $q = useQuasar();
@@ -262,8 +271,46 @@ const filterMenu = async () => {
 
 provide("filterMenu", filterMenu);
 
-onMounted(() => {
+const sessionDatasets = ref(getSessionDatasets());
+provide("sessionDatasets", sessionDatasets);
+
+async function loadSessionDatasetsIfNeeded() {
+  if (hasSessionDatasets()) {
+    sessionDatasets.value = getSessionDatasets();
+    return;
+  }
+
+  const auth = Cookies.get("sessionkey");
+  const root = config.apiurl.replace(/\/+$/, "");
+  const headers = auth ? { Authorization: auth } : {};
+
+  let rows = null;
+  try {
+    const { data } = await api.get("/central/db_list");
+    if (Array.isArray(data) && data.length) rows = data;
+  } catch (err) {
+    console.warn("central/db_list failed, trying root db_list:", err);
+  }
+
+  if (!rows) {
+    try {
+      const { data } = await axios.get(`${root}/db_list`, { headers });
+      if (Array.isArray(data) && data.length) rows = data;
+    } catch (err) {
+      console.error("Error fetching dataset list for session:", err);
+    }
+  }
+
+  if (rows) {
+    setSessionDatasetsFromApiRows(rows);
+  }
+  sessionDatasets.value = getSessionDatasets();
+}
+
+onMounted(async () => {
   filterMenu();
+
+  await loadSessionDatasetsIfNeeded();
 
   // Close mobile drawer when clicking outside
   document.addEventListener("click", (event) => {
@@ -333,13 +380,67 @@ const handleDrawerMouseLeave = (event) => {
 };
 </script>
 <style>
+/* ── Menu appearance: one place to change font size, icon size, and colors ── */
 .side-drawer {
+  /* font sizes */
+  --menu-item-font-size: 13px;
+  --menu-header-font-size: 11px;
+
+  --menu-icon-scale: 0.8;
+
+  /* colors — actual values come from themes.js via --q-* CSS variables */
+  --menu-item-color: var(--q-menutext);
+  --menu-header-color: var(--q-menuheader);
+  --menu-icon-color: var(--q-q-border);
+  --menu-active-bg: var(--q-menuactive);
+
   background-color: var(--q-menubg) !important;
-  color: #ffffff !important;
+  color: var(--menu-item-color) !important;
 }
-.menu-link {
+
+.side-drawer .q-item {
+  color: var(--menu-item-color);
+  font-size: var(--menu-item-font-size);
+  font-weight: 400;
+  min-height: 38px;
+}
+
+.side-drawer .q-expansion-item__header {
+  font-size: var(--menu-item-font-size);
+  font-weight: 400;
+  color: var(--menu-item-color);
+  min-height: 38px;
+}
+
+.side-drawer .q-expansion-item__header.nav-section-header {
+  font-size: var(--menu-header-font-size);
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--menu-header-color);
+  min-height: 34px;
 }
+
+.side-drawer .q-icon {
+  color: var(--menu-icon-color) !important;
+  transform: scale(var(--menu-icon-scale));
+}
+
+.side-drawer .q-expansion-item__header.nav-section-header .q-icon {
+  color: var(--menu-header-color) !important;
+}
+
+.side-drawer .q-item.q-router-link--active,
+.side-drawer .q-item.q-router-link--exact-active,
+.side-drawer a.q-item--active {
+  background-color: var(--menu-active-bg) !important;
+}
+
+.side-drawer .q-expansion-item__header.q-router-link--active,
+.side-drawer .q-expansion-item__header.q-router-link--exact-active {
+  background-color: var(--menu-active-bg) !important;
+}
+
 .toolbar {
   border-bottom: 1px solid var(--q-border);
 }

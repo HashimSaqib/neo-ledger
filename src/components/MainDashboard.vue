@@ -31,9 +31,3 @@ const onConfigSaved = (config) => {
   console.log("Widget config saved:", config);
 };
 </script>
-
-<style lang="scss" scoped>
-.main-dashboard {
-  padding: 0.5rem;
-}
-</style>

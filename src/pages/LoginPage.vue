@@ -69,6 +69,7 @@ import axios from "axios";
 import { resolveLogo } from "src/helpers/resolveLogo";
 import LanguageSwitcher from "src/components/LanguageSwitcher.vue";
 import config from "../../neoledger.json";
+import { clearSessionDatasets } from "src/helpers/sessionDatasets";
 
 const logo = resolveLogo();
 const { t } = useI18n();
@@ -84,6 +85,7 @@ const loginData = ref({
 
 onMounted(() => {
   LocalStorage.remove("available_db");
+  clearSessionDatasets();
   $q.cookies.remove("sessionkey");
 
   Object.keys(localStorage).forEach((key) => {

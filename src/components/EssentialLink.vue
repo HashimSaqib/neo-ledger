@@ -7,7 +7,6 @@
       v-if="props.title == 'Dashboard'"
       :icon="props.icon"
       :label="t(props.title)"
-      text-color="maintext"
       expand-icon="none"
       class="menu-link"
       active-class="menu-link"
@@ -42,6 +41,7 @@
       expand-separator
       active-class="menu-link"
       class="menu-link"
+      :header-class="props.depth === 0 ? 'nav-section-header' : undefined"
       :icon="props.icon"
       :label="t(props.title)"
     >
@@ -177,8 +177,5 @@ function computeInnerStyle(depth) {
   };
 }
 </script>
-<style scoped>
-.menu-link {
-  font-weight: 600;
-}
-</style>
+L
+<style scoped></style>
