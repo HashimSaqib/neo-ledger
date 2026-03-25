@@ -1304,14 +1304,35 @@ const getPDF = async () => {
 const createLink = inject("createLink");
 
 const getPath = (accno, period) => {
-  let todate = period.todate || period.label;
-  if (todate && todate.includes("/")) {
-    const parts = todate.split("/");
-    todate = `${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(
-      2,
-      "0",
-    )}`;
-  }
+  const toYmd = (value) => {
+    if (!value) return "";
+    if (value instanceof Date) return date.formatDate(value, "YYYY-MM-DD");
+
+    const str = String(value).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str; // already correct
+    if (/^\d{8}$/.test(str))
+      return `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}`;
+
+    // Handle mm/dd/yyyy and other date-like strings.
+    if (str.includes("/")) {
+      const parts = str.split("/");
+      if (parts.length === 3) {
+        const [mm, dd, yyyy] = parts;
+        if (yyyy && mm && dd) {
+          return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+        }
+      }
+    }
+
+    const parsed = new Date(str);
+    if (!Number.isNaN(parsed.getTime())) {
+      return date.formatDate(parsed, "YYYY-MM-DD");
+    }
+
+    return str;
+  };
+
+  const todate = toYmd(period?.todate || period?.label);
   const project = formData.value.projectnumber || "";
   const department = formData.value.department || "";
   const params = new URLSearchParams({ accno, todate, project, department });

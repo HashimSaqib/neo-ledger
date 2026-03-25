@@ -1320,10 +1320,25 @@ const downloadPDF = async () => {
 const createLink = inject("createLink");
 
 const getPath = (accno, period) => {
-  const formatDateStr = (dateStr) =>
-    `${dateStr.substr(0, 4)}-${dateStr.substr(4, 2)}-${dateStr.substr(6, 2)}`;
-  const fromdate = formatDateStr(period.fromdate);
-  const todate = formatDateStr(period.todate);
+  const toYmd = (value) => {
+    if (!value) return "";
+    if (value instanceof Date) return date.formatDate(value, "YYYY-MM-DD");
+
+    const str = String(value).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str; // already correct
+    if (/^\d{8}$/.test(str)) return `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}`;
+
+    // Handle inputs like "2026-3-1" or other date-like strings.
+    const parsed = new Date(str);
+    if (!Number.isNaN(parsed.getTime())) {
+      return date.formatDate(parsed, "YYYY-MM-DD");
+    }
+
+    return str;
+  };
+
+  const fromdate = toYmd(period.fromdate);
+  const todate = toYmd(period.todate);
   const project = formData.value.projectnumber || "";
   const department = formData.value.department || "";
   const params = new URLSearchParams({

@@ -10,6 +10,7 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
+    "clean": "rm -rf .quasar node_modules/.q-cache && quasar dev",
     "i18n:sync": "node scripts/i18n-sync.js",
     "i18n:watch": "node scripts/i18n-watch.js",
     "i18n:extract": "node scripts/i18n-extract.js",
