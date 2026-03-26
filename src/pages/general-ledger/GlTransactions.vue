@@ -216,6 +216,12 @@
                     outlined
                     dense
                   />
+                  <q-checkbox
+                    v-model="formData.fx_transaction"
+                    :label="t('Exchange Rate Difference')"
+                    color="primary"
+                    class="maintext q-mt-sm"
+                  />
                 </div>
               </div>
               <div class="container">
@@ -302,7 +308,9 @@
                 <strong>{{ props.row.groupLabel }}</strong>
               </router-link>
               <span v-else-if="col.name === 'balance'">{{
-                props.row.balance != null ? formatAmount(props.row.balance) : '—'
+                props.row.balance != null
+                  ? formatAmount(props.row.balance)
+                  : "—"
               }}</span>
             </q-td>
           </q-tr>
@@ -444,7 +452,9 @@ const { t } = useI18n();
 updateTitle(t("General Ledger"));
 
 // Form data and UI flags
-const formData = ref({});
+const formData = ref({
+  fx_transaction: true,
+});
 const filtersOpen = route.query.search == 1 ? ref(false) : ref(true);
 const results = ref([]);
 
@@ -862,6 +872,11 @@ const loadParams = () => {
     formData.value.accnoto = accountTo || query.accnoto;
   }
 
+  if (query.fx_transaction !== undefined) {
+    formData.value.fx_transaction =
+      query.fx_transaction === "1" || query.fx_transaction === "true";
+  }
+
   // Load simple parameters available on this page.
   // Adjust the keys in this array based on your formData fields.
   const simpleParams = [
@@ -909,6 +924,7 @@ const search = async () => {
     }
     // Flatten formData using the arrow function.
     const params = flattenParams(formData.value);
+    params.fx_transaction = formData.value.fx_transaction ? 1 : 0;
 
     // Use the flattened parameters in your API call.
     if (splitLedger.value) {

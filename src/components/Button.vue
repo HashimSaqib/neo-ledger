@@ -3,7 +3,6 @@
     v-bind="$attrs"
     :class="buttonClasses"
     :outline="isOutline"
-    v-on="$listeners"
     class="button"
     :size="size"
     flat

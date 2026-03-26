@@ -14,6 +14,7 @@ export default boot(({ app }) => {
   app.component("text-input", TextInput);
   app.component("date-input", DateInput);
   app.component("s-button", Button);
+  app.component("s-btn", Button);
   app.component("country-input", CountryInput);
   app.component("exchange-rate-input", ExchangeRateInput);
 });

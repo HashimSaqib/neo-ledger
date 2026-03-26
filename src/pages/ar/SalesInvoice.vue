@@ -2824,16 +2824,16 @@ const originalInvDate = ref(null);
   transform: translateX(-20px);
 }
 
-.no-hover-expansion :deep(.q-item:hover),
-.no-hover-expansion :deep(.q-item:focus) {
+.no-hover-expansion .q-item:hover,
+.no-hover-expansion .q-item:focus {
   background: transparent !important;
 }
 
-.no-hover-expansion :deep(.q-focus-helper) {
+.no-hover-expansion .q-focus-helper {
   display: none;
 }
 
-.no-hover-expansion :deep(.q-item) {
+.no-hover-expansion .q-item {
   padding-left: 0;
 }
 
