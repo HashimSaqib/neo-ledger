@@ -81,7 +81,9 @@
           :key="widget.id"
           class="widget-wrapper"
           :class="[
-            widget.width === 'full' ? 'widget-wrapper--full' : 'widget-wrapper--half',
+            widget.width === 'full'
+              ? 'widget-wrapper--full'
+              : 'widget-wrapper--half',
             { 'widget-wrapper--dragging': draggingWidget === widget.id },
             { 'widget-wrapper--drag-over': dragOverWidget === widget.id },
           ]"
@@ -96,7 +98,9 @@
           @dragend="onDragEnd"
         >
           <overview-widget
-            v-if="widget.type === 'ar_overview' || widget.type === 'ap_overview'"
+            v-if="
+              widget.type === 'ar_overview' || widget.type === 'ap_overview'
+            "
             :ref="(el) => setWidgetRef(widget.id, el)"
             :type="widget.type === 'ar_overview' ? 'customer' : 'vendor'"
             :data="widgetData[widget.type]"
@@ -158,16 +162,6 @@
             :data="widgetData.pl"
             :loading="widgetLoading.pl"
             :is-dragging="draggingWidget === widget.id"
-            @refresh="refreshWidget(widget.type)"
-            @toggle-visibility="toggleWidgetVisibility(widget.id)"
-          />
-          <balance-sheet-widget
-            v-else-if="widget.type === 'balance_sheet'"
-            :ref="(el) => setWidgetRef(widget.id, el)"
-            :data="widgetData.balance_sheet"
-            :loading="widgetLoading.balance_sheet"
-            :is-dragging="draggingWidget === widget.id"
-            :period-type="config.period_type"
             @refresh="refreshWidget(widget.type)"
             @toggle-visibility="toggleWidgetVisibility(widget.id)"
           />
@@ -239,7 +233,9 @@
               <q-item-section avatar>
                 <q-icon
                   :name="widget.icon"
-                  :color="exportSelection.includes(widget.id) ? 'primary' : 'grey'"
+                  :color="
+                    exportSelection.includes(widget.id) ? 'primary' : 'grey'
+                  "
                 />
               </q-item-section>
               <q-item-section>
@@ -391,8 +387,11 @@ import BankActivityWidget from "./BankActivityWidget.vue";
 import Top10VcWidget from "./Top10VcWidget.vue";
 import RevenueWidget from "./RevenueWidget.vue";
 import PLWidget from "./PLWidget.vue";
-import BalanceSheetWidget from "./BalanceSheetWidget.vue";
-import { drawLineChart, LABEL_AREA, chartBoxHeight } from "src/helpers/pdfChartRenderer";
+import {
+  drawLineChart,
+  LABEL_AREA,
+  chartBoxHeight,
+} from "src/helpers/pdfChartRenderer";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -434,7 +433,6 @@ const widgetWidths = reactive({
   bank_activity: "half",
   revenue: "half",
   pl: "half",
-  balance_sheet: "full",
 });
 
 const widthOptions = [
@@ -461,7 +459,6 @@ const widgetData = ref({
   bank_activity: null,
   revenue: null,
   pl: null,
-  balance_sheet: null,
 });
 
 const widgetLoading = ref({
@@ -472,7 +469,6 @@ const widgetLoading = ref({
   bank_activity: false,
   revenue: false,
   pl: false,
-  balance_sheet: false,
 });
 
 const ALLOWED_PERIOD_TYPES = ["monthly", "quarterly", "yearly"];
@@ -577,14 +573,6 @@ const widgetDefinitions = [
     icon: "analytics",
     permission: "gl.transactions",
   },
-  // {
-  //   id: "balance_sheet",
-  //   type: "balance_sheet",
-  //   label: t("Balance Sheet"),
-  //   description: t("Monthly asset and liability positions as stacked bar charts"),
-  //   icon: "account_balance_wallet",
-  //   permission: "gl.transactions",
-  // },
 ];
 
 // Get widget width
@@ -848,7 +836,7 @@ const onDragEnd = () => {
 const initializeWidgetConfigs = () => {
   console.log(
     "initializeWidgetConfigs called, current config.value.widgets:",
-    JSON.stringify(config.value.widgets, null, 2)
+    JSON.stringify(config.value.widgets, null, 2),
   );
 
   const newWidgets = { ...config.value.widgets };
@@ -920,7 +908,7 @@ const initializeWidgetConfigs = () => {
 
   console.log(
     "Initialized widget configs:",
-    JSON.stringify(newWidgets, null, 2)
+    JSON.stringify(newWidgets, null, 2),
   );
 
   return needsSave;
@@ -962,7 +950,7 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
         // Load period type (daily removed — migrate to monthly)
         if (serverConfig.period_type) {
           config.value.period_type = normalizePeriodType(
-            serverConfig.period_type
+            serverConfig.period_type,
           );
           console.log("Loaded period_type:", config.value.period_type);
         }
@@ -995,7 +983,7 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
               widgetWidths[widgetId] = config.value.widgets[widgetId].width;
               console.log(
                 `Loaded widget ${widgetId}:`,
-                config.value.widgets[widgetId]
+                config.value.widgets[widgetId],
               );
             }
           });
@@ -1003,7 +991,7 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
 
         console.log(
           "Config after loading:",
-          JSON.stringify(config.value, null, 2)
+          JSON.stringify(config.value, null, 2),
         );
       } else {
         console.log("No server config found or empty config, using defaults");
@@ -1033,9 +1021,6 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
       }
       if (configResponse.data.pl) {
         widgetData.value.pl = configResponse.data.pl;
-      }
-      if (configResponse.data.balance_sheet) {
-        widgetData.value.balance_sheet = configResponse.data.balance_sheet;
       }
 
       // If there are period dates, re-fetch with those dates
@@ -1076,19 +1061,12 @@ const fetchWidgetData = async (loadConfigFirst = false) => {
     if (response.data.pl) {
       widgetData.value.pl = response.data.pl;
     }
-    if (response.data.balance_sheet) {
-      widgetData.value.balance_sheet = response.data.balance_sheet;
-    }
 
     // Fetch previous period for Top 10 trend comparison
     const start = config.value.period.start;
     const end = config.value.period.end;
     if (start && end) {
-      const prev = getPreviousPeriod(
-        start,
-        end,
-        config.value.period_type
-      );
+      const prev = getPreviousPeriod(start, end, config.value.period_type);
       if (prev.start && prev.end) {
         try {
           const prevResponse = await api.get("/dashboard/widgets", {
@@ -1168,9 +1146,6 @@ const refreshWidget = async (widgetType) => {
     if (widgetType === "pl" && response.data.pl) {
       widgetData.value.pl = response.data.pl;
     }
-    if (widgetType === "balance_sheet" && response.data.balance_sheet) {
-      widgetData.value.balance_sheet = response.data.balance_sheet;
-    }
 
     // For Top 10 widgets, also fetch previous period for trend
     if (
@@ -1181,7 +1156,7 @@ const refreshWidget = async (widgetType) => {
       const prev = getPreviousPeriod(
         config.value.period.start,
         config.value.period.end,
-        config.value.period_type
+        config.value.period_type,
       );
       if (prev.start && prev.end) {
         try {
@@ -1191,11 +1166,17 @@ const refreshWidget = async (widgetType) => {
               transdateto: prev.end,
             },
           });
-          if (widgetType === "top10_customers" && prevResponse.data.customer_overview) {
+          if (
+            widgetType === "top10_customers" &&
+            prevResponse.data.customer_overview
+          ) {
             widgetData.value.ar_overview_previous =
               prevResponse.data.customer_overview;
           }
-          if (widgetType === "top10_vendors" && prevResponse.data.vendor_overview) {
+          if (
+            widgetType === "top10_vendors" &&
+            prevResponse.data.vendor_overview
+          ) {
             widgetData.value.ap_overview_previous =
               prevResponse.data.vendor_overview;
           }
@@ -1247,12 +1228,11 @@ const widgetDataKey = {
   bank_activity: ["bank_activity"],
   revenue: ["revenue"],
   pl: ["pl"],
-  balance_sheet: ["balance_sheet"],
 };
 
 const copyJSON = async () => {
   const orderedWidgets = visibleWidgets.value.filter((w) =>
-    exportSelection.value.includes(w.id)
+    exportSelection.value.includes(w.id),
   );
 
   const payload = {};
@@ -1267,9 +1247,17 @@ const copyJSON = async () => {
 
   try {
     await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-    Notify.create({ type: "positive", message: t("JSON copied to clipboard"), position: "top" });
+    Notify.create({
+      type: "positive",
+      message: t("JSON copied to clipboard"),
+      position: "top",
+    });
   } catch {
-    Notify.create({ type: "negative", message: t("Failed to copy JSON"), position: "top" });
+    Notify.create({
+      type: "negative",
+      message: t("Failed to copy JSON"),
+      position: "top",
+    });
   }
 };
 
@@ -1287,7 +1275,11 @@ const exportToPDF = async () => {
     const { jsPDF } = await import("jspdf");
     const autoTable = (await import("jspdf-autotable")).default;
 
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 12;
@@ -1311,7 +1303,7 @@ const exportToPDF = async () => {
     let yPos = margin + 22;
 
     const orderedWidgets = visibleWidgets.value.filter((w) =>
-      exportSelection.value.includes(w.id)
+      exportSelection.value.includes(w.id),
     );
 
     for (const widget of orderedWidgets) {
@@ -1335,7 +1327,9 @@ const exportToPDF = async () => {
           yPos = ensurePageSpace(pdf, yPos, 8, margin, pageHeight);
           pdf.setFontSize(8.5);
           pdf.setTextColor(80, 80, 80);
-          const kpiText = exportData.kpis.map((k) => `${k.label}: ${k.value}`).join("    ");
+          const kpiText = exportData.kpis
+            .map((k) => `${k.label}: ${k.value}`)
+            .join("    ");
           pdf.text(kpiText, margin + LABEL_AREA, yPos);
           pdf.setTextColor(0, 0, 0);
           yPos += 6;
@@ -1344,10 +1338,17 @@ const exportToPDF = async () => {
         // Native vector line chart — box starts after LABEL_AREA reserved for y labels
         const h = chartBoxHeight(exportData.datasets.length);
         yPos = ensurePageSpace(pdf, yPos, h, margin, pageHeight);
-        drawLineChart(pdf, margin + LABEL_AREA, yPos, usableWidth - LABEL_AREA, h, {
-          labels: exportData.labels,
-          datasets: exportData.datasets,
-        });
+        drawLineChart(
+          pdf,
+          margin + LABEL_AREA,
+          yPos,
+          usableWidth - LABEL_AREA,
+          h,
+          {
+            labels: exportData.labels,
+            datasets: exportData.datasets,
+          },
+        );
         yPos += h + 6;
       } else if (exportData.type === "table") {
         const tableRows = exportData.rows ?? [];
@@ -1361,11 +1362,22 @@ const exportToPDF = async () => {
           foot: footerRows,
           margin: { left: margin, right: margin },
           styles: { fontSize: 9, cellPadding: 3 },
-          headStyles: { fillColor: [59, 130, 246], textColor: [255, 255, 255], fontStyle: "bold" },
-          footStyles: { fillColor: [219, 234, 254], textColor: [20, 40, 100], fontStyle: "bold" },
+          headStyles: {
+            fillColor: [59, 130, 246],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+          },
+          footStyles: {
+            fillColor: [219, 234, 254],
+            textColor: [20, 40, 100],
+            fontStyle: "bold",
+          },
           columnStyles: { 0: { cellWidth: "auto" } },
           didParseCell: (data) => {
-            if (data.section === "body" && rowStyles[data.row.index] === "muted") {
+            if (
+              data.section === "body" &&
+              rowStyles[data.row.index] === "muted"
+            ) {
               data.cell.styles.textColor = [120, 120, 120];
               data.cell.styles.fontSize = 8;
             }
@@ -1380,7 +1392,11 @@ const exportToPDF = async () => {
     showExportDialog.value = false;
   } catch (err) {
     console.error("PDF export failed:", err);
-    Notify.create({ type: "negative", message: t("PDF export failed"), position: "top" });
+    Notify.create({
+      type: "negative",
+      message: t("PDF export failed"),
+      position: "top",
+    });
   } finally {
     exportLoading.value = false;
   }
@@ -1485,7 +1501,7 @@ watch(
       saveConfig();
     }, 500);
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Watch for period type changes (auto-save)
@@ -1497,7 +1513,7 @@ watch(
     window.periodTypeChangeTimeout = setTimeout(() => {
       saveConfig();
     }, 500);
-  }
+  },
 );
 </script>
 

@@ -15,7 +15,7 @@
             <div class="row q-gutter-sm q-mt-none">
               <div class="col-12 col-md-3" v-if="departments.length > 0">
                 <s-select
-                  v-model="formData.department"
+                  v-model="formData.departments"
                   :options="departments"
                   :label="t('Department')"
                   option-value="value"
@@ -25,12 +25,13 @@
                   clearable
                   emit-value
                   map-options
+                  multiple
                   search="description"
                 />
               </div>
               <div class="col-12 col-md-3" v-if="projects.length > 0">
                 <s-select
-                  v-model="formData.projectnumber"
+                  v-model="formData.projectnumbers"
                   :options="projects"
                   option-label="description"
                   option-value="value"
@@ -40,9 +41,16 @@
                   clearable
                   emit-value
                   map-options
+                  multiple
                   search="description"
                 />
               </div>
+            </div>
+
+            <!-- Multi-dimension notice -->
+            <div v-if="activeDimension" class="dimension-notice">
+              <q-icon name="compare_arrows" size="14px" />
+              <span>{{ t("Comparing by") }} <strong>{{ activeDimensionLabel }}</strong> · {{ t("other dimensions limited to one selection") }}</span>
             </div>
 
             <!-- Period Type Selection -->
@@ -332,10 +340,10 @@
                     target="_blank"
                     class="amount-link"
                   >
-                    {{ formatNumber(account.periods[period.label].amount) }}
+                    {{ formatAmount(account.periods[period.label].amount) }}
                   </router-link>
                   <span v-else>{{
-                    formatNumber(account.periods[period.label].amount)
+                    formatAmount(account.periods[period.label].amount)
                   }}</span>
                 </template>
                 <template v-else>-</template>
@@ -370,7 +378,7 @@
                 class="col-amount"
               >
                 {{
-                  formatNumber(
+                  formatAmount(
                     sumAllAccounts(completeAssetAccounts, period.label),
                   )
                 }}
@@ -452,10 +460,10 @@
                     target="_blank"
                     class="amount-link"
                   >
-                    {{ formatNumber(account.periods[period.label].amount) }}
+                    {{ formatAmount(account.periods[period.label].amount) }}
                   </router-link>
                   <span v-else>{{
-                    formatNumber(account.periods[period.label].amount)
+                    formatAmount(account.periods[period.label].amount)
                   }}</span>
                 </template>
                 <template v-else>-</template>
@@ -494,7 +502,7 @@
                 class="col-amount"
               >
                 {{
-                  formatNumber(
+                  formatAmount(
                     sumAllAccounts(completeLiabilityAccounts, period.label),
                   )
                 }}
@@ -587,10 +595,10 @@
                     target="_blank"
                     class="amount-link"
                   >
-                    {{ formatNumber(account.periods[period.label].amount) }}
+                    {{ formatAmount(account.periods[period.label].amount) }}
                   </router-link>
                   <span v-else>{{
-                    formatNumber(account.periods[period.label].amount)
+                    formatAmount(account.periods[period.label].amount)
                   }}</span>
                 </template>
                 <template v-else>-</template>
@@ -624,7 +632,7 @@
                 :key="'earnings-' + period.label"
                 class="col-amount"
               >
-                {{ formatNumber(getCurrentEarnings(period.label)) }}
+                {{ formatAmount(getCurrentEarnings(period.label)) }}
               </div>
               <div
                 v-if="showVarianceDollar && results.periods?.length >= 2"
@@ -651,7 +659,7 @@
                 :key="'equity-total-' + period.label"
                 class="col-amount"
               >
-                {{ formatNumber(getTotalEquity(period.label)) }}
+                {{ formatAmount(getTotalEquity(period.label)) }}
               </div>
               <div
                 v-if="showVarianceDollar && results.periods?.length >= 2"
@@ -683,7 +691,7 @@
             :key="'liabilities-equity-total-' + period.label"
             class="col-amount"
           >
-            {{ formatNumber(getTotalLiabilitiesAndEquity(period.label)) }}
+            {{ formatAmount(getTotalLiabilitiesAndEquity(period.label)) }}
           </div>
           <div
             v-if="showVarianceDollar && results.periods?.length >= 2"
@@ -738,8 +746,16 @@ const STORAGE_KEY = `${client}_balance_sheet_params`;
 const now = new Date();
 
 const formData = ref({
-  department: route.query.department || "",
-  projectnumber: route.query.projectnumber || "",
+  departments: route.query.departments
+    ? [route.query.departments].flat()
+    : route.query.department
+      ? [route.query.department]
+      : [],
+  projectnumbers: route.query.projectnumbers
+    ? [route.query.projectnumbers].flat()
+    : route.query.projectnumber
+      ? [route.query.projectnumber]
+      : [],
   usetemplate: false,
   l_accno: true,
   previousyear: false,
@@ -969,11 +985,6 @@ const completeEquityAccounts = computed(() => {
   return buildAccountHierarchy(raw, info, "Q", false);
 });
 
-const formatNumber = (value) => {
-  const num = Number(value) || 0;
-  if (num < 0) return `-${formatAmount(Math.abs(num))}`;
-  return formatAmount(num);
-};
 
 const getIndentation = (level) => {
   const basePadding = 12;
@@ -1245,10 +1256,18 @@ const search = async () => {
     loading.value = true;
     const params = { ...formData.value };
     delete params.periods;
+    delete params.departments;
+    delete params.projectnumbers;
     formData.value.periods.forEach((period, index) => {
       Object.keys(period).forEach((key) => {
         params[`periods[${index}][${key}]`] = period[key];
       });
+    });
+    formData.value.departments.forEach((dept, index) => {
+      params[`departments[${index}]`] = dept;
+    });
+    formData.value.projectnumbers.forEach((proj, index) => {
+      params[`projectnumbers[${index}]`] = proj;
     });
     params.l_accno = formData.value.l_accno ? 1 : 0;
 
@@ -1270,10 +1289,18 @@ const getPDF = async () => {
     loading.value = true;
     const params = { ...formData.value, usetemplate: "Y" };
     delete params.periods;
+    delete params.departments;
+    delete params.projectnumbers;
     formData.value.periods.forEach((period, index) => {
       Object.keys(period).forEach((key) => {
         params[`periods[${index}][${key}]`] = period[key];
       });
+    });
+    formData.value.departments.forEach((dept, index) => {
+      params[`departments[${index}]`] = dept;
+    });
+    formData.value.projectnumbers.forEach((proj, index) => {
+      params[`projectnumbers[${index}]`] = proj;
     });
     params.l_accno = formData.value.l_accno ? 1 : 0;
     // Add heading_level if a collapse level is selected
@@ -1333,8 +1360,8 @@ const getPath = (accno, period) => {
   };
 
   const todate = toYmd(period?.todate || period?.label);
-  const project = formData.value.projectnumber || "";
-  const department = formData.value.department || "";
+  const project = formData.value.projectnumbers?.[0] || "";
+  const department = formData.value.departments?.[0] || "";
   const params = new URLSearchParams({ accno, todate, project, department });
   return createLink("trial.transactions") + `?${params.toString()}`;
 };
@@ -1482,6 +1509,57 @@ watch(
     if (isLoadingParams.value) return;
     formData.value.periods = [];
     addPeriod();
+  },
+);
+
+const activeDimension = computed(() => {
+  if ((formData.value.departments?.length ?? 0) >= 2) return "departments";
+  if ((formData.value.projectnumbers?.length ?? 0) >= 2) return "projectnumbers";
+  if ((formData.value.periods?.length ?? 0) >= 2) return "periods";
+  return null;
+});
+
+const activeDimensionLabel = computed(() => {
+  switch (activeDimension.value) {
+    case "departments": return t("Departments");
+    case "projectnumbers": return t("Projects");
+    case "periods": return t("Periods");
+    default: return "";
+  }
+});
+
+watch(
+  () => formData.value.departments,
+  (val) => {
+    if (isLoadingParams.value) return;
+    if ((val?.length ?? 0) >= 2) {
+      if (formData.value.periods.length > 1) formData.value.periods.splice(1);
+      if (formData.value.projectnumbers.length > 1) formData.value.projectnumbers.splice(1);
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => formData.value.projectnumbers,
+  (val) => {
+    if (isLoadingParams.value) return;
+    if ((val?.length ?? 0) >= 2) {
+      if (formData.value.periods.length > 1) formData.value.periods.splice(1);
+      if (formData.value.departments.length > 1) formData.value.departments.splice(1);
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => formData.value.periods.length,
+  (len) => {
+    if (isLoadingParams.value) return;
+    if (len >= 2) {
+      if (formData.value.departments.length > 1) formData.value.departments.splice(1);
+      if (formData.value.projectnumbers.length > 1) formData.value.projectnumbers.splice(1);
+    }
   },
 );
 
@@ -1788,6 +1866,18 @@ const fetchLinks = async () => {
 
 .drag-handle:hover {
   cursor: grab;
+}
+
+.dimension-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: color-mix(in srgb, var(--q-primary) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--q-primary) 22%, transparent);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: var(--q-primary);
 }
 
 :deep(.variance-dropdown) {
