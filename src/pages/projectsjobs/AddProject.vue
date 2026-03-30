@@ -13,11 +13,13 @@
         class="q-my-sm"
       />
       <q-input
+        ref="descriptionInputRef"
         v-model="project.description"
         :label="t('Description')"
         outlined
         dense
         class="q-my-sm"
+        :rules="[descriptionRequiredRule]"
       />
 
       <s-select
@@ -88,6 +90,10 @@ const emit = defineEmits(["saved", "cancel"]);
 const saving = ref(false);
 const customers = ref([]);
 const isEditMode = ref(false);
+const descriptionInputRef = ref(null);
+
+const descriptionRequiredRule = (val) =>
+  (!!val && String(val).trim().length > 0) || t("Description is required");
 
 const project = ref({
   projectnumber: "",
@@ -133,6 +139,12 @@ const fetchProject = async (id) => {
 };
 
 const saveProject = async () => {
+  if (descriptionInputRef.value) {
+    const descValid = await descriptionInputRef.value.validate();
+    if (!descValid) {
+      return;
+    }
+  }
   saving.value = true;
   try {
     const data = {

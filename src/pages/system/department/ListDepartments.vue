@@ -1,6 +1,7 @@
 <template>
   <q-page class="lightbg q-pa-sm">
     <q-table
+      v-if="departments.length > 0"
       :rows="departments"
       :columns="columns"
       row-key="id"
@@ -26,31 +27,37 @@
       <!-- Actions column: Edit button is always visible. Delete is shown only when transactions is 0 -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn
-            :label="t('Edit')"
-            color="primary"
-            @click="openEditPopup(props.row)"
-            flat
-            size="sm"
-          />
-          <q-btn
-            v-if="props.row.transactions === 0"
-            :label="t('Delete')"
-            color="negative"
-            @click="deleteDepartment(props.row)"
-            flat
-            size="sm"
-            class="q-ml-sm"
-          />
+          <div class="row items-center justify-end no-wrap q-gutter-x-sm">
+            <q-btn
+              :label="t('Edit')"
+              color="primary"
+              flat
+              size="sm"
+              @click="openEditPopup(props.row)"
+            />
+            <q-btn
+              v-if="props.row.transactions === 0"
+              :label="t('Delete')"
+              color="negative"
+              flat
+              size="sm"
+              @click="deleteDepartment(props.row)"
+            />
+          </div>
         </q-td>
       </template>
     </q-table>
 
-    <q-btn
+    <div v-else class="departments-empty">
+      <q-icon name="corporate_fare" size="64px" class="empty-icon" />
+      <h3>{{ t("No Departments Found") }}</h3>
+      <p>{{ t("Add a department to get started") }}</p>
+    </div>
+
+    <s-button
+      type="add"
       :label="t('Add Department')"
-      color="primary"
       @click="openAddPopup"
-      size="sm"
       class="q-my-sm"
     />
 
@@ -63,11 +70,13 @@
           </div>
 
           <q-input
+            ref="departmentDescriptionRef"
             v-model="selectedDepartment.description"
             :label="t('Description')"
             outlined
             dense
             class="q-my-sm"
+            :rules="[departmentDescriptionRequiredRule]"
           />
 
           <q-input
@@ -122,6 +131,11 @@ const isEditMode = ref(false);
 
 // Store department data, including transactions property.
 // For new department, transactions is not used.
+const departmentDescriptionRef = ref(null);
+
+const departmentDescriptionRequiredRule = (val) =>
+  (!!val && String(val).trim().length > 0) || t("Description is required");
+
 const selectedDepartment = ref({
   description: "",
   detail: "",
@@ -173,11 +187,15 @@ const getDepartments = async () => {
     const response = await api.get("/system/departments/");
     departments.value = response.data;
   } catch (error) {
-    Notify.create({
-      message: error.response?.data?.message || t("Can't fetch departments"),
-      type: "negative",
-      position: "center",
-    });
+    if (error.response?.status === 404) {
+      departments.value = [];
+    } else {
+      Notify.create({
+        message: error.response?.data?.message || t("Can't fetch departments"),
+        type: "negative",
+        position: "center",
+      });
+    }
   }
 };
 
@@ -222,6 +240,12 @@ const openEditPopup = (department) => {
 // Save the department (POST for add, POST for update)
 // For editing, if transactions is 1, the role remains unchanged.
 const saveDepartment = async () => {
+  if (departmentDescriptionRef.value) {
+    const descValid = await departmentDescriptionRef.value.validate();
+    if (!descValid) {
+      return;
+    }
+  }
   try {
     const role = selectedDepartment.value.roleType || "";
 
@@ -300,3 +324,33 @@ onMounted(() => {
   getDepartments();
 });
 </script>
+
+<style scoped lang="scss">
+.departments-empty {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: var(--q-mutedtext);
+
+  .empty-icon {
+    opacity: 0.5;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--q-maintext);
+  }
+
+  p {
+    margin: 0 0 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+</style>

@@ -1,6 +1,7 @@
 <template>
   <q-page class="lightbg q-pa-sm">
     <q-table
+      v-if="projects.length > 0"
       :rows="projects"
       :columns="columns"
       row-key="id"
@@ -12,14 +13,24 @@
       <!-- Actions column: Edit button is always visible. -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <s-button
-            type="edit"
-            :label="t('Edit')"
-            @click="openEditPopup(props.row)"
-          />
+          <div class="row items-center justify-end no-wrap">
+            <q-btn
+              :label="t('Edit')"
+              color="primary"
+              flat
+              size="sm"
+              @click="openEditPopup(props.row)"
+            />
+          </div>
         </q-td>
       </template>
     </q-table>
+
+    <div v-else class="projects-empty">
+      <q-icon name="work_outline" size="64px" class="empty-icon" />
+      <h3>{{ t("No Projects Found") }}</h3>
+      <p>{{ t("Add a project to get started") }}</p>
+    </div>
 
     <s-button
       type="add"
@@ -90,11 +101,6 @@ const getProjects = async () => {
       response.data === undefined ||
       !Array.isArray(response.data)
     ) {
-      Notify.create({
-        message: t("No projects found"),
-        type: "negative",
-        position: "center",
-      });
       projects.value = [];
       return;
     }
@@ -108,11 +114,7 @@ const getProjects = async () => {
     }));
   } catch (error) {
     if (error.response?.status === 404) {
-      Notify.create({
-        message: t("No projects found"),
-        type: "negative",
-        position: "center",
-      });
+      projects.value = [];
     } else {
       Notify.create({
         message: error.response?.data?.message || t("Can't fetch projects"),
@@ -144,3 +146,33 @@ onMounted(() => {
   getProjects();
 });
 </script>
+
+<style scoped lang="scss">
+.projects-empty {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: var(--q-mutedtext);
+
+  .empty-icon {
+    opacity: 0.5;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--q-maintext);
+  }
+
+  p {
+    margin: 0 0 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+</style>
