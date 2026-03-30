@@ -810,6 +810,12 @@ const varianceOptions = computed(() => {
         currentIdx: i,
         previousIdx: j,
       });
+      options.push({
+        value: `${j}-${i}`,
+        label: `${label2} vs ${label1}`,
+        currentIdx: j,
+        previousIdx: i,
+      });
     }
   }
   return options;
