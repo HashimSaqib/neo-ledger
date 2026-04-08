@@ -266,17 +266,45 @@
       <q-spinner-dots color="primary" size="40px" />
     </div>
 
-    <div v-if="!linksLoading" class="row q-mb-sm hide-print">
-      <s-btn
-        type="edit"
-        :label="
-          lineData
-            ? t('Batch update lines')
-            : t('Batch update transactions')
-        "
-        :disable="apBatchSelectedRows.length === 0"
-        @click="openApBatchUpdateDialog"
-      />
+    <div
+      v-if="!linksLoading"
+      class="batch-update-toolbar hide-print"
+    >
+      <div class="batch-update-toolbar__stats">
+        <div class="batch-update-toolbar__stat">
+          <span class="batch-update-toolbar__stat-label">{{
+            lineData ? t("Total lines") : t("Total transactions")
+          }}</span>
+          <span class="batch-update-toolbar__stat-value">{{
+            batchTotalRowCount
+          }}</span>
+        </div>
+        <div class="batch-update-toolbar__stat">
+          <span class="batch-update-toolbar__stat-label">{{
+            lineData ? t("Lines selected") : t("Transactions selected")
+          }}</span>
+          <span
+            class="batch-update-toolbar__stat-value"
+            :class="{
+              'batch-update-toolbar__stat-value--accent':
+                batchSelectedCount > 0,
+            }"
+            >{{ batchSelectedCount }}</span
+          >
+        </div>
+      </div>
+      <div class="batch-update-toolbar__actions">
+        <s-btn
+          type="edit"
+          :label="
+            lineData
+              ? t('Batch update lines')
+              : t('Batch update transactions')
+          "
+          :disable="apBatchSelectedRows.length === 0"
+          @click="openApBatchUpdateDialog"
+        />
+      </div>
     </div>
 
     <q-dialog
@@ -824,6 +852,8 @@ const {
   accountFilterOptions,
   columns,
   tableRows,
+  batchTotalRowCount,
+  batchSelectedCount,
   tableRowKey,
   batchTableKey,
   glLineSplitView,

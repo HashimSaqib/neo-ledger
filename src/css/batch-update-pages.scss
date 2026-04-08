@@ -1,5 +1,57 @@
 /* Shared: BatchUpdateGl.vue, BatchUpdateAr.vue, BatchUpdateAp.vue — add class batch-update-page on q-page */
 
+.batch-update-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--q-border);
+}
+
+.batch-update-toolbar__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1.25rem 1.75rem;
+  min-width: 0;
+}
+
+.batch-update-toolbar__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.batch-update-toolbar__stat-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--q-mutedtext);
+  line-height: 1.25;
+}
+
+.batch-update-toolbar__stat-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--q-maintext);
+  line-height: 1.2;
+}
+
+.batch-update-toolbar__stat-value--accent {
+  color: var(--q-primary);
+}
+
+.batch-update-toolbar__actions {
+  flex: 0 0 auto;
+}
+
 .batch-update-page {
   .batch-filters-wrap {
     align-items: flex-start;

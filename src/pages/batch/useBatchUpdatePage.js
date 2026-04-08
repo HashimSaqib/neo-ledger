@@ -51,7 +51,7 @@ const createLink = inject("createLink");
 const lineData = ref(false);
 
 function syncLineDataDefault() {
-  lineData.value = module === "gl";
+  lineData.value = false;
 }
 
 const granularity = computed(() => (lineData.value ? "line" : "transaction"));
@@ -93,6 +93,8 @@ const filters = ref({
   lineItemTaxAccount: null,
   department: null,
   project: null,
+  source: "",
+  memo: "",
 });
 
 const linkPayload = ref({});
@@ -139,6 +141,27 @@ const apBatchUpdateLoading = ref(false);
 const apBatchUpdateDialogOpen = ref(false);
 /** After a successful batch update, refresh runs in @hide so the table does not remount while the dialog/popups tear down. */
 const apBatchRefreshAfterDialogClose = ref(false);
+
+/** GL: POST /batch/update */
+const glBatchSelectedRows = ref([]);
+const glBatchUpdatePatch = ref({
+  transdate: "",
+  department: null,
+  clearDepartment: false,
+  project: null,
+  clearProject: false,
+});
+const glBatchLineUpdatePatch = ref({
+  transdate: "",
+  department: null,
+  clearDepartment: false,
+  project: null,
+  clearLineProject: false,
+  account: null,
+});
+const glBatchUpdateLoading = ref(false);
+const glBatchUpdateDialogOpen = ref(false);
+const glBatchRefreshAfterDialogClose = ref(false);
 
 function groupGlBatchByAccount(data) {
   const withAccno = [];
@@ -194,6 +217,23 @@ const tableRows = computed(() => {
     return groupGlBatchByAccount(searchResults.value);
   }
   return searchResults.value;
+});
+
+/** Rows in the results table (excludes GL line group headers). */
+const batchTotalRowCount = computed(() => {
+  const rows = tableRows.value;
+  if (!rows.length) return 0;
+  if (module === "gl" && glLineSplitView.value) {
+    return rows.filter((r) => !r.isGroupHeader).length;
+  }
+  return rows.length;
+});
+
+/** AP / GL batch selection count (0 for AR). */
+const batchSelectedCount = computed(() => {
+  if (module === "ap") return apBatchSelectedRows.value.length;
+  if (module === "gl") return glBatchSelectedRows.value.length;
+  return 0;
 });
 
 const customerOptions = computed(() => linkPayload.value.customers || []);
@@ -254,6 +294,11 @@ const taxAccountOptions = computed(() => {
   return p.expense_tax_accounts || p.tax_accounts || [];
 });
 
+const glAccountOptions = computed(() => {
+  if (module !== "gl") return [];
+  return linkPayload.value.gl_accounts || [];
+});
+
 const COLUMN_LABELS = {
   reference: "Reference",
   transdate: "Date",
@@ -293,6 +338,8 @@ const COLUMN_LABELS = {
   tax_account: "Tax account",
   tax_amount: "Tax amount",
   project: "Project",
+  projectnumber: "Project #",
+  project_description: "Project description",
 };
 
 const HIDDEN_COLUMN_KEYS = new Set([
@@ -327,8 +374,10 @@ const GL_LINE_COLUMN_ORDER = [
   "reference",
   "transdate",
   "document_description",
+  "department",
   "memo",
   "source",
+  "project",
   "curr",
 ];
 
@@ -412,7 +461,12 @@ function orderedVisibleKeys(sample, module, granularity) {
       if (k === "project") {
         const hasProject =
           keySet.has("project") ||
-          (module === "ap" && granularity === "line" && keySet.has("project_id"));
+          (module === "ap" && granularity === "line" && keySet.has("project_id")) ||
+          (module === "gl" &&
+            granularity === "line" &&
+            (keySet.has("project_id") ||
+              keySet.has("projectnumber") ||
+              keySet.has("project_description")));
         if (hasProject && !ordered.includes("project")) {
           ordered.push("project");
         }
@@ -445,6 +499,14 @@ function orderedVisibleKeys(sample, module, granularity) {
       module === "gl" &&
       granularity === "line" &&
       (k === "accno" || k === "account_description")
+    ) {
+      continue;
+    }
+    if (
+      module === "gl" &&
+      granularity === "line" &&
+      (k === "projectnumber" || k === "project_description") &&
+      ordered.includes("project")
     ) {
       continue;
     }
@@ -592,6 +654,15 @@ function projectDisplayLabelFromRow(row) {
   if (p != null && typeof p === "object" && !Array.isArray(p)) {
     const lbl = p.label ?? p.description;
     if (lbl != null && String(lbl).trim() !== "") return String(lbl);
+  }
+  if (
+    row.project_description != null &&
+    String(row.project_description).trim() !== ""
+  ) {
+    return String(row.project_description).trim();
+  }
+  if (row.projectnumber != null && String(row.projectnumber).trim() !== "") {
+    return String(row.projectnumber).trim();
   }
   if (idRaw == null || idRaw === "") return "";
   const list = projectOptions.value;
@@ -1265,6 +1336,309 @@ function onApBatchUpdateDialogHide() {
   void runSearch();
 }
 
+// ─── GL batch update ────────────────────────────────────────────────────────
+
+function glTransactionIdFromRow(row) {
+  const raw =
+    row?.id != null && row.id !== ""
+      ? row.id
+      : row?.gl_id != null && row.gl_id !== ""
+        ? row.gl_id
+        : row?.trans_id != null && row.trans_id !== ""
+          ? row.trans_id
+          : null;
+  if (raw == null) return null;
+  const n = parseInt(String(raw), 10);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n;
+}
+
+function isGlBatchRowSelected(row) {
+  const k = tableRowKey(row);
+  return glBatchSelectedRows.value.some((r) => tableRowKey(r) === k);
+}
+
+function toggleGlBatchRowSelected(row, add) {
+  const k = tableRowKey(row);
+  if (add) {
+    if (!glBatchSelectedRows.value.some((r) => tableRowKey(r) === k)) {
+      glBatchSelectedRows.value = [...glBatchSelectedRows.value, row];
+    }
+  } else {
+    glBatchSelectedRows.value = glBatchSelectedRows.value.filter(
+      (r) => tableRowKey(r) !== k,
+    );
+  }
+}
+
+function toggleGlBatchSelectAll(val) {
+  if (module !== "gl") return;
+  glBatchSelectedRows.value = val
+    ? tableRows.value.filter((r) => !r.isGroupHeader)
+    : [];
+}
+
+const glBatchSelectAll = computed(() => {
+  if (module !== "gl") return false;
+  const rows = tableRows.value.filter((r) => !r.isGroupHeader);
+  if (!rows.length) return false;
+  return rows.every((r) => isGlBatchRowSelected(r));
+});
+
+function resetGlBatchUpdatePatchForm() {
+  glBatchUpdatePatch.value = {
+    transdate: "",
+    department: null,
+    clearDepartment: false,
+    project: null,
+    clearProject: false,
+  };
+  glBatchLineUpdatePatch.value = {
+    transdate: "",
+    department: null,
+    clearDepartment: false,
+    project: null,
+    clearLineProject: false,
+    account: null,
+  };
+}
+
+function setGlBatchClearDepartment(clear) {
+  glBatchUpdatePatch.value.clearDepartment = clear;
+  if (clear) glBatchUpdatePatch.value.department = null;
+}
+
+function setGlBatchClearProject(clear) {
+  glBatchUpdatePatch.value.clearProject = clear;
+  if (clear) glBatchUpdatePatch.value.project = null;
+}
+
+function setGlBatchLineClearDepartment(clear) {
+  glBatchLineUpdatePatch.value.clearDepartment = clear;
+  if (clear) glBatchLineUpdatePatch.value.department = null;
+}
+
+function setGlBatchLineClearProject(clear) {
+  glBatchLineUpdatePatch.value.clearLineProject = clear;
+  if (clear) glBatchLineUpdatePatch.value.project = null;
+}
+
+function buildGlTransactionBatchUpdateItems(selectedRows) {
+  const p = glBatchUpdatePatch.value;
+  const patch = {};
+  if (p.transdate != null && String(p.transdate).trim() !== "") {
+    patch.transdate = String(p.transdate).trim();
+  }
+  if (p.clearDepartment) {
+    patch.department_id = null;
+  } else if (p.department != null && p.department.id != null) {
+    const d = Number(p.department.id) + 0;
+    if (Number.isFinite(d) && d > 0) patch.department_id = d;
+  }
+  if (p.clearProject) {
+    patch.project_id = null;
+  } else if (p.project != null && p.project.id != null) {
+    const pr = Number(p.project.id) + 0;
+    if (Number.isFinite(pr) && pr > 0) patch.project_id = pr;
+  }
+  if (Object.keys(patch).length === 0) {
+    return { error: t("No updatable fields provided.") };
+  }
+  const items = [];
+  for (const row of selectedRows) {
+    const id = glTransactionIdFromRow(row);
+    if (id == null) continue;
+    items.push({ id, ...patch });
+  }
+  if (!items.length) {
+    return { error: t("Selected rows are missing a valid transaction id.") };
+  }
+  return { items };
+}
+
+function buildGlLineBatchUpdateItems(selectedRows) {
+  const lp = glBatchLineUpdatePatch.value;
+  const hasTransdate = lp.transdate != null && String(lp.transdate).trim() !== "";
+  const hasDepartment =
+    lp.clearDepartment || (lp.department != null && lp.department.id != null);
+  const hasProject =
+    lp.clearLineProject || (lp.project != null && lp.project.id != null);
+  const hasAccount =
+    lp.account?.accno != null &&
+    String(lp.account.accno).trim() !== "";
+
+  if (!hasTransdate && !hasDepartment && !hasProject && !hasAccount) {
+    return { error: t("No updatable fields provided.") };
+  }
+
+  const seenEntry = new Set();
+  const items = [];
+  for (const row of selectedRows) {
+    const entryId = ledgerLineEntryIdFromRow(row);
+    if (entryId == null) {
+      return {
+        error: t(
+          "Each selected line needs entry_id. Refresh search if this field is missing.",
+        ),
+      };
+    }
+    if (seenEntry.has(entryId)) continue;
+    seenEntry.add(entryId);
+
+    const item = { entry_id: entryId };
+    if (hasTransdate) item.transdate = String(lp.transdate).trim();
+    if (lp.clearDepartment) {
+      item.department_id = null;
+    } else if (lp.department != null && lp.department.id != null) {
+      const d = Number(lp.department.id) + 0;
+      if (Number.isFinite(d) && d > 0) item.department_id = d;
+    }
+    if (lp.clearLineProject) {
+      item.project_id = null;
+    } else if (lp.project != null && lp.project.id != null) {
+      const pr = Number(lp.project.id) + 0;
+      if (Number.isFinite(pr) && pr > 0) item.project_id = pr;
+    }
+    if (hasAccount) {
+      item.accno = String(lp.account.accno).trim();
+    }
+    items.push(item);
+  }
+
+  if (!items.length) {
+    return { error: t("No update payload could be built from the selection.") };
+  }
+  return { items };
+}
+
+function applyGlBatchUpdateOutcome(data, items) {
+  const isLine = lineData.value;
+  const parsed = parseApBatchUpdateResults(data);
+
+  const closeAndRefresh = () => {
+    glBatchSelectedRows.value = [];
+    resetGlBatchUpdatePatchForm();
+    glBatchRefreshAfterDialogClose.value = true;
+    glBatchUpdateDialogOpen.value = false;
+  };
+
+  const okMsg = (count) =>
+    isLine
+      ? t("Update applied to {count} line(s).", { count })
+      : t("Update applied to {count} transaction(s).", { count });
+
+  if (parsed == null) {
+    Notify.create({ type: "positive", message: okMsg(items.length), position: "center" });
+    closeAndRefresh();
+    return;
+  }
+
+  const { failures, okCount } = parsed;
+  const failDetail = failures.map((f) => `id ${f.id}: ${f.error}`).join("\n");
+
+  if (failures.length === 0) {
+    Notify.create({ type: "positive", message: okMsg(okCount || items.length), position: "center" });
+    closeAndRefresh();
+    return;
+  }
+
+  if (okCount > 0) {
+    Notify.create({
+      type: "warning",
+      message: isLine
+        ? t("{ok} line(s) updated; {fail} could not be updated.", {
+            ok: okCount,
+            fail: failures.length,
+          })
+        : t("{ok} transaction(s) updated; {fail} could not be updated.", {
+            ok: okCount,
+            fail: failures.length,
+          }),
+      caption: failDetail,
+      multiLine: true,
+      timeout: 12000,
+      position: "center",
+    });
+    closeAndRefresh();
+    return;
+  }
+
+  Notify.create({
+    type: "negative",
+    multiLine: true,
+    message:
+      failures.length === 1
+        ? failures[0].error
+        : `${t("{n} transaction(s) could not be updated.", { n: failures.length })}\n\n${failDetail}`,
+    position: "center",
+    timeout: 0,
+  });
+}
+
+async function submitGlBatchUpdate() {
+  if (module !== "gl") return;
+  const selected = glBatchSelectedRows.value;
+  if (!selected.length) {
+    Notify.create({
+      type: "negative",
+      message: t(
+        lineData.value ? "Select one or more lines." : "Select one or more transactions.",
+      ),
+      position: "center",
+    });
+    return;
+  }
+
+  const built = lineData.value
+    ? buildGlLineBatchUpdateItems(selected)
+    : buildGlTransactionBatchUpdateItems(selected);
+
+  if (built.error) {
+    Notify.create({ type: "negative", message: built.error, position: "center" });
+    return;
+  }
+
+  const items = built.items;
+  glBatchUpdateLoading.value = true;
+  try {
+    const { data } = await api.post("/batch/update", {
+      module: "gl",
+      granularity: lineData.value ? "line" : "transaction",
+      items,
+    });
+    applyGlBatchUpdateOutcome(data, items);
+  } catch (err) {
+    const data = err.response?.data;
+    if (data && Array.isArray(data.results) && data.results.length > 0) {
+      applyGlBatchUpdateOutcome(data, items);
+    } else {
+      Notify.create({
+        type: "negative",
+        message:
+          data?.error ||
+          data?.message ||
+          err.message ||
+          t("Update failed"),
+        position: "center",
+      });
+    }
+  } finally {
+    glBatchUpdateLoading.value = false;
+  }
+}
+
+function openGlBatchUpdateDialog() {
+  glBatchUpdateDialogOpen.value = true;
+}
+
+function onGlBatchUpdateDialogHide() {
+  if (!glBatchRefreshAfterDialogClose.value) return;
+  glBatchRefreshAfterDialogClose.value = false;
+  void runSearch();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+
 function filterByAccno(accnoStr) {
   const acc = accountFieldAccno(accnoStr);
   if (acc === "") return;
@@ -1437,11 +1811,11 @@ const columns = computed(() => {
         k !== "accno" &&
         k !== "account_description",
     );
-    const anchor = names.includes("document_description")
-      ? "document_description"
-      : names.includes("description")
-        ? "description"
-        : null;
+    let anchor = null;
+    if (names.includes("source")) anchor = "source";
+    else if (names.includes("memo")) anchor = "memo";
+    else if (names.includes("document_description")) anchor = "document_description";
+    else if (names.includes("description")) anchor = "description";
     const idx = anchor ? names.indexOf(anchor) : -1;
     if (idx >= 0) {
       names.splice(idx + 1, 0, "posting_label", "line_amount");
@@ -1575,12 +1949,31 @@ function buildSearchParams() {
       );
     }
   } else {
-    if (
-      m === "gl" &&
-      filters.value.account?.accno != null &&
-      String(filters.value.account.accno) !== ""
-    ) {
-      params.accno = filters.value.account.accno;
+    if (m === "gl") {
+      appendApNumericIdParam(
+        params,
+        "department_id",
+        filters.value.department?.id,
+      );
+      if (g === "line") {
+        appendApNumericIdParam(
+          params,
+          "project_id",
+          filters.value.project?.id,
+        );
+        if (filters.value.source?.trim()) {
+          params.source = filters.value.source.trim();
+        }
+        if (filters.value.memo?.trim()) {
+          params.memo = filters.value.memo.trim();
+        }
+      }
+      if (
+        filters.value.account?.accno != null &&
+        String(filters.value.account.accno) !== ""
+      ) {
+        params.accno = filters.value.account.accno;
+      }
     }
   }
   if (m === "ar" && g === "line" && filters.value.partnumber?.trim()) {
@@ -1699,6 +2092,8 @@ function resetFilters() {
     lineItemTaxAccount: null,
     department: null,
     project: null,
+    source: "",
+    memo: "",
   };
   runSearch();
 }
@@ -1707,13 +2102,23 @@ function onLineDataToggled(checked) {
   if (module === "ap" && checked === false) {
     filters.value.project = null;
   }
+  if (module === "gl" && checked === false) {
+    filters.value.project = null;
+    filters.value.source = "";
+    filters.value.memo = "";
+  }
   runSearch();
 }
 
 watch(lineData, () => {
-  if (module !== "ap") return;
-  apBatchSelectedRows.value = [];
-  apBatchUpdateDialogOpen.value = false;
+  if (module === "ap") {
+    apBatchSelectedRows.value = [];
+    apBatchUpdateDialogOpen.value = false;
+  }
+  if (module === "gl") {
+    glBatchSelectedRows.value = [];
+    glBatchUpdateDialogOpen.value = false;
+  }
 });
 
 onMounted(async () => {
@@ -1746,6 +2151,8 @@ onMounted(async () => {
     showAccountFilter,
     columns,
     tableRows,
+    batchTotalRowCount,
+    batchSelectedCount,
     tableRowKey,
     batchTableKey,
     glLineSplitView,
@@ -1793,5 +2200,22 @@ onMounted(async () => {
     apBatchUpdateDialogOpen,
     openApBatchUpdateDialog,
     onApBatchUpdateDialogHide,
+    glAccountOptions,
+    glBatchSelectedRows,
+    glBatchUpdatePatch,
+    glBatchLineUpdatePatch,
+    glBatchUpdateLoading,
+    glBatchSelectAll,
+    isGlBatchRowSelected,
+    toggleGlBatchRowSelected,
+    toggleGlBatchSelectAll,
+    setGlBatchClearDepartment,
+    setGlBatchClearProject,
+    setGlBatchLineClearDepartment,
+    setGlBatchLineClearProject,
+    submitGlBatchUpdate,
+    glBatchUpdateDialogOpen,
+    openGlBatchUpdateDialog,
+    onGlBatchUpdateDialogHide,
   };
 }
