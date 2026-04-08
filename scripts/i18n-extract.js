@@ -8,10 +8,10 @@ const rootDir = path.resolve(__dirname, "..");
 
 // Regex patterns to find translatable strings
 const patterns = [
-  // $t('key') or $t("key")
-  /\$t\(['"]([^'"]+)['"]\)/g,
-  // t('key') or t("key") - composition API
-  /\bt\(['"]([^'"]+)['"]\)/g,
+  // $t('key') or $t("key") — optional second arg e.g. $t("Hello {name}", { name })
+  /\$t\(\s*['"]([^'"]+)['"]\s*(?:,\s*[^)]*)?\)/g,
+  // t('key') or t("key") — optional second arg e.g. t("Hello {name}", { name })
+  /\bt\(\s*['"]([^'"]+)['"]\s*(?:,\s*[^)]*)?\)/g,
   // v-t directive
   /v-t="['"]([^'"]+)["']"/g,
   // i18n-t component

@@ -11,8 +11,8 @@ const potPath = path.join(rootDir, "src/i18n/messages.pot");
 const localesDir = path.join(rootDir, "src/i18n/locales");
 
 const patterns = [
-  /\$t\(['"]([^'"]+)['"]\)/g,
-  /\bt\(['"]([^'"]+)['"]\)/g,
+  /\$t\(\s*['"]([^'"]+)['"]\s*(?:,\s*[^)]*)?\)/g,
+  /\bt\(\s*['"]([^'"]+)['"]\s*(?:,\s*[^)]*)?\)/g,
   /v-t="['"]([^'"]+)["']"/g,
   /<i18n-t[^>]+keypath=["']([^"']+)["']/g,
   // title: "..." or title: '...' in JavaScript objects
