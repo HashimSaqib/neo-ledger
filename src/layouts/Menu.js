@@ -87,6 +87,12 @@ const getMenuLinks = async () => {
               perm: "customer.batch",
             },
             {
+              title: "Batch Update",
+              link: "/batch-update/ar",
+              perm: "customer.batchupdate",
+              icon: "edit_calendar",
+            },
+            {
               title: "Reminder",
               link: "/ar/reminder",
               perm: "customer.reminder",
@@ -172,6 +178,12 @@ const getMenuLinks = async () => {
               perm: "vendor.add",
             },
           ],
+        },
+        {
+          title: "Batch Update",
+          link: "/batch-update/ap",
+          perm: "vendor.batchupdate",
+          icon: "edit_calendar",
         },
         {
           title: "Reports",
@@ -270,6 +282,12 @@ const getMenuLinks = async () => {
           link: "/gl/add-gl",
           perm: "gl.add",
           icon: "post_add",
+        },
+        {
+          title: "Batch Update",
+          link: "/batch-update/gl",
+          perm: "ledger.batchupdate",
+          icon: "edit_calendar",
         },
         {
           title: "Year End",

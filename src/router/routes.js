@@ -53,6 +53,9 @@ const Connections = () => import("src/pages/Connections.vue");
 const Taxes = () => import("src/pages/system/Taxes.vue");
 const Audit = () => import("src/pages/system/Audit.vue");
 const Batch = () => import("src/pages/system/Batch.vue");
+const BatchUpdateGl = () => import("src/pages/batch/BatchUpdateGl.vue");
+const BatchUpdateAr = () => import("src/pages/batch/BatchUpdateAr.vue");
+const BatchUpdateAp = () => import("src/pages/batch/BatchUpdateAp.vue");
 const YearEnd = () => import("src/pages/system/YearEnd.vue");
 const Import = () => import("src/pages/Import.vue");
 const BankAccounts = () => import("src/pages/system/BankAccounts.vue");
@@ -94,6 +97,31 @@ const getRoutes = async () => {
           path: "gl/reports",
           component: GlTransactions,
           meta: { permission: "gl.transactions" },
+        },
+        {
+          path: "batch-update/gl",
+          component: BatchUpdateGl,
+          meta: { permission: "ledger.batchupdate" },
+        },
+        {
+          path: "batch-update/ar",
+          component: BatchUpdateAr,
+          meta: { permission: "customer.batchupdate" },
+        },
+        {
+          path: "batch-update/ap",
+          component: BatchUpdateAp,
+          meta: { permission: "vendor.batchupdate" },
+        },
+        {
+          path: "batch-update",
+          redirect: (to) => {
+            const m = to.query.batchModule;
+            const seg =
+              m === "gl" || m === "ar" || m === "ap" ? m : "gl";
+            const base = to.path.replace(/\/$/, "");
+            return { path: `${base}/${seg}` };
+          },
         },
         // ARAP
         {

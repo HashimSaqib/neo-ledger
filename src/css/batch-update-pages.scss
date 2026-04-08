@@ -1,0 +1,87 @@
+/* Shared: BatchUpdateGl.vue, BatchUpdateAr.vue, BatchUpdateAp.vue — add class batch-update-page on q-page */
+
+.batch-update-page {
+  .batch-filters-wrap {
+    align-items: flex-start;
+  }
+
+  .batch-filter-line-data {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  @media (max-width: 1023px) {
+    .batch-filters-wrap.flex-container {
+      flex-direction: column;
+    }
+
+    .batch-filters-wrap.flex-container > * {
+      flex: 1 1 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+  }
+
+  .document-list-table {
+    width: 100%;
+  }
+
+  .batch-results-qtable {
+    width: 100%;
+  }
+
+  .q-table__container {
+    max-height: calc(100vh - 320px);
+    position: relative;
+  }
+
+  .q-table thead {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+    background-color: var(--q-tableheader);
+  }
+
+  .q-table thead tr {
+    border-bottom: 1px solid var(--q-border);
+  }
+
+  .q-table thead tr th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    background-color: var(--q-tableheader) !important;
+    color: var(--q-maintext) !important;
+    padding: 12px 16px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .q-table thead tr th .q-icon,
+  .q-table thead tr th .q-table__sort-icon {
+    color: var(--q-maintext);
+  }
+
+  .q-table td {
+    padding: 8px 12px;
+    vertical-align: top;
+    color: var(--q-maintext);
+  }
+
+  .q-virtual-scroll__content {
+    margin-bottom: 0 !important;
+  }
+
+  .description-cell {
+    max-width: 300px;
+  }
+
+  .wrapped-description {
+    display: block;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+}

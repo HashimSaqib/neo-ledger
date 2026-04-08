@@ -5,6 +5,7 @@
       ref="qSelectRef"
       v-model="internalValue"
       :options="filteredOptions"
+      v-bind="behaviorBind"
       use-input
       input-debounce="0"
       :auto-select-first="true"
@@ -32,7 +33,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { ref, unref, watch, computed } from "vue";
+
+function normalizeOptions(raw) {
+  const v = unref(raw);
+  return Array.isArray(v) ? v : [];
+}
 
 // Define props that mirror q-select's props plus our custom search/account props
 const props = defineProps({
@@ -109,7 +115,18 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** Quasar QSelect: 'menu' | 'dialog' | 'default' — use `dialog` inside QDialog to avoid popup/focus issues. */
+  behavior: {
+    type: String,
+    default: undefined,
+  },
 });
+
+const behaviorBind = computed(() =>
+  props.behavior != null && props.behavior !== ""
+    ? { behavior: props.behavior }
+    : {},
+);
 
 // Emit the usual v-model event
 const emit = defineEmits(["update:modelValue"]);
@@ -130,18 +147,20 @@ watch(internalValue, (newVal) => {
   emit("update:modelValue", newVal);
 });
 
-// Keep an internal copy of the original options
-const internalOptions = ref([...props.options]);
+// Keep an internal copy of the original options (unwrap refs; non-arrays → [])
+const internalOptions = ref([...normalizeOptions(props.options)]);
+
+// The filtered list that we pass to <q-select>
+const filteredOptions = ref([...normalizeOptions(props.options)]);
+
 watch(
-  () => props.options,
-  (newVal) => {
-    internalOptions.value = [...newVal];
+  () => normalizeOptions(props.options),
+  (normalized) => {
+    internalOptions.value = [...normalized];
+    filteredOptions.value = [...normalized];
   },
   { deep: true },
 );
-
-// The filtered list that we pass to <q-select>
-const filteredOptions = ref([...props.options]);
 
 // A separate ref for the text that is displayed in the input while searching
 const searchTerm = ref("");
