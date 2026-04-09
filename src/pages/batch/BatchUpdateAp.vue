@@ -35,26 +35,6 @@
         <div class="flex-container batch-filters-wrap">
           <div class="flex-container q-mt-md container">
             <text-input
-              v-model="filters.datefrom"
-              type="date"
-              class="lightbg"
-              :label="t('Date From')"
-              input-class="maintext"
-              label-color="secondary"
-              outlined
-              dense
-            />
-            <text-input
-              v-model="filters.dateto"
-              type="date"
-              class="lightbg"
-              :label="t('Date To')"
-              input-class="maintext"
-              label-color="secondary"
-              outlined
-              dense
-            />
-            <text-input
               v-model="filters.description"
               class="lightbg"
               :label="t('Description')"
@@ -164,29 +144,6 @@
               dense
               @update:model-value="onLineDataToggled"
             />
-          </div>
-
-          <div class="flex-container q-mt-md container">
-            <text-input
-              v-model="filters.duedatefrom"
-              type="date"
-              class="lightbg"
-              :label="t('Due date from')"
-              input-class="maintext"
-              label-color="secondary"
-              outlined
-              dense
-            />
-            <text-input
-              v-model="filters.duedateto"
-              type="date"
-              class="lightbg"
-              :label="t('Due date to')"
-              input-class="maintext"
-              label-color="secondary"
-              outlined
-              dense
-            />
             <text-input
               v-model="filters.morethanamount"
               type="number"
@@ -245,6 +202,89 @@
               dense
             />
           </div>
+
+          <div class="flex-container q-mt-md container">
+            <text-input
+              v-model="filters.datefrom"
+              type="date"
+              class="lightbg"
+              :label="t('Date From')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.dateto"
+              type="date"
+              class="lightbg"
+              :label="t('Date To')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.createdfrom"
+              type="date"
+              class="lightbg"
+              :label="t('Created From')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.createdto"
+              type="date"
+              class="lightbg"
+              :label="t('Created To')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.updatedfrom"
+              type="date"
+              class="lightbg"
+              :label="t('Updated From')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.updatedto"
+              type="date"
+              class="lightbg"
+              :label="t('Updated To')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.duedatefrom"
+              type="date"
+              class="lightbg"
+              :label="t('Due date from')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.duedateto"
+              type="date"
+              class="lightbg"
+              :label="t('Due date to')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+          </div>
         </div>
 
         <div class="row q-mt-sm q-gutter-x-sm justify-end">
@@ -293,7 +333,14 @@
           >
         </div>
       </div>
-      <div class="batch-update-toolbar__actions">
+      <div class="batch-update-toolbar__actions row q-gutter-sm items-center">
+        <s-btn
+          v-if="!lineData"
+          type="delete"
+          :label="t('Batch delete')"
+          :disable="apBatchSelectedRows.length === 0"
+          @click="openApBatchDeleteDialog"
+        />
         <s-btn
           type="edit"
           :label="
@@ -372,14 +419,11 @@
             <div class="col text-body2 maintext min-width-0">
               <template v-if="apBatchSelectedRows.length">
                 <span class="text-weight-medium">
+                  {{ apBatchSelectedRows.length }}
                   {{
                     lineData
-                      ? t("batch_ap_n_lines_selected", {
-                          n: apBatchSelectedRows.length,
-                        })
-                      : t("batch_ap_n_transactions_selected", {
-                          n: apBatchSelectedRows.length,
-                        })
+                      ? t("lines selected")
+                      : t("transactions selected")
                   }}
                 </span>
               </template>
@@ -403,7 +447,28 @@
                 v-model="apBatchUpdatePatch.transdate"
                 type="date"
                 class="lightbg"
+                :disable="apBatchUpdatePatch.transdateYearOnly"
                 :label="t('Transaction date')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-checkbox
+                v-model="apBatchUpdatePatch.transdateYearOnly"
+                dense
+                color="primary"
+                class="maintext"
+                :label="
+                  t('Set transaction year only (keep month and day per row)')
+                "
+              />
+              <text-input
+                v-if="apBatchUpdatePatch.transdateYearOnly"
+                v-model="apBatchUpdatePatch.transdateTargetYear"
+                type="number"
+                class="lightbg"
+                :label="t('Target year')"
                 input-class="maintext"
                 label-color="secondary"
                 outlined
@@ -500,7 +565,28 @@
                 v-model="apBatchLineUpdatePatch.transdate"
                 type="date"
                 class="lightbg"
+                :disable="apBatchLineUpdatePatch.transdateYearOnly"
                 :label="t('Transaction date')"
+                input-class="maintext"
+                label-color="secondary"
+                outlined
+                dense
+              />
+              <q-checkbox
+                v-model="apBatchLineUpdatePatch.transdateYearOnly"
+                dense
+                color="primary"
+                class="maintext"
+                :label="
+                  t('Set transaction year only (keep month and day per row)')
+                "
+              />
+              <text-input
+                v-if="apBatchLineUpdatePatch.transdateYearOnly"
+                v-model="apBatchLineUpdatePatch.transdateTargetYear"
+                type="number"
+                class="lightbg"
+                :label="t('Target year')"
                 input-class="maintext"
                 label-color="secondary"
                 outlined
@@ -626,6 +712,89 @@
             :loading="apBatchUpdateLoading"
             :disable="searchLoading || apBatchSelectedRows.length === 0"
             @click="submitApBatchUpdate"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog
+      v-model="apBatchDeleteDialogOpen"
+      class="batch-ap-delete-dialog"
+      allow-focus-outside
+      transition-show="scale"
+      transition-hide="scale"
+      :no-esc-dismiss="apBatchDeleteLoading"
+      :no-backdrop-dismiss="apBatchDeleteLoading"
+      @hide="onApBatchDeleteDialogHide"
+    >
+      <q-card flat bordered class="lightbg">
+        <q-card-section class="q-pb-none">
+          <div class="row items-start no-wrap full-width">
+            <div class="col min-width-0">
+              <div class="text-h6 text-weight-bold maintext">
+                {{ t("Delete transactions?") }}
+              </div>
+              <div class="text-body2 mutedtext q-mt-xs">
+                {{
+                  t(
+                    "This permanently removes the selected AP transactions. This cannot be undone.",
+                  )
+                }}
+              </div>
+            </div>
+            <div class="col-auto">
+              <q-btn
+                flat
+                round
+                dense
+                icon="close"
+                :disable="apBatchDeleteLoading"
+                @click="apBatchDeleteDialogOpen = false"
+              />
+            </div>
+          </div>
+          <q-separator class="q-mt-md" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-md q-pb-sm">
+          <div
+            class="batch-delete-confirm-banner rounded-borders q-pa-md row items-center no-wrap full-width"
+            :class="
+              apBatchDeleteTransactionCount > 0
+                ? 'batch-delete-confirm-banner--active'
+                : 'batch-delete-confirm-banner--empty'
+            "
+          >
+            <q-icon
+              name="warning_amber"
+              size="20px"
+              class="q-mr-sm"
+              color="warning"
+            />
+            <div class="col text-body2 maintext min-width-0">
+              <span class="text-weight-medium">
+                {{ apBatchDeleteTransactionCount }}
+                {{ t("transaction(s) will be deleted.") }}
+              </span>
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right" class="q-px-md q-py-sm q-gutter-sm">
+          <s-btn
+            type="clear"
+            :label="t('Cancel')"
+            :disable="apBatchDeleteLoading"
+            @click="apBatchDeleteDialogOpen = false"
+          />
+          <s-btn
+            type="destructive"
+            :label="t('Delete transactions')"
+            :loading="apBatchDeleteLoading"
+            :disable="searchLoading || apBatchDeleteTransactionCount === 0"
+            @click="submitApBatchDelete"
           />
         </q-card-actions>
       </q-card>
@@ -900,6 +1069,12 @@ const {
   openApBatchUpdateDialog,
   onApBatchUpdateDialogHide,
   apBatchSelectedRows,
+  apBatchDeleteDialogOpen,
+  apBatchDeleteLoading,
+  openApBatchDeleteDialog,
+  onApBatchDeleteDialogHide,
+  submitApBatchDelete,
+  apBatchDeleteTransactionCount,
 } = useBatchUpdatePage("ap");
 </script>
 
@@ -936,6 +1111,14 @@ const {
 
 .batch-ap-update-dialog :deep(.q-dialog__inner) {
   width: min(60%, calc(100vw - 32px));
+}
+
+.batch-ap-delete-dialog :deep(.q-dialog__inner) {
+  width: min(440px, calc(100vw - 32px));
+}
+
+.batch-ap-delete-dialog :deep(.q-dialog__inner > *) {
+  width: 100%;
 }
 
 .batch-ap-update-dialog :deep(.q-dialog__inner > *) {

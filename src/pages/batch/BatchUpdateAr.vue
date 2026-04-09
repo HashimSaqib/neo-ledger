@@ -55,6 +55,46 @@
               dense
             />
             <text-input
+              v-model="filters.createdfrom"
+              type="date"
+              class="lightbg"
+              :label="t('Created From')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.createdto"
+              type="date"
+              class="lightbg"
+              :label="t('Created To')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.updatedfrom"
+              type="date"
+              class="lightbg"
+              :label="t('Updated From')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
+              v-model="filters.updatedto"
+              type="date"
+              class="lightbg"
+              :label="t('Updated To')"
+              input-class="maintext"
+              label-color="secondary"
+              outlined
+              dense
+            />
+            <text-input
               v-model="filters.description"
               class="lightbg"
               :label="t('Description')"

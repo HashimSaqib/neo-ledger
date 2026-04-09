@@ -33,6 +33,54 @@ export function formatAccountListValue(val) {
   return String(val).trim();
 }
 
+/** Parse batch row date to YYYY-MM-DD; tries line/invoice fields used across modules. */
+function batchRowTransdateISO(row) {
+  const candidates = [
+    row?.transdate,
+    row?.document_transdate,
+    row?.invoicedate,
+  ];
+  for (const raw of candidates) {
+    if (raw == null) continue;
+    const s = String(raw).trim();
+    if (!s) continue;
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+    if (m) {
+      const dd = m[1].padStart(2, "0");
+      const mm = m[2].padStart(2, "0");
+      const yyyy = m[3];
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }
+  return null;
+}
+
+function parseTargetYear(value) {
+  const n = parseInt(String(value).trim(), 10);
+  if (!Number.isFinite(n) || n < 1000 || n > 9999) return null;
+  return n;
+}
+
+/** Same month/day as YYYY-MM-DD, new year; clamps day if invalid in target year (e.g. Feb 29). */
+function transdateWithYear(isoDate, newYear) {
+  const m = String(isoDate).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  const y = newYear;
+  const lastDay = new Date(Date.UTC(y, month, 0)).getUTCDate();
+  const d = Math.min(day, lastDay);
+  return `${y}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+function transdateFromRowWithNewYear(row, newYear) {
+  const iso = batchRowTransdateISO(row);
+  if (iso == null) return null;
+  return transdateWithYear(iso, newYear);
+}
+
 /**
  * Shared batch-update logic for GL / AR / AP pages (separate routes).
  * @param {"gl" | "ar" | "ap"} module
@@ -75,6 +123,10 @@ const defaultDateRange = () => {
 
 const filters = ref({
   ...defaultDateRange(),
+  createdfrom: "",
+  createdto: "",
+  updatedfrom: "",
+  updatedto: "",
   description: "",
   reference: "",
   invnumber: "",
@@ -117,6 +169,8 @@ const batchSearchMeta = ref({
 const apBatchSelectedRows = ref([]);
 const apBatchUpdatePatch = ref({
   transdate: "",
+  transdateYearOnly: false,
+  transdateTargetYear: "",
   duedate: "",
   vendor: null,
   department: null,
@@ -132,6 +186,8 @@ const apBatchLineUpdatePatch = ref({
   project: null,
   clearLineProject: false,
   transdate: "",
+  transdateYearOnly: false,
+  transdateTargetYear: "",
   duedate: "",
   vendor: null,
   department: null,
@@ -146,6 +202,8 @@ const apBatchRefreshAfterDialogClose = ref(false);
 const glBatchSelectedRows = ref([]);
 const glBatchUpdatePatch = ref({
   transdate: "",
+  transdateYearOnly: false,
+  transdateTargetYear: "",
   department: null,
   clearDepartment: false,
   project: null,
@@ -153,6 +211,8 @@ const glBatchUpdatePatch = ref({
 });
 const glBatchLineUpdatePatch = ref({
   transdate: "",
+  transdateYearOnly: false,
+  transdateTargetYear: "",
   department: null,
   clearDepartment: false,
   project: null,
@@ -162,6 +222,15 @@ const glBatchLineUpdatePatch = ref({
 const glBatchUpdateLoading = ref(false);
 const glBatchUpdateDialogOpen = ref(false);
 const glBatchRefreshAfterDialogClose = ref(false);
+
+/** POST /batch/delete — transaction granularity only (same permissions as batch update). */
+const apBatchDeleteDialogOpen = ref(false);
+const apBatchDeleteLoading = ref(false);
+const apBatchDeleteRefreshAfterDialogClose = ref(false);
+
+const glBatchDeleteDialogOpen = ref(false);
+const glBatchDeleteLoading = ref(false);
+const glBatchDeleteRefreshAfterDialogClose = ref(false);
 
 function groupGlBatchByAccount(data) {
   const withAccno = [];
@@ -909,6 +978,8 @@ const apBatchSelectAll = computed(() => {
 function resetApBatchUpdatePatchForm() {
   apBatchUpdatePatch.value = {
     transdate: "",
+    transdateYearOnly: false,
+    transdateTargetYear: "",
     duedate: "",
     vendor: null,
     department: null,
@@ -923,6 +994,8 @@ function resetApBatchUpdatePatchForm() {
     project: null,
     clearLineProject: false,
     transdate: "",
+    transdateYearOnly: false,
+    transdateTargetYear: "",
     duedate: "",
     vendor: null,
     department: null,
@@ -967,6 +1040,10 @@ function buildApTransactionSearchParamsForLineMerge() {
   };
   if (filters.value.datefrom) params.datefrom = filters.value.datefrom;
   if (filters.value.dateto) params.dateto = filters.value.dateto;
+  if (filters.value.createdfrom) params.createdfrom = filters.value.createdfrom;
+  if (filters.value.createdto) params.createdto = filters.value.createdto;
+  if (filters.value.updatedfrom) params.updatedfrom = filters.value.updatedfrom;
+  if (filters.value.updatedto) params.updatedto = filters.value.updatedto;
   if (filters.value.description?.trim()) {
     params.description = filters.value.description.trim();
   }
@@ -1005,7 +1082,18 @@ function buildApLineBatchUpdateItems(selectedRows) {
   const hasExpense = expenseAccno !== "";
   const hasProjectSet = lp.project != null && lp.project.id != null;
   const hasProjectOp = lp.clearLineProject || hasProjectSet;
-  const hasTransdate = lp.transdate != null && String(lp.transdate).trim() !== "";
+  const yearLine = lp.transdateYearOnly
+    ? parseTargetYear(lp.transdateTargetYear)
+    : null;
+  if (lp.transdateYearOnly && yearLine == null) {
+    return { error: t("Enter a valid year (1000-9999).") };
+  }
+  const useTransdateYearOnly = Boolean(lp.transdateYearOnly && yearLine != null);
+  const hasTransdateExplicit =
+    !useTransdateYearOnly &&
+    lp.transdate != null &&
+    String(lp.transdate).trim() !== "";
+  const hasTransdate = hasTransdateExplicit || useTransdateYearOnly;
   const hasDuedate = lp.duedate != null && String(lp.duedate).trim() !== "";
   const hasVendor = lp.vendor != null && lp.vendor.id != null;
   const hasDepartment = lp.clearDepartment || (lp.department != null && lp.department.id != null);
@@ -1043,7 +1131,19 @@ function buildApLineBatchUpdateItems(selectedRows) {
         if (Number.isFinite(pr) && pr > 0) item.project_id = pr;
       }
     }
-    if (hasTransdate) item.transdate = String(lp.transdate).trim();
+    if (hasTransdateExplicit) {
+      item.transdate = String(lp.transdate).trim();
+    } else if (useTransdateYearOnly) {
+      const td = transdateFromRowWithNewYear(row, yearLine);
+      if (td == null) {
+        return {
+          error: t(
+            "One or more selected rows are missing a usable transaction date.",
+          ),
+        };
+      }
+      item.transdate = td;
+    }
     if (hasDuedate) item.duedate = String(lp.duedate).trim();
     if (hasVendor) {
       const v = Number(lp.vendor.id) + 0;
@@ -1070,7 +1170,14 @@ function buildApLineBatchUpdateItems(selectedRows) {
 function buildApTransactionUpdatePatch() {
   const p = apBatchUpdatePatch.value;
   const patch = {};
-  if (p.transdate != null && String(p.transdate).trim() !== "") {
+  const useTransdateYearOnly =
+    p.transdateYearOnly &&
+    parseTargetYear(p.transdateTargetYear) != null;
+  if (
+    !useTransdateYearOnly &&
+    p.transdate != null &&
+    String(p.transdate).trim() !== ""
+  ) {
     patch.transdate = String(p.transdate).trim();
   }
   if (p.duedate != null && String(p.duedate).trim() !== "") {
@@ -1115,13 +1222,16 @@ function apTransactionIdFromRow(row) {
   return n;
 }
 
-function parseApBatchUpdateResults(data) {
+function parseApBatchUpdateResults(data, opts = {}) {
   if (!data || !Array.isArray(data.results) || data.results.length === 0) {
     return null;
   }
   const failures = [];
   let okCount = 0;
-  const fallbackMsg = String(data.error || "").trim() || t("Update failed");
+  const fallbackMsg =
+    String(opts.fallbackError || "").trim() ||
+    String(data.error || "").trim() ||
+    t("Update failed");
   for (const r of data.results) {
     const ok = r?.ok;
     const errStr = r?.error != null ? String(r.error).trim() : "";
@@ -1273,12 +1383,27 @@ async function submitApBatchUpdate() {
     return;
   }
 
+  const pTx = apBatchUpdatePatch.value;
+  const yearTx = pTx.transdateYearOnly
+    ? parseTargetYear(pTx.transdateTargetYear)
+    : null;
+  if (pTx.transdateYearOnly && yearTx == null) {
+    Notify.create({
+      type: "negative",
+      message: t("Enter a valid year (1000-9999)."),
+      position: "center",
+    });
+    return;
+  }
+  const hasTransdateYearOnlyTx = Boolean(
+    pTx.transdateYearOnly && yearTx != null,
+  );
   const patch = buildApTransactionUpdatePatch();
-  if (Object.keys(patch).length === 0) {
+  if (Object.keys(patch).length === 0 && !hasTransdateYearOnlyTx) {
     Notify.create({
       type: "negative",
       message: t(
-        "Choose at least one field to apply (transaction date, due date, vendor, department, project, or record account).",
+        "Choose at least one field to apply (transaction date, transaction year, due date, vendor, department, project, or record account).",
       ),
       position: "center",
     });
@@ -1288,7 +1413,22 @@ async function submitApBatchUpdate() {
   for (const row of selected) {
     const id = apTransactionIdFromRow(row);
     if (id == null) continue;
-    items.push({ id, ...patch });
+    const item = { id, ...patch };
+    if (hasTransdateYearOnlyTx) {
+      const td = transdateFromRowWithNewYear(row, yearTx);
+      if (td == null) {
+        Notify.create({
+          type: "negative",
+          message: t(
+            "One or more selected rows are missing a usable transaction date.",
+          ),
+          position: "center",
+        });
+        return;
+      }
+      item.transdate = td;
+    }
+    items.push(item);
   }
   if (!items.length) {
     Notify.create({
@@ -1388,6 +1528,8 @@ const glBatchSelectAll = computed(() => {
 function resetGlBatchUpdatePatchForm() {
   glBatchUpdatePatch.value = {
     transdate: "",
+    transdateYearOnly: false,
+    transdateTargetYear: "",
     department: null,
     clearDepartment: false,
     project: null,
@@ -1395,6 +1537,8 @@ function resetGlBatchUpdatePatchForm() {
   };
   glBatchLineUpdatePatch.value = {
     transdate: "",
+    transdateYearOnly: false,
+    transdateTargetYear: "",
     department: null,
     clearDepartment: false,
     project: null,
@@ -1426,7 +1570,16 @@ function setGlBatchLineClearProject(clear) {
 function buildGlTransactionBatchUpdateItems(selectedRows) {
   const p = glBatchUpdatePatch.value;
   const patch = {};
-  if (p.transdate != null && String(p.transdate).trim() !== "") {
+  const year = p.transdateYearOnly ? parseTargetYear(p.transdateTargetYear) : null;
+  if (p.transdateYearOnly && year == null) {
+    return { error: t("Enter a valid year (1000-9999).") };
+  }
+  const useTransdateYearOnly = Boolean(p.transdateYearOnly && year != null);
+  if (
+    !useTransdateYearOnly &&
+    p.transdate != null &&
+    String(p.transdate).trim() !== ""
+  ) {
     patch.transdate = String(p.transdate).trim();
   }
   if (p.clearDepartment) {
@@ -1441,14 +1594,26 @@ function buildGlTransactionBatchUpdateItems(selectedRows) {
     const pr = Number(p.project.id) + 0;
     if (Number.isFinite(pr) && pr > 0) patch.project_id = pr;
   }
-  if (Object.keys(patch).length === 0) {
+  if (Object.keys(patch).length === 0 && !useTransdateYearOnly) {
     return { error: t("No updatable fields provided.") };
   }
   const items = [];
   for (const row of selectedRows) {
     const id = glTransactionIdFromRow(row);
     if (id == null) continue;
-    items.push({ id, ...patch });
+    const item = { id, ...patch };
+    if (useTransdateYearOnly) {
+      const td = transdateFromRowWithNewYear(row, year);
+      if (td == null) {
+        return {
+          error: t(
+            "One or more selected rows are missing a usable transaction date.",
+          ),
+        };
+      }
+      item.transdate = td;
+    }
+    items.push(item);
   }
   if (!items.length) {
     return { error: t("Selected rows are missing a valid transaction id.") };
@@ -1458,7 +1623,18 @@ function buildGlTransactionBatchUpdateItems(selectedRows) {
 
 function buildGlLineBatchUpdateItems(selectedRows) {
   const lp = glBatchLineUpdatePatch.value;
-  const hasTransdate = lp.transdate != null && String(lp.transdate).trim() !== "";
+  const year = lp.transdateYearOnly
+    ? parseTargetYear(lp.transdateTargetYear)
+    : null;
+  if (lp.transdateYearOnly && year == null) {
+    return { error: t("Enter a valid year (1000-9999).") };
+  }
+  const useTransdateYearOnly = Boolean(lp.transdateYearOnly && year != null);
+  const hasTransdateExplicit =
+    !useTransdateYearOnly &&
+    lp.transdate != null &&
+    String(lp.transdate).trim() !== "";
+  const hasTransdate = hasTransdateExplicit || useTransdateYearOnly;
   const hasDepartment =
     lp.clearDepartment || (lp.department != null && lp.department.id != null);
   const hasProject =
@@ -1486,7 +1662,19 @@ function buildGlLineBatchUpdateItems(selectedRows) {
     seenEntry.add(entryId);
 
     const item = { entry_id: entryId };
-    if (hasTransdate) item.transdate = String(lp.transdate).trim();
+    if (hasTransdateExplicit) {
+      item.transdate = String(lp.transdate).trim();
+    } else if (useTransdateYearOnly) {
+      const td = transdateFromRowWithNewYear(row, year);
+      if (td == null) {
+        return {
+          error: t(
+            "One or more selected rows are missing a usable transaction date.",
+          ),
+        };
+      }
+      item.transdate = td;
+    }
     if (lp.clearDepartment) {
       item.department_id = null;
     } else if (lp.department != null && lp.department.id != null) {
@@ -1634,6 +1822,262 @@ function openGlBatchUpdateDialog() {
 function onGlBatchUpdateDialogHide() {
   if (!glBatchRefreshAfterDialogClose.value) return;
   glBatchRefreshAfterDialogClose.value = false;
+  void runSearch();
+}
+
+// ─── Batch delete (AP / GL, transaction ids only) ───────────────────────────
+
+function buildApBatchDeleteTransactionIds() {
+  const seen = new Set();
+  const ids = [];
+  for (const row of apBatchSelectedRows.value) {
+    const id = apTransactionIdFromRow(row);
+    if (id == null || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+}
+
+function buildGlBatchDeleteTransactionIds() {
+  const seen = new Set();
+  const ids = [];
+  for (const row of glBatchSelectedRows.value) {
+    const id = glTransactionIdFromRow(row);
+    if (id == null || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+}
+
+const apBatchDeleteTransactionCount = computed(() => {
+  if (module !== "ap") return 0;
+  return buildApBatchDeleteTransactionIds().length;
+});
+
+const glBatchDeleteTransactionCount = computed(() => {
+  if (module !== "gl") return 0;
+  return buildGlBatchDeleteTransactionIds().length;
+});
+
+function applyBatchDeleteOutcome(data, ids, closeAndRefresh, failAllLabel) {
+  const parsed = parseApBatchUpdateResults(data, {
+    fallbackError: t("Delete failed"),
+  });
+  const okMsg = (count) =>
+    t("Deleted {count} transaction(s).", { count });
+
+  if (parsed == null) {
+    Notify.create({
+      type: "positive",
+      message: okMsg(ids.length),
+      position: "center",
+    });
+    closeAndRefresh();
+    return;
+  }
+
+  const { failures, okCount } = parsed;
+  const failDetail = failures
+    .map((f) => `id ${f.id}: ${f.error}`)
+    .join("\n");
+
+  if (failures.length === 0) {
+    Notify.create({
+      type: "positive",
+      message: okMsg(okCount || ids.length),
+      position: "center",
+    });
+    closeAndRefresh();
+    return;
+  }
+
+  if (okCount > 0) {
+    Notify.create({
+      type: "warning",
+      message: t("{ok} transaction(s) deleted; {fail} could not be deleted.", {
+        ok: okCount,
+        fail: failures.length,
+      }),
+      caption: failDetail,
+      multiLine: true,
+      timeout: 12000,
+      position: "center",
+    });
+    closeAndRefresh();
+    return;
+  }
+
+  Notify.create({
+    type: "negative",
+    multiLine: true,
+    message:
+      failures.length === 1
+        ? failures[0].error
+        : `${failAllLabel}\n\n${failDetail}`,
+    position: "center",
+    timeout: 0,
+  });
+}
+
+async function submitApBatchDelete() {
+  if (module !== "ap") return;
+  if (lineData.value) {
+    Notify.create({
+      type: "negative",
+      message: t(
+        "Batch delete applies to whole transactions. Turn off Line Data, select transactions, then try again.",
+      ),
+      position: "center",
+    });
+    return;
+  }
+  const ids = buildApBatchDeleteTransactionIds();
+  if (!ids.length) {
+    Notify.create({
+      type: "negative",
+      message: t("Selected rows are missing a valid transaction id."),
+      position: "center",
+    });
+    return;
+  }
+
+  apBatchDeleteLoading.value = true;
+  try {
+    const { data } = await api.post("/batch/delete", {
+      module: "ap",
+      granularity: "transaction",
+      ids,
+    });
+    const closeAndRefresh = () => {
+      apBatchSelectedRows.value = [];
+      apBatchDeleteRefreshAfterDialogClose.value = true;
+      apBatchDeleteDialogOpen.value = false;
+    };
+    applyBatchDeleteOutcome(
+      data,
+      ids,
+      closeAndRefresh,
+      t("{n} transaction(s) could not be deleted.", { n: ids.length }),
+    );
+  } catch (err) {
+    const data = err.response?.data;
+    if (data && Array.isArray(data.results) && data.results.length > 0) {
+      const closeAndRefresh = () => {
+        apBatchSelectedRows.value = [];
+        apBatchDeleteRefreshAfterDialogClose.value = true;
+        apBatchDeleteDialogOpen.value = false;
+      };
+      applyBatchDeleteOutcome(
+        data,
+        ids,
+        closeAndRefresh,
+        t("{n} transaction(s) could not be deleted.", { n: ids.length }),
+      );
+    } else {
+      Notify.create({
+        type: "negative",
+        message:
+          data?.error ||
+          data?.message ||
+          err.message ||
+          t("Delete failed"),
+        position: "center",
+      });
+    }
+  } finally {
+    apBatchDeleteLoading.value = false;
+  }
+}
+
+async function submitGlBatchDelete() {
+  if (module !== "gl") return;
+  if (lineData.value) {
+    Notify.create({
+      type: "negative",
+      message: t(
+        "Batch delete applies to whole transactions. Turn off Line Data, select transactions, then try again.",
+      ),
+      position: "center",
+    });
+    return;
+  }
+  const ids = buildGlBatchDeleteTransactionIds();
+  if (!ids.length) {
+    Notify.create({
+      type: "negative",
+      message: t("Selected rows are missing a valid transaction id."),
+      position: "center",
+    });
+    return;
+  }
+
+  glBatchDeleteLoading.value = true;
+  try {
+    const { data } = await api.post("/batch/delete", {
+      module: "gl",
+      granularity: "transaction",
+      ids,
+    });
+    const closeAndRefresh = () => {
+      glBatchSelectedRows.value = [];
+      glBatchDeleteRefreshAfterDialogClose.value = true;
+      glBatchDeleteDialogOpen.value = false;
+    };
+    applyBatchDeleteOutcome(
+      data,
+      ids,
+      closeAndRefresh,
+      t("{n} transaction(s) could not be deleted.", { n: ids.length }),
+    );
+  } catch (err) {
+    const data = err.response?.data;
+    if (data && Array.isArray(data.results) && data.results.length > 0) {
+      const closeAndRefresh = () => {
+        glBatchSelectedRows.value = [];
+        glBatchDeleteRefreshAfterDialogClose.value = true;
+        glBatchDeleteDialogOpen.value = false;
+      };
+      applyBatchDeleteOutcome(
+        data,
+        ids,
+        closeAndRefresh,
+        t("{n} transaction(s) could not be deleted.", { n: ids.length }),
+      );
+    } else {
+      Notify.create({
+        type: "negative",
+        message:
+          data?.error ||
+          data?.message ||
+          err.message ||
+          t("Delete failed"),
+        position: "center",
+      });
+    }
+  } finally {
+    glBatchDeleteLoading.value = false;
+  }
+}
+
+function openApBatchDeleteDialog() {
+  apBatchDeleteDialogOpen.value = true;
+}
+
+function onApBatchDeleteDialogHide() {
+  if (!apBatchDeleteRefreshAfterDialogClose.value) return;
+  apBatchDeleteRefreshAfterDialogClose.value = false;
+  void runSearch();
+}
+
+function openGlBatchDeleteDialog() {
+  glBatchDeleteDialogOpen.value = true;
+}
+
+function onGlBatchDeleteDialogHide() {
+  if (!glBatchDeleteRefreshAfterDialogClose.value) return;
+  glBatchDeleteRefreshAfterDialogClose.value = false;
   void runSearch();
 }
 
@@ -1884,6 +2328,10 @@ function buildSearchParams() {
   };
   if (filters.value.datefrom) params.datefrom = filters.value.datefrom;
   if (filters.value.dateto) params.dateto = filters.value.dateto;
+  if (filters.value.createdfrom) params.createdfrom = filters.value.createdfrom;
+  if (filters.value.createdto) params.createdto = filters.value.createdto;
+  if (filters.value.updatedfrom) params.updatedfrom = filters.value.updatedfrom;
+  if (filters.value.updatedto) params.updatedto = filters.value.updatedto;
   if (filters.value.description?.trim()) {
     params.description = filters.value.description.trim();
   }
@@ -2074,6 +2522,10 @@ async function runSearch() {
 function resetFilters() {
   filters.value = {
     ...defaultDateRange(),
+    createdfrom: "",
+    createdto: "",
+    updatedfrom: "",
+    updatedto: "",
     description: "",
     reference: "",
     invnumber: "",
@@ -2114,10 +2566,12 @@ watch(lineData, () => {
   if (module === "ap") {
     apBatchSelectedRows.value = [];
     apBatchUpdateDialogOpen.value = false;
+    apBatchDeleteDialogOpen.value = false;
   }
   if (module === "gl") {
     glBatchSelectedRows.value = [];
     glBatchUpdateDialogOpen.value = false;
+    glBatchDeleteDialogOpen.value = false;
   }
 });
 
@@ -2200,6 +2654,12 @@ onMounted(async () => {
     apBatchUpdateDialogOpen,
     openApBatchUpdateDialog,
     onApBatchUpdateDialogHide,
+    apBatchDeleteDialogOpen,
+    apBatchDeleteLoading,
+    openApBatchDeleteDialog,
+    onApBatchDeleteDialogHide,
+    submitApBatchDelete,
+    apBatchDeleteTransactionCount,
     glAccountOptions,
     glBatchSelectedRows,
     glBatchUpdatePatch,
@@ -2217,5 +2677,11 @@ onMounted(async () => {
     glBatchUpdateDialogOpen,
     openGlBatchUpdateDialog,
     onGlBatchUpdateDialogHide,
+    glBatchDeleteDialogOpen,
+    glBatchDeleteLoading,
+    openGlBatchDeleteDialog,
+    onGlBatchDeleteDialogHide,
+    submitGlBatchDelete,
+    glBatchDeleteTransactionCount,
   };
 }
