@@ -163,8 +163,14 @@
             hide-bottom
             class="q-mb-sm"
           >
+            <template v-slot:body-cell-transdate="props">
+              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+                {{ props.value || (props.row.isSubtotal ? "" : "-") }}
+              </q-td>
+            </template>
+
             <template v-slot:body-cell-invnumber="props">
-              <q-td :props="props">
+              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
                 <router-link
                   v-if="props.value && !props.row.isSubtotal"
                   :to="getPath(props.row)"
@@ -176,8 +182,22 @@
               </q-td>
             </template>
 
+            <template v-slot:body-cell-files="props">
+              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+                <FileList :files="props.row.files" :report="true" />
+              </q-td>
+            </template>
+
+            <template v-slot:body-cell-description="props">
+              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+                <div class="wrapped-description">
+                  {{ props.value || (props.row.isSubtotal ? "" : "-") }}
+                </div>
+              </q-td>
+            </template>
+
             <template v-slot:body-cell-name="props">
-              <q-td :props="props">
+              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
                 <router-link
                   v-if="props.value && !props.row.isSubtotal"
                   :to="getPath(props.row)"
@@ -190,7 +210,7 @@
             </template>
 
             <template v-slot:body-cell-address="props">
-              <q-td :props="props">
+              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
                 {{ props.value || "-" }}
               </q-td>
             </template>
@@ -199,7 +219,7 @@
               <q-td
                 :props="props"
                 class="text-right"
-                :class="{ 'text-weight-bold': props.row.isSubtotal }"
+                :class="{ 'text-weight-bold': props.row.isSubtotal, 'bg-grey-2': props.row.isSubtotal }"
               >
                 {{ formatAmount(props.value) }}
               </q-td>
@@ -209,7 +229,7 @@
               <q-td
                 :props="props"
                 class="text-right"
-                :class="{ 'text-weight-bold': props.row.isSubtotal }"
+                :class="{ 'text-weight-bold': props.row.isSubtotal, 'bg-grey-2': props.row.isSubtotal }"
               >
                 {{ formatAmount(props.value) }}
               </q-td>
@@ -219,56 +239,10 @@
               <q-td
                 :props="props"
                 class="text-right"
-                :class="{ 'text-weight-bold': props.row.isSubtotal }"
+                :class="{ 'text-weight-bold': props.row.isSubtotal, 'bg-grey-2': props.row.isSubtotal }"
               >
                 {{ props.row.isSubtotal ? "" : props.value.toFixed(2) + "%" }}
               </q-td>
-            </template>
-
-            <template v-slot:body-cell-files="props">
-              <q-td :props="props">
-                <FileList :files="props.row.files" :report="true" />
-              </q-td>
-            </template>
-
-            <template v-slot:body-row="props">
-              <q-tr
-                :props="props"
-                :class="{ 'bg-grey-2': props.row.isSubtotal }"
-              >
-                <q-td
-                  v-for="col in props.cols"
-                  :key="col.name"
-                  :props="props"
-                  :class="[
-                    col.name === 'amount' || col.name === 'tax'
-                      ? 'text-right'
-                      : 'text-left',
-                    props.row.isSubtotal ? 'text-weight-bold' : '',
-                  ]"
-                >
-                  <router-link
-                    v-if="
-                      (col.name === 'invnumber' || col.name === 'name') &&
-                      col.value &&
-                      !props.row.isSubtotal
-                    "
-                    :to="getPath(props.row)"
-                    class="text-primary"
-                  >
-                    {{ col.value }}
-                  </router-link>
-                  <span v-else-if="col.name === 'amount' || col.name === 'tax'">
-                    {{ formatAmount(col.value) }}
-                  </span>
-                  <span v-else-if="col.name === 'calculated_tax'">
-                    {{ props.row.isSubtotal ? "" : col.value.toFixed(2) + "%" }}
-                  </span>
-                  <span v-else>
-                    {{ col.value || (props.row.isSubtotal ? "" : "-") }}
-                  </span>
-                </q-td>
-              </q-tr>
             </template>
           </q-table>
         </div>
@@ -472,10 +446,11 @@ const groupedResults = computed(() => {
     let calculatedTax = 0;
     if (taxIncluded) {
       // If tax is included, calculate rate as: tax / (amount - tax)
-      calculatedTax = amount - tax > 0 ? (tax / (amount - tax)) * 100 : 0;
+      const base = amount - tax;
+      calculatedTax = base !== 0 ? (tax / base) * 100 : 0;
     } else {
       // If tax is not included, calculate rate as: tax / amount
-      calculatedTax = amount > 0 ? (tax / amount) * 100 : 0;
+      calculatedTax = amount !== 0 ? (tax / amount) * 100 : 0;
     }
 
     // Add calculated tax to the item
@@ -849,7 +824,7 @@ const exportToPDF = () => {
         9: { halign: "right", overflow: "hidden" },
         10: { halign: "right", overflow: "hidden" },
       },
-    }
+    },
   );
 
   yPosition = doc.lastAutoTable.finalY + 12;
@@ -956,7 +931,7 @@ const exportToPDF = () => {
         5: { halign: "right", overflow: "hidden" },
         6: { halign: "right", overflow: "hidden" },
       },
-    }
+    },
   );
 
   doc.save("all_taxes_report.pdf");
@@ -967,7 +942,6 @@ const exportToPDF = () => {
 // =====================================================
 onMounted(async () => {
   await fetchLinks();
-  await search();
 });
 
 const fetchLinks = async () => {
@@ -984,6 +958,13 @@ const fetchLinks = async () => {
 .q-table {
   border: 1px solid #e0e0e0;
 }
+
+.wrapped-description {
+  white-space: pre-wrap;
+  max-width: 25vw;
+  line-break: anywhere;
+}
+
 
 @media print {
   .form,
