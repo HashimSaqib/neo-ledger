@@ -164,13 +164,19 @@
             class="q-mb-sm"
           >
             <template v-slot:body-cell-transdate="props">
-              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+              <q-td
+                :props="props"
+                :class="{ 'bg-grey-2': props.row.isSubtotal }"
+              >
                 {{ props.value || (props.row.isSubtotal ? "" : "-") }}
               </q-td>
             </template>
 
             <template v-slot:body-cell-invnumber="props">
-              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+              <q-td
+                :props="props"
+                :class="{ 'bg-grey-2': props.row.isSubtotal }"
+              >
                 <router-link
                   v-if="props.value && !props.row.isSubtotal"
                   :to="getPath(props.row)"
@@ -183,13 +189,19 @@
             </template>
 
             <template v-slot:body-cell-files="props">
-              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+              <q-td
+                :props="props"
+                :class="{ 'bg-grey-2': props.row.isSubtotal }"
+              >
                 <FileList :files="props.row.files" :report="true" />
               </q-td>
             </template>
 
             <template v-slot:body-cell-description="props">
-              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+              <q-td
+                :props="props"
+                :class="{ 'bg-grey-2': props.row.isSubtotal }"
+              >
                 <div class="wrapped-description">
                   {{ props.value || (props.row.isSubtotal ? "" : "-") }}
                 </div>
@@ -197,7 +209,10 @@
             </template>
 
             <template v-slot:body-cell-name="props">
-              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+              <q-td
+                :props="props"
+                :class="{ 'bg-grey-2': props.row.isSubtotal }"
+              >
                 <router-link
                   v-if="props.value && !props.row.isSubtotal"
                   :to="getPath(props.row)"
@@ -210,7 +225,10 @@
             </template>
 
             <template v-slot:body-cell-address="props">
-              <q-td :props="props" :class="{ 'bg-grey-2': props.row.isSubtotal }">
+              <q-td
+                :props="props"
+                :class="{ 'bg-grey-2': props.row.isSubtotal }"
+              >
                 {{ props.value || "-" }}
               </q-td>
             </template>
@@ -219,7 +237,10 @@
               <q-td
                 :props="props"
                 class="text-right"
-                :class="{ 'text-weight-bold': props.row.isSubtotal, 'bg-grey-2': props.row.isSubtotal }"
+                :class="{
+                  'text-weight-bold': props.row.isSubtotal,
+                  'bg-grey-2': props.row.isSubtotal,
+                }"
               >
                 {{ formatAmount(props.value) }}
               </q-td>
@@ -229,7 +250,10 @@
               <q-td
                 :props="props"
                 class="text-right"
-                :class="{ 'text-weight-bold': props.row.isSubtotal, 'bg-grey-2': props.row.isSubtotal }"
+                :class="{
+                  'text-weight-bold': props.row.isSubtotal,
+                  'bg-grey-2': props.row.isSubtotal,
+                }"
               >
                 {{ formatAmount(props.value) }}
               </q-td>
@@ -239,7 +263,10 @@
               <q-td
                 :props="props"
                 class="text-right"
-                :class="{ 'text-weight-bold': props.row.isSubtotal, 'bg-grey-2': props.row.isSubtotal }"
+                :class="{
+                  'text-weight-bold': props.row.isSubtotal,
+                  'bg-grey-2': props.row.isSubtotal,
+                }"
               >
                 {{ props.row.isSubtotal ? "" : props.value.toFixed(2) + "%" }}
               </q-td>
@@ -299,7 +326,8 @@ const title = inject("title");
 // =====================================================
 const formData = ref({
   department: route.query.department || "",
-  fromdate: route.query.fromdate || "",
+  fromdate:
+    route.query.fromdate || `${new Date().getFullYear()}-01-01`,
   todate: route.query.todate || "",
 });
 
@@ -610,7 +638,7 @@ const search = async () => {
     results.value = response.data;
     results.value = results.value.map((row) => {
       if (row.module === "AP") {
-        return { ...row, amount: row.amount * -1 };
+        return { ...row, amount: row.amount * -1, tax: row.tax * -1 };
       } else {
         return row;
       }
@@ -942,6 +970,7 @@ const exportToPDF = () => {
 // =====================================================
 onMounted(async () => {
   await fetchLinks();
+  await search();
 });
 
 const fetchLinks = async () => {
@@ -964,7 +993,6 @@ const fetchLinks = async () => {
   max-width: 25vw;
   line-break: anywhere;
 }
-
 
 @media print {
   .form,

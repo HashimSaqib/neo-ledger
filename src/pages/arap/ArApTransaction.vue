@@ -565,8 +565,8 @@
                   <div class="row justify-end q-mb-xs maintext">
                     <q-checkbox
                       :label="t('Tax Included')"
-                      v-model="taxIncluded"
-                      @click="calculateTaxes"
+                      :model-value="taxIncluded"
+                      @update:model-value="onTaxIncludedToggle"
                     />
                   </div>
                   <div class="totals-grid">
@@ -1252,6 +1252,25 @@ const calculateTaxes = () => {
   }
 };
 
+const onTaxIncludedToggle = (newVal) => {
+  taxIncluded.value = newVal;
+  if (initialLoad.value) return;
+
+  if (lineTax.value) {
+    recalculatingLineTaxes.value = true;
+    lines.value.forEach((line) => {
+      if (line.taxAccount && line.amount) {
+        line.apiTaxAmount = 0;
+        line.taxAmount = computeLineTaxAmount(line);
+      }
+    });
+    recalculatingLineTaxes.value = false;
+  }
+
+  preserveApiTaxes.value = false;
+  calculateTaxes();
+};
+
 const subtotal = computed(() => {
   let totalValue = lines.value.reduce(
     (acc, line) => acc + (parseFloat(line.amount) || 0),
@@ -1561,6 +1580,7 @@ const fetchCurrencies = async () => {
 
 let initialLoad = ref(false);
 let preserveApiTaxes = ref(false);
+let recalculatingLineTaxes = ref(false);
 
 // -------------------------
 // Invoice Submission & Loading
@@ -2368,7 +2388,7 @@ const canDelete = computed(
 watch(
   lines,
   () => {
-    if (!initialLoad.value) {
+    if (!initialLoad.value && !recalculatingLineTaxes.value) {
       preserveApiTaxes.value = false;
       calculateTaxes();
     }

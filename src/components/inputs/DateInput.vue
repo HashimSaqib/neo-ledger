@@ -23,8 +23,8 @@ import { ref, computed } from "vue";
  */
 const props = defineProps({
   modelValue: {
-    type: Number,
-    default: 0,
+    type: String,
+    default: "",
   },
   label: {
     type: String,
