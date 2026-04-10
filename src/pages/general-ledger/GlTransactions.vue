@@ -957,23 +957,13 @@ const search = async () => {
 };
 
 const formatTaxAcc = (row) => {
-  if (row.invoice) {
-    if (row.linetax_accno && row.linetax_description) {
-      const accnos = row.linetax_accno.split(",");
-      const descriptions = row.linetax_description.split(",");
-      return accnos
-        .map((acc, i) => `${acc.trim()}--${(descriptions[i] || "").trim()}`)
-        .join(", ");
-    } else {
-      return "";
-    }
-  } else {
-    if (row.linetax_accno && row.linetax_description) {
-      return `${row.linetax_accno}--${row.linetax_description}`;
-    } else {
-      return "";
-    }
-  }
+  const v = row.linetax_account;
+  if (v == null || String(v).trim() === "") return "";
+  return String(v)
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .join(", ");
 };
 
 // Use results directly for your table rows
@@ -1003,7 +993,6 @@ const filterByAccno = (accno) => {
 // Clear account filters and trigger a search
 const clearAccnoFilter = () => {
   formData.value.accnofrom = "";
-  ``;
   formData.value.accnoto = "";
   search();
 };
