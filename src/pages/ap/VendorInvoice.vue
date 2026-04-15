@@ -849,11 +849,25 @@
       <q-card style="min-width: 500px" class="q-pa-sm">
         <q-card-section class="q-pa-none"> </q-card-section>
         <q-card-section>
+          <q-select
+            v-if="invType === 'invoice'"
+            v-model="emailSendMode"
+            :options="emailSendModeOptions"
+            :label="t('Email type')"
+            class="q-mb-md"
+            outlined
+            dense
+            emit-value
+            map-options
+            bg-color="input"
+            label-color="secondary"
+          />
           <EmailOptions
             :selectedVendor="vendor"
             :invId="invId"
             :invNumber="invNumber"
-            :type="invType"
+            :type="emailOptionsSendType"
+            :email_message="prefilledVendorEmailMessage"
             vc="vendor"
           />
         </q-card-section>
@@ -951,6 +965,35 @@ if (route.params.type === "debit_invoice") {
 const invType = ref(
   route.params.type === "debit_invoice" ? "debit_invoice" : "invoice"
 );
+
+const emailSendMode = ref("invoice");
+const emailSendModeOptions = computed(() => [
+  { label: t("Invoice / debit email"), value: "invoice" },
+  { label: t("Reminder 1"), value: "reminder1" },
+  { label: t("Reminder 2"), value: "reminder2" },
+  { label: t("Reminder 3"), value: "reminder3" },
+]);
+
+const emailOptionsSendType = computed(() => {
+  if (invType.value === "invoice" && emailSendMode.value !== "invoice") {
+    return emailSendMode.value;
+  }
+  return invType.value;
+});
+
+const prefilledVendorEmailMessage = computed(() => {
+  if (!vendor.value) return "";
+  if (emailOptionsSendType.value === "reminder1") {
+    return vendor.value.reminder_1_email_message || "";
+  }
+  if (emailOptionsSendType.value === "reminder2") {
+    return vendor.value.reminder_2_email_message || "";
+  }
+  if (emailOptionsSendType.value === "reminder3") {
+    return vendor.value.reminder_3_email_message || "";
+  }
+  return vendor.value.email_message || "";
+});
 
 const templates = [{ label: t("Vendor Invoice"), value: "vendor_invoice" }];
 const printLocations = [
@@ -1485,6 +1528,7 @@ const vendorUpdate = async (newValue) => {
   } else {
     console.warn("Invalid invoice date");
   }
+  emailSendMode.value = "invoice";
   calculateTaxes();
 };
 
@@ -1958,6 +2002,9 @@ onMounted(() => {
 const emailDialog = ref(false);
 const toggleEmailDialog = () => {
   emailDialog.value = !emailDialog.value;
+  if (emailDialog.value) {
+    emailSendMode.value = "invoice";
+  }
 };
 
 // Add computed properties to control button visibility

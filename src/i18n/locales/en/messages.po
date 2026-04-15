@@ -5,19 +5,22 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Neo Ledger 0.0.1\n"
-"POT-Creation-Date: 2026-04-08 07:11:09+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-14 16:41:28+0000\n"
+"PO-Revision-Date: 2026-04-14 00:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: English\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
-"Language-Team: English\n"
-"PO-Revision-Date: 2026-04-08 00:00+0000\n"
 
 #: src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
 msgid " Add Reference Documents"
 msgstr ""
 
+#: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 msgid " payment(s) have missing BIC for selected bank account"
@@ -286,6 +289,10 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Account (this line)"
+msgstr ""
+
 #: src/pages/cash/adjustments/Confirmation.vue
 msgid "Account Description"
 msgstr ""
@@ -305,6 +312,10 @@ msgstr ""
 #: src/ai_plugin/components/TemplateBuilder.vue
 #: src/ai_plugin/components/TemplateBuilder.vue
 msgid "Account Mapping"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Account Name"
 msgstr ""
 
 #: src/pages/Import.vue
@@ -396,6 +407,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Account linked successfully"
 msgstr ""
 
@@ -485,6 +497,7 @@ msgstr ""
 msgid "Activate Audit Trail"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
 #: src/ai_plugin/components/RuleCreationDialog.vue
 #: src/ai_plugin/components/RuleManagerDialog.vue
@@ -949,11 +962,16 @@ msgstr ""
 msgid "Applied Rule Information"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Apply"
+msgstr ""
+
 #: src/ai_plugin/pages/BankTransactions.vue
 msgid "Apply Rules to All"
 msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid "Apply update"
 msgstr ""
 
@@ -1248,6 +1266,7 @@ msgstr ""
 msgid "Backup codes copied to clipboard"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/pages/cash/Reconciliation.vue
 #: src/pages/general-ledger/GlTransactions.vue
@@ -1478,9 +1497,20 @@ msgstr ""
 
 #: src/layouts/Menu.js
 #: src/layouts/Menu.js
-#: src/layouts/Menu.js
 #: src/pages/batch/useBatchUpdatePage.js
 msgid "Batch Update"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Batch delete"
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+msgid ""
+"Batch delete applies to whole transactions. Turn off Line Data, select "
+"transactions, then try again."
 msgstr ""
 
 #: src/ai_plugin/components/CmptImport.vue
@@ -1489,11 +1519,15 @@ msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid "Batch update lines"
 msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid "Batch update transactions"
 msgstr ""
 
@@ -1552,9 +1586,11 @@ msgid "COGS"
 msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
+#: src/ai_plugin/components/DocumentListTable.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
 #: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/components/RuleManagerDialog.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
@@ -1574,6 +1610,9 @@ msgstr ""
 #: src/pages/arap/ArReminder.vue
 #: src/pages/arap/ArReminder.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 #: src/pages/central/ApiKeys.vue
@@ -1614,6 +1653,10 @@ msgstr ""
 msgid "Cancel Processing"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Cancel — remove from queue"
+msgstr ""
+
 #: src/pages/central/IndexPage.vue
 msgid "Cannot remove owner access"
 msgstr ""
@@ -1643,7 +1686,12 @@ msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
 msgid "Cannot upload: "
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Card (last four)"
 msgstr ""
 
 #: src/pages/arap/TaxReport.vue
@@ -1744,10 +1792,14 @@ msgstr ""
 msgid "Check Inventory"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Choose an action for documents that are stuck or pending retry."
+msgstr ""
+
 #: src/pages/batch/useBatchUpdatePage.js
 msgid ""
-"Choose at least one field to apply (transaction date, due date, vendor, "
-"department, project, or record account)."
+"Choose at least one field to apply (transaction date, transaction year, due "
+"date, vendor, department, project, or record account)."
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
@@ -1782,6 +1834,8 @@ msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid "Clear department"
 msgstr ""
 
@@ -1789,8 +1843,16 @@ msgstr ""
 msgid "Clear project"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Clear project (all lines)"
+msgstr ""
+
 #: src/pages/batch/BatchUpdateAp.vue
 msgid "Clear project (line)"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Clear project (this line)"
 msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
@@ -1844,6 +1906,7 @@ msgstr ""
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
 #: src/ai_plugin/components/MatchTransactionDialog.vue
 #: src/ai_plugin/components/MatchTransactionDialog.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
@@ -1961,6 +2024,10 @@ msgstr ""
 msgid "Completed"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Completing Revolut connection…"
+msgstr ""
+
 #: src/components/OnboardingList.vue
 msgid "Configure Defaults"
 msgstr ""
@@ -2037,6 +2104,16 @@ msgstr ""
 msgid "Connect to Moco"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Connect with Revolut"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid ""
+"Connect your Revolut Business account to import transactions and process "
+"payouts."
+msgstr ""
+
 #: src/ai_plugin/components/IntegrationConnectedBadge.vue
 msgid "Connected"
 msgstr ""
@@ -2110,6 +2187,10 @@ msgstr ""
 msgid "Contra"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Copied to clipboard"
+msgstr ""
+
 #: src/ai_plugin/pages/Moco.vue
 msgid "Copy"
 msgstr ""
@@ -2156,6 +2237,10 @@ msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Could not load Konfipay status: "
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Could not load Revolut OAuth settings"
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
@@ -2288,10 +2373,16 @@ msgstr ""
 msgid "Created Date To"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAr.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/general-ledger/GlTransactions.vue
 msgid "Created From"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAr.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/general-ledger/GlTransactions.vue
 msgid "Created To"
 msgstr ""
@@ -2349,6 +2440,7 @@ msgstr ""
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/components/LastTransactions.vue
@@ -2761,11 +2853,28 @@ msgid "Delete Rule"
 msgstr ""
 
 #: src/pages/ar/RecurringInvoices.vue
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
 msgid "Delete failed"
 msgstr ""
 
 #: src/pages/ar/RecurringInvoices.vue
 msgid "Delete recurring invoice?"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Delete transactions"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Delete transactions?"
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "Deleted {count} transaction(s)."
 msgstr ""
 
 #: src/pages/system/chart/Categories.vue
@@ -2806,6 +2915,9 @@ msgstr ""
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/cash/PaymentsReport.vue
 #: src/pages/general-ledger/GeneralLedger.vue
@@ -2947,6 +3059,15 @@ msgstr ""
 
 #: src/pages/central/ApiKeys.vue
 msgid "Disabled"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Disconnect"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Disconnect Revolut?"
 msgstr ""
 
 #: src/pages/Import.vue
@@ -3108,6 +3229,7 @@ msgid ""
 "not both."
 msgstr ""
 
+#: src/pages/batch/useBatchUpdatePage.js
 #: src/pages/batch/useBatchUpdatePage.js
 msgid "Each selected line needs entry_id. Refresh search if this field is missing."
 msgstr ""
@@ -3328,6 +3450,7 @@ msgid "End Date"
 msgstr ""
 
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "End Date (optional)"
 msgstr ""
 
@@ -3369,6 +3492,13 @@ msgstr ""
 
 #: src/pages/Signup.vue
 msgid "Enter OTP"
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "Enter a valid year (1000-9999)."
 msgstr ""
 
 #: src/components/TwoFactorSetup.vue
@@ -3439,6 +3569,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Error details"
 msgstr ""
 
@@ -3731,6 +3862,10 @@ msgstr ""
 msgid "Failed to cancel invite"
 msgstr ""
 
+#: src/ai_plugin/pages/Integrations.vue
+msgid "Failed to complete Revolut connection"
+msgstr ""
+
 #: src/ai_plugin/pages/Moco.vue
 msgid "Failed to connect"
 msgstr ""
@@ -3792,6 +3927,10 @@ msgstr ""
 msgid "Failed to delete rule"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Failed to disconnect Revolut"
+msgstr ""
+
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
 #: src/pages/arap/ArApTransaction.vue
@@ -3800,6 +3939,10 @@ msgstr ""
 
 #: src/pages/oe/OrderEntry.vue
 msgid "Failed to download order"
+msgstr ""
+
+#: src/ai_plugin/pages/Integrations.vue
+msgid "Failed to exchange authorization code"
 msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
@@ -3832,6 +3975,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/pages/arap/ArApTransaction.vue
 msgid "Failed to fetch accounts"
 msgstr ""
@@ -3936,6 +4080,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Failed to import transactions"
 msgstr ""
 
@@ -3947,8 +4092,13 @@ msgstr ""
 msgid "Failed to initialize editor. Please try again."
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Failed to initiate Revolut connection"
+msgstr ""
+
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Failed to link account"
 msgstr ""
 
@@ -4078,6 +4228,10 @@ msgstr ""
 msgid "Failed to save Konfipay connection"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Failed to save Revolut Client ID"
+msgstr ""
+
 #: src/pages/system/chart/AddAccount.vue
 #: src/pages/system/chart/ListAccounts.vue
 msgid "Failed to save account"
@@ -4200,6 +4354,10 @@ msgstr ""
 
 #: src/ai_plugin/pages/Moco.vue
 msgid "Fetch Categories"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Fetching and processing Revolut transactions"
 msgstr ""
 
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
@@ -4548,6 +4706,7 @@ msgstr ""
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/components/BankAccountForm.vue
 #: src/pages/Import.vue
 #: src/pages/arap/SearchVC.vue
@@ -4600,6 +4759,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Import Completed with Issues"
 msgstr ""
 
@@ -4634,11 +4794,13 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Import Successful"
 msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Import Transactions"
 msgstr ""
 
@@ -4678,14 +4840,17 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/Moco.vue
 msgid "Imported"
 msgstr ""
 
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Importing…"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
 #: src/ai_plugin/components/RuleManagerDialog.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/ai_plugin/pages/ManageStations.vue
@@ -5366,6 +5531,11 @@ msgstr ""
 msgid "Lineitem"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Lines selected"
+msgstr ""
+
 #: src/pages/Import.vue
 msgid "Lines to add"
 msgstr ""
@@ -5377,12 +5547,20 @@ msgid ""
 "cannot also be linked to Amnis."
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid ""
+"Link each Revolut account to a local bank account. Import will only process "
+"linked accounts."
+msgstr ""
+
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Linked Account"
 msgstr ""
 
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Linked GL bank"
 msgstr ""
 
@@ -5448,6 +5626,10 @@ msgstr ""
 
 #: src/pages/system/Roles.vue
 msgid "Loading..."
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Loading…"
 msgstr ""
 
 #: src/pages/ap/VendorInvoice.vue
@@ -5577,6 +5759,10 @@ msgstr ""
 msgid "Mark as Uploaded"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Mark failed — stop retrying"
+msgstr ""
+
 #: src/pages/goodservices/SearchPart.vue
 #: src/pages/goodservices/SearchPart.vue
 msgid "Markup"
@@ -5590,6 +5776,7 @@ msgstr ""
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 msgid "Matched"
 msgstr ""
@@ -5633,6 +5820,7 @@ msgstr ""
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/arap/ArApTransactions.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/cash/PaymentsReport.vue
@@ -5666,6 +5854,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/layouts/Menu.js
 #: src/pages/system/Messages.vue
 msgid "Messages"
@@ -5911,6 +6100,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "No accno"
 msgstr ""
 
@@ -5964,12 +6154,17 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/Moco.vue
 msgid "No description"
 msgstr ""
 
 #: src/ai_plugin/pages/UserStations.vue
 msgid "No description available"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "No details available"
 msgstr ""
 
 #: src/pages/system/Batch.vue
@@ -6001,6 +6196,7 @@ msgid "No languages yet. Add one to get started."
 msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid ""
 "No lines selected. Close this dialog, tick rows in the table, then open "
 "batch update again."
@@ -6024,10 +6220,6 @@ msgstr ""
 
 #: src/pages/central/IndexPage.vue
 msgid "No pending invites"
-msgstr ""
-
-#: src/ai_plugin/components/DocumentListTable.vue
-msgid "No prompt available"
 msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
@@ -6059,6 +6251,7 @@ msgid "No transactions found"
 msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid ""
 "No transactions selected. Close this dialog, tick rows in the table, then "
 "open batch update again."
@@ -6081,6 +6274,12 @@ msgid "No transactions to update"
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "No updatable fields provided."
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
 msgid "No update payload could be built from the selection."
 msgstr ""
 
@@ -6102,6 +6301,10 @@ msgstr ""
 
 #: src/components/MessageVariableInput.vue
 msgid "No variables match"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "No workers running"
 msgstr ""
 
 #: src/ai_plugin/pages/UserStations.vue
@@ -6282,11 +6485,19 @@ msgstr ""
 msgid "One Level Up"
 msgstr ""
 
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "One or more selected rows are missing a usable transaction date."
+msgstr ""
+
 #: src/pages/central/CreateDataset.vue
 msgid "Only lowercase alphabets and numbers allowed"
 msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid ""
 "Only values you enter below are sent. Leave a field blank to leave that "
 "value unchanged."
@@ -6571,8 +6782,18 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid ""
+"Paste the Client ID from your Revolut Business API settings, then save. "
+"Required once per company (or when it changes)."
+msgstr ""
+
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Pay with Amnis"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Pay with Revolut"
 msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
@@ -6735,6 +6956,10 @@ msgstr ""
 msgid "Pick List"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Pipeline"
+msgstr ""
+
 #: src/ai_plugin/pages/BankTransactions.vue
 msgid "Please configure the template before creating transactions"
 msgstr ""
@@ -6798,6 +7023,7 @@ msgid "Please select a Last Number field before inserting a variable."
 msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
 msgid "Please select a bank account"
 msgstr ""
 
@@ -6852,6 +7078,7 @@ msgstr ""
 msgid "Please select a vendor/customer first"
 msgstr ""
 
+#: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
@@ -6984,6 +7211,7 @@ msgid "Processing"
 msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
+#: src/ai_plugin/components/DocumentListTable.vue
 msgid "Processing Details"
 msgstr ""
 
@@ -7015,6 +7243,7 @@ msgstr ""
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/general-ledger/GeneralLedger.vue
 #: src/pages/general-ledger/GlTransactions.vue
 #: src/pages/oe/OrderEntry.vue
@@ -7023,8 +7252,16 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Project (all lines)"
+msgstr ""
+
 #: src/pages/batch/BatchUpdateAp.vue
 msgid "Project (line)"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Project (this line)"
 msgstr ""
 
 #: src/pages/Import.vue
@@ -7051,6 +7288,10 @@ msgid "Projects"
 msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
+msgid "Prompt"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
 msgid "Prompt & Response"
 msgstr ""
 
@@ -7060,6 +7301,18 @@ msgstr ""
 
 #: src/pages/system/AiPrompts.vue
 msgid "Prompt saved successfully"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Provider"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Provider data (raw)"
+msgstr ""
+
+#: src/ai_plugin/pages/BankTransactions.vue
+msgid "Provider merchant"
 msgstr ""
 
 #: src/layouts/Menu.js
@@ -7251,6 +7504,19 @@ msgstr ""
 msgid "Records"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Recover"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Recover Stale Documents"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Recovery failed"
+msgstr ""
+
 #: src/pages/ar/SalesInvoice.vue
 msgid "Recurring Invoice"
 msgstr ""
@@ -7278,6 +7544,10 @@ msgstr ""
 
 #: src/components/RecurringInvoiceSchedule.vue
 msgid "Recurring schedule"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Redirect URI (from server)"
 msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
@@ -7308,6 +7578,7 @@ msgstr ""
 msgid "References"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
 #: src/ai_plugin/pages/UserStations.vue
 #: src/components/widgets/BalanceSheetWidget.vue
 #: src/components/widgets/BankActivityWidget.vue
@@ -7426,6 +7697,7 @@ msgid "Reset to Default"
 msgstr ""
 
 #: src/ai_plugin/components/CmptImport.vue
+#: src/ai_plugin/components/DocumentListTable.vue
 msgid "Response"
 msgstr ""
 
@@ -7441,6 +7713,7 @@ msgstr ""
 msgid "Retained Earnings Account"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
 #: src/pages/cash/adjustments/BankTransactionDetail.vue
 #: src/pages/cash/adjustments/Confirmation.vue
 msgid "Retry"
@@ -7448,6 +7721,10 @@ msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
 msgid "Retry Processing"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Retry — re-queue for processing"
 msgstr ""
 
 #: src/components/widgets/RevenueWidget.vue
@@ -7483,6 +7760,57 @@ msgstr ""
 
 #: src/pages/cash/adjustments/Confirmation.vue
 msgid "Review carefully - this action cannot be undone"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut API client"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut Accounts"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut Business is connected for this company."
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut Client ID"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut Client ID saved"
+msgstr ""
+
+#: src/ai_plugin/pages/Integrations.vue
+msgid "Revolut connected successfully"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut disconnected"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Revolut payment upload failed"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut session expired. Please reconnect."
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Revolut session expired. Reconnect in Integrations."
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Revolut transaction pull summary"
 msgstr ""
 
 #: src/pages/central/IndexPage.vue
@@ -7743,6 +8071,10 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Save Client ID"
+msgstr ""
+
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
 msgid "Save Connection"
@@ -7760,6 +8092,10 @@ msgstr ""
 msgid "Save Reconciliation"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Save Revolut Client ID below"
+msgstr ""
+
 #: src/ai_plugin/pages/ManageStations.vue
 msgid "Save Station"
 msgstr ""
@@ -7774,6 +8110,10 @@ msgstr ""
 
 #: src/components/TwoFactorSetup.vue
 msgid "Save these backup codes"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Save your Revolut Client ID first"
 msgstr ""
 
 #: src/components/TwoFactorSetup.vue
@@ -7946,6 +8286,12 @@ msgstr ""
 msgid "Select Variance"
 msgstr ""
 
+#: src/ai_plugin/pages/BankPayments.vue
+msgid ""
+"Select a Revolut-linked GL bank (link accounts under Integrations → "
+"Revolut)."
+msgstr ""
+
 #: src/ai_plugin/pages/Notifications.vue
 msgid "Select any time when the notification should be sent"
 msgstr ""
@@ -8011,6 +8357,9 @@ msgid "Selected bank account is missing IBAN"
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
 msgid "Selected rows are missing a valid transaction id."
 msgstr ""
 
@@ -8063,6 +8412,10 @@ msgstr ""
 msgid "Send email when invoice is created"
 msgstr ""
 
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Send selected payments via Revolut"
+msgstr ""
+
 #: src/ai_plugin/components/DocumentListTable.vue
 #: src/ai_plugin/components/DocumentListTable.vue
 #: src/ai_plugin/pages/UserStations.vue
@@ -8092,6 +8445,14 @@ msgstr ""
 msgid "Serial Number"
 msgstr ""
 
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Server FRONT_END_URL missing"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid "Server frontend URL OK"
+msgstr ""
+
 #: src/layouts/Menu.js
 msgid "Services"
 msgstr ""
@@ -8110,6 +8471,13 @@ msgstr ""
 
 #: src/components/BankAccountForm.vue
 msgid "Set as Default Bank Account"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Set transaction year only (keep month and day per row)"
 msgstr ""
 
 #: src/components/OnboardingList.vue
@@ -8231,7 +8599,12 @@ msgstr ""
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Skipped"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "Some Revolut payments failed"
 msgstr ""
 
 #: src/pages/general-ledger/GeneralLedger.vue
@@ -8252,6 +8625,7 @@ msgstr ""
 msgid "Sort Names by Number"
 msgstr ""
 
+#: src/ai_plugin/pages/BankTransactions.vue
 #: src/pages/Import.vue
 #: src/pages/ap/VendorInvoice.vue
 #: src/pages/ar/SalesInvoice.vue
@@ -8261,6 +8635,7 @@ msgstr ""
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/arap/ArApTransaction.vue
 #: src/pages/arap/ArApTransactions.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/cash/Payments.vue
 #: src/pages/cash/PaymentsReport.vue
@@ -8287,6 +8662,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 #: src/ai_plugin/pages/BankTransactions.vue
 #: src/pages/Import.vue
 #: src/pages/arap/AddVC.vue
@@ -8464,6 +8840,10 @@ msgid "Successfully imported"
 msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
+msgid "Successfully sent"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
 msgid "Successfully uploaded"
 msgstr ""
 
@@ -8519,6 +8899,13 @@ msgstr ""
 
 #: src/ai_plugin/pages/Moco.vue
 msgid "Target"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Target year"
 msgstr ""
 
 #: src/components/OnboardingList.vue
@@ -8711,6 +9098,24 @@ msgstr ""
 msgid "This field is required"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+msgid ""
+"This permanently removes the selected AP transactions. This cannot be "
+"undone."
+msgstr ""
+
+#: src/pages/batch/BatchUpdateGl.vue
+msgid ""
+"This permanently removes the selected GL transactions. This cannot be "
+"undone."
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid ""
+"This removes the stored tokens for this company. You can reconnect anytime "
+"via OAuth."
+msgstr ""
+
 #: src/pages/cash/adjustments/Confirmation.vue
 msgid "This will permanently modify your accounting records"
 msgstr ""
@@ -8770,6 +9175,8 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+#: src/ai_plugin/pages/BankPayments.vue
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Too many requests. Please try again later."
 msgstr ""
@@ -8882,6 +9289,16 @@ msgstr ""
 msgid "Total input"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Total lines"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Total transactions"
+msgstr ""
+
 #: src/pages/arap/ArApTransactions.vue
 #: src/pages/cash/Reconciliation.vue
 #: src/pages/oe/OrderReports.vue
@@ -8985,6 +9402,8 @@ msgstr ""
 
 #: src/pages/batch/BatchUpdateAp.vue
 #: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+#: src/pages/batch/BatchUpdateGl.vue
 msgid "Transaction date"
 msgstr ""
 
@@ -9029,6 +9448,11 @@ msgstr ""
 msgid "Transactions matched successfully"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "Transactions selected"
+msgstr ""
+
 #: src/pages/cash/adjustments/Confirmation.vue
 msgid "Transactions to be Adjusted"
 msgstr ""
@@ -9056,6 +9480,7 @@ msgstr ""
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/CmptImport.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "Transition GL"
 msgstr ""
 
@@ -9190,13 +9615,16 @@ msgid "Update Status"
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
 msgid "Update applied to {count} line(s)."
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
 msgid "Update applied to {count} transaction(s)."
 msgstr ""
 
+#: src/pages/batch/useBatchUpdatePage.js
 #: src/pages/batch/useBatchUpdatePage.js
 #: src/pages/batch/useBatchUpdatePage.js
 #: src/pages/batch/useBatchUpdatePage.js
@@ -9234,10 +9662,16 @@ msgstr ""
 msgid "Updated Date To"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAr.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/general-ledger/GlTransactions.vue
 msgid "Updated From"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateAr.vue
+#: src/pages/batch/BatchUpdateGl.vue
 #: src/pages/general-ledger/GlTransactions.vue
 msgid "Updated To"
 msgstr ""
@@ -9310,6 +9744,12 @@ msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "Use format YYYY-MM-DD"
+msgstr ""
+
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
+msgid ""
+"Use this exact URI in your Revolut API application redirect list so it "
+"matches the backend."
 msgstr ""
 
 #: src/pages/central/IndexPage.vue
@@ -9514,6 +9954,7 @@ msgstr ""
 
 #: src/ai_plugin/components/AmnisIntegrationCard.vue
 #: src/ai_plugin/components/KonfipayIntegrationCard.vue
+#: src/ai_plugin/components/RevolutIntegrationCard.vue
 msgid "View Accounts"
 msgstr ""
 
@@ -9710,6 +10151,10 @@ msgstr ""
 msgid "Work Phone"
 msgstr ""
 
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "Workers active"
+msgstr ""
+
 #: src/ai_plugin/pages/Notifications.vue
 #: src/ai_plugin/pages/Notifications.vue
 msgid "Workflow Pending Invoices"
@@ -9804,14 +10249,6 @@ msgstr ""
 msgid "added successfully!"
 msgstr ""
 
-#: src/pages/batch/BatchUpdateAp.vue
-msgid "batch_ap_n_lines_selected"
-msgstr ""
-
-#: src/pages/batch/BatchUpdateAp.vue
-msgid "batch_ap_n_transactions_selected"
-msgstr ""
-
 #: src/ai_plugin/pages/Moco.vue
 #: src/ai_plugin/pages/Moco.vue
 msgid "categories"
@@ -9823,6 +10260,14 @@ msgstr ""
 
 #: src/pages/system/department/ListDepartments.vue
 msgid "deleted successfully!"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "document(s) need attention (stale or pending retry)"
+msgstr ""
+
+#: src/ai_plugin/components/DocumentListTable.vue
+msgid "document(s) recovered"
 msgstr ""
 
 #: src/ai_plugin/components/DocumentListTable.vue
@@ -9860,6 +10305,11 @@ msgstr ""
 msgid "items"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "lines selected"
+msgstr ""
+
 #: src/components/OnboardingList.vue
 msgid "of"
 msgstr ""
@@ -9876,6 +10326,10 @@ msgstr ""
 
 #: src/ai_plugin/pages/BankPayments.vue
 msgid "payments to Amnis"
+msgstr ""
+
+#: src/ai_plugin/pages/BankPayments.vue
+msgid "payments via Revolut"
 msgstr ""
 
 #: src/ai_plugin/components/MatchTransactionDialog.vue
@@ -9899,8 +10353,18 @@ msgstr ""
 msgid "transaction"
 msgstr ""
 
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "transaction(s) will be deleted."
+msgstr ""
+
 #: src/pages/arap/ArapOverview.vue
 msgid "transactions"
+msgstr ""
+
+#: src/pages/batch/BatchUpdateAp.vue
+#: src/pages/batch/BatchUpdateGl.vue
+msgid "transactions selected"
 msgstr ""
 
 #: src/pages/cash/adjustments/Confirmation.vue
@@ -9930,9 +10394,26 @@ msgid "{message} at row {row}"
 msgstr ""
 
 #: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "{n} transaction(s) could not be deleted."
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "{n} transaction(s) could not be updated."
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
+#: src/pages/batch/useBatchUpdatePage.js
 msgid "{ok} line(s) updated; {fail} could not be updated."
 msgstr ""
 
+#: src/pages/batch/useBatchUpdatePage.js
+msgid "{ok} transaction(s) deleted; {fail} could not be deleted."
+msgstr ""
+
+#: src/pages/batch/useBatchUpdatePage.js
 #: src/pages/batch/useBatchUpdatePage.js
 msgid "{ok} transaction(s) updated; {fail} could not be updated."
 msgstr ""

@@ -1113,12 +1113,25 @@
       <q-card style="min-width: 500px" class="q-pa-sm">
         <q-card-section class="q-pa-none"> </q-card-section>
         <q-card-section>
+          <q-select
+            v-if="!isRecurring && invType === 'invoice'"
+            v-model="emailSendMode"
+            :options="emailSendModeOptions"
+            :label="t('Email type')"
+            class="q-mb-md"
+            outlined
+            dense
+            emit-value
+            map-options
+            bg-color="input"
+            label-color="secondary"
+          />
           <EmailOptions
             :selectedCustomer="customer"
             :invId="invId"
             :invNumber="invNumber"
-            :type="invType"
-            :email_message="email_message"
+            :type="emailOptionsSendType"
+            :email_message="prefilledInvoiceEmailMessage"
             vc="customer"
           />
         </q-card-section>
@@ -1788,7 +1801,37 @@ const removePayment = (index) => {
 // =====================
 // Customer Update & Invoice Loading Functions
 // =====================
-const email_message = ref("");
+/** invoice | reminder1 | reminder2 | reminder3 — only used when invType is invoice */
+const emailSendMode = ref("invoice");
+const emailSendModeOptions = computed(() => [
+  { label: t("Invoice / credit email"), value: "invoice" },
+  { label: t("Reminder 1"), value: "reminder1" },
+  { label: t("Reminder 2"), value: "reminder2" },
+  { label: t("Reminder 3"), value: "reminder3" },
+]);
+
+const emailOptionsSendType = computed(() => {
+  if (isRecurring.value) return invType.value;
+  if (invType.value === "invoice" && emailSendMode.value !== "invoice") {
+    return emailSendMode.value;
+  }
+  return invType.value;
+});
+
+const prefilledInvoiceEmailMessage = computed(() => {
+  if (!customer.value) return "";
+  if (emailOptionsSendType.value === "reminder1") {
+    return customer.value.reminder_1_email_message || "";
+  }
+  if (emailOptionsSendType.value === "reminder2") {
+    return customer.value.reminder_2_email_message || "";
+  }
+  if (emailOptionsSendType.value === "reminder3") {
+    return customer.value.reminder_3_email_message || "";
+  }
+  return customer.value.email_message || "";
+});
+
 const customerUpdate = async (newValue) => {
   if (!newValue) {
     customer.value = {};
@@ -1835,10 +1878,10 @@ const customerUpdate = async (newValue) => {
       );
     }
   }
-  email_message.value = customer.value?.email_message || "";
   if (isRecurring.value && customer.value?.email_message !== undefined) {
     recurringMessage.value = customer.value?.email_message || "";
   }
+  emailSendMode.value = "invoice";
   if (isRecurring.value && customer.value?.terms != null) {
     recurringDueDateDays.value = Number(customer.value.terms) || 0;
   }
@@ -2667,6 +2710,9 @@ onMounted(async () => {
 const emailDialog = ref(false);
 const toggleEmailDialog = () => {
   emailDialog.value = !emailDialog.value;
+  if (emailDialog.value) {
+    emailSendMode.value = "invoice";
+  }
 };
 
 // Add computed properties to control button visibility

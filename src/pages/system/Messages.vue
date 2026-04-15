@@ -175,7 +175,12 @@ const isEditMode = ref(false);
 const selectedLanguage = ref({ code: "", description: "" });
 
 // Message configuration
-const MESSAGE_TYPES = [{ value: "invoice_send", label: "Invoice send" }];
+const MESSAGE_TYPES = [
+  { value: "invoice_send", label: "Invoice send" },
+  { value: "reminder_1", label: "Reminder 1" },
+  { value: "reminder_2", label: "Reminder 2" },
+  { value: "reminder_3", label: "Reminder 3" },
+];
 const messageTypeOptions = computed(() =>
   MESSAGE_TYPES.map((opt) => ({ value: opt.value, label: t(opt.label) })),
 );

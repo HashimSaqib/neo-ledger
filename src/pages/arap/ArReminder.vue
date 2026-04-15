@@ -182,6 +182,13 @@
             type="textarea"
             outlined
           />
+          <div class="text-caption text-grey-7 q-mt-xs">
+            {{
+              t(
+                "Optional. Leave empty to use each customer's reminder templates and company defaults. A non-empty message overrides for every selected row unless a row supplies its own message.",
+              )
+            }}
+          </div>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat :label="t('Cancel')" color="negative" v-close-popup />
@@ -597,16 +604,18 @@ const sendEmailBatch = async () => {
       invnumber: row.invnumber,
     }));
 
-    // Create the final object
     const batchData = {
       attachment: emailData.value.attachment,
       inline: emailData.value.inline,
-      message: emailData.value.message,
       jobtype: emailData.value.jobtype,
       adminemail: emailData.value.adminemail,
       emails: emails,
       vc: "customer",
     };
+    const msg = (emailData.value.message || "").trim();
+    if (msg) {
+      batchData.message = emailData.value.message;
+    }
 
     // Post to create_email_batch endpoint
     const response = await api.post("/create_email_batch", batchData);

@@ -57,6 +57,12 @@
           :placeholder="t('Email Message')"
         />
       </div>
+      <div
+        v-if="isReminderEmailType"
+        class="col-12 text-caption text-grey-7 q-px-xs"
+      >
+        {{ t("Leave blank to use the customer or vendor template and company defaults.") }}
+      </div>
       <div class="col-12">
         <s-button
           color="primary"
@@ -75,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { api } from "src/boot/axios";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -91,6 +97,10 @@ const props = defineProps({
     required: true,
   },
   selectedCustomer: {
+    type: Object,
+    default: () => ({}),
+  },
+  selectedVendor: {
     type: Object,
     default: () => ({}),
   },
@@ -111,6 +121,16 @@ const props = defineProps({
 const emit = defineEmits(["close"]);
 const loading = ref(false);
 
+const contactParty = computed(() =>
+  props.vc === "vendor"
+    ? props.selectedVendor || {}
+    : props.selectedCustomer || {},
+);
+
+const isReminderEmailType = computed(() =>
+  /^reminder[123]$/.test(props.type || ""),
+);
+
 const emailData = ref({
   email: "",
   subject: "",
@@ -123,21 +143,63 @@ const emailData = ref({
   invId: props.invId,
 });
 
-// Watch for changes in selectedCustomer
+function syncPartyFields() {
+  const party = contactParty.value;
+  if (!party || typeof party !== "object") return;
+  emailData.value.email = party.email || "";
+  emailData.value.cc = party.cc || "";
+  emailData.value.bcc = party.bcc || "";
+}
+
+function syncPrefilledMessage() {
+  emailData.value.message = props.email_message || "";
+}
+
+function syncSubject() {
+  const num = props.invNumber;
+  if (!num) return;
+  const typ = props.type || "invoice";
+  const m = /^reminder([123])$/.exec(typ);
+  if (m) {
+    emailData.value.subject = `${t("Reminder")} ${m[1]} — ${num}`;
+    return;
+  }
+  if (typ === "credit_invoice") {
+    emailData.value.subject = `${t("Credit Invoice")} ${num}`;
+    return;
+  }
+  if (typ === "debit_invoice") {
+    emailData.value.subject = `${t("Debit Invoice")} ${num}`;
+    return;
+  }
+  emailData.value.subject = `${t("Invoice")} ${num}`;
+}
+
 watch(
-  () => props.selectedCustomer,
-  (newCustomer) => {
-    if (newCustomer) {
-      emailData.value.email = newCustomer.email || "";
-      emailData.value.cc = newCustomer.cc || "";
-      emailData.value.bcc = newCustomer.bcc || "";
-      emailData.value.message = props.email_message || "";
-    }
+  contactParty,
+  () => {
+    syncPartyFields();
+    syncPrefilledMessage();
   },
   { immediate: true, deep: true },
 );
 
-// Watch for changes in invId
+watch(
+  () => props.email_message,
+  () => {
+    syncPrefilledMessage();
+  },
+  { immediate: true },
+);
+
+watch(
+  () => [props.type, props.invNumber],
+  () => {
+    syncSubject();
+  },
+  { immediate: true },
+);
+
 watch(
   () => props.invId,
   (newId) => {
@@ -148,24 +210,17 @@ watch(
   { immediate: true },
 );
 
-// Watch for changes in invNumber and invType
 watch(
-  [() => props.invNumber, () => props.invType],
-  ([newInvNumber, newInvType]) => {
-    if (newInvNumber) {
-      const type =
-        newInvType === "credit_invoice" ? "Credit Invoice" : "Invoice";
-      emailData.value.subject = `${type} ${newInvNumber}`;
-    }
+  () => props.vc,
+  (v) => {
+    emailData.value.vc = v;
   },
-  { immediate: true },
 );
 
 // Send Email function
 const sendEmail = async () => {
   loading.value = true;
   try {
-    // Prepare the email data according to the backend API requirements
     const emailPayload = {
       vc: emailData.value.vc,
       id: emailData.value.invId,
@@ -178,7 +233,6 @@ const sendEmail = async () => {
       message: emailData.value.message,
     };
 
-    // Send the email via API
     const response = await api.post("/send_email", emailPayload);
 
     if (response.data.success) {
@@ -204,13 +258,10 @@ const sendEmail = async () => {
 };
 
 onMounted(() => {
-  // Set initial values from props
-  if (props.selectedCustomer) {
-    emailData.value.email = props.selectedCustomer.email || "";
-    emailData.value.cc = props.selectedCustomer.cc || "";
-    emailData.value.bcc = props.selectedCustomer.bcc || "";
-  }
+  syncPartyFields();
   emailData.value.vc = props.vc;
   emailData.value.invId = props.invId;
+  syncPrefilledMessage();
+  syncSubject();
 });
 </script>

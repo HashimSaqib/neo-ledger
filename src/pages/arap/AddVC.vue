@@ -39,7 +39,9 @@
           <q-tab name="contact" :label="t('Contact Person')" />
           <q-tab name="vat" :label="t('VAT')" />
           <q-tab
-            v-if="componentType === 'customer'"
+            v-if="
+              componentType === 'customer' || componentType === 'vendor'
+            "
             name="communication"
             :label="t('Communication')"
           />
@@ -379,7 +381,9 @@
 
           <!-- Communication tab -->
           <q-tab-panel
-            v-if="componentType === 'customer'"
+            v-if="
+              componentType === 'customer' || componentType === 'vendor'
+            "
             name="communication"
             class="q-pa-none"
           >
@@ -400,13 +404,69 @@
                   class="q-mb-sm"
                 />
               </div>
-              <div v-if="componentType === 'customer'" class="col-12">
+              <div
+                v-if="
+                  componentType === 'customer' || componentType === 'vendor'
+                "
+                class="col-12 q-mb-sm"
+              >
                 <MessageVariableInput
                   type="invoice_send"
                   :message-rows="customerMessageRows"
                   :active-message-language="activeMessageLanguage"
                   :label="t('Message')"
                   @update:message-rows="onCustomerMessageRowsUpdate"
+                  @update:active-message-language="
+                    activeMessageLanguage = $event
+                  "
+                />
+              </div>
+              <div
+                v-if="
+                  componentType === 'customer' || componentType === 'vendor'
+                "
+                class="col-12 q-mb-sm"
+              >
+                <MessageVariableInput
+                  type="reminder_1"
+                  :message-rows="reminder1MessageRows"
+                  :active-message-language="activeMessageLanguage"
+                  :label="t('Reminder 1 message')"
+                  @update:message-rows="onReminder1MessageRowsUpdate"
+                  @update:active-message-language="
+                    activeMessageLanguage = $event
+                  "
+                />
+              </div>
+              <div
+                v-if="
+                  componentType === 'customer' || componentType === 'vendor'
+                "
+                class="col-12 q-mb-sm"
+              >
+                <MessageVariableInput
+                  type="reminder_2"
+                  :message-rows="reminder2MessageRows"
+                  :active-message-language="activeMessageLanguage"
+                  :label="t('Reminder 2 message')"
+                  @update:message-rows="onReminder2MessageRowsUpdate"
+                  @update:active-message-language="
+                    activeMessageLanguage = $event
+                  "
+                />
+              </div>
+              <div
+                v-if="
+                  componentType === 'customer' || componentType === 'vendor'
+                "
+                class="col-12 q-mb-sm"
+              >
+                <MessageVariableInput
+                  type="reminder_3"
+                  :message-rows="reminder3MessageRows"
+                  :active-message-language="activeMessageLanguage"
+                  :label="t('Reminder 3 message')"
+                  @update:message-rows="onReminder3MessageRowsUpdate"
                   @update:active-message-language="
                     activeMessageLanguage = $event
                   "
@@ -718,6 +778,9 @@ const form = ref({
   notes: "",
   taxincluded: false,
   message: "",
+  reminder_1_message: "",
+  reminder_2_message: "",
+  reminder_3_message: "",
   // Hidden fields
   discount_accno: "",
   cashdiscount: "",
@@ -743,7 +806,7 @@ const taxAccounts = ref([]);
 const languages = ref([]);
 const arap = ref("");
 
-// Message (customer only): single template stored in form.message, shown as one row
+// Email templates (customer/vendor): one row per VC language_code
 const activeMessageLanguage = ref("");
 const customerMessageRows = computed(() => {
   const lang = form.value.language_code || languages.value[0]?.code || "en";
@@ -759,6 +822,57 @@ const customerMessageRows = computed(() => {
 function onCustomerMessageRowsUpdate(rows) {
   if (rows && rows.length > 0) {
     form.value.message = rows[0].content ?? "";
+  }
+}
+
+const reminder1MessageRows = computed(() => {
+  const lang = form.value.language_code || languages.value[0]?.code || "en";
+  const desc = languages.value.find((l) => l.code === lang)?.description ?? "";
+  return [
+    {
+      language_code: lang,
+      description: desc,
+      content: form.value.reminder_1_message ?? "",
+    },
+  ];
+});
+function onReminder1MessageRowsUpdate(rows) {
+  if (rows && rows.length > 0) {
+    form.value.reminder_1_message = rows[0].content ?? "";
+  }
+}
+
+const reminder2MessageRows = computed(() => {
+  const lang = form.value.language_code || languages.value[0]?.code || "en";
+  const desc = languages.value.find((l) => l.code === lang)?.description ?? "";
+  return [
+    {
+      language_code: lang,
+      description: desc,
+      content: form.value.reminder_2_message ?? "",
+    },
+  ];
+});
+function onReminder2MessageRowsUpdate(rows) {
+  if (rows && rows.length > 0) {
+    form.value.reminder_2_message = rows[0].content ?? "";
+  }
+}
+
+const reminder3MessageRows = computed(() => {
+  const lang = form.value.language_code || languages.value[0]?.code || "en";
+  const desc = languages.value.find((l) => l.code === lang)?.description ?? "";
+  return [
+    {
+      language_code: lang,
+      description: desc,
+      content: form.value.reminder_3_message ?? "",
+    },
+  ];
+});
+function onReminder3MessageRowsUpdate(rows) {
+  if (rows && rows.length > 0) {
+    form.value.reminder_3_message = rows[0].content ?? "";
   }
 }
 
@@ -988,7 +1102,10 @@ watch(
 watch(
   [() => form.value.language_code, languages],
   () => {
-    if (componentType.value === "customer") {
+    if (
+      componentType.value === "customer" ||
+      componentType.value === "vendor"
+    ) {
       activeMessageLanguage.value =
         form.value.language_code || languages.value[0]?.code || "en";
     }
