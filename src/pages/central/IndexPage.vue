@@ -104,6 +104,37 @@
           {{ t("Error fetching datasets. Please try again later.") }}
         </q-banner>
 
+        <!-- Top-level tabs: Datasets vs. Receipts -->
+        <q-tabs
+          v-if="!loading && !error"
+          v-model="mainTab"
+          dense
+          class="central-tabs q-mb-md"
+          active-color="primary"
+          indicator-color="primary"
+          align="left"
+          narrow-indicator
+          inline-label
+        >
+          <q-tab name="datasets" icon="folder_open" :label="t('Datasets')" />
+          <q-tab
+            v-if="isAiPluginEnabled"
+            name="receipts"
+            icon="receipt_long"
+            :label="t('Upload Receipts')"
+          />
+        </q-tabs>
+        <q-separator v-if="!loading && !error" class="q-mb-md" />
+
+        <q-tab-panels
+          v-if="!loading && !error"
+          v-model="mainTab"
+          animated
+          keep-alive
+          class="central-tab-panels"
+        >
+          <q-tab-panel name="datasets" class="q-pa-none">
+
         <!-- Search and Create Dataset Bar -->
         <div class="q-mb-md">
           <div
@@ -372,6 +403,21 @@
             </template>
           </q-table>
         </div>
+          </q-tab-panel>
+
+          <q-tab-panel
+            v-if="isAiPluginEnabled"
+            name="receipts"
+            class="q-pa-none"
+          >
+            <component
+              v-if="ReceiptsPanel"
+              :is="ReceiptsPanel"
+              :datasets="datasets"
+              @refresh="getDatasets"
+            />
+          </q-tab-panel>
+        </q-tab-panels>
 
         <!-- Manage Dataset Dialog -->
         <q-dialog v-model="manageDialog">
@@ -1188,7 +1234,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, useTemplateRef } from "vue";
+import {
+  ref,
+  onMounted,
+  computed,
+  useTemplateRef,
+  defineAsyncComponent,
+} from "vue";
 import { api } from "src/boot/axios";
 import { Notify, Cookies, useQuasar, LocalStorage } from "quasar";
 import { useI18n } from "vue-i18n";
@@ -1202,6 +1254,12 @@ import CreateDataset from "./CreateDataset.vue";
 import DatasetConnections from "./DatasetConnections.vue";
 import ApiKeys from "./ApiKeys.vue";
 import neoledgerConfig from "../../../neoledger.json";
+
+const ReceiptsPanel = neoledgerConfig.ai_plugin
+  ? defineAsyncComponent(() =>
+      import("../../ai_plugin/components/ReceiptsPanel.vue"),
+    )
+  : null;
 
 const logo = resolveLogo({ forceDark: true });
 const productName = neoledgerConfig.productName || "Neo Ledger";
@@ -1368,6 +1426,10 @@ const router = useRouter();
 
 // View and search state
 const searchQuery = ref("");
+
+// Top-level tab state: "datasets" (existing) or "receipts" (new upload panel)
+const isAiPluginEnabled = !!neoledgerConfig.ai_plugin;
+const mainTab = ref("datasets");
 
 // Datasets state
 const datasets = ref([]);
@@ -2235,5 +2297,27 @@ function getAccessLevelPillClass(accessLevel) {
 .status-pill--info {
   background-color: #ebf4ff;
   color: #007bff;
+}
+
+.central-tabs {
+  color: var(--q-lighttext);
+}
+
+.central-tabs :deep(.q-tab) {
+  min-height: 40px;
+  padding: 0 14px;
+  font-weight: 500;
+}
+
+.central-tabs :deep(.q-tab--active) {
+  color: var(--q-primary);
+}
+
+.central-tab-panels {
+  background: transparent;
+}
+
+.central-tab-panels :deep(.q-tab-panel) {
+  background: transparent;
 }
 </style>

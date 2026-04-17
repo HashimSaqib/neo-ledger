@@ -28,7 +28,15 @@
       popup-content-class="popupcontentclass"
       :placeholder="placeholder"
       clear-icon="close"
-    />
+    >
+      <!-- Forward any named slot passed into <s-select> through to <q-select>. -->
+      <template
+        v-for="slotName in Object.keys($slots)"
+        #[slotName]="slotProps"
+      >
+        <slot :name="slotName" v-bind="slotProps || {}" />
+      </template>
+    </q-select>
   </div>
 </template>
 
