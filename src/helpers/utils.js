@@ -113,6 +113,7 @@ export const PDF_STYLES = {
     notes: 25,
     name: 30,
     address: 35,
+    taxAcc: 20,
   },
 };
 
@@ -571,6 +572,69 @@ export const createPDFWithCustomStyles = (
     head: [headerRow],
     body: bodyData,
   };
+
+  // Ensure headers wrap only at word boundaries (never inside a single word).
+  if (Array.isArray(headerRow) && headerRow.length > 0) {
+    const baseFontSize =
+      finalOptions.styles?.fontSize || PDF_STYLES.transactionTable.styles.fontSize;
+    const headFontSize = finalOptions.headStyles?.fontSize || baseFontSize;
+    const headFontStyle = finalOptions.headStyles?.fontStyle || "bold";
+
+    const resolveHorizontalPadding = (padding) => {
+      if (typeof padding === "number") return padding * 2;
+      if (padding && typeof padding === "object") {
+        const left = Number(padding.left ?? padding.horizontal ?? 0);
+        const right = Number(padding.right ?? padding.horizontal ?? 0);
+        return left + right;
+      }
+      return 4; // fallback for transaction table defaults
+    };
+
+    const horizontalPaddingMm = resolveHorizontalPadding(
+      finalOptions.headStyles?.cellPadding ?? finalOptions.styles?.cellPadding
+    );
+
+    const getLongestHeaderWordWidthMm = (header) => {
+      const words = String(header || "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      if (!words.length) return 0;
+      return words.reduce(
+        (maxWidth, word) => Math.max(maxWidth, getTextWidthMm(doc, word)),
+        0
+      );
+    };
+
+    const previousFontSize = doc.getFontSize();
+    const previousFont = doc.getFont();
+    doc.setFontSize(headFontSize);
+    doc.setFont(previousFont.fontName, headFontStyle);
+
+    const headerMinWidths = headerRow.map((header) =>
+      Math.max(getLongestHeaderWordWidthMm(header) + horizontalPaddingMm + 1, 8)
+    );
+
+    doc.setFontSize(previousFontSize);
+    doc.setFont(previousFont.fontName, previousFont.fontStyle);
+
+    const mergedColumnStyles = { ...(finalOptions.columnStyles || {}) };
+    headerMinWidths.forEach((minWidth, index) => {
+      const existingStyle = mergedColumnStyles[index] || {};
+      const existingCellWidth =
+        typeof existingStyle.cellWidth === "number" ? existingStyle.cellWidth : null;
+
+      mergedColumnStyles[index] = {
+        ...existingStyle,
+        minCellWidth: Math.max(existingStyle.minCellWidth || 0, minWidth),
+        ...(existingCellWidth !== null
+          ? { cellWidth: Math.max(existingCellWidth, minWidth) }
+          : {}),
+      };
+    });
+
+    finalOptions.columnStyles = mergedColumnStyles;
+  }
 
   autoTable(doc, finalOptions);
   return doc.lastAutoTable.finalY;

@@ -17,7 +17,7 @@
                 input-class="maintext"
                 label-color="secondary"
                 outlined
-                dense
+                densetaxam
               />
               <text-input
                 v-model="formData.description"
@@ -476,10 +476,26 @@ const baseColumns = ref([
     default: false,
   },
   {
+    name: "accno",
+    align: "left",
+    label: "Account",
+    field: "accno",
+    sortable: true,
+    default: true,
+  },
+  {
     name: "transdate",
     align: "left",
     label: "Date",
     field: "transdate",
+    sortable: true,
+    default: true,
+  },
+  {
+    name: "contra",
+    align: "left",
+    label: "Counter Account",
+    field: "contra",
     sortable: true,
     default: true,
   },
@@ -507,7 +523,7 @@ const baseColumns = ref([
     label: "Files",
     field: "files",
     sortable: true,
-    default: true,
+    default: false,
   },
   {
     name: "name",
@@ -550,6 +566,14 @@ const baseColumns = ref([
     default: false,
   },
   {
+    name: "taxAcc",
+    align: "left",
+    label: "VAT Code",
+    field: (row) => formatTaxAcc(row),
+    sortable: false,
+    default: true,
+  },
+  {
     name: "debit",
     align: "right",
     label: "Debit",
@@ -566,20 +590,12 @@ const baseColumns = ref([
     default: true,
   },
   {
-    name: "taxAcc",
-    align: "left",
-    label: "Tax Acc",
-    field: (row) => formatTaxAcc(row),
-    sortable: false,
-    default: true,
-  },
-  {
     name: "taxAmount",
     align: "right",
     label: "Tax Amount",
     field: (row) => Number(row.linetaxamount) || 0,
     sortable: true,
-    default: true,
+    default: false,
   },
   {
     name: "source",
@@ -598,26 +614,10 @@ const baseColumns = ref([
     default: false,
   },
   {
-    name: "accno",
-    align: "left",
-    label: "Account",
-    field: "accno",
-    sortable: true,
-    default: false,
-  },
-  {
     name: "gifi_accno",
     align: "left",
     label: "GIFI",
     field: "gifi_accno",
-    sortable: true,
-    default: false,
-  },
-  {
-    name: "contra",
-    align: "left",
-    label: "Contra",
-    field: "contra",
     sortable: true,
     default: false,
   },
@@ -646,6 +646,18 @@ const selectedColumns = ref(
     return acc;
   }, {}),
 );
+const GL_FILTERS_VERSION = 2;
+const JOURNAL_DEFAULT_ORDER = [
+  "accno",
+  "transdate",
+  "contra",
+  "reference",
+  "description",
+  "taxAcc",
+  "debit",
+  "credit",
+  "balance",
+];
 
 function processFilters() {
   const savedFilters = LocalStorage.getItem("gl_list_filters");
@@ -661,10 +673,33 @@ function processFilters() {
         parsedFilters.columns &&
         parsedFilters.order
       ) {
-        selectedColumns.value = {
+        const migratedColumns = {
           ...selectedColumns.value,
           ...parsedFilters.columns,
         };
+        let migratedOrder = parsedFilters.order;
+
+        // One-time migration for legacy saved filters so new defaults apply.
+        if (parsedFilters.version !== GL_FILTERS_VERSION) {
+          migratedColumns.taxAmount = false;
+          migratedColumns.files = false;
+          JOURNAL_DEFAULT_ORDER.forEach((name) => {
+            migratedColumns[name] = true;
+          });
+          migratedOrder = [
+            ...JOURNAL_DEFAULT_ORDER,
+            ...parsedFilters.order.filter(
+              (name) => !JOURNAL_DEFAULT_ORDER.includes(name),
+            ),
+          ];
+        }
+
+        selectedColumns.value = {
+          ...migratedColumns,
+        };
+        baseColumns.value = migratedOrder
+          .map((name) => baseColumns.value.find((col) => col.name === name))
+          .filter((col) => col !== undefined);
       } else {
         throw new Error("Invalid filter structure in cookie.");
       }
@@ -674,6 +709,7 @@ function processFilters() {
     }
   } else {
     const defaultFilters = {
+      version: GL_FILTERS_VERSION,
       columns: baseColumns.value.reduce((acc, column) => {
         acc[column.name] = column.default;
         return acc;
@@ -698,6 +734,7 @@ watch(
   [selectedColumns, baseColumns],
   () => {
     const filters = {
+      version: GL_FILTERS_VERSION,
       columns: selectedColumns.value,
       order: baseColumns.value.map((col) => col.name),
     };
@@ -1119,12 +1156,25 @@ const createPDF = () => {
 
   // Prepare columnStyles: numeric columns right aligned, no line break; others left aligned.
   const numericColumns = ["debit", "credit", "taxAmount", "balance"];
+  const wrapColumnMaxWidth = {
+    description: 35,
+    notes: 25,
+    name: 30,
+    address: 35,
+    taxAcc: 20,
+  };
   const columnStyles = {};
   displayColumns.value.forEach((col, index) => {
     const isNumeric = numericColumns.includes(col.name);
-    columnStyles[index] = isNumeric
-      ? { halign: "right", overflow: "hidden" }
-      : { halign: "left" };
+    const maxWidth = wrapColumnMaxWidth[col.name];
+    if (isNumeric) {
+      columnStyles[index] = { halign: "right", overflow: "hidden" };
+    } else {
+      columnStyles[index] = {
+        halign: "left",
+        ...(maxWidth ? { cellWidth: maxWidth, overflow: "linebreak" } : {}),
+      };
+    }
   });
 
   // Extract rows
