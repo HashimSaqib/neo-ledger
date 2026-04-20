@@ -1141,7 +1141,6 @@ const createPDF = () => {
 
   // Extract headers
   const headerRow = displayColumns.value.map((col) => col.label);
-  const exportData = [];
 
   // Prepare columnStyles: numeric columns right aligned, no line break; others left aligned.
   const numericColumns = ["debit", "credit", "taxAmount", "balance"];
@@ -1176,50 +1175,79 @@ const createPDF = () => {
     }
   });
 
-  // Extract rows
-  tableRows.value.forEach((row) => {
-    if (row.isGroupHeader) {
-      exportData.push([
-        {
-          content: row.groupLabel,
-          colSpan: headerRow.length,
-          styles: { fontStyle: "bold" },
-        },
-      ]);
-    } else if (row.isSubtotal) {
-      exportData.push(
-        displayColumns.value.map((col) => {
-          if (numericColumns.includes(col.name))
-            return formatAmount(row[col.name]);
-          if (col.name === "accno") return row.accno;
-          return "";
-        }),
-      );
-    } else {
-      exportData.push(
-        displayColumns.value.map((col) => {
-          if (col.name === "reference") return row.reference;
-          if (col.name === "accno") return row.accno;
-          if (col.name === "transdate") return formatDate(row.transdate);
-          if (numericColumns.includes(col.name)) {
-            return formatAmount(
-              typeof col.field === "function" ? col.field(row) : row[col.field],
-            );
-          }
-          if (col.name === "created") return formatTimestamp(row.created);
-          if (col.name === "updated") return formatUpdatedTimestamp(row);
-          return typeof col.field === "function"
-            ? col.field(row)
-            : row[col.field];
-        }),
-      );
-    }
-  });
+  const mapDataRowToPdf = (row) =>
+    displayColumns.value.map((col) => {
+      if (col.name === "reference") return row.reference;
+      if (col.name === "accno") return row.accno;
+      if (col.name === "transdate") return formatDate(row.transdate);
+      if (numericColumns.includes(col.name)) {
+        return formatAmount(
+          typeof col.field === "function" ? col.field(row) : row[col.field],
+        );
+      }
+      if (col.name === "created") return formatTimestamp(row.created);
+      if (col.name === "updated") return formatUpdatedTimestamp(row);
+      return typeof col.field === "function" ? col.field(row) : row[col.field];
+    });
 
-  // Generate table using centralized styles for tabular layout with grey lines
-  createPDFWithCustomStyles(doc, headerRow, exportData, {
-    startY: yPosition,
-    columnStyles: columnStyles,
+  const mapSubtotalRowToPdf = (row) =>
+    displayColumns.value.map((col) => {
+      if (numericColumns.includes(col.name)) return formatAmount(row[col.name]);
+      if (col.name === "accno") return row.accno;
+      return "";
+    });
+
+  const buildPdfChunks = () => {
+    const chunks = [];
+    if (appliedSplitLedger.value) {
+      let current = [];
+      tableRows.value.forEach((row) => {
+        if (row.isGroupHeader) {
+          current.push([
+            {
+              content: row.groupLabel,
+              colSpan: headerRow.length,
+              styles: { fontStyle: "bold" },
+            },
+          ]);
+        } else if (row.isSubtotal) {
+          current.push(mapSubtotalRowToPdf(row));
+          chunks.push(current);
+          current = [];
+        } else {
+          current.push(mapDataRowToPdf(row));
+        }
+      });
+      if (current.length) chunks.push(current);
+    } else {
+      let current = [];
+      let prevAccno = null;
+      tableRows.value.forEach((row) => {
+        const acc = row.accno != null ? String(row.accno) : "";
+        if (prevAccno !== null && acc !== prevAccno) {
+          chunks.push(current);
+          current = [];
+        }
+        prevAccno = acc;
+        current.push(mapDataRowToPdf(row));
+      });
+      if (current.length) chunks.push(current);
+    }
+    return chunks.filter((c) => c.length > 0);
+  };
+
+  const pdfChunks = buildPdfChunks();
+  const continuedPageStartY = 15;
+
+  pdfChunks.forEach((body, index) => {
+    if (index > 0) {
+      doc.addPage();
+    }
+    createPDFWithCustomStyles(doc, headerRow, body, {
+      startY: index === 0 ? yPosition : continuedPageStartY,
+      columnStyles: columnStyles,
+      rowPageBreak: "avoid",
+    });
   });
 
   // Save the PDF
