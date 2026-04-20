@@ -1077,43 +1077,32 @@ const downloadTransactions = () => {
   // Build header row from displayed columns
   const headerRow = displayColumns.value.map((col) => col.label);
   const exportData = [headerRow];
+  const formatAccountForExport = (row) => {
+    const accountNo = row.accno || "";
+    const accountDescription = row.account_description || "";
+    return accountDescription
+      ? `${accountNo} -- ${accountDescription}`
+      : accountNo;
+  };
 
   // Build export data row by row
   tableRows.value.forEach((row) => {
-    if (row.isGroupHeader) {
-      const newRow = [
-        row.groupLabel,
-        ...new Array(headerRow.length - 1).fill(""),
-      ];
-      exportData.push(newRow);
-    } else if (row.isSubtotal) {
-      const newRow = displayColumns.value.map((col) => {
-        if (col.name === "debit") return formatAmount(row.debit);
-        if (col.name === "credit") return roundAmount(row.credit);
-        if (col.name === "taxAmount") return roundAmount(row.taxAmount);
-        if (col.name === "balance") return roundAmount(row.balance);
-        if (col.name === "accno") return row.accno;
-        return "";
-      });
-      exportData.push(newRow);
-    } else {
-      const newRow = displayColumns.value.map((col) => {
-        if (col.name === "reference") return row.reference;
-        if (col.name === "accno") return row.accno;
-        if (col.name === "transdate") return formatDate(row.transdate);
-        if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
-          return roundAmount(
-            typeof col.field === "function" ? col.field(row) : row[col.field],
-          );
-        }
-        if (col.name === "created") return formatTimestamp(row.created);
-        if (col.name === "updated") return formatUpdatedTimestamp(row);
-        return typeof col.field === "function"
-          ? col.field(row)
-          : row[col.field];
-      });
-      exportData.push(newRow);
-    }
+    if (row.isGroupHeader || row.isSubtotal) return;
+
+    const newRow = displayColumns.value.map((col) => {
+      if (col.name === "reference") return row.reference;
+      if (col.name === "accno") return formatAccountForExport(row);
+      if (col.name === "transdate") return formatDate(row.transdate);
+      if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
+        return roundAmount(
+          typeof col.field === "function" ? col.field(row) : row[col.field],
+        );
+      }
+      if (col.name === "created") return formatTimestamp(row.created);
+      if (col.name === "updated") return formatUpdatedTimestamp(row);
+      return typeof col.field === "function" ? col.field(row) : row[col.field];
+    });
+    exportData.push(newRow);
   });
 
   // Create worksheet and auto-adjust column widths
@@ -1156,6 +1145,11 @@ const createPDF = () => {
 
   // Prepare columnStyles: numeric columns right aligned, no line break; others left aligned.
   const numericColumns = ["debit", "credit", "taxAmount", "balance"];
+  const previousFontSize = doc.getFontSize();
+  doc.setFontSize(PDF_STYLES.transactionTable.styles.fontSize);
+  // Width target for 7-figure formatted amounts like 9,999,999.99
+  const numericColumnWidth = doc.getTextWidth("9,999,999.9");
+  doc.setFontSize(previousFontSize);
   const wrapColumnMaxWidth = {
     description: 35,
     notes: 25,
@@ -1168,7 +1162,12 @@ const createPDF = () => {
     const isNumeric = numericColumns.includes(col.name);
     const maxWidth = wrapColumnMaxWidth[col.name];
     if (isNumeric) {
-      columnStyles[index] = { halign: "right", overflow: "hidden" };
+      columnStyles[index] = {
+        halign: "right",
+        overflow: "hidden",
+        cellWidth: numericColumnWidth,
+        minCellWidth: numericColumnWidth,
+      };
     } else {
       columnStyles[index] = {
         halign: "left",
