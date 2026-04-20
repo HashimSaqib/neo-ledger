@@ -835,12 +835,54 @@
                     formatAmount(tax.amount)
                   }}</span>
                 </template>
-                <span class="totals-label maintext"
-                  ><strong>{{ t("Rounding") }}</strong></span
-                >
-                <span class="totals-value maintext"
-                  ><strong>{{ rounding }}</strong></span
-                >
+                <span class="totals-label maintext totals-rounding-label">
+                  <q-icon
+                    name="tune"
+                    size="12px"
+                    class="text-secondary totals-rounding-icon"
+                  />
+                  <span class="totals-rounding-text">{{ t("Rounding") }}</span>
+                  <q-popup-edit
+                    v-model="rounding"
+                    v-slot="scope"
+                    @save="saveRounding"
+                    :offset="[0, 8]"
+                  >
+                    <div class="rounding-popup">
+                      <fn-input
+                        v-model="scope.value"
+                        no-label
+                        class="rounding-popup-input"
+                        @keyup.enter="scope.set"
+                      />
+                      <div class="rounding-popup-actions">
+                        <q-btn
+                          flat
+                          round
+                          size="sm"
+                          color="secondary"
+                          icon="close"
+                          class="rounding-action-btn"
+                          @click="scope.cancel"
+                        />
+                        <q-btn
+                          flat
+                          round
+                          size="sm"
+                          color="primary"
+                          icon="check"
+                          class="rounding-action-btn"
+                          @click="scope.set"
+                        />
+                      </div>
+                    </div>
+                  </q-popup-edit>
+                </span>
+                <span class="totals-value maintext totals-rounding-value">
+                  <span class="totals-rounding-amount">{{
+                    formatAmount(rounding)
+                  }}</span>
+                </span>
                 <span class="totals-label maintext"
                   ><strong>{{ t("Total") }}</strong></span
                 >
@@ -1634,6 +1676,12 @@ watch(partDialog, () => {
 const taxIncluded = ref(false);
 const rounding = ref(0);
 const invoiceTaxes = ref([]);
+const saveRounding = (value) => {
+  const parsedValue = Number.parseFloat(value);
+  rounding.value = Number.isFinite(parsedValue)
+    ? Number(parsedValue.toFixed(2))
+    : 0;
+};
 const calculateTaxes = () => {
   if (!customer.value) {
     return;
@@ -2890,12 +2938,65 @@ const originalInvDate = ref(null);
 .totals-grid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 2px 24px;
+  gap: 6px 24px;
   justify-items: end;
 }
 
 .totals-value {
   text-align: right;
   min-width: 80px;
+}
+
+.totals-rounding-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.totals-rounding-label {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--q-border);
+  background: var(--q-input);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.totals-rounding-label:hover {
+  border-color: var(--q-secondary);
+}
+
+.totals-rounding-icon {
+  opacity: 0.65;
+}
+
+.totals-rounding-text {
+  font-weight: 600;
+}
+
+.totals-rounding-amount {
+  font-weight: 600;
+}
+
+.rounding-popup {
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rounding-popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.rounding-action-btn {
+  opacity: 0.9;
 }
 </style>

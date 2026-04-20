@@ -48,6 +48,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  emitOnInput: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 /**
@@ -114,6 +118,9 @@ watch(
  */
 function onInput(value) {
   rawValue.value = value;
+  if (props.emitOnInput) {
+    emit("update:modelValue", parseAmount(value));
+  }
 }
 </script>
 
