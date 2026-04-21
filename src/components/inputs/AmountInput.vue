@@ -20,6 +20,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
+import { LocalStorage } from "quasar";
 import { formatAmount, parseAmount } from "src/helpers/utils";
 
 /**
@@ -52,6 +53,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disableRounding: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 /**
@@ -73,7 +78,10 @@ const containerRef = ref(null);
  * - When editing, we show the raw value the user is typing.
  */
 const displayValue = computed(() => {
-  return isEditing.value ? rawValue.value : formatAmount(props.modelValue);
+  if (isEditing.value) return rawValue.value;
+  return props.disableRounding
+    ? stringifyValue(props.modelValue)
+    : formatAmount(props.modelValue);
 });
 
 /**
@@ -81,8 +89,9 @@ const displayValue = computed(() => {
  */
 function onFocus() {
   isEditing.value = true;
-  // Show the same formatted value for editing
-  rawValue.value = formatAmount(props.modelValue);
+  rawValue.value = props.disableRounding
+    ? stringifyValue(props.modelValue)
+    : formatAmount(props.modelValue);
 }
 
 /**
@@ -100,7 +109,7 @@ function onBlur(event) {
     return;
   }
   isEditing.value = false;
-  const newVal = parseAmount(rawValue.value);
+  const newVal = parseInputValue(rawValue.value);
   emit("update:modelValue", newVal);
 }
 
@@ -108,7 +117,9 @@ watch(
   () => props.modelValue,
   (newVal) => {
     if (isEditing.value) {
-      rawValue.value = formatAmount(newVal);
+      rawValue.value = props.disableRounding
+        ? stringifyValue(newVal)
+        : formatAmount(newVal);
     }
   },
 );
@@ -119,8 +130,57 @@ watch(
 function onInput(value) {
   rawValue.value = value;
   if (props.emitOnInput) {
-    emit("update:modelValue", parseAmount(value));
+    emit("update:modelValue", parseInputValue(value));
   }
+}
+
+function stringifyValue(value) {
+  if (value === null || value === undefined || value === "") return "";
+  if (typeof value === "number") return String(value);
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? String(value) : String(parsed);
+}
+
+function parseInputValue(value) {
+  if (!props.disableRounding) return parseAmount(String(value ?? ""));
+  return parseAmountWithoutRounding(value);
+}
+
+function parseAmountWithoutRounding(amountValue) {
+  if (amountValue === null || amountValue === undefined || amountValue === "") {
+    return 0;
+  }
+
+  if (typeof amountValue === "number") {
+    return Number.isNaN(amountValue) ? 0 : amountValue;
+  }
+
+  const amountString = String(amountValue);
+  const numberFormat = LocalStorage.getItem("numberFormat") || "1,000.00";
+  let parsed;
+
+  switch (numberFormat) {
+    case "1,000.00":
+      parsed = parseFloat(amountString.replace(/,/g, ""));
+      break;
+    case "1'000.00":
+      parsed = parseFloat(amountString.replace(/'/g, ""));
+      break;
+    case "1.000,00":
+      parsed = parseFloat(amountString.replace(/\./g, "").replace(/,/g, "."));
+      break;
+    case "1000,00":
+      parsed = parseFloat(amountString.replace(/,/g, "."));
+      break;
+    case "1000.00":
+      parsed = parseFloat(amountString);
+      break;
+    default:
+      parsed = parseFloat(amountString.replace(/,/g, ""));
+      break;
+  }
+
+  return Number.isNaN(parsed) ? 0 : parsed;
 }
 </script>
 

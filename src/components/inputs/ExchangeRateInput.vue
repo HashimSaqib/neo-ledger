@@ -4,11 +4,12 @@
       :model-value="numericValue"
       @update:model-value="emitValue"
       :label="noLabel ? '' : label"
+      :no-label="noLabel"
+      :bg-color="bgColor"
+      disable-rounding
       outlined
       dense
-      :bg-color="bgColor"
       label-color="secondary"
-      :no-label="noLabel"
     >
       <template #append>
         <q-icon
@@ -17,7 +18,9 @@
           size="18px"
           @mousedown.prevent="fetchRate"
         >
-          <q-tooltip>{{ t("Get suggested exchange rate (Swiss BAZG)") }}</q-tooltip>
+          <q-tooltip>{{
+            t("Get suggested exchange rate (Swiss BAZG)")
+          }}</q-tooltip>
         </q-icon>
       </template>
     </fn-input>
@@ -60,23 +63,28 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
+const DECIMALS = 4;
 
 const numericValue = computed(() => {
   if (props.modelValue === "" || props.modelValue == null) return 0;
   const num = Number(props.modelValue);
-  return Number.isNaN(num) ? 0 : num;
+  return Number.isNaN(num) ? 0 : roundToDecimals(num);
 });
+
+function roundToDecimals(value, decimals = DECIMALS) {
+  return Number(value.toFixed(decimals));
+}
 
 function emitValue(val) {
   const num = typeof val === "number" ? val : parseFloat(val);
-  emit("update:modelValue", Number.isNaN(num) ? 0 : num);
+  emit("update:modelValue", Number.isNaN(num) ? 0 : roundToDecimals(num));
 }
 
 const fetchRate = async () => {
   const dateStr =
     typeof props.transdate === "string"
       ? props.transdate
-      : props.transdate?.value ?? "";
+      : (props.transdate?.value ?? "");
   if (!props.currency?.trim() || !dateStr) {
     Notify.create({
       message: t("Currency and date are required to fetch exchange rate"),
