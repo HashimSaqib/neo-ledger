@@ -300,7 +300,7 @@ const saveRole = async () => {
       // For creation, send client info as before
       await api.post(
         `/system/roles?client=${selectedDataset.value.db_name}`,
-        payload
+        payload,
       );
       Notify.create({
         message: t("Role added successfully!"),
@@ -414,7 +414,9 @@ h1 {
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .dataset-card:hover {

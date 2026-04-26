@@ -1598,6 +1598,18 @@ const roleOptionsForEdit = computed(() => {
 // Compute grouped access controls from menuLinks
 const groupedAcs = ref([]);
 
+// Extra permission groups — for capabilities that aren't tied to a specific
+// route or menu entry (e.g. the AI chat widget). These are rendered alongside
+// the menu-derived groups so admins can grant/revoke them per role.
+const EXTRA_ACS_GROUPS = [
+  {
+    group: "ai",
+    label: "AI",
+    top: false,
+    subs: [{ perm: "ai.chat", label: "AI Chat" }],
+  },
+];
+
 const computeGroupedAcs = async () => {
   const menuLinks = await getMenuLinks();
 
@@ -1614,7 +1626,7 @@ const computeGroupedAcs = async () => {
     });
   };
 
-  groupedAcs.value = menuLinks.map((link) => {
+  const menuGroups = menuLinks.map((link) => {
     const groupPerm = link.perm || link.perl;
     const groupLabel = link.title;
     const subs = link.sublinks ? flattenSublinks(link.sublinks) : [];
@@ -1625,6 +1637,35 @@ const computeGroupedAcs = async () => {
       subs: subs,
     };
   });
+
+  // Collect all perms already represented in menu groups to avoid duplicates
+  const knownPerms = new Set();
+  menuGroups.forEach((g) => {
+    if (g.group) knownPerms.add(g.group);
+    g.subs.forEach((s) => knownPerms.add(s.perm));
+  });
+
+  // Merge extras: either extend an existing group (if same `group` key) or
+  // append a new group. Each extra is skipped if its perm is already known.
+  for (const extra of EXTRA_ACS_GROUPS) {
+    const filteredSubs = extra.subs.filter((s) => !knownPerms.has(s.perm));
+    if (!filteredSubs.length) continue;
+
+    const existing = menuGroups.find((g) => g.group === extra.group);
+    if (existing) {
+      existing.subs.push(...filteredSubs);
+    } else {
+      menuGroups.push({
+        group: extra.group,
+        label: extra.label,
+        top: !!extra.top,
+        subs: filteredSubs,
+      });
+    }
+    filteredSubs.forEach((s) => knownPerms.add(s.perm));
+  }
+
+  groupedAcs.value = menuGroups;
 };
 
 // Flat list of all menu items for the hidden dropdown

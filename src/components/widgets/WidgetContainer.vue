@@ -89,7 +89,7 @@
           ]"
           :data-widget-id="widget.id"
           :data-index="index"
-          draggable="true"
+          :draggable="isWidgetDraggable(widget)"
           @dragstart="onDragStart($event, widget, index)"
           @dragenter="onDragEnter($event, widget, index)"
           @dragover.prevent="onDragOver"
@@ -163,6 +163,14 @@
             :loading="widgetLoading.pl"
             :is-dragging="draggingWidget === widget.id"
             @refresh="refreshWidget(widget.type)"
+            @toggle-visibility="toggleWidgetVisibility(widget.id)"
+          />
+          <ai-chat-widget
+            v-else-if="widget.type === 'ai_chat'"
+            :ref="(el) => setWidgetRef(widget.id, el)"
+            :is-dragging="draggingWidget === widget.id"
+            @drag-start="enableWidgetDrag(widget.id)"
+            @drag-end="draggableWidgetId = null"
             @toggle-visibility="toggleWidgetVisibility(widget.id)"
           />
         </div>
@@ -387,6 +395,7 @@ import BankActivityWidget from "./BankActivityWidget.vue";
 import Top10VcWidget from "./Top10VcWidget.vue";
 import RevenueWidget from "./RevenueWidget.vue";
 import PLWidget from "./PLWidget.vue";
+import AiChatWidget from "./AiChatWidget.vue";
 import {
   drawLineChart,
   LABEL_AREA,
@@ -423,6 +432,17 @@ const gridRef = ref(null);
 const draggingWidget = ref(null);
 const dragOverWidget = ref(null);
 const draggedIndex = ref(null);
+// Widgets with selectable/interactive content (e.g. the AI chat) should only
+// become draggable when the user explicitly grabs their header. Otherwise the
+// native HTML5 drag hijacks text selection.
+const draggableWidgetId = ref(null);
+const isWidgetDraggable = (widget) => {
+  if (widget.type !== "ai_chat") return true;
+  return draggableWidgetId.value === widget.id;
+};
+const enableWidgetDrag = (widgetId) => {
+  draggableWidgetId.value = widgetId;
+};
 
 // Widget widths - reactive object to track width per widget (default is half/50%)
 const widgetWidths = reactive({
@@ -433,6 +453,7 @@ const widgetWidths = reactive({
   bank_activity: "half",
   revenue: "half",
   pl: "half",
+  ai_chat: "half",
 });
 
 const widthOptions = [
@@ -469,6 +490,7 @@ const widgetLoading = ref({
   bank_activity: false,
   revenue: false,
   pl: false,
+  ai_chat: false,
 });
 
 const ALLOWED_PERIOD_TYPES = ["monthly", "quarterly", "yearly"];
@@ -572,6 +594,14 @@ const widgetDefinitions = [
     description: t("YTD profit & loss summary vs prior year"),
     icon: "analytics",
     permission: "gl.transactions",
+  },
+  {
+    id: "ai_chat",
+    type: "ai_chat",
+    label: t("AI Assistant"),
+    description: t("Chat with your ledger — ask questions in natural language"),
+    icon: "auto_awesome",
+    permission: "ai.chat",
   },
 ];
 
@@ -830,6 +860,7 @@ const onDragEnd = () => {
   draggingWidget.value = null;
   dragOverWidget.value = null;
   draggedIndex.value = null;
+  draggableWidgetId.value = null;
 };
 
 // Initialize all widget configs with proper unique orders
@@ -1310,6 +1341,7 @@ const exportToPDF = async () => {
       const widgetRef = widgetRefs[widget.id];
       if (!widgetRef?.getPdfExport) continue;
       const exportData = widgetRef.getPdfExport();
+      if (!exportData) continue;
 
       // Widget title — aligned with chart card left edge (margin + LABEL_AREA for
       // chart widgets, plain margin for table widgets)
