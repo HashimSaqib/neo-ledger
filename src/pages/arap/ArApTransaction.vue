@@ -1927,9 +1927,7 @@ const loadInvoice = async (invoice) => {
 
     lines.value = invoice.lineitems.map((item, index) => ({
       id: Date.now() + index,
-      amount: Boolean(invoice.taxincluded)
-        ? +item.amount + +item.taxAmount
-        : +item.amount,
+      amount: item.amount,
       account:
         itemAccounts.value.find((acc) => acc.accno == item.accno) || null,
       description: item.description,
