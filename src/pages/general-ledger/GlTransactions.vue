@@ -288,7 +288,7 @@
         :rows-per-page-options="[0]"
         :rows="tableRows"
         :columns="displayColumns"
-        row-key="id"
+        row-key="_rowKey"
       >
         <!-- Custom body slot: group header, subtotal and normal rows -->
         <template v-slot:body="props">
@@ -765,6 +765,15 @@ const displayColumns = computed(() => {
   return cols.map((col) => ({ ...col, label: t(col.label) }));
 });
 
+/** Synthetic API row: opening balance only (no transactions in range). Excluded from XL export. */
+function isOpeningBalanceOnlyEntry(row) {
+  if (!row || row.isGroupHeader || row.isSubtotal) return false;
+  if (Number(row.id) !== 0) return false;
+  if (row.transdate != null && row.transdate !== "") return false;
+  if (row.contra != null && String(row.contra).trim() !== "") return false;
+  return true;
+}
+
 // Helper function that groups the data if grouping is desired at search time.
 // When l_splitledger=1 the backend stamps an opening balance on every row for
 // that account (same value for all rows of the same account). We use that as
@@ -798,25 +807,32 @@ function groupData(data) {
       account_description: group[0].account_description,
       groupLabel: `${acc} -- ${group[0].account_description}`,
       balance: openingBalance,
+      _rowKey: `gl-hdr-${acc}`,
     });
 
     let runningBalance = Number(group[0].balance) * -1 || 0;
-    group.forEach((row) => {
+    const detailRows = group.filter((r) => !isOpeningBalanceOnlyEntry(r));
+    detailRows.forEach((row) => {
       runningBalance += Number(row.debit) - Number(row.credit);
-      finalRows.push({ ...row, balance: runningBalance });
+      finalRows.push({
+        ...row,
+        balance: runningBalance,
+        _rowKey: `gl-${acc}-ln-${row.id}-${finalRows.length}`,
+      });
     });
 
     finalRows.push({
       isSubtotal: true,
       accno: acc,
       account_description: group[0].account_description,
-      debit: group.reduce((sum, r) => sum + Number(r.debit), 0),
-      credit: group.reduce((sum, r) => sum + Number(r.credit), 0),
-      taxAmount: group.reduce(
+      debit: detailRows.reduce((sum, r) => sum + Number(r.debit), 0),
+      credit: detailRows.reduce((sum, r) => sum + Number(r.credit), 0),
+      taxAmount: detailRows.reduce(
         (sum, r) => sum + (Number(r.linetaxamount) || 0),
         0,
       ),
       balance: runningBalance,
+      _rowKey: `gl-sub-${acc}`,
     });
   });
   return finalRows;
@@ -1003,8 +1019,13 @@ const formatTaxAcc = (row) => {
     .join(", ");
 };
 
-// Use results directly for your table rows
-const tableRows = computed(() => results.value);
+// Stable keys for virtual scroll (many rows share id 0 for opening-only placeholders).
+const tableRows = computed(() =>
+  results.value.map((row, index) => ({
+    ...row,
+    _rowKey: row._rowKey ?? `gl-raw-${row.accno}-${row.id}-${index}`,
+  })),
+);
 
 // Overall totals for split ledger
 const overallTotals = computed(() => {
@@ -1088,6 +1109,7 @@ const downloadTransactions = () => {
   // Build export data row by row
   tableRows.value.forEach((row) => {
     if (row.isGroupHeader || row.isSubtotal) return;
+    if (isOpeningBalanceOnlyEntry(row)) return;
 
     const newRow = displayColumns.value.map((col) => {
       if (col.name === "reference") return row.reference;
@@ -1145,16 +1167,37 @@ const createPDF = () => {
   // Prepare columnStyles: numeric columns right aligned, no line break; others left aligned.
   const numericColumns = ["debit", "credit", "taxAmount", "balance"];
   const previousFontSize = doc.getFontSize();
+  const previousFont = doc.getFont();
   doc.setFontSize(PDF_STYLES.transactionTable.styles.fontSize);
-  // Width target for 7-figure formatted amounts like 9,999,999.99
-  const numericColumnWidth = doc.getTextWidth("9,999,999.9");
+  // Fit formatted amounts (user number format), negatives, and bold subtotals — the old
+  // literal "9,999,999.9" was too narrow and was measured in normal weight only.
+  const pdfNumericWidthSamples = [
+    formatAmount(9_999_999_999.99),
+    formatAmount(-9_999_999_999.99),
+  ];
+  const measurePdfNumericWidth = () =>
+    pdfNumericWidthSamples.reduce(
+      (w, s) => (s ? Math.max(w, doc.getTextWidth(s)) : w),
+      0,
+    );
+  doc.setFont(previousFont.fontName, "bold");
+  const pdfNumericWidthBold = measurePdfNumericWidth();
+  doc.setFont(previousFont.fontName, "normal");
+  const pdfNumericWidthNormal = measurePdfNumericWidth();
+  doc.setFont(previousFont.fontName, previousFont.fontStyle);
   doc.setFontSize(previousFontSize);
+  const numericColumnWidth = Math.max(
+    pdfNumericWidthBold,
+    pdfNumericWidthNormal,
+    16,
+  );
   const wrapColumnMaxWidth = {
     description: 35,
     notes: 25,
     name: 30,
     address: 35,
     taxAcc: 20,
+    reference: 30,
   };
   const columnStyles = {};
   displayColumns.value.forEach((col, index) => {
@@ -1197,19 +1240,54 @@ const createPDF = () => {
       return "";
     });
 
+  // Label spans all but the last column; opening/previous balance sits in the rightmost
+  // cell (same end as the Balance column in the grid).
+  const buildGroupHeaderPdfRow = (row) => {
+    const balText = row.balance != null ? formatAmount(row.balance) : "—";
+    const colCount = headerRow.length;
+    if (colCount <= 1) {
+      return [
+        {
+          content: `${row.groupLabel}    ${balText}`,
+          colSpan: colCount,
+          styles: { fontStyle: "bold", overflow: "linebreak" },
+        },
+      ];
+    }
+    return [
+      {
+        content: row.groupLabel,
+        colSpan: colCount - 1,
+        styles: {
+          fontStyle: "bold",
+          overflow: "linebreak",
+          halign: "left",
+        },
+      },
+      {
+        content: balText,
+        styles: {
+          fontStyle: "bold",
+          halign: "right",
+          overflow: "visible",
+        },
+      },
+    ];
+  };
+
+  const openingBalanceDisplayFromApiRow = (row) => {
+    if (row.balance == null || row.balance === "") return null;
+    const n = -Number(row.balance);
+    return Number.isFinite(n) ? n : null;
+  };
+
   const buildPdfChunks = () => {
     const chunks = [];
     if (appliedSplitLedger.value) {
       let current = [];
       tableRows.value.forEach((row) => {
         if (row.isGroupHeader) {
-          current.push([
-            {
-              content: row.groupLabel,
-              colSpan: headerRow.length,
-              styles: { fontStyle: "bold" },
-            },
-          ]);
+          current.push(buildGroupHeaderPdfRow(row));
         } else if (row.isSubtotal) {
           current.push(mapSubtotalRowToPdf(row));
           chunks.push(current);
@@ -1227,6 +1305,14 @@ const createPDF = () => {
         if (prevAccno !== null && acc !== prevAccno) {
           chunks.push(current);
           current = [];
+        }
+        if (current.length === 0) {
+          current.push(
+            buildGroupHeaderPdfRow({
+              groupLabel: `${row.accno} -- ${row.account_description || ""}`,
+              balance: openingBalanceDisplayFromApiRow(row),
+            }),
+          );
         }
         prevAccno = acc;
         current.push(mapDataRowToPdf(row));

@@ -16,7 +16,7 @@
               <div class="col-12 col-md-3" v-if="departments.length > 0">
                 <s-select
                   v-model="formData.departments"
-                  :options="departments"
+                  :options="departmentOptions"
                   :label="t('Department')"
                   option-value="value"
                   option-label="description"
@@ -32,7 +32,7 @@
               <div class="col-12 col-md-3" v-if="projects.length > 0">
                 <s-select
                   v-model="formData.projectnumbers"
-                  :options="projects"
+                  :options="projectOptions"
                   option-label="description"
                   option-value="value"
                   :label="t('Project')"
@@ -792,6 +792,16 @@ const quarterOptions = [
 
 const departments = ref([]);
 const projects = ref([]);
+const departmentOptions = computed(() =>
+  departments.value.length > 0
+    ? [{ value: "overall", description: t("Overall") }, ...departments.value]
+    : [],
+);
+const projectOptions = computed(() =>
+  projects.value.length > 0
+    ? [{ value: "overall", description: t("Overall") }, ...projects.value]
+    : [],
+);
 const currencies = ref([]);
 const filtersOpen = ref(true);
 const loading = ref(false);
