@@ -86,7 +86,7 @@
     </q-header>
 
     <q-page-container>
-      <q-page class="q-pa-md">
+      <q-page class="q-pa-lg">
         <!-- Loading state -->
         <div v-if="loading" class="flex flex-center q-pa-lg">
           <q-spinner-dots size="50px" color="primary" />
@@ -123,6 +123,12 @@
             icon="receipt_long"
             :label="t('Upload Receipts')"
           />
+          <q-tab
+            v-if="isSuperUser"
+            name="management"
+            icon="admin_panel_settings"
+            :label="t('System Management')"
+          />
         </q-tabs>
         <q-separator v-if="!loading && !error" class="q-mb-md" />
 
@@ -136,139 +142,115 @@
           <q-tab-panel name="datasets" class="q-pa-none">
 
         <!-- Search and Create Dataset Bar -->
-        <div class="q-mb-md">
-          <div
-            v-if="!loading && !error"
-            class="row q-mb-none items-center q-gutter-md"
+        <div v-if="!loading && !error" class="row items-center q-gutter-sm q-mb-md">
+          <q-input
+            v-model="searchQuery"
+            dense
+            outlined
+            :placeholder="t('Search datasets...')"
+            clearable
+            class="col-grow"
           >
-            <div class="col-grow">
-              <q-input
-                v-model="searchQuery"
-                dense
-                outlined
-                :placeholder="t('Search datasets...')"
-                clearable
-              >
-                <template v-slot:prepend>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </div>
-            <q-btn
-              v-if="allowDbCreation"
-              :label="t('Create New Dataset')"
-              @click="showDatasetDialog = true"
-              color="primary"
-              icon="add"
-              unelevated
-            />
-          </div>
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+          <q-btn
+            v-if="allowDbCreation"
+            :label="t('Create New Dataset')"
+            @click="showDatasetDialog = true"
+            color="primary"
+            icon="add"
+            unelevated
+          />
         </div>
 
         <!-- Pending Invites section (only shown when there are invites) -->
-        <div>
-          <q-card
-            v-if="!loading && !error && receivedInvites.length > 0"
-            class="q-mb-md"
-          >
-            <q-card-section class="q-pb-none">
-              <div class="text-h6 flex items-center">
-                <q-icon name="move_to_inbox" class="q-mr-sm" />
-                {{ t("Pending Invites") }} ({{ receivedInvites.length }})
-              </div>
-            </q-card-section>
+        <q-card
+          v-if="!loading && !error && receivedInvites.length > 0"
+          flat
+          bordered
+          class="q-mb-md invite-card"
+        >
+          <q-card-section class="row items-center no-wrap q-py-sm q-px-md">
+            <q-icon name="move_to_inbox" color="primary" size="sm" />
+            <span class="text-subtitle2 text-weight-medium q-ml-sm">{{ t("Pending Invites") }}</span>
+            <q-badge color="primary" class="q-ml-sm" rounded align="middle">{{ receivedInvites.length }}</q-badge>
+          </q-card-section>
 
-            <q-separator class="q-my-md" />
+          <q-separator />
 
-            <q-card-section>
-              <div v-if="loadingInvites" class="flex flex-center q-pa-md">
-                <q-spinner color="primary" size="md" />
-              </div>
-              <div v-else>
-                <q-list separator>
-                  <q-item
-                    v-for="invite in receivedInvites"
-                    :key="invite.id"
-                    class="q-py-sm"
+          <div v-if="loadingInvites" class="flex flex-center q-pa-md">
+            <q-spinner color="primary" size="md" />
+          </div>
+          <q-list v-else separator>
+            <q-item
+              v-for="invite in receivedInvites"
+              :key="invite.id"
+              class="q-py-sm"
+            >
+              <q-item-section avatar>
+                <q-avatar v-if="invite.logo" size="36px">
+                  <img :src="invite.logo" />
+                </q-avatar>
+                <q-avatar v-else size="36px" color="primary" text-color="white" font-size="15px">
+                  {{ invite.db_name?.charAt(0)?.toUpperCase() }}
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-weight-medium">{{ invite.db_name }}</q-item-label>
+                <q-item-label caption class="q-mt-xs">
+                  <span
+                    class="status-pill q-mr-sm"
+                    :class="`status-pill--${getAccessLevelPillClass(invite.access_level)}`"
                   >
-                    <q-item-section avatar>
-                      <q-avatar v-if="invite.logo">
-                        <img :src="invite.logo" />
-                      </q-avatar>
-
-                      <q-avatar
-                        v-else
-                        color="primary"
-                        text-color="white"
-                        icon="database"
-                      />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>
-                        <span class="text-weight-medium">{{
-                          invite.db_name
-                        }}</span>
-                      </q-item-label>
-                      <q-item-label caption class="q-mt-xs">
-                        <span
-                          class="status-pill q-mr-sm"
-                          :class="`status-pill--${getAccessLevelPillClass(invite.access_level)}`"
-                        >
-                          {{ invite.access_level }}
-                        </span>
-                        <template v-if="invite.role">
-                          <span class="status-pill status-pill--role">
-                            {{ invite.role }}
-                          </span>
-                        </template>
-                      </q-item-label>
-                    </q-item-section>
-                    <q-item-section side>
-                      <div class="row q-gutter-sm">
-                        <q-btn
-                          color="positive"
-                          flat
-                          :label="t('Accept')"
-                          @click="acceptInvite(invite.id)"
-                          :loading="processingInvite === invite.id"
-                        />
-                        <q-btn
-                          color="negative"
-                          flat
-                          :label="t('Decline')"
-                          @click="declineInvite(invite.id)"
-                          :loading="processingInvite === invite.id"
-                        />
-                      </div>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
+                    {{ invite.access_level }}
+                  </span>
+                  <template v-if="invite.role">
+                    <span class="status-pill status-pill--role">{{ invite.role }}</span>
+                  </template>
+                </q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <div class="row q-gutter-xs">
+                  <q-btn
+                    color="positive"
+                    unelevated
+                    size="sm"
+                    :label="t('Accept')"
+                    @click="acceptInvite(invite.id)"
+                    :loading="processingInvite === invite.id"
+                  />
+                  <q-btn
+                    color="negative"
+                    flat
+                    size="sm"
+                    :label="t('Decline')"
+                    @click="declineInvite(invite.id)"
+                    :loading="processingInvite === invite.id"
+                  />
+                </div>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
         <!-- No results message -->
-        <div class="">
-          <div
-            v-if="!loading && !error && filteredDatasets.length === 0"
-            class="flex flex-center column q-py-xl text-grey text-center"
-          >
-            <q-icon name="search_off" size="64px" />
-            <div class="text-h6 q-mt-md">{{ t("No datasets found") }}</div>
-            <div class="text-body2">
-              {{ t("Try adjusting your search query") }}
-            </div>
-          </div>
+        <div
+          v-if="!loading && !error && filteredDatasets.length === 0"
+          class="flex flex-center column q-py-xl text-grey text-center"
+        >
+          <q-icon name="search_off" size="64px" />
+          <div class="text-h6 q-mt-md">{{ t("No datasets found") }}</div>
+          <div class="text-body2">{{ t("Try adjusting your search query") }}</div>
         </div>
-        <div>
-          <!-- Use v-model for two-way binding of dialog visibility -->
-          <CreateDataset
-            v-model="showDatasetDialog"
-            @create-dataset="handleCreateDataset"
-            @update:allowCreation="handleAllowCreation"
-          />
-        </div>
+
+        <!-- Use v-model for two-way binding of dialog visibility -->
+        <CreateDataset
+          v-model="showDatasetDialog"
+          @create-dataset="handleCreateDataset"
+          @update:allowCreation="handleAllowCreation"
+        />
 
         <!-- API Keys Dialog -->
         <ApiKeys
@@ -299,13 +281,8 @@
                 class="cursor-pointer"
                 @click="navigateToDataset(props.row)"
               >
-                <div class="text-weight-medium">
-                  {{ props.row.name }}
-                </div>
-                <div
-                  class="text-caption"
-                  v-if="emailDomain && emailDomain !== ''"
-                >
+                <div class="text-weight-medium">{{ props.row.name }}</div>
+                <div class="text-caption text-grey" v-if="emailDomain && emailDomain !== ''">
                   {{ `${props.row.db_name}@${emailDomain}` }}
                 </div>
               </q-td>
@@ -398,7 +375,6 @@
                 >
                   <q-tooltip>{{ t("Manage Dataset") }}</q-tooltip>
                 </q-btn>
-                <span v-else>-</span>
               </q-td>
             </template>
           </q-table>
@@ -417,6 +393,11 @@
               @refresh="getDatasets"
             />
           </q-tab-panel>
+
+          <!-- System Management Tab Panel (super-user only) -->
+          <q-tab-panel v-if="isSuperUser" name="management" class="q-pa-none">
+            <SystemManagement />
+          </q-tab-panel>
         </q-tab-panels>
 
         <!-- Manage Dataset Dialog -->
@@ -426,9 +407,9 @@
             style="width: 90vw; max-width: 1200px"
           >
             <q-card-section class="row items-center q-pb-none">
-              <div class="text-h6">
-                {{ t("Manage Dataset") }}:
-                {{ selectedDatasetForManage.db_name }}
+              <div>
+                <div class="text-overline text-grey-6 q-mb-none" style="line-height: 1.2">{{ t("Manage Dataset") }}</div>
+                <div class="text-h6 text-weight-medium">{{ selectedDatasetForManage.db_name }}</div>
               </div>
               <q-space />
               <q-btn
@@ -496,7 +477,7 @@
                 <q-space />
                 <div class="row q-gutter-sm">
                   <q-btn
-                    flat
+                    unelevated
                     color="primary"
                     icon="person_add"
                     :label="t('Invite User')"
@@ -517,10 +498,12 @@
               <q-tabs
                 v-model="selectedDatasetForManage.activeTab"
                 dense
-                class="text-grey"
+                class="central-tabs"
                 active-color="primary"
                 indicator-color="primary"
                 align="left"
+                narrow-indicator
+                inline-label
               >
                 <q-tab name="users" icon="group" :label="t('Users')" />
                 <q-tab name="roles" icon="security" :label="t('Roles')" />
@@ -1253,6 +1236,7 @@ import { setSessionDatasetsFromApiRows } from "src/helpers/sessionDatasets";
 import CreateDataset from "./CreateDataset.vue";
 import DatasetConnections from "./DatasetConnections.vue";
 import ApiKeys from "./ApiKeys.vue";
+import SystemManagement from "./SystemManagement.vue";
 import neoledgerConfig from "../../../neoledger.json";
 
 const ReceiptsPanel = neoledgerConfig.ai_plugin
@@ -1430,6 +1414,9 @@ const searchQuery = ref("");
 // Top-level tab state: "datasets" (existing) or "receipts" (new upload panel)
 const isAiPluginEnabled = !!neoledgerConfig.ai_plugin;
 const mainTab = ref("datasets");
+
+// Super-user flag — set from db_list response
+const isSuperUser = ref(false);
 
 // Datasets state
 const datasets = ref([]);
@@ -1729,10 +1716,13 @@ async function handleLogout() {
 const getDatasets = async () => {
   try {
     const response = await api.get("/db_list");
-    datasets.value = response.data.map((ds) => ({
+    const datasetsArray = response.data.datasets ?? response.data;
+    isSuperUser.value = !!response.data.is_super_user;
+
+    datasets.value = datasetsArray.map((ds) => ({
       ...ds,
-      activeTab: "users", // Add active tab state for each dataset
-      expanded: false, // For list view expansion
+      activeTab: "users",
+      expanded: false,
       roles:
         ds.roles?.map((role) => ({
           ...role,
@@ -1746,13 +1736,11 @@ const getDatasets = async () => {
         ? `${ds.logo}?rand=${Math.random().toString(36).slice(2)}`
         : ds.logo,
     }));
-    if (response.data && Array.isArray(response.data)) {
-      setSessionDatasetsFromApiRows(response.data);
-    } else {
-      console.warn("API response data is not an array:", response.data);
+
+    if (Array.isArray(datasetsArray)) {
+      setSessionDatasetsFromApiRows(datasetsArray);
     }
 
-    // Load invites after datasets are loaded
     getInvites();
   } catch (err) {
     console.error("Error fetching datasets:", err);
@@ -2306,40 +2294,63 @@ function getAccessLevelPillClass(accessLevel) {
 </script>
 
 <style scoped>
+/* ── Status pills ── */
 .status-pill {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 9999px;
-  font-size: 0.8125rem;
+  font-size: 0.78rem;
   font-weight: 500;
+  letter-spacing: 0.01em;
   border: none;
 }
 
 .status-pill--owner {
-  background-color: #e6f7ed;
-  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.12);
+  color: #1a8a35;
+}
+.body--dark .status-pill--owner {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #6dca7c;
 }
 
 .status-pill--admin {
-  background-color: #ebf4ff;
-  color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0057c2;
+}
+.body--dark .status-pill--admin {
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #5ba5ff;
 }
 
 .status-pill--member {
-  background-color: #f3f4f6;
-  color: #6b7280;
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #4b5563;
+}
+.body--dark .status-pill--member {
+  background-color: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
 }
 
 .status-pill--role {
-  background-color: #e0f2f1;
-  color: #00897b;
+  background-color: rgba(0, 137, 123, 0.1);
+  color: #006b61;
+}
+.body--dark .status-pill--role {
+  background-color: rgba(0, 137, 123, 0.2);
+  color: #4db6ac;
 }
 
 .status-pill--info {
-  background-color: #ebf4ff;
-  color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0057c2;
+}
+.body--dark .status-pill--info {
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #5ba5ff;
 }
 
+/* ── Tabs ── */
 .central-tabs {
   color: var(--q-lighttext);
 }
@@ -2354,11 +2365,25 @@ function getAccessLevelPillClass(accessLevel) {
   color: var(--q-primary);
 }
 
+/* ── Tab panels ── */
 .central-tab-panels {
   background: transparent;
 }
 
 .central-tab-panels :deep(.q-tab-panel) {
   background: transparent;
+}
+
+/* ── Dataset table row hover ── */
+.table-styling :deep(tbody tr:hover td) {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+.body--dark .table-styling :deep(tbody tr:hover td) {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Pending invites accent ── */
+.invite-card {
+  border-left: 3px solid var(--q-primary) !important;
 }
 </style>
