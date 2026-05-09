@@ -37,6 +37,8 @@
                 :label="t('Company Name')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(128)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -77,6 +79,8 @@
                 :label="t('Street Name')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(64)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -87,6 +91,8 @@
                 :label="t('Street Number')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(255)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -97,6 +103,8 @@
                 :label="t('Address 2')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(64)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -107,6 +115,8 @@
                 :label="t('Postal Office')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(64)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -117,6 +127,8 @@
                 :label="t('ZIP/Postal Code')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(32)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -127,6 +139,8 @@
                 :label="t('City')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(64)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -137,6 +151,8 @@
                 :label="t('State/Province')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(32)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -165,6 +181,8 @@
                 :label="t('Phone')"
                 outlined
                 dense
+                hide-bottom-space
+                :rules="[maxLenRule(20)]"
                 class="lightbg input-box q-mb-sm"
               />
             </div>
@@ -897,6 +915,56 @@ const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 updateTitle(t("Company Defaults"));
 
+function fieldStrLen(val) {
+  if (val == null || val === "") return 0;
+  return String(val).length;
+}
+
+function maxLengthMessage(max) {
+  return `${t("Must be at most")} ${max} ${t("characters")}`;
+}
+
+function maxLenRule(max) {
+  const msg = maxLengthMessage(max);
+  return (val) => fieldStrLen(val) <= max || msg;
+}
+
+function validateCompanyDefaultsPayload(payload) {
+  const errors = [];
+  const check = (path, val, max) => {
+    if (fieldStrLen(val) > max) {
+      errors.push(`${path}: ${maxLengthMessage(max)}`);
+    }
+  };
+
+  const ci = payload.company_info || {};
+  check("company_info.name", ci.name, 128);
+
+  const addr = ci.address || {};
+  check("company_info.address.street", addr.street, 255);
+  check("company_info.address.line1", addr.line1, 64);
+  check("company_info.address.line2", addr.line2, 64);
+  check("company_info.address.post_office", addr.post_office, 64);
+  check("company_info.address.city", addr.city, 64);
+  check("company_info.address.state", addr.state, 32);
+  check("company_info.address.zip", addr.zip, 32);
+
+  const contact = ci.contact || {};
+  check("company_info.contact.phone", contact.phone, 20);
+  check("company_info.contact.fax", contact.fax, 20);
+
+  const settings = payload.settings || {};
+  if (
+    settings.type_of_contact != null &&
+    settings.type_of_contact !== "" &&
+    fieldStrLen(settings.type_of_contact) > 20
+  ) {
+    errors.push(`settings.type_of_contact: ${maxLengthMessage(20)}`);
+  }
+
+  return errors;
+}
+
 const formRef = ref(null);
 const activeTab = ref("company");
 
@@ -1408,6 +1476,16 @@ async function loadDefaults() {
 
 async function submitForm() {
   try {
+    const valid = await formRef.value.validate();
+    if (!valid) {
+      Notify.create({
+        message: t("Please correct the errors in the form"),
+        type: "negative",
+        position: "center",
+      });
+      return;
+    }
+
     console.log(form.value);
 
     // Transform data to new structured format
@@ -1543,6 +1621,16 @@ async function submitForm() {
     };
 
     console.log(payload);
+
+    const payloadErrors = validateCompanyDefaultsPayload(payload);
+    if (payloadErrors.length) {
+      Notify.create({
+        message: payloadErrors[0],
+        type: "negative",
+        position: "center",
+      });
+      return;
+    }
 
     await api.post("/system/companydefaults", payload);
 

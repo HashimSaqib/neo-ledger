@@ -26,14 +26,6 @@
               outlined
               dense
             />
-            <q-input
-              v-model="formData.serialnumber"
-              :label="t('Serial Number')"
-              input-class="maintext"
-              label-color="secondary"
-              outlined
-              dense
-            />
             <template v-if="itemType !== 'services'">
               <q-input
                 v-model="formData.lot"
@@ -573,7 +565,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject } from "vue";
+import { ref, computed, onMounted, watch, inject } from "vue";
 import { useRoute } from "vue-router";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
@@ -587,12 +579,19 @@ const route = useRoute();
 const itemType = ref(route.params.type || "items"); // expected: parts, services, allitems
 
 const pageTitle = computed(() => {
-  if (itemType.value === "allitems") return "Search All Items";
-  if (itemType.value === "parts") return "Search Parts";
-  if (itemType.value === "services") return "Search Services";
-  return "Search Items";
+  if (itemType.value === "allitems") return t("Search All Items");
+  if (itemType.value === "parts") return t("Search Parts");
+  if (itemType.value === "services") return t("Search Services");
+  return t("Search Items");
 });
-updateTitle(pageTitle.value);
+
+watch(
+  pageTitle,
+  (title) => {
+    if (updateTitle) updateTitle(title);
+  },
+  { immediate: true },
+);
 const filtersOpen = ref(true);
 const results = ref([]);
 
@@ -600,7 +599,6 @@ const results = ref([]);
 const formData = ref({
   partnumber: "",
   description: "",
-  serialnumber: "",
   lot: "",
   make: "",
   model: "",
@@ -667,8 +665,6 @@ const formData = ref({
 // Options for radio groups and selects
 const itemStatusOptions = computed(() => [
   { label: t("Active"), value: "active" },
-  { label: t("On Hand"), value: "onhand" },
-  { label: t("Short"), value: "short" },
   { label: t("Obsolete"), value: "obsolete" },
   { label: t("Orphaned"), value: "orphaned" },
 ]);
@@ -955,7 +951,10 @@ function search() {
     .catch((err) => {
       console.error(err);
       Notify.create({
-        message: err.response?.data?.message || t("Error performing search"),
+        message:
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          t("Error performing search"),
         type: "negative",
         position: "center",
       });
@@ -979,10 +978,7 @@ function clearForm() {
 
 const createLink = inject("createLink");
 function getPath(row) {
-  if (itemType.value === "services") {
-    return { path: createLink("service.add"), query: { id: row.id } };
-  }
-  return { path: createLink("part.add"), query: { id: row.id } };
+  return { path: createLink("service.add"), query: { id: row.id } };
 }
 function getinvPath(row) {
   const base =

@@ -6,6 +6,8 @@
       v-model="internalValue"
       :options="filteredOptions"
       v-bind="behaviorBind"
+      :rules="rules"
+      :lazy-rules="lazyRules"
       use-input
       input-debounce="0"
       :auto-select-first="true"
@@ -14,6 +16,7 @@
       @popup-show="onPopupShow"
       outlined
       dense
+      hide-bottom-space
       :multiple="multiple"
       clearable
       :fill-input="!multiple"
@@ -126,6 +129,14 @@ const props = defineProps({
   /** Quasar QSelect: 'menu' | 'dialog' | 'default' — use `dialog` inside QDialog to avoid popup/focus issues. */
   behavior: {
     type: String,
+    default: undefined,
+  },
+  rules: {
+    type: Array,
+    default: () => [],
+  },
+  lazyRules: {
+    type: Boolean,
     default: undefined,
   },
 });

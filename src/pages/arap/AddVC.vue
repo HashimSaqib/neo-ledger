@@ -39,9 +39,7 @@
           <q-tab name="contact" :label="t('Contact Person')" />
           <q-tab name="vat" :label="t('VAT')" />
           <q-tab
-            v-if="
-              componentType === 'customer' || componentType === 'vendor'
-            "
+            v-if="componentType === 'customer' || componentType === 'vendor'"
             name="communication"
             :label="t('Communication')"
           />
@@ -64,7 +62,7 @@
                   :label="t(`${vcType} Name`)"
                   outlined
                   dense
-                  required
+                  :rules="nameFieldRules"
                   class="q-mb-sm"
                 />
               </div>
@@ -75,7 +73,9 @@
                   :label="t(`${vcType} Number`)"
                   outlined
                   dense
+                  :rules="vcMaxRules('vcnumber')"
                   class="q-mb-sm"
+                  :placeholder="t('Auto')"
                 />
               </div>
             </div>
@@ -93,6 +93,7 @@
                   :label="t('Street Name')"
                   outlined
                   dense
+                  :rules="vcMaxRules('address1')"
                   class="q-mb-sm"
                 />
               </div>
@@ -103,6 +104,7 @@
                   :label="t('Street Number')"
                   outlined
                   dense
+                  :rules="vcMaxRules('street')"
                   class="q-mb-sm"
                 />
               </div>
@@ -113,6 +115,7 @@
                   :label="t('Address 2')"
                   outlined
                   dense
+                  :rules="vcMaxRules('address2')"
                   class="q-mb-sm"
                 />
               </div>
@@ -123,6 +126,7 @@
                   :label="t('Postal Office')"
                   outlined
                   dense
+                  :rules="vcMaxRules('post_office')"
                   class="q-mb-sm"
                 />
               </div>
@@ -133,6 +137,7 @@
                   :label="t('Zip/Postal Code')"
                   outlined
                   dense
+                  :rules="vcMaxRules('zipcode')"
                   class="q-mb-sm"
                 />
               </div>
@@ -143,6 +148,7 @@
                   :label="t('City')"
                   outlined
                   dense
+                  :rules="vcMaxRules('city')"
                   class="q-mb-sm"
                 />
               </div>
@@ -153,6 +159,7 @@
                   :label="t('State/Province')"
                   outlined
                   dense
+                  :rules="vcMaxRules('state')"
                   class="q-mb-sm"
                 />
               </div>
@@ -182,6 +189,7 @@
                   outlined
                   dense
                   type="tel"
+                  :rules="vcMaxRules('phone')"
                   class="q-mb-sm"
                 />
               </div>
@@ -193,6 +201,7 @@
                   outlined
                   dense
                   type="tel"
+                  :rules="vcMaxRules('mobile')"
                   class="q-mb-sm"
                 />
               </div>
@@ -237,6 +246,7 @@
                   outlined
                   dense
                   type="tel"
+                  :rules="vcMaxRules('fax')"
                   class="q-mb-sm"
                 />
               </div>
@@ -255,6 +265,7 @@
                   :label="t('Tax Number / SSN')"
                   outlined
                   dense
+                  :rules="vcMaxRules('taxnumber')"
                   class="q-mb-sm"
                 />
               </div>
@@ -265,6 +276,7 @@
                   :label="t('SIC')"
                   outlined
                   dense
+                  :rules="vcMaxRules('sic_code')"
                   class="q-mb-sm"
                 />
               </div>
@@ -293,6 +305,7 @@
                   :label="t('Salutation')"
                   outlined
                   dense
+                  :rules="vcMaxRules('salutation')"
                   class="q-mb-sm"
                 />
                 <text-input
@@ -301,6 +314,7 @@
                   :label="t('First Name')"
                   outlined
                   dense
+                  :rules="vcMaxRules('firstname')"
                   class="q-mb-sm"
                 />
                 <text-input
@@ -309,6 +323,7 @@
                   :label="t('Occupation')"
                   outlined
                   dense
+                  :rules="vcMaxRules('occupation')"
                   class="q-mb-sm"
                 />
               </div>
@@ -319,6 +334,7 @@
                   :label="t('Title')"
                   outlined
                   dense
+                  :rules="vcMaxRules('contacttitle')"
                   class="q-mb-sm"
                 />
                 <text-input
@@ -327,6 +343,7 @@
                   :label="t('Last Name')"
                   outlined
                   dense
+                  :rules="vcMaxRules('lastname')"
                   class="q-mb-sm"
                 />
                 <div class="q-mb-sm">
@@ -381,9 +398,7 @@
 
           <!-- Communication tab -->
           <q-tab-panel
-            v-if="
-              componentType === 'customer' || componentType === 'vendor'
-            "
+            v-if="componentType === 'customer' || componentType === 'vendor'"
             name="communication"
             class="q-pa-none"
           >
@@ -690,6 +705,7 @@
 import { ref, onMounted, watch, computed, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { api } from "src/boot/axios";
+import { getApiErrorMessage } from "src/utils/apiError";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 import BankAccountForm from "src/components/BankAccountForm.vue";
@@ -711,6 +727,83 @@ const updateTitle = inject("updateTitle");
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+
+/** POST /arap/customer | /arap/vendor — max string lengths per field */
+const ARAP_VC_MAX = {
+  name: 128,
+  contact: 64,
+  phone: 20,
+  fax: 20,
+  vcnumber: 32,
+  customernumber: 32,
+  vendornumber: 32,
+  taxnumber: 32,
+  sic_code: 6,
+  language_code: 6,
+  iban: 34,
+  bic: 11,
+  gifi_accno: 30,
+  address1: 64,
+  address2: 64,
+  city: 64,
+  state: 32,
+  zipcode: 32,
+  country: 32,
+  street: 255,
+  post_office: 64,
+  salutation: 32,
+  firstname: 32,
+  lastname: 32,
+  contacttitle: 32,
+  occupation: 32,
+  typeofcontact: 20,
+  mobile: 20,
+  gender: 1,
+};
+
+const PAYLOAD_SKIP_LENGTH_KEYS = new Set([
+  "language_code",
+  "curr",
+  "country",
+  "gender",
+  "typeofcontact",
+]);
+
+function vcStrLen(val) {
+  if (val == null || val === "") return 0;
+  return String(val).length;
+}
+
+function maxLengthMessage(max) {
+  return `${t("Must be at most")} ${max} ${t("characters")}`;
+}
+
+function arapVcMaxLengthRule(max) {
+  const msg = maxLengthMessage(max);
+  return (val) => vcStrLen(val) <= max || msg;
+}
+
+function validateArapVcPayload(payload) {
+  const errors = [];
+  for (const [key, max] of Object.entries(ARAP_VC_MAX)) {
+    if (PAYLOAD_SKIP_LENGTH_KEYS.has(key)) continue;
+    const v = payload[key];
+    if (v == null || v === "") continue;
+    if (vcStrLen(v) > max) {
+      errors.push(`${key}: ${maxLengthMessage(max)}`);
+    }
+  }
+  return errors;
+}
+
+function vcMaxRules(field) {
+  return [arapVcMaxLengthRule(ARAP_VC_MAX[field])];
+}
+
+const nameFieldRules = computed(() => [
+  (v) => !!String(v ?? "").trim() || t("Name is required"),
+  arapVcMaxLengthRule(ARAP_VC_MAX.name),
+]);
 
 // Create computed values that prefer props over route params
 const componentId = computed(() => {
@@ -979,7 +1072,7 @@ const fetchVc = async (id) => {
   } catch (error) {
     console.error("Failed to fetch vc:", error);
     Notify.create({
-      message: t("Failed to load vc data"),
+      message: getApiErrorMessage(error, t("Failed to load vc data")),
       type: "negative",
       position: "center",
     });
@@ -1022,17 +1115,10 @@ const handleBankAccountSaved = async () => {
 // Form submission handler
 const submitForm = async () => {
   try {
-    if (!formRef.value.validate()) {
+    const valid = await formRef.value.validate();
+    if (!valid) {
       Notify.create({
         message: t("Please correct the errors in the form"),
-        type: "negative",
-        position: "center",
-      });
-      return;
-    }
-    if (!form.value.name) {
-      Notify.create({
-        message: t("Name is required"),
         type: "negative",
         position: "center",
       });
@@ -1071,6 +1157,16 @@ const submitForm = async () => {
         ? form.value.payment_accno.label
         : form.value.payment_accno;
 
+    const payloadErrors = validateArapVcPayload(payload);
+    if (payloadErrors.length) {
+      Notify.create({
+        message: payloadErrors[0],
+        type: "negative",
+        position: "center",
+      });
+      return;
+    }
+
     const response = await api.post(`/arap/${componentType.value}`, payload);
     Notify.create({
       message: t(`${vcType.value} updated successfully`),
@@ -1084,7 +1180,7 @@ const submitForm = async () => {
   } catch (error) {
     console.error("Form submission error:", error);
     Notify.create({
-      message: t("An error occurred while saving"),
+      message: getApiErrorMessage(error, t("An error occurred while saving")),
       type: "negative",
       position: "center",
     });

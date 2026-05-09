@@ -1,239 +1,129 @@
 <template>
-  <q-page class="lightbg q-pa-md q-py-sm relative-position">
-    <q-form @submit.prevent class="q-px-sm q-py-sm mainbg container">
+  <q-page class="q-pa-md q-py-sm lightbg relative-position">
+    <q-form @submit.prevent class="q-px-sm q-py-sm container">
       <q-expansion-item
         :label="t('Search Params')"
         header-class="container-bg"
         expand-icon-class="maintext"
         v-model="filtersOpen"
       >
-        <!-- Basic Info Section -->
-        <div class="row q-mt-md q-gutter-md">
-          <s-select
-            class="lightbg col-6 col-md-3"
-            v-model="formData.dropdown"
-            :label="nameLabel"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-            :options="vCList"
-            option-label="label"
-            option-value="name"
-            search="label"
-            map-options
-            emit-value
-          />
-          <q-input
-            v-model="formData.name"
-            class="lightbg col-6 col-md-3"
-            :label="nameLabel"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.contact"
-            class="lightbg col-6 col-md-3"
-            :label="t('Contact')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.email"
-            class="lightbg col-6 col-md-3"
-            :label="t('E-mail')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.phone"
-            class="lightbg col-6 col-md-3"
-            :label="t('Phone')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Additional Info Section -->
-        <div class="row q-mt-xs q-gutter-md">
-          <q-input
-            v-model="formData[vcNumberProperty]"
-            class="lightbg col-6 col-md-3"
-            :label="numberLabel"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.address"
-            class="lightbg col-6 col-md-3"
-            :label="t('Address')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.city"
-            class="lightbg col-6 col-md-3"
-            :label="t('City')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.state"
-            class="lightbg col-6 col-md-3"
-            :label="t('State/Province')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.zipcode"
-            class="lightbg col-6 col-md-3"
-            :label="t('Zip/Postal Code')"
-            input-class="maintext"
-            label-color="secondary"
-            outlined
-            dense
-          />
-          <country-input
-            v-model="formData.country"
-            class="lightbg col-6 col-md-3"
-            :label="t('Country')"
-            outlined
-            dense
-          />
-        </div>
-
-        <div class="row q-mt-md q-gutter-x-md">
-          <q-input
-            v-model="formData.transdatefrom"
-            type="date"
-            :label="t('Transaction Date From')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-6 col-md-3"
-            outlined
-            dense
-          />
-          <q-input
-            v-model="formData.transdateto"
-            type="date"
-            :label="t('Transaction Date To')"
-            input-class="maintext"
-            label-color="secondary"
-            class="lightbg col-6 col-md-3"
-            outlined
-            dense
-          />
-        </div>
-
-        <!-- Transaction Type Section -->
-        <div class="row q-mt-xs q-gutter-md">
-          <div class="col-12">
-            <q-toggle
-              v-model="formData.l_transnumber"
-              :label="transactionLabel.transNumber"
-              class="q-mr-md"
-            />
-            <q-toggle
-              v-model="formData.l_invnumber"
-              :label="transactionLabel.invNumber"
-              class="q-mr-md"
-            />
-            <q-toggle
-              v-model="formData.l_ordnumber"
-              :label="transactionLabel.ordNumber"
-              class="q-mr-md"
-            />
-            <q-toggle
-              v-model="formData.l_quonumber"
-              :label="t('Quotations')"
-              class="q-mr-md"
-            />
-          </div>
-        </div>
-
-        <div class="row q-gutter-x-md" v-if="isAnyTransactionTypeSelected">
-          <q-checkbox
-            v-model="formData.open"
-            :label="t('Open')"
-            val="Y"
-            class="q-mr-md"
-          />
-          <q-checkbox
-            v-model="formData.closed"
-            :label="t('Closed')"
-            val="Y"
-            class="q-mr-md"
-          />
-
-          <div class="col-12">
-            <q-checkbox
-              v-model="formData.l_amount"
-              :label="t('Amount')"
-              class="q-mr-md"
-            />
-            <q-checkbox
-              v-model="formData.l_tax"
-              :label="t('Tax')"
-              class="q-mr-md"
-            />
-            <q-checkbox
-              v-model="formData.l_total"
-              :label="t('Total')"
-              class="q-mr-md"
-            />
-            <q-checkbox
-              v-model="formData.l_subtotal"
-              :label="t('Subtotal')"
-              class="q-mr-md"
-            />
-          </div>
-        </div>
-
-        <!-- Column Selection Section -->
-        <div class="q-py-md">
-          <draggable v-model="baseColumns" item-key="name" class="drag-area">
-            <template #item="{ element }">
-              <q-checkbox
-                size="2rem"
-                v-model="selectedColumns[element.name]"
-                :label="t(element.label)"
-                color="primary"
-                class="q-mr-md maintext"
+        <div class="search-vc-params q-mt-md">
+          <div class="flex-container search-vc-params__grid">
+            <div class="container flex-container search-vc-params__search">
+              <s-select
+                v-model="formData.dropdown"
+                :label="nameLabel"
+                outlined
+                dense
+                :options="vCList"
+                option-label="label"
+                option-value="name"
+                search="label"
+                map-options
+                emit-value
+                clearable
+                class="search-vc-field"
               />
-            </template>
-          </draggable>
+              <text-input
+                v-model="formData.name"
+                :label="nameLabel"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData[vcNumberProperty]"
+                :label="numberLabel"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.contact"
+                :label="t('Contact')"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.email"
+                :label="t('E-mail')"
+                type="email"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.phone"
+                :label="t('Phone')"
+                type="tel"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.address"
+                :label="t('Address')"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.city"
+                :label="t('City')"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.state"
+                :label="t('State/Province')"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <text-input
+                v-model="formData.zipcode"
+                :label="t('Zip/Postal Code')"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+              <country-input
+                v-model="formData.country"
+                :label="t('Country')"
+                outlined
+                dense
+                class="search-vc-field"
+              />
+            </div>
+
+            <div class="container search-vc-params__filters">
+              <draggable v-model="baseColumns" item-key="name" class="drag-area">
+                <template #item="{ element }">
+                  <q-checkbox
+                    size="2rem"
+                    v-model="selectedColumns[element.name]"
+                    :label="t(element.label)"
+                    color="primary"
+                    class="q-mr-md maintext"
+                  />
+                </template>
+              </draggable>
+            </div>
+          </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="row q-mt-md justify-end">
           <s-button type="clear" @click="clearForm" class="q-mr-sm" />
-
           <s-button type="search" @click="search" />
         </div>
       </q-expansion-item>
     </q-form>
 
-    <!-- Results Table -->
-    <div v-if="results.length > 0">
+    <div v-if="displayRows.length > 0" class="table-styling q-mt-md">
       <q-table
-        class="q-mt-md"
-        :rows="filteredResults"
+        :rows="displayRows"
         row-key="uniqueRowId"
         :columns="finalColumns"
         flat
@@ -243,7 +133,6 @@
         virtual-scroll
         virtual-scroll-sticky-end
       >
-        <!-- Example slot for "id" column linking -->
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <router-link :to="getPath(props.row)" class="text-primary">
@@ -251,16 +140,9 @@
             </router-link>
           </q-td>
         </template>
-        <template v-slot:body-cell-invnumber="props">
-          <q-td :props="props">
-            <router-link :to="getinvPath(props.row)" class="text-primary">
-              {{ props.row.invnumber }}
-            </router-link>
-          </q-td>
-        </template>
         <template v-slot:body-cell="props">
           <q-td :props="props">
-            <span v-if="['amount', 'tax', 'total'].includes(props.col.name)">
+            <span v-if="numericColumnNames.has(props.col.name)">
               {{ formatAmount(props.row[props.col.name]) }}
             </span>
             <span v-else>
@@ -286,189 +168,352 @@ const { t } = useI18n();
 const updateTitle = inject("updateTitle");
 const route = useRoute();
 
+/** Table columns that should use amount formatting when visible */
+const numericColumnNames = new Set([
+  "creditlimit",
+  "outstanding",
+  "availablecredit",
+  "discount",
+  "threshold",
+]);
+
 const allColumns = computed(() => [
-  { name: "id", label: t("ID"), field: "id", default: false },
-  { name: "type", label: t("Type"), field: "type", default: false },
   {
     name: "customernumber",
     label: t("Customer Number"),
     field: "customernumber",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "vendornumber",
     label: t("Vendor Number"),
     field: "vendornumber",
     default: true,
+    align: "left",
+    sortable: true,
   },
-  { name: "name", label: t("Name"), field: "name", default: true },
-  { name: "address", label: t("Address"), field: "address", default: true },
+  {
+    name: "name",
+    label: t("Name"),
+    field: "name",
+    default: true,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "address",
+    label: t("Address"),
+    field: "address",
+    default: true,
+    align: "left",
+    sortable: true,
+  },
   {
     name: "salutation",
     label: t("Salutation"),
     field: "salutation",
     default: false,
+    align: "left",
+    sortable: true,
   },
-  { name: "contact", label: t("Contact"), field: "contact", default: false },
-  { name: "title", label: t("Title"), field: "title", default: false },
-  { name: "gender", label: t("Gender"), field: "gender", default: false },
+  {
+    name: "contact",
+    label: t("Contact"),
+    field: "contact",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "title",
+    label: t("Title"),
+    field: "title",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "gender",
+    label: t("Gender"),
+    field: "gender",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
   {
     name: "occupation",
     label: t("Occupation"),
     field: "occupation",
     default: false,
+    align: "left",
+    sortable: true,
   },
-  { name: "email", label: t("E-mail"), field: "email", default: true },
-  { name: "cc", label: t("Cc"), field: "cc", default: false },
-  { name: "bcc", label: t("Bcc"), field: "bcc", default: false },
-  { name: "city", label: t("City"), field: "city", default: false },
-  { name: "state", label: t("State/Province"), field: "state", default: false },
+  {
+    name: "email",
+    label: t("E-mail"),
+    field: "email",
+    default: true,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "cc",
+    label: t("Cc"),
+    field: "cc",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "bcc",
+    label: t("Bcc"),
+    field: "bcc",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "city",
+    label: t("City"),
+    field: "city",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "state",
+    label: t("State/Province"),
+    field: "state",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
   {
     name: "zipcode",
     label: t("Zip/Postal Code"),
     field: "zipcode",
     default: false,
+    align: "left",
+    sortable: true,
   },
-  { name: "country", label: t("Country"), field: "country", default: false },
-  { name: "phone", label: t("Phone"), field: "phone", default: true },
-  { name: "fax", label: t("Fax"), field: "fax", default: false },
-  { name: "notes", label: t("Notes"), field: "notes", default: false },
-  { name: "discount", label: t("Discount"), field: "discount", default: false },
+  {
+    name: "country",
+    label: t("Country"),
+    field: "country",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "phone",
+    label: t("Phone"),
+    field: "phone",
+    default: true,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "fax",
+    label: t("Fax"),
+    field: "fax",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "notes",
+    label: t("Notes"),
+    field: "notes",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "discount",
+    label: t("Discount"),
+    field: "discount",
+    default: false,
+    align: "right",
+    sortable: true,
+  },
   {
     name: "threshold",
     label: t("Threshold"),
     field: "threshold",
     default: false,
+    align: "right",
+    sortable: true,
   },
-  { name: "accounts", label: t("Accounts"), field: "accounts", default: false },
+  {
+    name: "accounts",
+    label: t("Accounts"),
+    field: "accounts",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
   {
     name: "paymentmethod",
     label: t("Payment Method"),
     field: "paymentmethod",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "taxnumber",
     label: t("Tax Number"),
     field: "taxnumber",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "salesperson",
     label: t("Salesperson"),
     field: "salesperson",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "pricegroup",
     label: t("Pricegroup"),
     field: "pricegroup",
     default: false,
+    align: "left",
+    sortable: true,
   },
-  { name: "sic", label: t("SIC"), field: "sic", default: false },
-  { name: "bank", label: t("Bank"), field: "bank", default: false },
-  { name: "iban", label: t("IBAN"), field: "iban", default: false },
-  { name: "bic", label: t("BIC"), field: "bic", default: false },
+  {
+    name: "sic",
+    label: t("SIC"),
+    field: "sic",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "bank",
+    label: t("Bank"),
+    field: "bank",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "iban",
+    label: t("IBAN"),
+    field: "iban",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "bic",
+    label: t("BIC"),
+    field: "bic",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
   {
     name: "membernumber",
     label: t("Member Number"),
     field: "membernumber",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "bcnumber",
     label: t("BC Number"),
     field: "bcnumber",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "typeofbusiness",
     label: t("Type of Business"),
     field: "typeofbusiness",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "creditlimit",
     label: t("Credit Limit"),
     field: "creditlimit",
     default: false,
+    align: "right",
+    sortable: true,
   },
   {
     name: "outstanding",
     label: t("Outstanding"),
     field: "outstanding",
     default: false,
+    align: "right",
+    sortable: true,
   },
   {
     name: "availablecredit",
     label: t("Available Credit"),
     field: "availablecredit",
     default: false,
+    align: "right",
+    sortable: true,
   },
-  { name: "terms", label: t("Terms"), field: "terms", default: false },
-  { name: "language", label: t("Language"), field: "language", default: false },
+  {
+    name: "terms",
+    label: t("Terms"),
+    field: "terms",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "language",
+    label: t("Language"),
+    field: "language",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
   {
     name: "remittancevoucher",
     label: t("Remittance Voucher"),
     field: "remittancevoucher",
     default: false,
+    align: "left",
+    sortable: true,
   },
   {
     name: "startdate",
     label: t("Startdate"),
     field: "startdate",
     default: false,
+    align: "left",
+    sortable: true,
   },
-  { name: "enddate", label: t("Enddate"), field: "enddate", default: false },
+  {
+    name: "enddate",
+    label: t("Enddate"),
+    field: "enddate",
+    default: false,
+    align: "left",
+    sortable: true,
+  },
 ]);
 
-// Ensure alignment & sortability for all columns
-// Note: allColumns is now computed, so alignment/sortability is set in the computed definition
-
-// This ref will contain only the relevant columns for the current vcType (customer/vendor).
 const baseColumns = ref([]);
 
-// "invnumber" column is added if l_transnumber or l_invnumber toggles are on.
-const invnumberColumn = computed(() => ({
-  name: "invnumber",
-  label: t("Invoice"),
-  field: "invnumber",
-  align: "left",
-  sortable: true,
-}));
-
-// Amount columns appear if toggled & any transaction is selected
-const fixedColumns = computed(() => [
-  {
-    name: "amount",
-    label: t("Amount"),
-    field: "netamount",
-    align: "left",
-    sortable: true,
-  },
-  { name: "tax", label: t("Tax"), field: "tax", align: "left", sortable: true },
-  {
-    name: "total",
-    label: t("Total"),
-    field: "amount",
-    align: "left",
-    sortable: true,
-  },
-  {
-    name: "subtotal",
-    label: t("Subtotal"),
-    field: "subtotal",
-    align: "left",
-    sortable: true,
-  },
-]);
-
-// ----------------------------------------------------
-//  Tracking form data & toggles
-// ----------------------------------------------------
 const vcType = ref(route.params.type || "customer");
 
 const formData = ref({
+  dropdown: "",
   name: "",
   contact: "",
   email: "",
@@ -480,32 +525,11 @@ const formData = ref({
   state: "",
   zipcode: "",
   country: "",
-  // Transaction toggles
-  l_transnumber: false, // AR/AP Transactions
-  l_invnumber: false, // Sales/Vendor Invoices
-  l_ordnumber: false, // Sales/Purchase Orders
-  l_quonumber: false, // Quotations
-  transdatefrom: "",
-  transdateto: "",
-  open: false,
-  closed: false,
-  // Amount toggles
-  l_amount: false,
-  l_tax: false,
-  l_total: false,
-  l_subtotal: false,
 });
 
-// Dynamic labels
 const nameLabel = ref(t("Customer"));
 const numberLabel = ref(t("Customer Number"));
-const transactionLabel = ref({
-  transNumber: t("AR Transactions"),
-  invNumber: t("Sales Invoices"),
-  ordNumber: t("Sales Orders"),
-});
 
-// If we’re in vendor mode, we use vendornumber; otherwise customernumber
 const vcNumberProperty = computed(() => {
   return vcType.value === "vendor" ? "vendornumber" : "customernumber";
 });
@@ -513,18 +537,14 @@ const vcNumberProperty = computed(() => {
 const filtersOpen = ref(true);
 const results = ref([]);
 
-// This tracks user toggles for each column
-const selectedColumns = ref({});
+const displayRows = computed(() =>
+  results.value.map((row, idx) => ({
+    ...row,
+    uniqueRowId: `${row.id}-${idx}`,
+  })),
+);
 
-// Are any transaction toggles on?
-const isAnyTransactionTypeSelected = computed(() => {
-  return (
-    formData.value.l_transnumber ||
-    formData.value.l_invnumber ||
-    formData.value.l_ordnumber ||
-    formData.value.l_quonumber
-  );
-});
+const selectedColumns = ref({});
 
 const vCList = ref([]);
 const fetchLinks = async () => {
@@ -543,50 +563,18 @@ const fetchLinks = async () => {
   }
 };
 
-// ----------------------------------------------------
-//  finalColumns
-//    1) Start with baseColumns that survived updateVCSettings() (only relevant columns).
-//    2) Filter by user toggles in selectedColumns.
-//    3) Add invnumber if l_transnumber or l_invnumber.
-//    4) Add amount/tax/total/subtotal if toggled & any transaction is selected.
-// ----------------------------------------------------
-const finalColumns = computed(() => {
-  let cols = baseColumns.value.filter(
+const finalColumns = computed(() =>
+  baseColumns.value.filter(
     (col) => selectedColumns.value[col.name] === true,
-  );
+  ),
+);
 
-  // If AR/AP or Invoice toggles are on => add invnumber column (if not already there).
-  if (formData.value.l_transnumber || formData.value.l_invnumber) {
-    if (!cols.find((c) => c.name === invnumberColumn.name)) {
-      cols.push(invnumberColumn);
-    }
-  }
-
-  // If any transaction toggles are on, we add the amount columns if toggled
-  if (isAnyTransactionTypeSelected.value) {
-    fixedColumns.forEach((fc) => {
-      if (formData.value[`l_${fc.name}`]) {
-        // Only push if not present
-        if (!cols.find((c) => c.name === fc.name)) {
-          cols.push(fc);
-        }
-      }
-    });
-  }
-
-  return cols;
-});
-
-// ----------------------------------------------------
-//  Cookie name for storing user column preferences
-// ----------------------------------------------------
 const filterCookieName = computed(() => {
   return vcType.value === "vendor"
     ? "vendor_search_filters"
     : "customer_search_filters";
 });
 
-// Whenever columns or selection changes, save to cookie
 watch(
   [selectedColumns, baseColumns, filterCookieName],
   () => {
@@ -603,9 +591,6 @@ watch(
   { deep: true },
 );
 
-// ----------------------------------------------------
-//  flattenParams - for the search
-// ----------------------------------------------------
 function flattenParams(obj) {
   const out = {};
   for (const [k, v] of Object.entries(obj)) {
@@ -622,9 +607,6 @@ function flattenParams(obj) {
   return out;
 }
 
-// ----------------------------------------------------
-//  search
-// ----------------------------------------------------
 async function search() {
   try {
     const endpoint =
@@ -632,72 +614,54 @@ async function search() {
     const params = flattenParams(formData.value);
     params.name = formData.value.dropdown;
     const resp = await api.get(endpoint, { params });
-    if (resp.data) {
-      results.value = resp.data;
-    } else {
-      results.value = [];
-      Notify.create({
-        message: t("No Results Found"),
-        type: "negative",
-        position: "center",
-      });
-    }
+    const rows = resp.data;
+    results.value = Array.isArray(rows) ? rows : [];
     filtersOpen.value = false;
   } catch (err) {
     console.error(err);
     Notify.create({
-      message: err.response?.data?.message || "Error performing search",
+      message:
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        t("Error performing search"),
       type: "negative",
       position: "center",
     });
   }
 }
 
-// ----------------------------------------------------
-//  clearForm
-// ----------------------------------------------------
 function clearForm() {
-  Object.keys(formData.value).forEach((key) => {
-    if (
-      key === "open" ||
-      key === "closed" ||
-      key === "l_amount" ||
-      key === "l_tax" ||
-      key === "l_total" ||
-      key === "l_subtotal" ||
-      key === "l_transnumber" ||
-      key === "l_invnumber" ||
-      key === "l_ordnumber" ||
-      key === "l_quonumber"
-    ) {
-      formData.value[key] = false;
-    } else {
-      formData.value[key] = "";
-    }
-  });
+  formData.value = {
+    dropdown: "",
+    name: "",
+    contact: "",
+    email: "",
+    phone: "",
+    customernumber: "",
+    vendornumber: "",
+    address: "",
+    city: "",
+    state: "",
+    zipcode: "",
+    country: "",
+  };
 }
 
-// ----------------------------------------------------
-//  processFilters - loads cookie & merges with default
-// ----------------------------------------------------
 function processFilters() {
   const saved = LocalStorage.getItem(filterCookieName.value);
   if (saved) {
     try {
       const parsed = typeof saved === "string" ? JSON.parse(saved) : saved;
       if (parsed && parsed.columns && parsed.order) {
-        // Merge with our local selectedColumns
         selectedColumns.value = {
           ...selectedColumns.value,
           ...parsed.columns,
         };
-        // Reorder baseColumns
         const newOrder = [];
         parsed.order.forEach((nm) => {
           const found = baseColumns.value.find((c) => c.name === nm);
           if (found) newOrder.push(found);
         });
-        // Append any that were not in saved order
         baseColumns.value.forEach((c) => {
           if (!newOrder.includes(c)) newOrder.push(c);
         });
@@ -710,7 +674,6 @@ function processFilters() {
       LocalStorage.remove(filterCookieName.value);
     }
   } else {
-    // No cookie => create defaults
     const defaults = {};
     baseColumns.value.forEach((c) => {
       defaults[c.name] = c.default;
@@ -724,55 +687,6 @@ function processFilters() {
   }
 }
 
-// ----------------------------------------------------
-//  filteredResults
-//    If any transaction toggles are on => deduplicate
-// ----------------------------------------------------
-const filteredResults = computed(() => {
-  // If no transaction toggles => just return rows as-is
-  if (!isAnyTransactionTypeSelected.value) {
-    return results.value.map((row, idx) => ({
-      ...row,
-      uniqueRowId: `${row.id}-${idx}`,
-    }));
-  }
-
-  const transactionCols = [
-    "invid",
-    "module",
-    "invnumber",
-    "ordnumber",
-    "quonumber",
-    "amount",
-    "tax",
-    "total",
-    "subtotal",
-  ];
-  const seen = new Set();
-
-  return results.value.map((row, idx) => {
-    const newRow = { ...row };
-
-    if (seen.has(row.id)) {
-      // Blank out non-transaction columns
-      Object.keys(newRow).forEach((key) => {
-        if (!transactionCols.includes(key)) {
-          newRow[key] = "";
-        }
-      });
-    } else {
-      seen.add(row.id);
-    }
-
-    // Always attach a uniqueRowId
-    newRow.uniqueRowId = `${row.id}-${idx}`;
-    return newRow;
-  });
-});
-
-// ----------------------------------------------------
-//  getPath
-// ----------------------------------------------------
 const createLink = inject("createLink");
 
 function getPath(row) {
@@ -780,56 +694,23 @@ function getPath(row) {
   return { path: base, query: { id: row.id } };
 }
 
-function getinvPath(row) {
-  const base =
-    vcType.value === "vendor"
-      ? row.module === "ir"
-        ? createLink("vendor.invoice")
-        : createLink("vendor.transaction")
-      : row.module === "is"
-        ? createLink("customer.invoice")
-        : createLink("customer.transaction");
-  return { path: base, query: { id: row.invid } };
-}
-
-// ----------------------------------------------------
-//  updateVCSettings
-//    1) Switch out the relevant columns from allColumns
-//    2) Load cookies for that set
-// ----------------------------------------------------
 function updateVCSettings() {
-  // Switch out labeling
   if (vcType.value === "vendor") {
     nameLabel.value = t("Vendor");
     numberLabel.value = t("Vendor Number");
-    transactionLabel.value.transNumber = t("AP Transactions");
-    transactionLabel.value.invNumber = t("Vendor Invoices");
-    transactionLabel.value.ordNumber = t("Purchase Orders");
-
-    // Filter out "customer"/"customernumber" from baseColumns
     baseColumns.value = allColumns.value.filter(
       (c) => c.name !== "customer" && c.name !== "customernumber",
     );
   } else {
     nameLabel.value = t("Customer");
     numberLabel.value = t("Customer Number");
-    transactionLabel.value.transNumber = t("AR Transactions");
-    transactionLabel.value.invNumber = t("Sales Invoices");
-    transactionLabel.value.ordNumber = t("Sales Orders");
-
-    // Filter out "vendor"/"vendornumber" from baseColumns
     baseColumns.value = allColumns.value.filter(
       (c) => c.name !== "vendor" && c.name !== "vendornumber",
     );
   }
-
-  // Process cookie-based user preferences
   processFilters();
 }
 
-// ----------------------------------------------------
-//  Lifecycle
-// ----------------------------------------------------
 onMounted(async () => {
   if (updateTitle) {
     updateTitle(
@@ -837,13 +718,14 @@ onMounted(async () => {
     );
   }
   await fetchLinks();
-  updateVCSettings(); // Initialize baseColumns and selectedColumns on mount
+  updateVCSettings();
 });
 
 watch(
   () => route.params.type,
-  (newType) => {
+  async (newType) => {
     vcType.value = newType || "customer";
+    await fetchLinks();
     updateVCSettings();
     if (updateTitle) {
       updateTitle(
@@ -853,19 +735,48 @@ watch(
   },
 );
 </script>
+
 <style scoped>
+.search-vc-params__grid.flex-container {
+  align-items: flex-start;
+}
+
+.search-vc-params__grid > .container {
+  min-width: 0;
+}
+
+/* Inner GL-style 2-col grid: .flex-container > * is ~50% in app.scss */
+.search-vc-params__search.flex-container {
+  gap: 12px 20px;
+}
+
+.search-vc-params__filters {
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+}
+
+.search-vc-field {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Left-align text in search parameter fields */
+.search-vc-params :deep(.q-field__native),
+.search-vc-params :deep(input),
+.search-vc-params :deep(textarea) {
+  text-align: left;
+}
+
 .drag-area {
   display: flex;
   flex-wrap: wrap;
 }
 
-/* Table container height */
 :deep(.q-table__container) {
   height: calc(100vh - 180px);
   position: relative;
 }
 
-/* Sticky header styles */
 :deep(.q-table thead) {
   position: sticky;
   z-index: 2;
@@ -890,58 +801,16 @@ watch(
   color: var(--q-mainbg);
 }
 
-/* Loading state */
 .q-table--loading {
   opacity: 0.7;
   transition: opacity 0.3s ease-in-out;
 }
 
-/* Totals row styling */
-:deep(.totals-row) {
-  position: sticky !important;
-  bottom: 0 !important;
-  z-index: 2;
-  background-color: var(--q-maintext);
-  color: var(--q-mainbg);
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.12);
-}
-
-:deep(.totals-row td) {
-  position: sticky !important;
-  bottom: 0 !important;
-  font-weight: var(--q-font-weight-bolder);
-  text-align: left;
-  background-color: var(--q-maintext);
-  color: var(--q-mainbg);
-}
-
-:deep(.totals-row td[class*="amount"]),
-:deep(.totals-row td[class*="paid"]),
-:deep(.totals-row td[class*="tax"]),
-:deep(.totals-row td[class*="paymentdiff"]) {
-  text-align: right !important;
-}
-
-/* Number columns alignment */
-:deep(.q-table tbody td[class*="amount"]),
-:deep(.q-table tbody td[class*="paid"]),
-:deep(.q-table tbody td[class*="tax"]),
-:deep(.q-table tbody td[class*="paymentdiff"]) {
-  text-align: right;
-}
-
-/* Virtual scroll table content */
 :deep(.q-virtual-scroll__content) {
   margin-bottom: 0 !important;
 }
 
-/* Ensure proper padding */
 :deep(.q-table td) {
   padding: 8px 16px;
-}
-
-.wrapped-description {
-  white-space: pre-wrap;
-  min-width: 10vw;
 }
 </style>

@@ -9,6 +9,8 @@
     :clearable="clearable"
     :disable="disable"
     :readonly="readonly"
+    :rules="rules"
+    :lazy-rules="lazyRules"
     option-label="name"
     option-value="code"
     search="name"
@@ -66,6 +68,14 @@ const props = defineProps({
   customClass: {
     type: String,
     default: "",
+  },
+  rules: {
+    type: Array,
+    default: () => [],
+  },
+  lazyRules: {
+    type: Boolean,
+    default: undefined,
   },
 });
 

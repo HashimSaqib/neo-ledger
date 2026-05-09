@@ -300,6 +300,7 @@ import "jspreadsheet-ce/dist/jspreadsheet.css";
 
 import { useRoute } from "vue-router";
 import { api } from "src/boot/axios";
+import { getApiErrorMessage } from "src/utils/apiError";
 import { useI18n } from "vue-i18n";
 import { Notify } from "quasar";
 import { date } from "quasar";
@@ -2042,7 +2043,7 @@ const validateData = () => {
     console.error("Validation error:", error);
     Notify.create({
       color: "negative",
-      message: t("An error occurred during validation"),
+      message: getApiErrorMessage(error, t("An error occurred during validation")),
       icon: "error",
       position: "center",
     });
@@ -2481,7 +2482,7 @@ const importData = async () => {
     importDisabled.value = false;
     Notify.create({
       color: "negative",
-      message: t("An error occurred during import"),
+      message: getApiErrorMessage(error, t("An error occurred during import")),
       icon: "error",
       position: "center",
     });

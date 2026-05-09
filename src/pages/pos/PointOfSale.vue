@@ -393,6 +393,14 @@ const fetchCustomer = async (id) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    Notify.create({
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        t("Failed to load customer"),
+      type: "negative",
+      position: "center",
+    });
     return null;
   }
 };

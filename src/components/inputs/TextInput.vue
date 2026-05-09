@@ -2,6 +2,8 @@
   <div class="input-container">
     <label v-if="label && !noLabel" class="input-label">{{ label }}</label>
     <q-input
+      ref="qInputRef"
+      :name="name"
       :model-value="displayValue"
       @update:model-value="onInput"
       @focus="onFocus"
@@ -14,6 +16,9 @@
       bg-color="input"
       :placeholder="placeholder"
       :disable="disable"
+      :rules="rules"
+      :lazy-rules="lazyRules"
+      :hide-bottom-space="hideBottomSpace"
     />
   </div>
 </template>
@@ -63,6 +68,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  name: {
+    type: String,
+    default: "",
+  },
+  rules: {
+    type: Array,
+    default: () => [],
+  },
+  lazyRules: {
+    type: Boolean,
+    default: undefined,
+  },
+  hideBottomSpace: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 /**
@@ -70,6 +91,12 @@ const props = defineProps({
  * - update:modelValue: standard event for v-model
  */
 const emit = defineEmits(["update:modelValue", "focus", "blur"]);
+
+const qInputRef = ref(null);
+defineExpose({
+  validate: () => qInputRef.value?.validate?.(),
+  resetValidation: () => qInputRef.value?.resetValidation?.(),
+});
 
 /**
  * Internal state

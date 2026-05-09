@@ -174,7 +174,7 @@ const createLink = (link) => {
   } else if (link === "customer") {
     path = `${base}/arap/customer`;
   } else if (link === "part.add") {
-    path = `${base}/ic/add/part`;
+    path = `${base}/ic/add/service`;
   } else if (link === "service.add") {
     path = `${base}/ic/add/service`;
   } else if (link === "customer.order") {

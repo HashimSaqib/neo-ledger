@@ -751,16 +751,9 @@
           <div class="row q-mb-md items-center q-gutter-x-md">
             <s-button
               type="outlined"
-              label="Add Part"
-              icon="add"
-              @click="openAddPart('part')"
-              outlined
-            />
-            <s-button
-              type="outlined"
               label="Add Service"
               icon="add"
-              @click="openAddPart('service')"
+              @click="openAddPart"
               outlined
             />
           </div>
@@ -1144,7 +1137,7 @@
                 ? selectedPartLine.partnumber.id
                 : null
             "
-            :type="selectedPartType"
+            type="service"
             @saved="partSaved"
           />
         </q-card-section>
@@ -1297,8 +1290,6 @@ const dialogMode = ref("add"); // "add" or "edit"
 // Product (Part) Dialog
 const partDialog = ref(false);
 const selectedPartLine = ref(null);
-const selectedPartType = ref("");
-
 // Open Customer Dialogs
 const openAddCustomer = () => {
   dialogMode.value = "add";
@@ -1313,14 +1304,9 @@ const openEditCustomer = () => {
 // Open Product (Part) Dialog for Editing
 const openEditPart = (line) => {
   selectedPartLine.value = line;
-  // Determine type based on inventory_accno_id property
-  selectedPartType.value =
-    line.partnumber && line.partnumber.inventory_accno_id ? "part" : "service";
   partDialog.value = true;
 };
-const openAddPart = (type) => {
-  // Determine type based on inventory_accno_id property
-  selectedPartType.value = type;
+const openAddPart = () => {
   partDialog.value = true;
 };
 const partSaved = async () => {
@@ -1393,6 +1379,14 @@ const fetchCustomer = async (id) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    Notify.create({
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        t("Failed to load customer"),
+      type: "negative",
+      position: "center",
+    });
     return null;
   }
 };
@@ -1666,7 +1660,6 @@ watch(invDate, () => {
 watch(partDialog, () => {
   if (!partDialog.value) {
     selectedPartLine.value = null;
-    selectedPartType.value = "";
   }
 });
 

@@ -192,6 +192,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
+import { getApiErrorMessage } from "src/utils/apiError";
 import { formatAmount } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 
@@ -288,13 +289,14 @@ const fetchConfirmationData = async () => {
       selectedTransactions.value = data.selected_transactions || [];
       glAccountDetails.value = data.gl_account_details || {};
     } else {
-      error.value = response.data.error || t("Failed to fetch confirmation data");
+      error.value = getApiErrorMessage(response.data, t("Failed to fetch confirmation data"));
     }
   } catch (err) {
     console.error("Error fetching confirmation data:", err);
-    error.value =
-      err.response?.data?.error ||
-      t("An error occurred while fetching confirmation data");
+    error.value = getApiErrorMessage(
+      err,
+      t("An error occurred while fetching confirmation data"),
+    );
   } finally {
     loading.value = false;
   }
@@ -335,9 +337,10 @@ const processAdjustment = async () => {
     console.error("Error processing adjustment:", err);
     $q.notify({
       type: "negative",
-      message:
-        err.response?.data?.error ||
+      message: getApiErrorMessage(
+        err,
         t("An error occurred while processing the adjustment"),
+      ),
       timeout: 5000,
     });
   } finally {

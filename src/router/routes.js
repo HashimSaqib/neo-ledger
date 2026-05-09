@@ -337,16 +337,12 @@ const getRoutes = async () => {
           meta: { permission: "reports.alltaxes" },
         },
 
-        // Goods & Services
+        // Services (IC catalogue)
         {
           path: "ic/add/:type",
           component: AddPart,
           meta: {
-            permission: (route) => {
-              return route.params.type === "part"
-                ? "items.part"
-                : "items.service";
-            },
+            permission: "items.service",
           },
         },
         {

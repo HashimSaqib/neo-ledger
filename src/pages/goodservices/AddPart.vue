@@ -11,7 +11,6 @@
       ]"
       @submit.prevent="submitForm"
     >
-      <!-- Tab Navigation -->
       <q-tabs
         v-model="activeTab"
         dense
@@ -23,7 +22,7 @@
       >
         <q-tab name="mandatory" :label="t('Mandatory Field')" />
         <q-tab name="additional" :label="t('Additional Details')" />
-        <q-tab name="inventory" :label="t('Inventory Detail')" />
+        <q-tab name="pricing" :label="t('Pricing')" />
       </q-tabs>
 
       <div class="q-px-md">
@@ -31,9 +30,7 @@
       </div>
 
       <q-tab-panels v-model="activeTab" animated class="q-pa-md">
-        <!-- Mandatory Field tab -->
         <q-tab-panel name="mandatory" class="q-pa-none">
-          <!-- Mandatory Fields Section -->
           <div class="row q-mb-sm q-gutter-sm">
             <div class="col-12 col-md-6">
               <text-input
@@ -44,6 +41,7 @@
                 dense
                 class="q-mb-sm"
                 label-color="secondary"
+                :placeholder="t('Auto')"
               />
               <text-input
                 v-model="form.description"
@@ -66,6 +64,8 @@
                 dense
                 class="q-mb-sm"
                 label-color="secondary"
+                :rules="[unitMaxRule]"
+                hide-bottom-space
               />
             </div>
             <div class="col-12 col-md-6">
@@ -81,62 +81,12 @@
             </div>
           </div>
 
-          <!-- Accounts Section (Always visible) -->
           <div class="row q-mb-sm q-gutter-sm">
             <div class="col-12 col-md-6">
               <s-select
-                v-if="type == 'part'"
-                v-model="form.inventory"
-                :options="inventoryAccounts"
-                name="IC_inventory"
-                :label="t('Inventory')"
-                outlined
-                dense
-                class="q-mb-sm"
-                label-color="secondary"
-                search="label"
-                account
-                :rules="[requiredRule]"
-                hide-bottom-space
-                option-label="label"
-              />
-              <s-select
-                v-if="type == 'part'"
-                v-model="form.income"
-                :options="incomeAccounts"
-                name="IC_income"
-                :label="t('Income')"
-                outlined
-                dense
-                class="q-mb-sm"
-                label-color="secondary"
-                search="label"
-                account
-                :rules="[requiredRule]"
-                hide-bottom-space
-                option-label="label"
-              />
-              <s-select
-                v-if="type == 'part'"
-                v-model="form.cogs"
-                :options="cogsAccounts"
-                name="IC_expense"
-                :label="t('COGS')"
-                outlined
-                dense
-                class="q-mb-sm"
-                label-color="secondary"
-                search="label"
-                account
-                :rules="[requiredRule]"
-                hide-bottom-space
-                option-label="label"
-              />
-              <s-select
-                v-if="type == 'service'"
                 v-model="form.income"
                 :options="serviceIncomeAccounts"
-                name="IC_income"
+                name="income_accno"
                 :label="t('Income')"
                 outlined
                 dense
@@ -149,10 +99,9 @@
                 option-label="label"
               />
               <s-select
-                v-if="type == 'service'"
                 v-model="form.expense"
                 :options="expenseAccounts"
-                name="IC_expense"
+                name="expense_accno"
                 :label="t('Expense')"
                 outlined
                 dense
@@ -160,15 +109,13 @@
                 label-color="secondary"
                 search="label"
                 account
-                :rules="[requiredRule]"
                 hide-bottom-space
                 option-label="label"
               />
             </div>
             <div class="col-12 col-md-6">
-              <!-- Tax Accounts -->
               <div class="row">
-                <div v-for="tax in taxAccounts" :key="tax.accno">
+                <div v-for="tax in taxAccountsList" :key="tax.accno">
                   <q-checkbox
                     v-model="form.taxes[tax.accno]"
                     :name="`IC_tax_${tax.accno}`"
@@ -191,9 +138,7 @@
           </div>
         </q-tab-panel>
 
-        <!-- Additional Details tab -->
         <q-tab-panel name="additional" class="q-pa-none">
-          <!-- Additional Details Section -->
           <div class="q-mb-sm">
             <div class="text-weight-bold q-mb-xs">
               {{ t("Additional Details") }}
@@ -237,16 +182,6 @@
                   class="q-mb-sm"
                   label-color="secondary"
                 />
-                <text-input
-                  v-if="type == 'part'"
-                  v-model="form.lot"
-                  name="lot"
-                  :label="t('Lot')"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
               </div>
               <div class="col-12 col-md-6">
                 <country-input
@@ -277,76 +212,16 @@
                 />
               </div>
             </div>
-
-            <!-- Make and Model (Not for service) -->
-            <div v-if="type !== 'service'" class="q-mb-sm">
-              <div class="text-weight-bold q-mb-xs">
-                {{ t("Make and Model") }}
-              </div>
-              <div
-                v-for="(line, index) in form.makeModelLines"
-                :key="'mm-' + index"
-                class="row q-mb-md q-gutter-sm items-center"
-              >
-                <div class="col-12 col-md-4">
-                  <text-input
-                    v-model="line.make"
-                    :name="`make_${index}`"
-                    :label="t('Make')"
-                    outlined
-                    dense
-                    class="q-mb-sm"
-                    label-color="secondary"
-                    @keyup.enter.prevent="handleMakeModelEnter(index)"
-                    :ref="(el) => (makeInputRefs[index] = el)"
-                  />
-                </div>
-                <div class="col-12 col-md-4">
-                  <text-input
-                    v-model="line.model"
-                    :name="`model_${index}`"
-                    :label="t('Model')"
-                    outlined
-                    dense
-                    class="q-mb-sm"
-                    label-color="secondary"
-                    @keyup.enter.prevent="handleMakeModelEnter(index)"
-                  />
-                </div>
-                <div class="col-auto">
-                  <q-btn
-                    color="negative"
-                    icon="delete"
-                    dense
-                    flat
-                    @click="deleteMakeModelLine(index)"
-                  />
-                </div>
-              </div>
-            </div>
           </div>
         </q-tab-panel>
 
-        <!-- Inventory Detail tab -->
-        <q-tab-panel name="inventory" class="q-pa-none">
-          <!-- Inventory Details Section -->
+        <q-tab-panel name="pricing" class="q-pa-none">
           <div class="q-mb-sm">
             <div class="text-weight-bold q-mb-xs">
-              {{ t("Inventory Details") }}
+              {{ t("Pricing") }}
             </div>
             <div class="row q-mb-sm q-gutter-sm">
               <div class="col-12 col-md-6">
-                <text-input
-                  v-if="type == 'part'"
-                  v-model="form.expires"
-                  name="expires"
-                  :label="t('Expires')"
-                  type="date"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
                 <text-input
                   v-model="form.listprice"
                   name="listprice"
@@ -365,65 +240,6 @@
                   class="q-mb-sm"
                   label-color="secondary"
                 />
-                <text-input
-                  v-if="type !== 'service'"
-                  v-model="form.averageCost"
-                  name="averageCost"
-                  :label="t('Average Cost')"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
-                <text-input
-                  v-if="type !== 'service'"
-                  v-model="form.weight"
-                  name="weight"
-                  :label="t('Weight (kg)')"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <text-input
-                  v-if="type !== 'service'"
-                  v-model="form.onhand"
-                  name="onhand"
-                  :label="t('On Hand')"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
-                <q-checkbox
-                  v-if="type !== 'service'"
-                  v-model="form.checkinventory"
-                  name="checkinventory"
-                  :label="t('Check Inventory')"
-                  class="q-mb-sm"
-                />
-                <text-input
-                  v-if="type !== 'service'"
-                  v-model="form.rop"
-                  name="rop"
-                  :label="t('ROP')"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
-                <text-input
-                  v-if="type !== 'service'"
-                  v-model="form.bin"
-                  name="bin"
-                  :label="t('Bin')"
-                  outlined
-                  dense
-                  class="q-mb-sm"
-                  label-color="secondary"
-                />
               </div>
             </div>
           </div>
@@ -431,7 +247,6 @@
       </q-tab-panels>
 
       <div class="row justify-start q-mt-md">
-        <!-- Using type="submit" on buttons so that the q-form's validation is triggered -->
         <s-button type="post" @click="submitForm(false)" class="q-mx-sm" />
         <s-button
           type="post-as-new"
@@ -444,18 +259,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, nextTick, computed, watch } from "vue";
+import { ref, onMounted, inject, computed, watch } from "vue";
 import { Notify } from "quasar";
 import { api } from "src/boot/axios";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 
-// -------------------------
-// Transaction Type & Page Title
-// -------------------------
 const updateTitle = inject("updateTitle");
 
 const props = defineProps({
@@ -466,51 +279,32 @@ const props = defineProps({
 const emit = defineEmits(["saved"]);
 const haveProps = computed(() => props.id != null || props.type != null);
 const componentId = computed(() => (props.type ? props.id : route.query.id));
-const componentType = computed(() => props.type ?? route.params.type);
-const type = ref(componentType.value || "part");
 
 if (!props.type) {
-  if (type.value === "part") {
-    updateTitle(t("Add Part"));
-  } else if (type.value === "service") {
-    updateTitle(t("Add Service"));
-  }
+  updateTitle(t("Add Service"));
 }
+
 const formRef = ref(null);
 const saveAsNew = ref(false);
 
-// Active tab for Mandatory / Additional / Inventory
 const activeTab = ref("mandatory");
 
 const form = ref({
-  // Basic Information
   partnumber: "",
   description: "",
-  // Account & Tax Section
-  inventory: "",
   income: "",
-  cogs: "",
+  expense: "",
   taxes: {},
-  // External integration
   mocoId: null,
   referenceDescription: "",
   referenceConfidential: false,
   notes: "",
-  // Pricing & Inventory Details
   priceupdate: new Date().toISOString().split("T")[0],
-  lot: "",
-  expires: "",
   sellprice: "",
   listprice: "",
   lastcost: "",
   markup: "",
-  averageCost: "",
   unit: "",
-  weight: "",
-  onhand: "",
-  checkinventory: false,
-  rop: "",
-  bin: "",
   image: "",
   countryorigin: "",
   drawing: "",
@@ -518,9 +312,6 @@ const form = ref({
   microfiche: "",
   barcode: "",
   toolnumber: "",
-  // Make & Model Lines as Array (not used for service)
-  makeModelLines: [{ make: "", model: "" }],
-  // Vendor Lines as Array
   vendorLines: [
     {
       vendor: null,
@@ -530,7 +321,6 @@ const form = ref({
       vendorLeadtime: "",
     },
   ],
-  // Customer Lines as Array
   customerLines: [
     {
       customer: null,
@@ -543,105 +333,176 @@ const form = ref({
   ],
 });
 
-const inventoryAccounts = ref([]);
-const incomeAccounts = ref([]);
 const serviceIncomeAccounts = ref([]);
-const cogsAccounts = ref([]);
 const expenseAccounts = ref([]);
-const taxAccounts = ref([]);
+const taxAccounts = ref({});
+const taxAccountsList = computed(() => Object.values(taxAccounts.value || {}));
 const vendors = ref([]);
 const customers = ref([]);
 const currencies = ref([]);
 
-// Refs for dynamic field focusing
-const makeInputRefs = [];
-
-// Validation rule for required fields
 const requiredRule = (v) => !!v || t("This field is required");
+
+function fieldStrLen(val) {
+  if (val == null || val === "") return 0;
+  return String(val).length;
+}
+
+function maxLengthMessage(max) {
+  return `${t("Must be at most")} ${max} ${t("characters")}`;
+}
+
+const unitMaxRule = (v) => fieldStrLen(v) <= 5 || maxLengthMessage(5);
+
+const FORBIDDEN_IC_KEYS = [
+  "income_accno_id",
+  "income_account_id",
+  "IC_income",
+  "ic_income",
+  "icIncome",
+  "expense_accno_id",
+  "expense_account_id",
+];
+
+function validateIcItemPayload(postData, { isCreate }) {
+  const errors = [];
+  if (
+    postData.unit != null &&
+    postData.unit !== "" &&
+    fieldStrLen(postData.unit) > 5
+  ) {
+    errors.push(`unit: ${maxLengthMessage(5)}`);
+  }
+  if (
+    isCreate &&
+    (postData.income_accno == null || postData.income_accno === "")
+  ) {
+    errors.push(t("Income account (account number) is required"));
+  }
+  return errors;
+}
+
+function asKeyList(keyOrKeys) {
+  if (keyOrKeys == null) return [];
+  return Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys];
+}
+
+/** Merge nested IC defaults (e.g. defaults.ic) into a flat object for lookups. */
+function flattenIcDefaults(raw) {
+  if (!raw || typeof raw !== "object") return {};
+  return {
+    ...raw,
+    ...(raw.ic && typeof raw.ic === "object" ? raw.ic : {}),
+    ...(raw.IC && typeof raw.IC === "object" ? raw.IC : {}),
+  };
+}
+
+/** Match chart row to a default accno string (plain accno or "accno--label" combo). */
+function matchAccountAccno(accountRow, rawDefault) {
+  if (rawDefault == null || rawDefault === "") return false;
+  const s = String(rawDefault).trim();
+  const accnoFromLabel = s.includes("--") ? s.split("--")[0].trim() : s;
+  const a = accountRow?.accno;
+  return String(a) === s || String(a) === accnoFromLabel;
+}
+
+/**
+ * Expense/COGS defaults often point at accounts listed under `accounts.cogs`;
+ * merge with `accounts.expense` so the select can show the default row.
+ */
+function mergeItemExpenseAccountOptions(expenseList, cogsList) {
+  const primary = Array.isArray(expenseList) ? expenseList : [];
+  const secondary = Array.isArray(cogsList) ? cogsList : [];
+  const seen = new Set();
+  const out = [];
+  const pushIfNew = (a) => {
+    if (!a || a.accno == null || String(a.accno).trim() === "") return;
+    const k = String(a.accno);
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push(a);
+  };
+  primary.forEach(pushIfNew);
+  secondary.forEach(pushIfNew);
+  return out;
+}
+
+function resolveDefaultAccount(accounts, defaults, keys) {
+  const accnoKeys = asKeyList(keys.accnoKey);
+  const idKeys = asKeyList(keys.idKey);
+  if (!accounts?.length) return undefined;
+
+  for (const k of accnoKeys) {
+    const v = defaults?.[k];
+    if (v == null || v === "") continue;
+    const found = accounts.find((a) => matchAccountAccno(a, v));
+    if (found) return found;
+  }
+  for (const k of idKeys) {
+    const v = defaults?.[k];
+    if (v == null) continue;
+    const found = accounts.find((a) => a.id == v);
+    if (found) return found;
+  }
+  return accounts[0];
+}
+
+function findAccountByStoredAccno(accounts, data, accnoField, idField) {
+  if (data?.[accnoField] != null && data[accnoField] !== "") {
+    return accounts.find((a) => String(a.accno) === String(data[accnoField]));
+  }
+  if (data?.[idField] != null) {
+    return accounts.find((a) => a.id == data[idField]);
+  }
+  return undefined;
+}
 
 const getLinks = async () => {
   try {
     const response = await api.get("/create_links/ic");
     const links = response.data;
 
-    // Filter taxes based on type and deduplicate by accno
-    const filterTaxesByType = (taxes, currentType) => {
-      if (!taxes) return {};
-
-      const filteredTaxes = {};
-      const seenAccnos = new Set();
-
-      Object.keys(taxes).forEach((key) => {
-        const tax = taxes[key];
-        if (tax.link && !seenAccnos.has(tax.accno)) {
-          const linkParts = tax.link.split(":");
-
-          // Check if tax applies to current type
-          const hasPartLink = linkParts.includes("IC_taxpart");
-          const hasServiceLink = linkParts.includes("IC_taxservice");
-
-          if (currentType === "service" && hasServiceLink) {
-            filteredTaxes[key] = tax;
-            seenAccnos.add(tax.accno);
-          } else if (currentType === "part" && hasPartLink) {
-            filteredTaxes[key] = tax;
-            seenAccnos.add(tax.accno);
-          }
+    const filteredTaxes = {};
+    const seenAccnos = new Set();
+    if (links.tax_accounts) {
+      Object.keys(links.tax_accounts).forEach((key) => {
+        const tax = links.tax_accounts[key];
+        if (!tax?.link || seenAccnos.has(tax.accno)) return;
+        const linkParts = tax.link.split(":");
+        if (linkParts.includes("IC_taxservice")) {
+          filteredTaxes[key] = tax;
+          seenAccnos.add(tax.accno);
         }
       });
-
-      return filteredTaxes;
-    };
-
-    // Filter taxes based on current type
-    const filteredTaxes = filterTaxesByType(links.tax_accounts, type.value);
+    }
     taxAccounts.value = filteredTaxes;
-    // Initialize form taxes
-    console.log(taxAccounts.value);
     Object.keys(taxAccounts.value).forEach((key) => {
       const tax = taxAccounts.value[key];
       form.value.taxes[tax.accno] = false;
     });
 
-    inventoryAccounts.value = links.accounts.inventory;
-    incomeAccounts.value = links.accounts.income;
-    cogsAccounts.value = links.accounts.cogs;
-    expenseAccounts.value = links.accounts.expense;
+    expenseAccounts.value = mergeItemExpenseAccountOptions(
+      links.accounts.expense,
+      links.accounts.cogs,
+    );
     serviceIncomeAccounts.value = links.accounts.service_income;
 
-    // Helper function: returns account with matching id, or the first account if none match (if array isn't empty)
-    const getAccount = (accounts, id) => {
-      if (!accounts || accounts.length === 0) {
-        return undefined;
-      }
-      return accounts.find((acc) => acc.id == id) || accounts[0];
-    };
-
-    form.value.inventory = getAccount(
-      inventoryAccounts.value,
-      links.defaults.inventory_accno_id,
+    const defaults = flattenIcDefaults(links.defaults);
+    form.value.income = resolveDefaultAccount(
+      serviceIncomeAccounts.value,
+      defaults,
+      {
+        accnoKey: ["income_accno", "sales_accno", "ic_income_accno"],
+        idKey: ["income_accno_id", "sales_accno_id"],
+      },
     );
-
-    form.value.income = getAccount(
-      incomeAccounts.value,
-      links.defaults.income_accno_id,
-    );
-
-    if (type.value === "service") {
-      form.value.income = getAccount(
-        serviceIncomeAccounts.value,
-        links.defaults.income_accno_id,
-      );
-    }
-
-    form.value.cogs = getAccount(
-      cogsAccounts.value,
-      links.defaults.expense_accno_id,
-    );
-
-    form.value.expense = getAccount(
+    form.value.expense = resolveDefaultAccount(
       expenseAccounts.value,
-      links.defaults.expense_accno_id,
+      defaults,
+      {
+        accnoKey: ["expense_accno", "cogs_accno", "ic_expense_accno"],
+        idKey: ["expense_accno_id", "cogs_accno_id"],
+      },
     );
 
     currencies.value = links.currencies;
@@ -656,71 +517,52 @@ const getLinks = async () => {
   }
 };
 
-// Load item data if an id is provided in the route
-const loadData = async () => {
-  const id = componentId.value;
+const loadData = async (idOverride) => {
+  const id = idOverride ?? componentId.value;
   if (!id) return;
   try {
     const response = await api.get(`/ic/items/${id}`);
     const data = response.data;
-    type.value = data.item;
     if (!props.type) {
-      updateTitle(`${t("Edit")} ${t(type.value)}`);
+      updateTitle(`${t("Edit")} ${t("Service")}`);
     }
-    // Basic fields
+
     form.value.partnumber = data.partnumber;
     form.value.description = data.description;
 
-    form.value.inventory = inventoryAccounts.value.find(
-      (acc) => acc.id == data.inventory_accno_id,
-    );
-    form.value.income = incomeAccounts.value.find(
-      (acc) => acc.id == data.income_accno_id,
-    );
+    form.value.income =
+      findAccountByStoredAccno(
+        serviceIncomeAccounts.value,
+        data,
+        "income_accno",
+        "income_accno_id",
+      ) || form.value.income;
+    form.value.expense =
+      findAccountByStoredAccno(
+        expenseAccounts.value,
+        data,
+        "expense_accno",
+        "expense_accno_id",
+      ) || form.value.expense;
 
-    if (type.value === "service") {
-      form.value.income = serviceIncomeAccounts.value.find(
-        (acc) => acc.id === data.income_accno_id,
-      );
-    }
-    form.value.cogs = cogsAccounts.value.find(
-      (acc) => acc.id == data.expense_accno_id,
-    );
-    form.value.expense = expenseAccounts.value.find(
-      (acc) => acc.id == data.expense_accno_id,
-    );
     Object.keys(taxAccounts.value).forEach((key) => {
       const tax = taxAccounts.value[key];
-      form.value.taxes[tax.accno] = Boolean(data.amount[tax.accno]);
+      form.value.taxes[tax.accno] = Boolean(data.amount?.[tax.accno]);
     });
 
-    // Pricing & Inventory fields
-    form.value.averageCost = data.avgcost;
     form.value.image = data.image;
     form.value.drawing = data.drawing;
     form.value.microfiche = data.microfiche;
     form.value.countryorigin = data.countryorigin;
     form.value.tariff_hscode = data.tariff_hscode;
     form.value.barcode = data.barcode;
-    form.value.bin = data.bin;
-    form.value.checkinventory = !!data.checkinventory;
     form.value.priceupdate = data.priceupdate;
-    form.value.lot = data.lot;
-    form.value.expires = data.expires;
     form.value.sellprice = data.sellprice;
     form.value.listprice = data.listprice;
     form.value.lastcost = data.lastcost;
-    form.value.rop = data.rop;
     form.value.unit = data.unit;
-    form.value.weight = data.weight;
     form.value.notes = data.notes;
 
-    // Make & Model Lines (if applicable and not a service)
-    if (data.makemodel && data.makemodels && type.value !== "service") {
-      form.value.makeModelLines = data.makemodels;
-    }
-
-    // Vendor Lines mapping from vendormatrix
     if (data.vendormatrix) {
       form.value.vendorLines = data.vendormatrix.map((vend) => ({
         vendor: vendors.value.find((v) => v.name === vend.name),
@@ -733,7 +575,6 @@ const loadData = async () => {
       }));
     }
 
-    // Customer Lines mapping from customermatrix
     if (data.customermatrix) {
       form.value.customerLines = data.customermatrix.map((cust) => ({
         customer: customers.value.find((c) => c.name === cust.name),
@@ -749,17 +590,29 @@ const loadData = async () => {
   } catch (error) {
     console.log(error);
     Notify.create({
-      message: t("Failed to load item data"),
+      message:
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        t("Failed to load item data"),
       type: "negative",
       position: "center",
     });
   }
 };
 
-const submitForm = async () => {
+function stripForbiddenIcKeys(obj) {
+  FORBIDDEN_IC_KEYS.forEach((k) => {
+    delete obj[k];
+  });
+}
+
+const submitForm = async (asNew) => {
+  if (typeof asNew === "boolean") {
+    saveAsNew.value = asNew;
+  }
+
   const valid = await formRef.value.validate();
 
-  // If the form is not valid, handle errors
   if (!valid) {
     const firstError = formRef.value.$el.querySelector(".q-field--error");
     if (firstError) {
@@ -772,21 +625,9 @@ const submitForm = async () => {
     });
     return;
   }
-  // Create a shallow copy of form data
+
   const postData = { ...form.value };
 
-  // If type is service, remove unnecessary fields
-  if (type.value === "service") {
-    delete postData.cogs;
-    delete postData.averageCost;
-    delete postData.weight;
-    delete postData.onhand;
-    delete postData.checkinventory;
-    delete postData.rop;
-    delete postData.bin;
-    delete postData.makeModelLines;
-  }
-  console.log(form.value.taxes);
   Object.keys(form.value.taxes).forEach((accno) => {
     postData[`IC_tax_${accno}`] = form.value.taxes[accno] ? "1" : "0";
   });
@@ -796,30 +637,18 @@ const submitForm = async () => {
 
   delete postData.taxes;
 
-  // Format accounts accordingly & delete originals
-  const mapping = {
-    income: "IC_income",
-    expense: "IC_expense",
-    cogs: "IC_expense",
-    inventory: "IC_inventory",
-  };
+  delete postData.income;
+  delete postData.expense;
 
-  Object.keys(mapping).forEach((key) => {
-    if (postData[key]) {
-      postData[mapping[key]] = postData[key].label;
-      delete postData[key];
-    }
-  });
-
-  if (type.value === "service") {
-    delete postData.IC_inventory;
-    delete postData.IC_cogs;
-    delete postData.averageCost;
-    delete postData.weight;
-    delete postData.onhand;
+  if (form.value.income?.accno != null && form.value.income.accno !== "") {
+    postData.income_accno = String(form.value.income.accno);
+  }
+  if (form.value.expense?.accno != null && form.value.expense.accno !== "") {
+    postData.expense_accno = String(form.value.expense.accno);
   }
 
-  // Map customer and vendor objects to "name--id" strings in their respective arrays.
+  stripForbiddenIcKeys(postData);
+
   if (postData.vendorLines && Array.isArray(postData.vendorLines)) {
     postData.vendorLines = postData.vendorLines.map((line) => ({
       ...line,
@@ -840,7 +669,6 @@ const submitForm = async () => {
     }));
   }
 
-  // Helper function to recursively convert booleans to "1" or "0"
   function convertBooleans(obj) {
     Object.keys(obj).forEach((key) => {
       if (typeof obj[key] === "boolean") {
@@ -862,48 +690,56 @@ const submitForm = async () => {
     });
   }
 
-  // Convert any boolean values in the postData to "1" or "0"
   convertBooleans(postData);
 
-  // Convert mocoId to moco_id for API
   if (postData.mocoId) {
     postData.moco_id = postData.mocoId;
     delete postData.mocoId;
   }
 
-  const id = componentId.value;
-  postData.id = id;
-  postData.item = componentType.value;
+  const rawId = componentId.value;
+  const isCreate = !rawId || saveAsNew.value;
+  postData.id = isCreate ? 0 : Number(rawId);
+  postData.item = "service";
 
-  let response;
+  const icPayloadErrors = validateIcItemPayload(postData, { isCreate });
+  if (icPayloadErrors.length) {
+    Notify.create({
+      message: icPayloadErrors[0],
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
   try {
-    if (id && !saveAsNew.value) {
-      // Update existing item
-      response = await api.post(`/ic/items/${id}`, postData);
-    } else {
-      // Create a new item
-      response = await api.post("/ic/items", postData);
-    }
+    const endpoint = isCreate ? "/ic/items/0" : `/ic/items/${rawId}`;
+    const response = await api.post(endpoint, postData);
 
     Notify.create({
-      message: t("Part/Service saved successfully"),
+      message: t("Service saved successfully"),
       type: "positive",
       position: "top-right",
     });
     const fetchId = response.data.id;
     if (fetchId) {
-      componentId.value = fetchId;
-      await loadData();
+      if (!props.type) {
+        await router.replace({
+          query: { ...route.query, id: fetchId },
+        });
+      }
+      await loadData(props.type ? fetchId : undefined);
       emit("saved");
     }
   } catch (error) {
     const errorMessage =
+      error?.response?.data?.message ||
       error?.response?.data?.error ||
       error.message ||
       t("An unexpected error occurred");
 
     Notify.create({
-      message: `${t("Error saving Part/Service")}: ${errorMessage}`,
+      message: `${t("Error saving service")}: ${errorMessage}`,
       type: "negative",
       position: "center",
     });
@@ -911,29 +747,6 @@ const submitForm = async () => {
   }
 };
 
-// Delete functions for each array group
-function deleteMakeModelLine(index) {
-  if (form.value.makeModelLines.length > 1) {
-    form.value.makeModelLines.splice(index, 1);
-  } else {
-    form.value.makeModelLines[0] = { make: "", model: "" };
-  }
-}
-
-// Make/Model helper functions
-function handleMakeModelEnter(index) {
-  const lines = form.value.makeModelLines;
-  // Only add a new line if on the last line
-  if (index === lines.length - 1) {
-    lines.push({ make: "", model: "" });
-    nextTick(() => {
-      // Focus the 'make' input on the newly added line
-      makeInputRefs[index + 1]?.focus && makeInputRefs[index + 1].focus();
-    });
-  }
-}
-
-// Apply initial data when provided - uses a watcher so it works when dialog reopens
 const applyInitialData = () => {
   if (!props.initialData || componentId.value) return;
 
@@ -945,18 +758,10 @@ const applyInitialData = () => {
     form.value.mocoId = props.initialData.mocoId;
   }
 
-  // Default unit to hours for services created from Moco
-  if (type.value === "service") {
-    form.value.unit = "h";
-  }
+  form.value.unit = "h";
 
-  // Match income account by accno property
   if (props.initialData.incomeAccno) {
-    const accounts =
-      type.value === "service"
-        ? serviceIncomeAccounts.value
-        : incomeAccounts.value;
-    const matchedAccount = accounts.find(
+    const matchedAccount = serviceIncomeAccounts.value.find(
       (acc) => String(acc.accno) === String(props.initialData.incomeAccno),
     );
     if (matchedAccount) {
@@ -968,8 +773,7 @@ const applyInitialData = () => {
 watch(
   () => props.initialData,
   () => {
-    // Only apply if accounts are already loaded
-    if (serviceIncomeAccounts.value.length || incomeAccounts.value.length) {
+    if (serviceIncomeAccounts.value.length) {
       applyInitialData();
     }
   },
@@ -978,13 +782,11 @@ watch(
 
 onMounted(async () => {
   await getLinks();
-  // Load item data if an id is provided in the route
   const id = componentId.value;
   if (id) {
     await loadData();
   }
 
-  // Apply initial data after links are loaded
   applyInitialData();
 });
 </script>

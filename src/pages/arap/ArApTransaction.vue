@@ -1529,6 +1529,14 @@ const fetchEntity = async (id) => {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch vc details:", error);
+    Notify.create({
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        t("Failed to fetch vc details"),
+      type: "negative",
+      position: "center",
+    });
     return null;
   }
 };

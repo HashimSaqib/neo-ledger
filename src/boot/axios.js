@@ -2,6 +2,7 @@ import { defineBoot } from "#q-app/wrappers";
 import axios from "axios";
 import { Notify, Cookies } from "quasar"; // Import Cookies from Quasar
 import config from "../../neoledger.json";
+import { getApiErrorMessage } from "src/utils/apiError";
 
 // Create a new Axios instance
 const api = axios.create();
@@ -49,7 +50,7 @@ export default defineBoot(({ app, router, urlPath, publicPath }) => {
           console.warn("Session validation failed, redirecting to login");
         } else if (status === 403 || status === 500) {
           const errorMessage =
-            error.response.data.message ||
+            getApiErrorMessage(error) ||
             "An unexpected error occurred. Please try again later.";
           Notify.create({
             type: "negative",

@@ -203,13 +203,8 @@
         <h6 class="q-my-none q-pa-none text-secondary">{{ t("Items") }}</h6>
         <s-button type="add-line" @click="addLine" class="q-ml-md" />
         <s-button
-          type="add-part"
-          @click="openAddPart('part')"
-          class="q-ml-md"
-        />
-        <s-button
           type="add-service"
-          @click="openAddPart('service')"
+          @click="openAddPart"
           class="q-ml-md"
         />
       </div>
@@ -729,7 +724,7 @@
                 ? selectedPartLine.partnumber.id
                 : null
             "
-            :type="selectedPartType"
+            type="service"
             @saved="partSaved"
           />
         </q-card-section>
@@ -960,6 +955,14 @@ const fetchVc = async (id) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    Notify.create({
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        t("Failed to load customer/vendor"),
+      type: "negative",
+      position: "center",
+    });
     return null;
   }
 };
@@ -974,14 +977,10 @@ const vcSaved = async (savedEntity) => {
 // Open Product (Part) Dialog for Editing
 const openEditPart = (line) => {
   selectedPartLine.value = line;
-  // Determine type based on inventory_accno_id property
-  selectedPartType.value =
-    line.partnumber && line.partnumber.inventory_accno_id ? "part" : "service";
   partDialog.value = true;
 };
 
-const openAddPart = (type) => {
-  selectedPartType.value = type;
+const openAddPart = () => {
   partDialog.value = true;
 };
 
@@ -1073,7 +1072,6 @@ const dialogMode = ref("add"); // "add" or "edit"
 // Product (Part) Dialog
 const partDialog = ref(false);
 const selectedPartLine = ref(null);
-const selectedPartType = ref("");
 
 // Email Dialog
 const emailDialog = ref(false);
@@ -1933,7 +1931,6 @@ watch(
 watch(partDialog, () => {
   if (!partDialog.value) {
     selectedPartLine.value = null;
-    selectedPartType.value = "";
   }
 });
 

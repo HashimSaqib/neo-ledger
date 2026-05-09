@@ -327,8 +327,8 @@
               <span v-else-if="col.name === 'credit'">{{
                 formatAmount(props.row.credit)
               }}</span>
-              <span v-else-if="col.name === 'taxAmount'">{{
-                formatAmount(props.row.taxAmount)
+              <span v-else-if="col.name === 'linetaxamount'">{{
+                formatAmount(props.row.linetaxamount)
               }}</span>
               <span v-else-if="col.name === 'balance'">{{
                 formatAmount(props.row.balance)
@@ -370,7 +370,9 @@
               </span>
               <span
                 v-else-if="
-                  ['debit', 'credit', 'taxAmount', 'balance'].includes(col.name)
+                  ['debit', 'credit', 'linetaxamount', 'balance'].includes(
+                    col.name,
+                  )
                 "
               >
                 {{
@@ -414,7 +416,7 @@
               <span v-else-if="col.name === 'credit'">{{
                 formatAmount(overallTotals.totalCredit)
               }}</span>
-              <span v-else-if="col.name === 'taxAmount'">{{
+              <span v-else-if="col.name === 'linetaxamount'">{{
                 formatAmount(overallTotals.totalTax)
               }}</span>
               <span v-else-if="col.name === 'balance'">{{
@@ -590,7 +592,7 @@ const baseColumns = ref([
     default: true,
   },
   {
-    name: "taxAmount",
+    name: "linetaxamount",
     align: "right",
     label: "Tax Amount",
     field: (row) => Number(row.linetaxamount) || 0,
@@ -646,7 +648,7 @@ const selectedColumns = ref(
     return acc;
   }, {}),
 );
-const GL_FILTERS_VERSION = 2;
+const GL_FILTERS_VERSION = 3;
 const JOURNAL_DEFAULT_ORDER = [
   "accno",
   "transdate",
@@ -681,7 +683,14 @@ function processFilters() {
 
         // One-time migration for legacy saved filters so new defaults apply.
         if (parsedFilters.version !== GL_FILTERS_VERSION) {
-          migratedColumns.taxAmount = false;
+          if (
+            Object.prototype.hasOwnProperty.call(migratedColumns, "taxAmount")
+          ) {
+            migratedColumns.linetaxamount = migratedColumns.taxAmount;
+            delete migratedColumns.taxAmount;
+          }
+          migratedColumns.linetaxamount =
+            migratedColumns.linetaxamount ?? false;
           migratedColumns.files = false;
           JOURNAL_DEFAULT_ORDER.forEach((name) => {
             migratedColumns[name] = true;
@@ -827,7 +836,7 @@ function groupData(data) {
       account_description: group[0].account_description,
       debit: detailRows.reduce((sum, r) => sum + Number(r.debit), 0),
       credit: detailRows.reduce((sum, r) => sum + Number(r.credit), 0),
-      taxAmount: detailRows.reduce(
+      linetaxamount: detailRows.reduce(
         (sum, r) => sum + (Number(r.linetaxamount) || 0),
         0,
       ),
@@ -1034,7 +1043,7 @@ const overallTotals = computed(() => {
   const totalDebit = subtotals.reduce((sum, r) => sum + Number(r.debit), 0);
   const totalCredit = subtotals.reduce((sum, r) => sum + Number(r.credit), 0);
   const totalTax = subtotals.reduce(
-    (sum, r) => sum + (Number(r.taxAmount) || 0),
+    (sum, r) => sum + (Number(r.linetaxamount) || 0),
     0,
   );
   const totalBalance = subtotals.reduce((sum, r) => sum + Number(r.balance), 0);
@@ -1086,10 +1095,10 @@ const getPath = (row) => {
 };
 
 // Utility to set text alignment classes.
-// Here we explicitly set numeric columns (debit, credit, taxAmount, balance) to be right aligned
+// Here we explicitly set numeric columns (debit, credit, linetaxamount, balance) to be right aligned
 // and all other columns to be left aligned.
 const getCellClass = (col) => {
-  const numericColumns = ["debit", "credit", "taxAmount", "balance"];
+  const numericColumns = ["debit", "credit", "linetaxamount", "balance"];
   return numericColumns.includes(col.name) ? "text-right" : "text-left";
 };
 
@@ -1115,7 +1124,7 @@ const downloadTransactions = () => {
       if (col.name === "reference") return row.reference;
       if (col.name === "accno") return formatAccountForExport(row);
       if (col.name === "transdate") return formatDate(row.transdate);
-      if (["debit", "credit", "taxAmount", "balance"].includes(col.name)) {
+      if (["debit", "credit", "linetaxamount", "balance"].includes(col.name)) {
         return roundAmount(
           typeof col.field === "function" ? col.field(row) : row[col.field],
         );
@@ -1165,7 +1174,7 @@ const createPDF = () => {
   const headerRow = displayColumns.value.map((col) => col.label);
 
   // Prepare columnStyles: numeric columns right aligned, no line break; others left aligned.
-  const numericColumns = ["debit", "credit", "taxAmount", "balance"];
+  const numericColumns = ["debit", "credit", "linetaxamount", "balance"];
   const previousFontSize = doc.getFontSize();
   const previousFont = doc.getFont();
   doc.setFontSize(PDF_STYLES.transactionTable.styles.fontSize);

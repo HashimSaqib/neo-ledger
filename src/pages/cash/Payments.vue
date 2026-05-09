@@ -266,6 +266,11 @@ const paymentAccounts = ref([]);
 const currencies = ref([]);
 const results = ref([]);
 const closedto = ref(null);
+const getApiErrorMessage = (error, fallbackMessage) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  error?.message ||
+  fallbackMessage;
 const formData = ref({
   department: null,
   fromdate: null,
@@ -576,7 +581,7 @@ const search = async () => {
     console.error("Error fetching data:", error);
     $q.notify({
       type: "negative",
-      message: t("Error fetching data"),
+      message: getApiErrorMessage(error, t("Error fetching data")),
     });
   } finally {
     loading.value = false;
@@ -691,12 +696,8 @@ const postPayments = async () => {
   } catch (error) {
     console.error("Error posting payments:", error);
 
-    // Extract error message from response
-    const errorMessage =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error.message ||
-      "Error posting payments";
+    // Prefer standardized API message, keep fallback for older responses.
+    const errorMessage = getApiErrorMessage(error, t("Error posting payments"));
 
     $q.notify({
       message: errorMessage,

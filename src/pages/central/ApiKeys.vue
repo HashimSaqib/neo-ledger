@@ -245,6 +245,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { api } from "src/boot/axios";
+import { getApiErrorMessage } from "src/utils/apiError";
 import { Notify } from "quasar";
 import { useI18n } from "vue-i18n";
 
@@ -348,7 +349,7 @@ const fetchApiKeys = async () => {
       apiKeys.value = [];
       error.value = "";
     } else {
-      error.value = err.response?.data?.error || t("Failed to fetch API keys");
+      error.value = getApiErrorMessage(err, t("Failed to fetch API keys"));
       console.error("Error fetching API keys:", err);
     }
   } finally {
@@ -389,7 +390,7 @@ const createApiKey = async () => {
     });
   } catch (err) {
     Notify.create({
-      message: err.response?.data?.error || t("Failed to create API key"),
+      message: getApiErrorMessage(err, t("Failed to create API key")),
       color: "negative",
     });
   } finally {
@@ -423,7 +424,7 @@ const confirmDelete = async () => {
     });
   } catch (err) {
     Notify.create({
-      message: err.response?.data?.error || t("Failed to delete API key"),
+      message: getApiErrorMessage(err, t("Failed to delete API key")),
       color: "negative",
     });
   } finally {

@@ -890,7 +890,10 @@ const fetchOverview = async () => {
   } catch (error) {
     console.error(error);
     Notify.create({
-      message: error.response?.data?.error || t("Error fetching overview"),
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        t("Error fetching overview"),
       type: "negative",
       position: "center",
     });

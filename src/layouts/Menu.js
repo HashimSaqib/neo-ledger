@@ -334,16 +334,10 @@ const getMenuLinks = async () => {
       ],
     },
     {
-      title: "Goods & Services",
+      title: "Services",
       icon: "local_offer",
       perm: "items",
       sublinks: [
-        {
-          title: "Add Part",
-          link: "/ic/add/part",
-          perm: "items.part",
-          icon: "inventory_2",
-        },
         {
           title: "Add Service",
           link: "/ic/add/service",
@@ -351,25 +345,10 @@ const getMenuLinks = async () => {
           icon: "miscellaneous_services",
         },
         {
-          title: "Reports",
+          title: "Search Services",
+          link: "/ic/search/services",
+          perm: "items.search.services",
           icon: "assessment",
-          sublinks: [
-            {
-              title: "All Items",
-              link: "/ic/search/allitems",
-              perm: "items.search.allitems",
-            },
-            {
-              title: "Parts",
-              link: "/ic/search/parts",
-              perm: "items.search.parts",
-            },
-            {
-              title: "Services",
-              link: "/ic/search/services",
-              perm: "items.search.services",
-            },
-          ],
         },
       ],
     },

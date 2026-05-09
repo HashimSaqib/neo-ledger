@@ -125,9 +125,9 @@ const columns = computed(() => {
       },
       { name: "curr", label: t("Currency"), field: "curr", align: "left" },
       {
-        name: "exchangerate",
+        name: "exchangeRate",
         label: t("Exchange Rate"),
-        field: "exchangerate",
+        field: "exchangeRate",
         align: "right",
       },
       { name: "amount", label: t("Amount"), field: "amount", align: "right" },
