@@ -219,16 +219,6 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
-                v-model="form.precision"
-                name="precision"
-                :label="t('Precision')"
-                outlined
-                dense
-                class="lightbg input-box q-mb-sm"
-              />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
                 v-model="form.annualinterest"
                 name="annualinterest"
                 :label="t('Annual Interest')"
@@ -242,16 +232,6 @@
                 v-model="form.latepaymentfee"
                 name="latepaymentfee"
                 :label="t('Late Payment Fee')"
-                outlined
-                dense
-                class="lightbg input-box q-mb-sm"
-              />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.restockingcharge"
-                name="restockingcharge"
-                :label="t('Restocking Charge')"
                 outlined
                 dense
                 class="lightbg input-box q-mb-sm"
@@ -280,19 +260,6 @@
             </div>
           </div>
 
-          <div class="row items-center q-mt-md">
-            <span class="text-body2 q-mr-sm">{{ t("Round") }}</span>
-            <q-option-group
-              v-model="form.roundchange"
-              name="roundchange"
-              type="radio"
-              inline
-              :options="roundOptions"
-              :label="t('Round')"
-              dense
-            />
-          </div>
-
           <div
             class="text-uppercase text-caption text-weight-bold text-grey-7 q-mt-md q-mb-sm"
           >
@@ -316,20 +283,6 @@
                 name="method"
                 :label="t('Reporting Method (Cash)')"
                 dense
-              />
-              <q-checkbox
-                v-model="form.checkinventory"
-                name="checkinventory"
-                :label="t('Check Inventory')"
-                dense
-                class="q-ml-md"
-              />
-              <q-checkbox
-                v-model="form.forcewarehouse"
-                name="forcewarehouse"
-                :label="t('Force Warehouse')"
-                dense
-                class="q-ml-md"
               />
               <q-checkbox
                 v-model="form.hideaccounts"
@@ -368,6 +321,13 @@
                 dense
                 class="q-ml-md"
               />
+              <q-checkbox
+                v-model="form.paymentfile_workflow"
+                name="paymentfile_workflow"
+                :label="t('Payment File for Workflow')"
+                dense
+                class="q-ml-md"
+              />
             </div>
           </div>
         </q-tab-panel>
@@ -382,20 +342,6 @@
             }}
           </div>
           <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <s-select
-                v-model="form.inventory_account"
-                :options="inventoryOptions"
-                item-label="label"
-                :label="t('Inventory')"
-                outlined
-                dense
-                class="lightbg input-box q-mb-sm"
-                search="label"
-                option-label="label"
-                account
-              />
-            </div>
             <div class="col-12 col-md-6">
               <s-select
                 v-model="form.income_account"
@@ -506,16 +452,6 @@
                 search="label"
                 account
                 option-label="label"
-              />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.clearing"
-                name="clearing"
-                :label="t('Clearing Account')"
-                outlined
-                dense
-                class="lightbg input-box q-mb-sm"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -987,22 +923,17 @@ const form = ref({
   method: false,
   cdt: false,
   referenceurl: "",
-  precision: "",
   annualinterest: "",
   latepaymentfee: "",
-  restockingcharge: "",
-  roundchange: "",
   weightunit: "",
   termdays: "",
   namesbynumber: false,
   xelatex: false,
   paymentfile: false,
+  paymentfile_workflow: false,
   typeofcontact: "",
-  checkinventory: false,
-  forcewarehouse: false,
   hideaccounts: false,
   linetax: false,
-  inventory_account: null,
   income_account: null,
   expense_account: null,
   fx_gain_loss_account: null,
@@ -1011,7 +942,6 @@ const form = ref({
   ap_account: null,
   ar_payment: null,
   ap_payment: null,
-  clearing: "",
   transition: "",
   glnumber: "",
   lock_glnumber: false,
@@ -1048,15 +978,6 @@ const form = ref({
 const showSmtpPassword = ref(false);
 
 // Options
-const roundOptions = [
-  { label: "0.01", value: "0.01" },
-  { label: "0.05", value: "0.05" },
-  { label: "0.1", value: "0.1" },
-  { label: "0.2", value: "0.2" },
-  { label: "0.5", value: "0.5" },
-  { label: "1", value: "1" },
-];
-
 const typeofcontactOptions = [
   { label: "Company", value: "" },
   { label: "Person", value: "person" },
@@ -1070,7 +991,6 @@ const smtpSslOptions = [
 ];
 
 // s-select items (arrays of objects)
-const inventoryOptions = ref([]);
 const incomeOptions = ref([]);
 const expenseOptions = ref([]);
 const fxgainlossOptions = ref([]);
@@ -1090,20 +1010,6 @@ function parseAccountOptions(arr) {
 }
 
 // Filter functions for different account types
-function filterInventoryAccounts(accounts) {
-  return accounts.filter((acc) => {
-    if (!acc.link) return false;
-    const link = acc.link.split(":");
-    return link.some(
-      (link) =>
-        link.includes("IC") &&
-        !link.includes("sale") &&
-        !link.includes("cogs") &&
-        !link.includes("IC_tax"),
-    );
-  });
-}
-
 function filterIncomeAccounts(accounts) {
   return accounts.filter((acc) => {
     if (!acc.link) return false;
@@ -1317,9 +1223,6 @@ async function loadDefaults() {
     const { data } = await api.get("/system/companydefaults");
 
     // Apply filters to create specific account option arrays
-    inventoryOptions.value = parseAccountOptions(
-      filterInventoryAccounts(data.all_accounts),
-    );
     incomeOptions.value = parseAccountOptions(
       filterIncomeAccounts(data.all_accounts),
     );
@@ -1360,32 +1263,22 @@ async function loadDefaults() {
     form.value.referenceurl = data.company_info?.reference_url || "";
 
     // Settings
-    form.value.precision = data.settings?.precision || "";
     form.value.annualinterest = data.settings?.annual_interest || "";
     form.value.latepaymentfee = data.settings?.late_payment_fee || "";
-    form.value.restockingcharge = data.settings?.restocking_charge || "";
-    form.value.roundchange = data.settings?.round_change || "";
     form.value.weightunit = data.settings?.weight_unit || "";
     form.value.termdays = data.settings?.term_days ?? "";
-    form.value.clearing = data.settings?.clearing_account || "";
     form.value.transition = data.settings?.transition_account || "";
 
     form.value.method = data.settings?.reporting_method_cash || false;
-    form.value.checkinventory = data.settings?.check_inventory || false;
-    form.value.forcewarehouse = data.settings?.force_warehouse || false;
     form.value.hideaccounts = data.settings?.hide_closed_accounts || false;
     form.value.linetax = data.settings?.line_tax || false;
     form.value.namesbynumber = data.settings?.sort_names_by_number || false;
     form.value.xelatex = data.settings?.xe_latex || false;
     form.value.paymentfile = data.settings?.paymentfile ? true : false;
+    form.value.paymentfile_workflow = data.settings?.paymentfile_workflow ? true : false;
     form.value.typeofcontact = data.settings?.type_of_contact || "";
 
     // Account Defaults - Find complete account objects by ID
-    form.value.inventory_account =
-      findAccountById(
-        data.all_accounts,
-        data.account_defaults?.inventory_account_id,
-      ) || null;
     form.value.income_account =
       findAccountById(
         data.all_accounts,
@@ -1515,30 +1408,24 @@ async function submitForm() {
 
       settings: {
         // Financial Settings
-        precision: form.value.precision,
         annual_interest: form.value.annualinterest,
         late_payment_fee: form.value.latepaymentfee,
-        restocking_charge: form.value.restockingcharge,
-        round_change: form.value.roundchange,
         weight_unit: form.value.weightunit,
         term_days: form.value.termdays,
-        clearing_account: form.value.clearing,
         transition_account: form.value.transition,
 
         // System Settings
         reporting_method_cash: form.value.method,
-        check_inventory: form.value.checkinventory,
-        force_warehouse: form.value.forcewarehouse,
         hide_closed_accounts: form.value.hideaccounts,
         line_tax: form.value.linetax,
         sort_names_by_number: form.value.namesbynumber,
         xe_latex: form.value.xelatex,
         paymentfile: form.value.paymentfile,
+        paymentfile_workflow: form.value.paymentfile_workflow,
         type_of_contact: form.value.typeofcontact,
       },
 
       account_defaults: {
-        inventory_account_id: form.value.inventory_account?.id || null,
         income_account_id: form.value.income_account?.id || null,
         expense_account_id: form.value.expense_account?.id || null,
         fx_gain_loss_account_id: form.value.fx_gain_loss_account?.id || null,
