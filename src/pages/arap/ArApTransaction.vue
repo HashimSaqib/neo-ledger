@@ -828,7 +828,6 @@
               <StationTransfer
                 v-if="
                   StationTransfer &&
-                  type === 'vendor' &&
                   invId &&
                   stations.length > 0
                 "
