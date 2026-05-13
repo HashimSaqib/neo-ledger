@@ -1484,7 +1484,7 @@ const fetchLinks = async () => {
     }
     // Only process workstation data if AI plugin is available
     if (aiHelpers) {
-      stations.value = response.data.stations || null;
+      stations.value = response.data.stations || [];
       user_stations.value = response.data.user_stations || {};
 
       const permissions = aiHelpers.processStationPermissions(
