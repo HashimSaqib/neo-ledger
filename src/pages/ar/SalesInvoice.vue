@@ -420,6 +420,13 @@
               </div>
             </q-expansion-item>
 
+            <!-- Accrual dropdown — auto-opens when an existing accrual is loaded -->
+            <AccrualPanel
+              v-model="accrual"
+              :lines="accrualLines"
+              :default-startdate="invDate"
+            />
+
             <div v-if="dcn">
               {{ dcn }}
             </div>
@@ -1206,6 +1213,7 @@ import EmailOptions from "src/components/EmailOptions.vue";
 import RecurringInvoiceSchedule from "src/components/RecurringInvoiceSchedule.vue";
 import MessageVariableInput from "src/components/MessageVariableInput.vue";
 import LastTransactions from "src/components/LastTransactions.vue";
+import AccrualPanel from "src/components/AccrualPanel.vue";
 const lastTransactionsRef = ref(null);
 const route = useRoute();
 const router = useRouter();
@@ -1529,6 +1537,10 @@ const getTodayDate = () => {
 };
 const invDate = ref(getTodayDate());
 const dueDate = ref(getTodayDate());
+
+// Accrual config + posted schedule preview (from API)
+const accrual = ref(null);
+const accrualLines = ref([]);
 
 // =====================
 // Invoice Lines & Calculations
@@ -2015,6 +2027,19 @@ const loadInvoice = async (invoice) => {
   exchangeRate.value = invoice.exchangerate || 1;
   taxIncluded.value = !!invoice.taxincluded;
   rounding.value = invoice.rounding ?? 0;
+
+  // Hydrate the accrual dropdown when present
+  if (invoice.accrual && invoice.accrual.period) {
+    accrual.value = {
+      period: invoice.accrual.period,
+      length: invoice.accrual.length,
+      startdate: invoice.accrual.startdate,
+    };
+    accrualLines.value = invoice.accrual.lines || [];
+  } else {
+    accrual.value = null;
+    accrualLines.value = [];
+  }
   lines.value = invoice.lines.map((line) => {
     return {
       id: lineId++,
@@ -2580,6 +2605,7 @@ const postInvoice = async (save = false, isNew = false) => {
       account: payment.account ? payment.account.accno : "",
       exchangerate: payment.exchangerate,
     })),
+    accrual: accrual.value,
   };
   if (selectedDepartment.value) {
     invoiceData.department = `${selectedDepartment.value.description}--${selectedDepartment.value.id}`;

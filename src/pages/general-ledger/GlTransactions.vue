@@ -1067,6 +1067,30 @@ const createLink = inject("createLink");
 
 // Return router path based on row type
 const getPath = (row) => {
+  // Accrual GL entries link back to their source AR/AP transaction
+  if (row.accrualSource) {
+    const { module, id, invoice } = row.accrualSource;
+    let path = "";
+    if (module === "ar") {
+      path = invoice
+        ? createLink("customer.invoice")
+        : createLink("customer.transaction");
+    } else if (module === "ap") {
+      path = invoice
+        ? createLink("vendor.invoice")
+        : createLink("vendor.transaction");
+    }
+    const defaultCallback = createLink("base") + `/gl/reports`;
+    return {
+      path,
+      query: {
+        id,
+        callback: route.query.callback || defaultCallback,
+        split: appliedSplitLedger.value ? 1 : 0,
+      },
+    };
+  }
+
   let path = "";
   if (row.type === "gl") {
     path = createLink("gl.transaction");

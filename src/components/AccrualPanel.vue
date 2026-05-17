@@ -1,6 +1,5 @@
 <template>
   <q-expansion-item
-    icon="event_repeat"
     :label="t('Accrual')"
     :caption="headerCaption"
     header-class="container-bg accrual-header"
@@ -66,50 +65,38 @@
       </div>
 
       <!-- Posted schedule (display only) -->
-      <div
+      <q-table
         v-if="enabled && lines && lines.length"
-        class="accrual-schedule q-pa-sm"
+        :rows="lines"
+        :columns="scheduleColumns"
+        flat
+        bordered
+        dense
+        hide-bottom
+        :rows-per-page-options="[0]"
+        row-key="date"
+        class="q-mt-sm"
       >
-        <div class="row items-center q-mb-sm">
-          <span class="text-caption text-grey-7">{{
-            t("Posted schedule")
-          }}</span>
-          <q-space />
-          <span class="text-caption text-grey-7"
-            >{{ lines.length }} {{ t("entries") }}</span
-          >
-        </div>
-        <table class="accrual-table">
-          <thead>
-            <tr>
-              <th class="text-left">{{ t("Date") }}</th>
-              <th class="text-left">{{ t("Debit") }}</th>
-              <th class="text-left">{{ t("Credit") }}</th>
-              <th class="text-right">{{ t("Amount") }}</th>
-              <th class="text-center"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, idx) in lines" :key="idx">
-              <td>{{ row.date }}</td>
-              <td>{{ row.debitAccno }}</td>
-              <td>{{ row.creditAccno }}</td>
-              <td class="text-right">{{ formatAmount(row.amount) }}</td>
-              <td class="text-center">
-                <q-icon
-                  :name="row.kind === 'accrual' ? 'south_east' : 'undo'"
-                  size="14px"
-                  :color="row.kind === 'accrual' ? 'primary' : 'grey-6'"
-                >
-                  <q-tooltip>{{
-                    row.kind === "accrual" ? t("Accrual") : t("Reversal")
-                  }}</q-tooltip>
-                </q-icon>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <template #body-cell-date="{ row }">
+          <q-td>{{ formatDate(row.date) }}</q-td>
+        </template>
+        <template #body-cell-amount="{ row }">
+          <q-td class="text-right">{{ formatAmount(row.amount) }}</q-td>
+        </template>
+        <template #body-cell-kind="{ row }">
+          <q-td class="text-center">
+            <q-icon
+              :name="row.kind === 'accrual' ? 'south_east' : 'undo'"
+              size="14px"
+              :color="row.kind === 'accrual' ? 'primary' : 'grey-6'"
+            >
+              <q-tooltip>{{
+                row.kind === "accrual" ? t("Accrual") : t("Reversal")
+              }}</q-tooltip>
+            </q-icon>
+          </q-td>
+        </template>
+      </q-table>
     </div>
   </q-expansion-item>
 </template>
@@ -117,6 +104,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { formatAmount, formatDate } from "src/helpers/utils";
 
 const props = defineProps({
   // Two-way binding for the accrual config. `null` when no accrual is set.
@@ -166,7 +154,7 @@ const headerCaption = computed(() => {
         : n === 1
           ? t("month")
           : t("months");
-  return `${n} ${unit}${startdate.value ? " · " + startdate.value : ""}`;
+  return `${n} ${unit}${startdate.value ? " · " + formatDate(startdate.value) : ""}`;
 });
 
 const summaryText = computed(() => {
@@ -179,8 +167,9 @@ const summaryText = computed(() => {
         ? t("years")
         : t("months");
   const start = startdate.value || props.defaultStartdate;
-  if (!start) return t("Spread over {n} {p}", { n, p: periodName });
-  return t("Spread over {n} {p} starting {d}", { n, p: periodName, d: start });
+  const base = `${t("Spread over")} ${n} ${periodName}`;
+  if (!start) return base;
+  return `${base} ${t("starting")} ${formatDate(start)}`;
 });
 
 // Hydrate from incoming modelValue. Auto-open dropdown when an accrual exists.
@@ -192,10 +181,8 @@ watch(
       period.value = val.period;
       lengthStr.value = String(val.length || 1);
       startdate.value = val.startdate || props.defaultStartdate || "";
-      expanded.value = true;
     } else {
       enabled.value = false;
-      expanded.value = false;
     }
   },
   { immediate: true },
@@ -224,13 +211,13 @@ function emitCurrent() {
 
 watch([enabled, period, lengthStr, startdate], emitCurrent);
 
-function formatAmount(v) {
-  const n = Number(v) || 0;
-  return n.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
+const scheduleColumns = computed(() => [
+  { name: "date",       label: t("Date"),   field: "date",       align: "left"  },
+  { name: "debitAccno", label: t("Debit"),  field: "debitAccno", align: "left"  },
+  { name: "creditAccno",label: t("Credit"), field: "creditAccno",align: "left"  },
+  { name: "amount",     label: t("Amount"), field: "amount",     align: "right" },
+  { name: "kind",       label: "",          field: "kind",       align: "center"},
+]);
 </script>
 
 <style scoped>
@@ -248,38 +235,5 @@ function formatAmount(v) {
   font-size: 0.75rem;
 }
 
-.accrual-schedule {
-  border: 1px solid var(--q-input);
-  border-radius: 6px;
-  background: transparent;
-}
 
-.accrual-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-}
-
-.accrual-table thead th {
-  font-weight: 500;
-  color: var(--q-secondary);
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--q-input);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.accrual-table tbody td {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--q-input);
-}
-
-.accrual-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.accrual-table tbody tr:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
 </style>

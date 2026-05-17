@@ -455,6 +455,32 @@
               />
             </div>
             <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.accrual_ap_chart"
+                :options="allOptions"
+                :label="t('AP Accrual Account')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <s-select
+                v-model="form.accrual_ar_chart"
+                :options="allOptions"
+                :label="t('AR Accrual Account')"
+                outlined
+                dense
+                class="lightbg input-box q-mb-sm"
+                search="label"
+                account
+                option-label="label"
+              />
+            </div>
+            <div class="col-12 col-md-6">
               <q-input
                 v-model="form.transition"
                 name="transition"
@@ -942,6 +968,8 @@ const form = ref({
   ap_account: null,
   ar_payment: null,
   ap_payment: null,
+  accrual_ap_chart: null,
+  accrual_ar_chart: null,
   transition: "",
   glnumber: "",
   lock_glnumber: false,
@@ -997,6 +1025,7 @@ const fxgainlossOptions = ref([]);
 const cashovershortOptions = ref([]);
 const arOptions = ref([]);
 const apOptions = ref([]);
+const allOptions = ref([]);
 const arPaymentOptions = ref([]);
 const apPaymentOptions = ref([]);
 
@@ -1243,6 +1272,7 @@ async function loadDefaults() {
     apPaymentOptions.value = parseAccountOptions(
       filterAPPaymentAccounts(data.all_accounts),
     );
+    allOptions.value = parseAccountOptions(data.all_accounts || []);
 
     // Company Info
     form.value.company = data.company_info?.name || "";
@@ -1318,6 +1348,16 @@ async function loadDefaults() {
       findAccountById(
         data.all_accounts,
         data.account_defaults?.ap_payment_id,
+      ) || null;
+    form.value.accrual_ap_chart =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.accrual_ap_chart_id,
+      ) || null;
+    form.value.accrual_ar_chart =
+      findAccountById(
+        data.all_accounts,
+        data.account_defaults?.accrual_ar_chart_id,
       ) || null;
 
     // Number Sequences
@@ -1435,6 +1475,8 @@ async function submitForm() {
         ap_account_id: form.value.ap_account?.id || null,
         ar_payment_id: form.value.ar_payment?.id || null,
         ap_payment_id: form.value.ap_payment?.id || null,
+        accrual_ap_chart_id: form.value.accrual_ap_chart?.id || null,
+        accrual_ar_chart_id: form.value.accrual_ar_chart?.id || null,
       },
 
       number_sequences: {

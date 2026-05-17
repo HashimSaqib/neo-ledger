@@ -296,6 +296,29 @@ const createLink = inject("createLink");
 const getPath = (row) => {
   if (!row || !row.module) return null;
 
+  // Accrual GL entries link back to their source AR/AP transaction
+  if (row.accrualSource) {
+    const { module, id, invoice } = row.accrualSource;
+    let path = "";
+    if (module === "ar") {
+      path = invoice
+        ? createLink("customer.invoice")
+        : createLink("customer.transaction");
+    } else if (module === "ap") {
+      path = invoice
+        ? createLink("vendor.invoice")
+        : createLink("vendor.transaction");
+    }
+    if (!path) return null;
+    return {
+      path,
+      query: {
+        id,
+        callback: createLink("base") + `/gl/reports`,
+      },
+    };
+  }
+
   let path = "";
 
   if (row.module === "gl") {

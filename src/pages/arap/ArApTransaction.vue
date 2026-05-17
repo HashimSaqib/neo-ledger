@@ -380,6 +380,14 @@
                   {{ t("View Document") }}
                 </a>
               </div>
+
+              <!-- Accrual dropdown — auto-opens when an existing accrual is loaded -->
+              <AccrualPanel
+                v-model="accrual"
+                :lines="accrualLines"
+                :default-startdate="invDate"
+                class="q-mt-md"
+              />
             </div>
 
             <!-- Items Section -->
@@ -924,6 +932,7 @@ import AddVC from "src/pages/arap/AddVC.vue";
 import FileList from "src/components/FileList.vue";
 import LastTransactions from "src/components/LastTransactions.vue";
 import BankAccountForm from "src/components/BankAccountForm.vue";
+import AccrualPanel from "src/components/AccrualPanel.vue";
 
 // Import neoledger configuration
 import neoledgerConfig from "../../../neoledger.json";
@@ -1127,6 +1136,10 @@ const link = ref("");
 const taxIncluded = ref(false);
 const invoiceTaxes = ref([]);
 const selectedTransferStation = ref(null);
+
+// Accrual config + posted schedule preview (from API)
+const accrual = ref(null);
+const accrualLines = ref([]);
 
 // -------------------------
 // Line Items Management
@@ -1744,6 +1757,7 @@ const postInvoice = async (save = true, isNew = false) => {
     })),
     payment_file: paymentFile.value,
     payment_amount: payment_amount.value,
+    accrual: accrual.value,
   };
 
   if (selectedDepartment.value) {
@@ -2002,6 +2016,19 @@ const loadInvoice = async (invoice) => {
     invNumber.value = invoice.invNumber || "";
     description.value = invoice.description || "";
     invId.value = invoice.id;
+
+    // Hydrate the accrual dropdown when present
+    if (invoice.accrual && invoice.accrual.period) {
+      accrual.value = {
+        period: invoice.accrual.period,
+        length: invoice.accrual.length,
+        startdate: invoice.accrual.startdate,
+      };
+      accrualLines.value = invoice.accrual.lines || [];
+    } else {
+      accrual.value = null;
+      accrualLines.value = [];
+    }
 
     if (reverse.value === "reverse") {
       invNumber.value = "REVERSE-" + (invoice.invNumber || "");

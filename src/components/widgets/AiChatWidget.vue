@@ -92,6 +92,7 @@
       ref="scrollRef"
       class="chat-scroll"
       :class="{ 'chat-scroll--empty': isEmptyState }"
+      @click="onChatScrollClick"
     >
       <!-- Empty state -->
       <div v-if="isEmptyState" class="empty-state">
@@ -102,7 +103,7 @@
         <p class="empty-desc">
           {{
             t(
-              "I can answer questions about your ledger data. I only share natural-language answers — never raw rows or SQL.",
+              "Get instant answers about your invoices, customers, payments, and more — or ask how to get things done in Neo-Ledger.",
             )
           }}
         </p>
@@ -293,7 +294,7 @@ import {
   watch,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { Notify } from "quasar";
 import { isAxiosError } from "axios";
 import { api } from "src/boot/axios";
@@ -306,6 +307,7 @@ import { formatAmount, formatDate, PDF_STYLES } from "src/helpers/utils";
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 
 const props = defineProps({
   isDragging: {
@@ -550,8 +552,8 @@ const canSend = computed(
 const suggestions = [
   t("Summarize this month's cash position"),
   t("Show my top customers by outstanding balance"),
-  t("What's our year-over-year revenue change?"),
   t("List any overdue invoices over 30 days"),
+  t("How do I set up bank accounts?"),
 ];
 
 const useSuggestion = (text) => {
@@ -1039,6 +1041,29 @@ marked.use({
   },
 });
 
+// Rewrite anchor tags in the already-sanitized chat HTML so:
+//   - Links to https://docs.neo-ledger.com/... open in a new tab.
+//   - Internal absolute SPA paths (starting with "/", but not "//") get a
+//     marker class so onChatScrollClick can route them via vue-router
+//     instead of triggering a full page reload.
+// Anything else (other external URLs) is left untouched; DOMPurify has
+// already stripped javascript:, data: and similar dangerous schemes.
+const rewriteChatLinks = (htmlStr) => {
+  if (!htmlStr || htmlStr.indexOf("<a") === -1) return htmlStr;
+  const doc = new DOMParser().parseFromString(htmlStr, "text/html");
+  const anchors = doc.body.querySelectorAll("a[href]");
+  for (const a of anchors) {
+    const href = a.getAttribute("href") || "";
+    if (href.startsWith("https://docs.neo-ledger.com")) {
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener noreferrer");
+    } else if (href.startsWith("/") && !href.startsWith("//")) {
+      a.classList.add("ai-chat-internal-link");
+    }
+  }
+  return doc.body.innerHTML;
+};
+
 const renderMarkdown = (msg) => {
   if (!msg || !msg.content) return "";
   currentAmountColumns =
@@ -1058,15 +1083,35 @@ const renderMarkdown = (msg) => {
     if (msg.tableCount !== currentTableCache.length) {
       msg.tableCount = currentTableCache.length;
     }
+    const linked = rewriteChatLinks(sanitized);
     // Final pass: replace any {{amt:X}} / {{date:X}} markers the model
     // emitted with user-locale-formatted values. Safe to run on the
     // already-sanitized HTML because the marker characters `{}:` are not
     // HTML-significant and formatAmount / formatDate produce plain text.
-    return applyValueMarkersHtml(sanitized);
+    return applyValueMarkersHtml(linked);
   } finally {
     currentAmountColumns = null;
     currentTableCache = null;
   }
+};
+
+// Delegated click handler for the chat scroll area. Intercepts clicks on
+// internal SPA links emitted by the assistant so they navigate via
+// vue-router instead of doing a full page reload. The marker class is
+// added by rewriteChatLinks; we re-check the href here as a defence in
+// depth so we never accidentally hijack an off-site link.
+const onChatScrollClick = (event) => {
+  const a = event.target && event.target.closest
+    ? event.target.closest("a.ai-chat-internal-link")
+    : null;
+  if (!a) return;
+  if (event.defaultPrevented) return;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (event.button !== undefined && event.button !== 0) return;
+  const href = a.getAttribute("href") || "";
+  if (!href.startsWith("/") || href.startsWith("//")) return;
+  event.preventDefault();
+  router.push(href).catch(() => {});
 };
 
 // Drag handoff — only trigger drag from the header background, never when the
