@@ -328,6 +328,13 @@
                 dense
                 class="q-ml-md"
               />
+              <q-checkbox
+                v-model="form.accrual_by_ai"
+                name="accrual_by_ai"
+                :label="t('Accrual by AI')"
+                dense
+                class="q-ml-md"
+              />
             </div>
           </div>
         </q-tab-panel>
@@ -957,6 +964,7 @@ const form = ref({
   xelatex: false,
   paymentfile: false,
   paymentfile_workflow: false,
+  accrual_by_ai: false,
   typeofcontact: "",
   hideaccounts: false,
   linetax: false,
@@ -1306,6 +1314,7 @@ async function loadDefaults() {
     form.value.xelatex = data.settings?.xe_latex || false;
     form.value.paymentfile = data.settings?.paymentfile ? true : false;
     form.value.paymentfile_workflow = data.settings?.paymentfile_workflow ? true : false;
+    form.value.accrual_by_ai = data.settings?.accrual_by_ai ? true : false;
     form.value.typeofcontact = data.settings?.type_of_contact || "";
 
     // Account Defaults - Find complete account objects by ID
@@ -1462,6 +1471,7 @@ async function submitForm() {
         xe_latex: form.value.xelatex,
         paymentfile: form.value.paymentfile,
         paymentfile_workflow: form.value.paymentfile_workflow,
+        accrual_by_ai: form.value.accrual_by_ai,
         type_of_contact: form.value.typeofcontact,
       },
 
